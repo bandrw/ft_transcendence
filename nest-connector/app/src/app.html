@@ -10,10 +10,18 @@
     <div id="app">
         <div v-if="authorized"
              :class="{ chat_closed: !show_chat, chat_opened: show_chat }"
-             v-on:click="show_chat=!show_chat"
-             >{{ type }}</div>
+             v-on:click="showChat">
+            <p>{{ type }}</p>
+            <div v-if="show_chat"
+                    class="chat_users_side">
+                <div class="user_in_chat"
+                     v-for="user in users">
+                    <p>{{ user.name }} {{ user.online }}</p>
+                </div>
+            </div>
+        </div>
         <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }"
-             v-on:click="showChat">{{ user }} {{ user_status }}</div>
+             v-on:click="authorize">{{ user }} {{ user_status }}</div>
         <div v-on:click="findGame"
                 :class="{ search_ladder: !find_game, finding_game: find_game }"
                 v-if="authorized">{{ ladder }}</div>

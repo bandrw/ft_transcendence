@@ -10,9 +10,23 @@ let app = new Vue({
     chat_state: 'chat_closed',
     ladder: 'play',
     find_game: false,
+    users: [
+      {
+        name: 'Mark',
+        id: 1,
+        game_status: false,
+        online: true,
+      },
+      {
+        name: 'Ivan',
+        id: 2,
+        game_status: false,
+        online: false,
+      },
+    ],
   },
   methods: {
-    showChat() {
+    authorize() {
       if (this.authorized) {
         this.authorized = false;
         this.show_chat = false;
@@ -30,6 +44,13 @@ let app = new Vue({
       } else {
         this.ladder = 'finding game';
         this.find_game = true;
+      }
+    },
+    showChat() {
+      if (this.show_chat) {
+        this.show_chat = false;
+      } else {
+        this.show_chat = true;
       }
     },
   },

@@ -19,6 +19,19 @@ body {
     bottom: 0;
 }
 
+.chat_users_side {
+    width: 33%;
+    height: 85%;
+    background-color: aliceblue;
+    left: 1%;
+    position: absolute;
+    bottom: 2%;
+}
+
+.user_in_chat {
+    background-color: coral;
+}
+
 .user_authorized {
     width: 20%;
     height: 10%;
