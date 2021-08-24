@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  sql:
+    container_name: sql
+    build: ./PostgreSQL/
+    ports:
+    - "5432:5432"
+    networks:
+      - transcendence
+  nest:
+    container_name: nest-connector
+    command: npm run start:dev
+    build:
+      context: nest-connector
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nest-connector/app:/transcendence
+    networks:
+      transcendence:
+        ipv4_address: 172.20.0.5
+networks:
+  transcendence:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
