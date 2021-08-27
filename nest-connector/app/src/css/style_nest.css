@@ -1,36 +1,6 @@
 body {
     background-color: aquamarine;
 }
-.chat_closed {
-    width: 35%;
-    height: 8%;
-    background-color: burlywood;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-}
-
-.chat_opened {
-    width: 35%;
-    height: 40%;
-    background-color: blue;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-}
-
-.chat_users_side {
-    width: 33%;
-    height: 85%;
-    background-color: aliceblue;
-    left: 1%;
-    position: absolute;
-    bottom: 2%;
-}
-
-.user_in_chat {
-    background-color: coral;
-}
 
 .user_authorized {
     width: 20%;

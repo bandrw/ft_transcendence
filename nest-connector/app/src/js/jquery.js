@@ -5510,7 +5510,7 @@ jQuery.event = {
 			enumerable: true,
 			configurable: true,
 
-			get: isFunction( hook ) ?
+			get_users: isFunction( hook ) ?
 				function() {
 					if ( this.originalEvent ) {
 						return hook( this.originalEvent );

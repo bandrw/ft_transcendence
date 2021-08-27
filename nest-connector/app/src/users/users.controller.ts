@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { UsersService } from "./users.service";
+import { Controller, Get, Res } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
-    constructor(private UsersService: UsersService) {}
+  constructor(private UsersService: UsersService) {}
 
-    @Get()
-    usersApp() {
-        this.UsersService.create("user", "password");
-    }
+  @Get('create')
+  createUser() {
+    this.UsersService.create('user', 'password');
+  }
+  @Get('get')
+  getUsers(@Res() res: Response) {
+    this.UsersService.findAll(res);
+  }
 }

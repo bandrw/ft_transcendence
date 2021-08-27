@@ -1,29 +1,18 @@
-let app = new Vue({
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
+chat = require('./chat');
+
+new Vue({
   el: '#app',
   data: {
-    type: 'Chat',
-    user: 'User',
-    user_status: 'login',
     authorized: false,
     show_chat: false,
+    user: 'User',
+    user_status: 'login',
     user_class: 'user_unauthorized',
-    chat_state: 'chat_closed',
     ladder: 'play',
     find_game: false,
-    users: [
-      {
-        name: 'Mark',
-        id: 1,
-        game_status: false,
-        online: true,
-      },
-      {
-        name: 'Ivan',
-        id: 2,
-        game_status: false,
-        online: false,
-      },
-    ],
+    get_users: null,
   },
   methods: {
     authorize() {
@@ -46,12 +35,20 @@ let app = new Vue({
         this.find_game = true;
       }
     },
-    showChat() {
-      if (this.show_chat) {
-        this.show_chat = false;
-      } else {
-        this.show_chat = true;
-      }
-    },
+  },
+  modules: {
+    chat: 'chat',
+  },
+  mounted() {
+    axios
+      .get('/users/get')
+      .then(function (response) {
+        console.log('resp:');
+        this.get_users = 'response';
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   },
 });
