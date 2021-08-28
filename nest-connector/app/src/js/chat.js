@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
-Vue.component('chat', {
+
+let chat = Vue.component('chat', {
   props: {
     authorized: {
       type: Boolean,
@@ -17,7 +18,7 @@ Vue.component('chat', {
                       class="chat_users_side">
                   <div class="user_in_chat"
                        v-for="user in users">
-                      <p>{{ user.name }} {{ user.online }}</p>
+                      <p>{{ user.login }} {{ user.id }}</p>
                   </div>
               </div>
         </div>
@@ -26,20 +27,7 @@ Vue.component('chat', {
     return {
       type: 'Chat',
       show_chat: false,
-      users: [
-        {
-          name: 'Mark',
-          id: 1,
-          game_status: false,
-          online: true,
-        },
-        {
-          name: 'Ivan',
-          id: 2,
-          game_status: false,
-          online: false,
-        },
-      ],
+      users: null,
     };
   },
   methods: {
@@ -50,18 +38,11 @@ Vue.component('chat', {
         this.show_chat = true;
       }
     },
-    // getUsers() {
-    //   try {
-    //     const response = axios.get('/users/get');
-    //     this.get_users = 'users';
-    //     console.log(response);
-    //     return response;
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // },
   },
-  components: {
-    chat: 'chat',
+  async mounted() {
+    this.users = await axios.get('/users/get').then(function (response) {
+      console.log(response.data);
+      return response.data;
+    });
   },
 });

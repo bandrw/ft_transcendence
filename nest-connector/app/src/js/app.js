@@ -6,19 +6,15 @@ new Vue({
   el: '#app',
   data: {
     authorized: false,
-    show_chat: false,
     user: 'User',
     user_status: 'login',
-    user_class: 'user_unauthorized',
     ladder: 'play',
     find_game: false,
-    get_users: null,
   },
   methods: {
     authorize() {
       if (this.authorized) {
         this.authorized = false;
-        this.show_chat = false;
         this.find_game = false;
         this.user_status = 'login';
       } else {
@@ -40,15 +36,6 @@ new Vue({
     chat: 'chat',
   },
   mounted() {
-    axios
-      .get('/users/get')
-      .then(function (response) {
-        console.log('resp:');
-        this.get_users = 'response';
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    console.log('vue app mounted');
   },
 });
