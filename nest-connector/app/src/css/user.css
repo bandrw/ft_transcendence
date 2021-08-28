@@ -1,0 +1,44 @@
+.user_authorized {
+    width: 20%;
+    height: 10%;
+    background-color: crimson;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.user_unauthorized {
+    width: 35%;
+    height: 30%;
+    background-color: chartreuse;
+    position: absolute;
+    right: 33%;
+    bottom: 35%;
+}
+
+.user_login_button {
+    width: 30%;
+    height: 30%;
+    background-color: gold;
+    position: absolute;
+    right: 15%;
+    bottom: 15%;
+}
+
+.user_logout_button {
+    width: 30%;
+    height: 74%;
+    background-color: chocolate;
+    position: absolute;
+    top: 25%;
+    right: 1%;
+}
+
+.user_settings_button {
+    width: 67%;
+    height: 74%;
+    background-color: green;
+    position: absolute;
+    top: 25%;
+    left: 1%;
+}

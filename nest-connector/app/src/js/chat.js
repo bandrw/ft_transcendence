@@ -1,17 +1,17 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 
-let chat = Vue.component('chat', {
+Vue.component('chat', {
   props: {
     authorized: {
       type: Boolean,
       required: true,
     },
   },
-  template: `<div v-if="authorized"
-             :class="{ chat_closed: !show_chat, chat_opened: show_chat }"
+  template: `<div :class="classGame"
              v-on:click="showChat">
-                <div class="chat_performance">
+                <div class="chat_performance" 
+                  v-if="authorized">
                     {{ type }}
                 </div>
               <div v-if="show_chat"
@@ -30,6 +30,18 @@ let chat = Vue.component('chat', {
       users: null,
     };
   },
+  computed: {
+    classGame: function () {
+      if (this.authorized) {
+        return {
+          chat_opened: this.show_chat,
+          chat_closed: !this.show_chat,
+        };
+      } else {
+        this.show_chat = false;
+      }
+    },
+  },
   methods: {
     showChat() {
       if (this.show_chat) {
@@ -40,8 +52,7 @@ let chat = Vue.component('chat', {
     },
   },
   async mounted() {
-    this.users = await axios.get('/users/get').then(function (response) {
-      console.log(response.data);
+    this.users = await axios.get('/users/getAll').then(function (response) {
       return response.data;
     });
   },

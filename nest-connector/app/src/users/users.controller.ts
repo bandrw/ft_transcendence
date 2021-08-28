@@ -1,4 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Res, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Response } from 'express';
 
@@ -10,8 +10,12 @@ export class UsersController {
   createUser() {
     this.UsersService.create('user', 'password');
   }
-  @Get('get')
+  @Get('getAll')
   getUsers(@Res() res: Response) {
     this.UsersService.findAll(res);
+  }
+  @Get('del')
+  delUser(@Query('id') id) {
+    this.UsersService.remove(id);
   }
 }

@@ -5,24 +5,13 @@
     <title id="title">hello</title>
     <link rel="stylesheet" type="text/css" href="css/style_nest.css">
     <link rel="stylesheet" type="text/css" href="css/chat.css">
+    <link rel="stylesheet" type="text/css" href="css/user.css">
+    <link rel="stylesheet" type="text/css" href="css/game.css">
     <script src="js/jquery.js"></script>
 </head>
 <body>
     <div id="app">
-        <chat :authorized="authorized"></chat>
-        <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
-            {{ user }}
-            <div v-if="authorized">
-                <div class="user_logout_button" v-on:click="authorize"> {{ user_status }}</div>
-                <div class="user_settings_button">settings</div>
-            </div>
-            <div v-else>
-                <div class="user_login_button" v-on:click="authorize"> {{ user_status }}</div>
-            </div>
-        </div>
-        <div v-on:click="findGame"
-                :class="{ search_ladder: !find_game, finding_game: find_game }"
-                v-if="authorized">{{ ladder }}</div>
+        <user></user>
     </div>
     <script src="js/vue.js"></script>
     <script src="js/build.js"></script>

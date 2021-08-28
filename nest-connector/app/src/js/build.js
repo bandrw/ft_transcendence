@@ -1779,61 +1779,30 @@ process.umask = function() { return 0; };
 },{}],29:[function(require,module,exports){
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
-chat = require('./chat');
+user = require('./user');
 
 new Vue({
   el: '#app',
-  data: {
-    authorized: false,
-    user: 'User',
-    user_status: 'login',
-    ladder: 'play',
-    find_game: false,
-  },
-  methods: {
-    authorize() {
-      if (this.authorized) {
-        this.authorized = false;
-        this.find_game = false;
-        this.user_status = 'login';
-      } else {
-        this.user_status = 'logout';
-        this.authorized = true;
-      }
-    },
-    findGame() {
-      if (this.find_game) {
-        this.ladder = 'play';
-        this.find_game = false;
-      } else {
-        this.ladder = 'finding game';
-        this.find_game = true;
-      }
-    },
-  },
   modules: {
-    chat: 'chat',
-  },
-  mounted() {
-    console.log('vue app mounted');
+    user: 'user',
   },
 });
 
-},{"./chat":30,"axios":1}],30:[function(require,module,exports){
+},{"./user":32,"axios":1}],30:[function(require,module,exports){
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 
-let chat = Vue.component('chat', {
+Vue.component('chat', {
   props: {
     authorized: {
       type: Boolean,
       required: true,
     },
   },
-  template: `<div v-if="authorized"
-             :class="{ chat_closed: !show_chat, chat_opened: show_chat }"
+  template: `<div :class="classGame"
              v-on:click="showChat">
-                <div class="chat_performance">
+                <div class="chat_performance" 
+                  v-if="authorized">
                     {{ type }}
                 </div>
               <div v-if="show_chat"
@@ -1852,6 +1821,18 @@ let chat = Vue.component('chat', {
       users: null,
     };
   },
+  computed: {
+    classGame: function () {
+      if (this.authorized) {
+        return {
+          chat_opened: this.show_chat,
+          chat_closed: !this.show_chat,
+        };
+      } else {
+        this.show_chat = false;
+      }
+    },
+  },
   methods: {
     showChat() {
       if (this.show_chat) {
@@ -1862,11 +1843,173 @@ let chat = Vue.component('chat', {
     },
   },
   async mounted() {
-    this.users = await axios.get('/users/get').then(function (response) {
-      console.log(response.data);
+    this.users = await axios.get('/users/getAll').then(function (response) {
       return response.data;
     });
   },
 });
 
-},{"axios":1}]},{},[29]);
+},{"axios":1}],31:[function(require,module,exports){
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   game.js                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
+/*   Updated: 2021/08/29 02:40:35 by pfile            ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+Vue.component('game', {
+  props: {
+    authorized: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  template: `<div v-on:click="findGame"
+                  :class="classGame">
+                  <div v-if="enemy">
+                    <div class="accept_button">{{ ladder }}</div>
+                    <div class="decline_button" v-on:click="cancel">cancel</div>
+                    <div class="enemy_status">{{ str_timer }}</div>
+                  </div>
+                  <div v-else>
+                    <p v-if="authorized">{{ ladder }}
+                    <div v-if="gameFinding">{{ str_timer }}
+                        <div class="cancel" v-on:click="cancel">cancel</div>
+                    </div>
+                  </p>
+                  </div>
+             </div>`,
+  data() {
+    return {
+      ladder: 'play',
+      game: false,
+      enemy: false,
+      timer: 0,
+      str_timer: null,
+    };
+  },
+  computed: {
+    gameFinding: function () {
+      return this.game && !this.enemy && this.authorized;
+    },
+    classGame: function () {
+      if (this.authorized) {
+        return {
+          search_ladder: !this.enemy,
+          game_accept: this.enemy,
+        };
+      } else {
+        clearInterval(this.id);
+        this.clearData();
+      }
+    },
+  },
+  methods: {
+    clearData() {
+      this.game = false;
+      this.enemy = false;
+      this.ladder = 'play';
+      this.timer = 0;
+      this.str_timer = null;
+      this.id = null;
+    },
+    cancel(e) {
+      clearInterval(this.id);
+      this.clearData();
+      e.stopPropagation();
+    },
+    waiting() {
+      this.timer = 10;
+      this.str_timer = null;
+      this.ladder = 'accept';
+      this.id = setInterval(
+        function () {
+          if (this.authorized && this.timer > 0.1) {
+            this.timer -= 0.1;
+            if (this.timer < 3) {
+              this.str_timer = this.timer.toFixed(1);
+            } else if (this.timer < 7) {
+              this.str_timer = this.timer.toFixed(0);
+            }
+          } else {
+            clearInterval(this.id);
+            this.clearData();
+          }
+        }.bind(this),
+        100,
+      );
+    },
+    findGame() {
+      if (!this.enemy && !this.game) {
+        this.game = true;
+        this.ladder = 'search ...';
+        this.id = setInterval(
+          function () {
+            if (this.authorized) {
+              this.timer += 0.1;
+              this.str_timer = this.timer.toFixed(1);
+              if (this.timer >= 3) {
+                this.enemy = true;
+                clearInterval(this.id);
+                this.waiting();
+              }
+            } else {
+              clearInterval(this.id);
+              this.clearData();
+            }
+          }.bind(this),
+          100,
+        );
+      }
+    },
+  },
+});
+
+},{}],32:[function(require,module,exports){
+chat = require('./chat');
+chat = require('./game');
+
+Vue.component('user', {
+  template: `<div>
+              <chat :authorized="authorized"></chat>
+              <game :authorized="authorized"></game>
+              <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
+                <div v-if="authorized">
+                    <div class="user_logout_button" v-on:click="authorize"> {{ user_status }}</div>
+                    <div class="user_settings_button">settings</div>
+                </div>
+                <div v-else>
+                    <div class="user_login_button" v-on:click="authorize"> {{ user_status }}</div>
+                </div>
+              </div>
+             </div>`,
+  data() {
+    return {
+      authorized: false,
+      user: 'User',
+      user_status: 'login',
+      ladder: 'play',
+    };
+  },
+  methods: {
+    authorize() {
+      if (this.authorized) {
+        this.authorized = false;
+        this.user_status = 'login';
+      } else {
+        this.user_status = 'logout';
+        this.authorized = true;
+      }
+    },
+  },
+  modules: {
+    user: 'chat',
+    game: 'game',
+  },
+});
+
+},{"./chat":30,"./game":31}]},{},[29]);
