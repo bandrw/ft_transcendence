@@ -11,6 +11,9 @@ export class User_table {
   @Column()
   password: string;
 
+  @Column()
+  url_avatar: string;
+
   @Column({ default: true })
   isActive: boolean;
 }

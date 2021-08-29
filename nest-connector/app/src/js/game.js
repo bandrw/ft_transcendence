@@ -6,7 +6,7 @@
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/08/29 02:40:35 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/08/29 02:43:43 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 Vue.component('game', {
@@ -21,7 +21,7 @@ Vue.component('game', {
                   <div v-if="enemy">
                     <div class="accept_button">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancel">cancel</div>
-                    <div class="enemy_status">{{ str_timer }}</div>
+                    <div class="timeout">{{ str_timer }}</div>
                   </div>
                   <div v-else>
                     <p v-if="authorized">{{ ladder }}

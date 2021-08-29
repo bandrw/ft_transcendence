@@ -1799,19 +1799,25 @@ Vue.component('chat', {
       required: true,
     },
   },
-  template: `<div :class="classGame"
-             v-on:click="showChat">
-                <div class="chat_performance" 
-                  v-if="authorized">
-                    {{ type }}
-                </div>
-              <div v-if="show_chat"
-                      class="chat_users_side">
-                  <div class="user_in_chat"
-                       v-for="user in users">
-                      <p>{{ user.login }} {{ user.id }}</p>
+  template: `<div>
+               <div :class="classGame"
+               v-on:click="showChat">
+                  <div class="chat_performance" 
+                    v-if="authorized">
+                      {{ type }}
                   </div>
-              </div>
+                <div v-if="show_chat"
+                        class="chat_users_side">
+                    <div class="user_in_chat"
+                         v-for="user in users">
+                        <p v-on:mouseover="userInfo(user)" v-on:mouseout="info=false">{{ user.login }} {{ user.id }}</p>
+                    </div>
+                </div>
+          </div>
+          <div v-if="info" class="chat_user_info">
+            {{ user.login }} {{ user.id }}
+            <img :src="user.url_avatar" class="user_profile_avatar">
+          </div>
         </div>
   `,
   data() {
@@ -1819,6 +1825,8 @@ Vue.component('chat', {
       type: 'Chat',
       show_chat: false,
       users: null,
+      info: false,
+      user: null,
     };
   },
   computed: {
@@ -1830,10 +1838,15 @@ Vue.component('chat', {
         };
       } else {
         this.show_chat = false;
+        this.info = false;
       }
     },
   },
   methods: {
+    userInfo(user) {
+      this.info = true;
+      this.user = user;
+    },
     showChat() {
       if (this.show_chat) {
         this.show_chat = false;
@@ -1858,7 +1871,7 @@ Vue.component('chat', {
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/08/29 02:40:35 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/08/29 02:43:43 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 Vue.component('game', {
@@ -1873,7 +1886,7 @@ Vue.component('game', {
                   <div v-if="enemy">
                     <div class="accept_button">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancel">cancel</div>
-                    <div class="enemy_status">{{ str_timer }}</div>
+                    <div class="timeout">{{ str_timer }}</div>
                   </div>
                   <div v-else>
                     <p v-if="authorized">{{ ladder }}
@@ -1970,6 +1983,8 @@ Vue.component('game', {
 });
 
 },{}],32:[function(require,module,exports){
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
 chat = require('./chat');
 chat = require('./game');
 
@@ -1980,11 +1995,15 @@ Vue.component('user', {
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
                     <div class="user_logout_button" v-on:click="authorize"> {{ user_status }}</div>
-                    <div class="user_settings_button">settings</div>
+                    <div class="user_profile_button" v-on:click="showProfile">profile</div>
                 </div>
                 <div v-else>
                     <div class="user_login_button" v-on:click="authorize"> {{ user_status }}</div>
                 </div>
+              </div>
+              <div v-if="profile" class="user_profile">
+                <img :src="avatar" class="user_profile_avatar">
+                <div class="user_profile_close_button" v-on:click="showProfile">x</div>
               </div>
              </div>`,
   data() {
@@ -1993,12 +2012,28 @@ Vue.component('user', {
       user: 'User',
       user_status: 'login',
       ladder: 'play',
+      profile: false,
+      wins: 0,
+      loses: 0,
+      games: 0,
+      winP: 0,
+      loseP: 0,
+      avatar: null,
+      id: 5,
     };
   },
   methods: {
+    showProfile() {
+      if (this.profile) {
+        this.profile = false;
+      } else {
+        this.profile = true;
+      }
+    },
     authorize() {
       if (this.authorized) {
         this.authorized = false;
+        this.profile = false;
         this.user_status = 'login';
       } else {
         this.user_status = 'logout';
@@ -2010,6 +2045,14 @@ Vue.component('user', {
     user: 'chat',
     game: 'game',
   },
+  async mounted() {
+    this.id = Math.random();
+    this.avatar = await axios
+      .get('/users/avatar?id=' + this.id)
+      .then(function (response) {
+        return response.data;
+      });
+  },
 });
 
-},{"./chat":30,"./game":31}]},{},[29]);
+},{"./chat":30,"./game":31,"axios":1}]},{},[29]);

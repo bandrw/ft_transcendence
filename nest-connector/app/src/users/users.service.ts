@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User_table } from './user.entity';
 import { Response } from 'express';
+import { AvatarGenerator } from 'random-avatar-generator';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,8 @@ export class UsersService {
     const user = this.usersRepository.create();
     user.password = password;
     user.login = login;
+    const generator = new AvatarGenerator();
+    user.url_avatar = generator.generateRandomAvatar(login);
     await this.usersRepository.manager.save(user);
   }
 }

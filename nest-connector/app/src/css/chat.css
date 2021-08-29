@@ -34,3 +34,11 @@
     height: 9%;
     position: absolute;
 }
+
+.chat_user_info {
+    width: 15%;
+    height: 15%;
+    position: absolute;
+    background-color: chocolate;
+    text-align: right;
+}

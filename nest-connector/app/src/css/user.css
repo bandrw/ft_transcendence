@@ -34,11 +34,38 @@
     right: 1%;
 }
 
-.user_settings_button {
+.user_profile_button {
     width: 67%;
     height: 74%;
     background-color: green;
     position: absolute;
     top: 25%;
     left: 1%;
+}
+
+.user_profile {
+    width: 40%;
+    height: 30%;
+    background-color: darkviolet;
+    position: absolute;
+    top: 1%;
+    right: 21%;
+}
+
+.user_profile_close_button {
+    position: absolute;
+    top: 1%;
+    right: 1%;
+    width: 5%;
+    height: 12%;
+    text-align: center;
+    background-color: aqua;
+}
+
+.user_profile_avatar {
+    position: absolute;
+    left: 1%;
+    top: 1%;
+    width: 25%;
+    height: 50%;
 }

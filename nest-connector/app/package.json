@@ -58,7 +58,8 @@
     "typescript": "^4.3.5",
     "browserify": "latest",
     "watchify": "latest",
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "random-avatar-generator": "^2.0.0"
   },
   "jest": {
     "moduleFileExtensions": [
