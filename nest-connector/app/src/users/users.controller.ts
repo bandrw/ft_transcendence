@@ -24,9 +24,8 @@ export class UsersController {
     this.UsersService.remove(id);
   }
   @Get('avatar')
-  getAvatar(@Query('id') id): string {
-    const generator = new AvatarGenerator();
-    return generator.generateRandomAvatar(id);
+  async updateAvatar(@Query('login') login): Promise<string> {
+    return await this.UsersService.updateAvatar(login);
   }
   @Post(':login')
   async authentification(@Param() params, @Res() response: Response) {

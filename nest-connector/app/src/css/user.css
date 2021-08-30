@@ -69,3 +69,13 @@
     width: 25%;
     height: 50%;
 }
+
+#user_update_avatar {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    width: 5%;
+    height: 12%;
+    text-align: center;
+    background-color: beige;
+}

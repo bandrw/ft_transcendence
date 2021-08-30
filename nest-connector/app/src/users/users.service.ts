@@ -26,12 +26,20 @@ export class UsersService {
     const user = this.usersRepository.create();
     user.password = password;
     user.login = login;
-    user.salt = Math.random().toString();
+    const salt = Math.random().toString();
     const generator = new AvatarGenerator();
-    user.url_avatar = generator.generateRandomAvatar(user.salt);
+    user.url_avatar = generator.generateRandomAvatar(salt);
     await this.usersRepository.manager.save(user);
   }
-  // async update(field: string, new_val: any, login: string) {
-  //   await this.usersRepository.manager.update(this.findOne();
-  // }
+  async updateAvatar(login: string) {
+    const user = await this.usersRepository.findOne({
+      where: { login: login },
+    });
+    const salt = Math.random().toString();
+    const generator = new AvatarGenerator();
+    const ret = generator.generateRandomAvatar(salt);
+    user.url_avatar = ret;
+    await this.usersRepository.manager.save(user);
+    return ret;
+  }
 }
