@@ -1798,6 +1798,9 @@ Vue.component('chat', {
       type: Boolean,
       required: true,
     },
+    im: {
+      required: true,
+    },
   },
   template: `<div>
                <div :class="classGame"
@@ -1810,13 +1813,18 @@ Vue.component('chat', {
                         class="chat_users_side">
                     <div class="user_in_chat"
                          v-for="user in users">
-                        <p v-on:mouseover="userInfo(user)" v-on:mouseout="info=false">{{ user.login }} {{ user.id }}</p>
+                        <p v-on:mouseover="userInfo(user, $event)"
+                        v-if="user.id!=im.id">
+                        {{ user.login }}</p>
                     </div>
                 </div>
           </div>
-          <div v-if="info" class="chat_user_info">
-            {{ user.login }} {{ user.id }}
-            <img :src="user.url_avatar" class="user_profile_avatar">
+          <div v-if="info" class="chat_user_info"
+          :style="{ left: infoStyle.left, top: infoStyle.top }">
+            {{ user.login }}
+            <img :src="user.url_avatar"
+            class="user_profile_avatar">
+            <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
           </div>
         </div>
   `,
@@ -1827,6 +1835,10 @@ Vue.component('chat', {
       users: null,
       info: false,
       user: null,
+      infoStyle: {
+        left: null,
+        top: null,
+      },
     };
   },
   computed: {
@@ -1843,13 +1855,16 @@ Vue.component('chat', {
     },
   },
   methods: {
-    userInfo(user) {
+    userInfo(user, e) {
       this.info = true;
       this.user = user;
+      this.infoStyle.left = e.pageX.toString() + 'px';
+      this.infoStyle.top = e.pageY.toString() + 'px';
     },
     showChat() {
       if (this.show_chat) {
         this.show_chat = false;
+        this.info = false;
       } else {
         this.show_chat = true;
       }
@@ -1990,36 +2005,40 @@ chat = require('./game');
 
 Vue.component('user', {
   template: `<div>
-              <chat :authorized="authorized"></chat>
+              <chat :authorized="authorized" :im="im"></chat>
               <game :authorized="authorized"></game>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
-                    <div class="user_logout_button" v-on:click="authorize"> {{ user_status }}</div>
-                    <div class="user_profile_button" v-on:click="showProfile">profile</div>
+                    <div class="user_logout_button" v-on:click="authorize">logout</div>
+                    <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
                 <div v-else>
-                    <div class="user_login_button" v-on:click="authorize"> {{ user_status }}</div>
+                    <input v-model="login" type="text" 
+                    v-on:keyup.enter="authorize">
+                    <input v-model="password" type="password"
+                    v-on:keyup.enter="authorize">
+                    <p v-if="error">error!</p>
+                    <div class="user_login_button"
+                    v-on:click="authorize">login</div>
                 </div>
               </div>
               <div v-if="profile" class="user_profile">
-                <img :src="avatar" class="user_profile_avatar">
+                <img :src="im.url_avatar" class="user_profile_avatar">
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
               </div>
              </div>`,
   data() {
     return {
+      login: null,
+      password: null,
       authorized: false,
       user: 'User',
-      user_status: 'login',
       ladder: 'play',
       profile: false,
-      wins: 0,
-      loses: 0,
-      games: 0,
       winP: 0,
       loseP: 0,
-      avatar: null,
-      id: 5,
+      error: false,
+      im: null,
     };
   },
   methods: {
@@ -2030,28 +2049,27 @@ Vue.component('user', {
         this.profile = true;
       }
     },
-    authorize() {
+    async authorize() {
       if (this.authorized) {
         this.authorized = false;
         this.profile = false;
-        this.user_status = 'login';
+        this.login = null;
+        this.error = false;
       } else {
-        this.user_status = 'logout';
-        this.authorized = true;
+        this.im = await axios.post('/users/' + this.login).then(function (res) {
+          return res.data;
+        });
+        if (this.im) {
+          this.authorized = true;
+        } else {
+          this.error = true;
+        }
       }
     },
   },
   modules: {
     user: 'chat',
     game: 'game',
-  },
-  async mounted() {
-    this.id = Math.random();
-    this.avatar = await axios
-      .get('/users/avatar?id=' + this.id)
-      .then(function (response) {
-        return response.data;
-      });
   },
 });
 

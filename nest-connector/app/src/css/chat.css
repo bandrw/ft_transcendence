@@ -40,5 +40,14 @@
     height: 15%;
     position: absolute;
     background-color: chocolate;
-    text-align: right;
+    text-align: center;
+}
+.chat_user_profile_close_button {
+    position: absolute;
+    top: 1%;
+    right: 1%;
+    width: 5%;
+    height: 17%;
+    text-align: center;
+    background-color: aqua;
 }

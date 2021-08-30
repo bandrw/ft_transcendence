@@ -1,4 +1,4 @@
-import { Controller, Get, Res, Query } from '@nestjs/common';
+import { Controller, Get, Res, Query, Post, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Response } from 'express';
 import { AvatarGenerator } from 'random-avatar-generator';
@@ -27,5 +27,11 @@ export class UsersController {
   getAvatar(@Query('id') id): string {
     const generator = new AvatarGenerator();
     return generator.generateRandomAvatar(id);
+  }
+  @Post(':login')
+  async authentification(@Param() params, @Res() response: Response) {
+    if (params.login) {
+      response.send(await this.UsersService.findOne(params.login));
+    }
   }
 }

@@ -15,8 +15,8 @@ export class UsersService {
     response.send(await this.usersRepository.find());
   }
 
-  findOne(id: string): Promise<User_table> {
-    return this.usersRepository.findOne(id);
+  async findOne(login: string): Promise<User_table> {
+    return await this.usersRepository.findOne({ where: { login: login } });
   }
 
   async remove(id: string): Promise<void> {
@@ -26,8 +26,12 @@ export class UsersService {
     const user = this.usersRepository.create();
     user.password = password;
     user.login = login;
+    user.salt = Math.random().toString();
     const generator = new AvatarGenerator();
-    user.url_avatar = generator.generateRandomAvatar(login);
+    user.url_avatar = generator.generateRandomAvatar(user.salt);
     await this.usersRepository.manager.save(user);
   }
+  // async update(field: string, new_val: any, login: string) {
+  //   await this.usersRepository.manager.update(this.findOne();
+  // }
 }

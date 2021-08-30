@@ -5,36 +5,40 @@ chat = require('./game');
 
 Vue.component('user', {
   template: `<div>
-              <chat :authorized="authorized"></chat>
+              <chat :authorized="authorized" :im="im"></chat>
               <game :authorized="authorized"></game>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
-                    <div class="user_logout_button" v-on:click="authorize"> {{ user_status }}</div>
-                    <div class="user_profile_button" v-on:click="showProfile">profile</div>
+                    <div class="user_logout_button" v-on:click="authorize">logout</div>
+                    <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
                 <div v-else>
-                    <div class="user_login_button" v-on:click="authorize"> {{ user_status }}</div>
+                    <input v-model="login" type="text" 
+                    v-on:keyup.enter="authorize">
+                    <input v-model="password" type="password"
+                    v-on:keyup.enter="authorize">
+                    <p v-if="error">error!</p>
+                    <div class="user_login_button"
+                    v-on:click="authorize">login</div>
                 </div>
               </div>
               <div v-if="profile" class="user_profile">
-                <img :src="avatar" class="user_profile_avatar">
+                <img :src="im.url_avatar" class="user_profile_avatar">
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
               </div>
              </div>`,
   data() {
     return {
+      login: null,
+      password: null,
       authorized: false,
       user: 'User',
-      user_status: 'login',
       ladder: 'play',
       profile: false,
-      wins: 0,
-      loses: 0,
-      games: 0,
       winP: 0,
       loseP: 0,
-      avatar: null,
-      id: 5,
+      error: false,
+      im: null,
     };
   },
   methods: {
@@ -45,27 +49,26 @@ Vue.component('user', {
         this.profile = true;
       }
     },
-    authorize() {
+    async authorize() {
       if (this.authorized) {
         this.authorized = false;
         this.profile = false;
-        this.user_status = 'login';
+        this.login = null;
+        this.error = false;
       } else {
-        this.user_status = 'logout';
-        this.authorized = true;
+        this.im = await axios.post('/users/' + this.login).then(function (res) {
+          return res.data;
+        });
+        if (this.im) {
+          this.authorized = true;
+        } else {
+          this.error = true;
+        }
       }
     },
   },
   modules: {
     user: 'chat',
     game: 'game',
-  },
-  async mounted() {
-    this.id = Math.random();
-    this.avatar = await axios
-      .get('/users/avatar?id=' + this.id)
-      .then(function (response) {
-        return response.data;
-      });
   },
 });

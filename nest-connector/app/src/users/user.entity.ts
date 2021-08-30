@@ -12,6 +12,9 @@ export class User_table {
   password: string;
 
   @Column()
+  salt: string;
+
+  @Column()
   url_avatar: string;
 
   @Column({ default: true })
