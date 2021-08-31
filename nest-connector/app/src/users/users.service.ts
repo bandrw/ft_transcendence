@@ -4,6 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User_table } from './user.entity';
 import { Response } from 'express';
 import { AvatarGenerator } from 'random-avatar-generator';
+import {webcrypto} from "crypto";
 
 @Injectable()
 export class UsersService {

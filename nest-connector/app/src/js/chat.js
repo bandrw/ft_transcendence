@@ -21,10 +21,10 @@ Vue.component('chat', {
                 <div v-if="show_chat"
                         class="chat_users_side">
                     <div class="user_in_chat"
-                         v-for="user in users">
-                        <p v-on:mouseover="userInfo(user, $event)"
+                         v-for="user in users"
+                        v-on:mouseover="userInfo(user, $event)"
                         v-if="user.id!=im.id">
-                        {{ user.login }}</p>
+                        {{ user.login }}
                     </div>
                 </div>
           </div>

@@ -79,3 +79,53 @@
     text-align: center;
     background-color: beige;
 }
+
+.tab {
+    text-align: left;
+    width: 20%;
+    background-color: beige;
+    font-size: larger;
+    margin: 1%;
+    top: 5%;
+}
+
+.active_tab {
+    text-decoration: underline;
+}
+
+.input {
+    margin: 2%;
+}
+
+#intra_img {
+    width: 12%;
+    height: 27%;
+    right: 5%;
+    top: 10%;
+    position: absolute;
+    object-position: 75% 25%;
+}
+
+#user_register_login {
+    position: absolute;
+    top: 20%;
+    left: 5%;
+}
+
+#user_register_pass1 {
+    position: absolute;
+    top: 45%;
+    left: 5%;
+}
+
+#user_register_pass2 {
+    position: absolute;
+    top: 70%;
+    left: 5%;
+}
+
+#user_register_error_message {
+    position: absolute;
+    top: 10%;
+    right: 5%;
+}

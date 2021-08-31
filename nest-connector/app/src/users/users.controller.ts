@@ -1,19 +1,23 @@
-import { Controller, Get, Res, Query, Post, Param } from '@nestjs/common';
+import { Controller, Get, Res, Query, Post, Param, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Response } from 'express';
-import { AvatarGenerator } from 'random-avatar-generator';
+import { Response, Request } from 'express';
 
 @Controller('users')
 export class UsersController {
   constructor(private UsersService: UsersService) {}
 
-  @Get('create')
-  createUser(@Query('login') login, @Query('password') pass) {
-    if (login && pass) {
-      this.UsersService.create(login, pass);
-    } else {
-      console.log('error: ' + login + ' ' + pass);
+  @Post('create')
+  async createUser(@Req() req: Request, @Res() res: Response) {
+    const bad = ' /|;<>&?:{}[]()';
+    for (let i = 0; i < req.body.login.length; i++) {
+      for (let k = 0; k < bad.length; k++) {
+        if (req.body.login[i] === bad[k]) {
+          res.send(bad[k]);
+          return;
+        }
+      }
     }
+    await this.UsersService.create(req.body.login, req.body.pass);
   }
   @Get('getAll')
   getUsers(@Res() res: Response) {
