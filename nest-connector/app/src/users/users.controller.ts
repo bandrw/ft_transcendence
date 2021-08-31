@@ -17,6 +17,7 @@ export class UsersController {
         }
       }
     }
+    res.send(true);
     await this.UsersService.create(req.body.login, req.body.pass);
   }
   @Get('getAll')

@@ -29982,7 +29982,7 @@ const axios = require('axios');
 chat = require('./chat');
 chat = require('./game');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-var bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 
 Vue.component('user_register', {
   template: `<div><div id="user_register_login">login: <input v-model="login" type="text"
@@ -30028,7 +30028,7 @@ Vue.component('user_register', {
                   }
                 } else {
                   this.error = null;
-                  console.log(res.data);
+                  this.$emit('register', this.login);
                 }
               }.bind(this),
             );
@@ -30095,13 +30095,17 @@ Vue.component('user', {
                 <div v-else>
                     <span v-for="tab in auth"  class="tab"
                     v-on:click="selectedAuth=tab"
-                    
+                    v-show="selectedAuth!=='another'"
                     :class="{ active_tab: selectedAuth === tab }">
                     {{ tab }}
                     </span>
                     <user_login v-show="selectedAuth === 'login'"
                     :error="error" @authorization="authorize"></user_login>
-                    <user_register v-show="selectedAuth === 'registration'"></user_register>
+                    <user_register
+                    v-show="selectedAuth === 'registration'"
+                    @register="thankYou"></user_register>
+                    <div v-show="selectedAuth === 'another'"
+                    id="thank_you"><h4>{{ message }}</h4></div>
                 </div>
               </div>
               <div v-if="profile" class="user_profile">
@@ -30122,9 +30126,21 @@ Vue.component('user', {
       im: null,
       auth: ['login', 'registration'],
       selectedAuth: 'login',
+      message: null,
     };
   },
   methods: {
+    thankYou(login) {
+      console.log('TY');
+      this.selectedAuth = 'another';
+      this.message = 'Hello ' + login + '! Thank you for registration';
+      setTimeout(
+        function () {
+          this.selectedAuth = 'login';
+        }.bind(this),
+        3500,
+      );
+    },
     async updateAvatar() {
       this.im.url_avatar = await axios
         .get('/users/avatar?login=' + this.im.login)
