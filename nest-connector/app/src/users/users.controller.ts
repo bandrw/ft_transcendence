@@ -34,8 +34,6 @@ export class UsersController {
   }
   @Post(':login')
   async authentification(@Param() params, @Res() response: Response) {
-    if (params.login) {
-      response.send(await this.UsersService.findOne(params.login));
-    }
+    response.send(await this.UsersService.findOne(params.login));
   }
 }

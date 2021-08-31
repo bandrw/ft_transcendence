@@ -30061,12 +30061,15 @@ Vue.component('user_login', {
       type: Boolean,
       required: true,
     },
+    error_message: {
+      required: true,
+    },
   },
   template: `<div style="margin-left: 5%">login: <input v-model="login" type="text" class="input"
                     v-on:keyup.enter="authorize"><br>
                     pass: <input v-model="password" type="password" class="input"
                     v-on:keyup.enter="authorize">
-                    <p v-if="error">error!</p>
+                    <p v-if="error">error: {{ error_message }}</p>
                     <div class="user_login_button"
                     v-on:click="authorize">login</div>
                     <img src="https://yt3.ggpht.com/ytc/AAUvwniWlUa-gZ5YNz8-2Mtada9CZOHaX8o4nGaq5JWc=s900-c-k-c0x00ffffff-no-rj" id="intra_img"></div>`,
@@ -30100,7 +30103,8 @@ Vue.component('user', {
                     {{ tab }}
                     </span>
                     <user_login v-show="selectedAuth === 'login'"
-                    :error="error" @authorization="authorize"></user_login>
+                    :error="error" :error_message="error_message"
+                    @authorization="authorize"></user_login>
                     <user_register
                     v-show="selectedAuth === 'registration'"
                     @register="thankYou"></user_register>
@@ -30123,6 +30127,7 @@ Vue.component('user', {
       winP: 0,
       loseP: 0,
       error: false,
+      error_message: null,
       im: null,
       auth: ['login', 'registration'],
       selectedAuth: 'login',
@@ -30138,7 +30143,7 @@ Vue.component('user', {
         function () {
           this.selectedAuth = 'login';
         }.bind(this),
-        3500,
+        3000,
       );
     },
     async updateAvatar() {
@@ -30162,13 +30167,29 @@ Vue.component('user', {
         this.login = null;
         this.error = false;
       } else {
+        if (!login) {
+          this.error = true;
+          this.error_message = 'please enter login';
+          return;
+        } else if (!password) {
+          this.error = true;
+          this.error_message = 'please enter password';
+          return;
+        }
         this.im = await axios.post('/users/' + login).then(function (res) {
           return res.data;
         });
         if (this.im) {
-          this.authorized = true;
+          if (bcrypt.compareSync(password, this.im.password)) {
+            this.authorized = true;
+            this.password = null;
+          } else {
+            this.error_message = 'Wrong password';
+            this.error = true;
+          }
         } else {
           this.error = true;
+          this.error_message = "User with login '" + login + "' not registered";
         }
       }
     },
