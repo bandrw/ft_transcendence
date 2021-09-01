@@ -8,6 +8,7 @@ Vue.component('chat', {
       required: true,
     },
     im: {
+      // type: Object,
       required: true,
     },
   },

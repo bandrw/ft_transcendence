@@ -43,13 +43,14 @@ Vue.component('user_register', {
                 if (res.data.length === 1) {
                   for (let k = 0; k < bad.length; k++) {
                     if (res.data === bad[k]) {
-                      this.error = "bad symbol: '" + bad[k] + "'";
+                      this.error = "bad symbol in login: '" + bad[k] + "'";
                       return;
                     }
                   }
                 } else {
                   this.error = null;
                   this.$emit('register', this.login);
+                  this.login = null;
                 }
               }.bind(this),
             );
@@ -57,11 +58,17 @@ Vue.component('user_register', {
       );
     },
     async register() {
-      if (!this.login || this.login.length < 4) {
+      if (!this.login) {
+        this.error = 'please enter login';
+      } else if (!this.password1) {
+        this.error = 'please enter password';
+      } else if (!this.password2) {
+        this.error = 'please enter password again';
+      } else if (this.login.length < 4) {
         this.error = 'login too short';
       } else if (this.password1 !== this.password2) {
         this.error = 'passwords are not equal';
-      } else if (!this.password1 || this.password1.length < 6) {
+      } else if (this.password1.length < 6) {
         this.error = 'password too short';
       } else if (
         await axios.post('/users/' + this.login).then(function (res) {
@@ -99,21 +106,13 @@ Vue.component('user_login', {
   methods: {
     authorize() {
       this.$emit('authorization', this.login, this.password);
+      this.password = null;
     },
   },
 });
 
-Vue.component('user', {
-  template: `<div>
-              <chat :authorized="authorized" :im="im"></chat>
-              <game :authorized="authorized"></game>
-              <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
-                <div v-if="authorized">
-                    <div class="user_logout_button" v-on:click="authorize">logout</div>
-                    <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
-                </div>
-                <div v-else>
-                    <span v-for="tab in auth"  class="tab"
+Vue.component('wall', {
+  template: `<div><span v-for="tab in auth"  class="tab"
                     v-on:click="selectedAuth=tab"
                     v-show="selectedAuth!=='another'"
                     :class="{ active_tab: selectedAuth === tab }">
@@ -126,10 +125,67 @@ Vue.component('user', {
                     v-show="selectedAuth === 'registration'"
                     @register="thankYou"></user_register>
                     <div v-show="selectedAuth === 'another'"
-                    id="thank_you"><h4>{{ message }}</h4></div>
+                    id="thank_you"><h4>{{ message }}</h4></div></div>`,
+  data() {
+    return {
+      authorized: false,
+      im: null,
+      profile: false,
+      error: null,
+      auth: ['login', 'registration'],
+      selectedAuth: 'login',
+      message: null,
+    };
+  },
+  methods: {
+    async authorize(login, password) {
+      if (!login) {
+        this.error = 'please enter login';
+        return;
+      } else if (!password) {
+        this.error = 'please enter password';
+        return;
+      }
+      this.im = await axios.post('/users/' + login).then(function (res) {
+        return res.data;
+      });
+      if (this.im) {
+        if (bcrypt.compareSync(password, this.im.password)) {
+          this.im.password = null;
+          this.error = null;
+          this.$emit('authSuccess', this.im);
+        } else {
+          this.error = 'Wrong password';
+        }
+      } else {
+        this.error = "User with login '" + login + "' not registered";
+      }
+    },
+    thankYou(login) {
+      this.selectedAuth = 'another';
+      this.message = 'Hello ' + login + '! Thank you for registration';
+      setTimeout(
+        function () {
+          this.selectedAuth = 'login';
+        }.bind(this),
+        3000,
+      );
+    },
+  },
+});
+
+Vue.component('user', {
+  template: `<div>
+              <chat :authorized="authorized" :im="im"></chat>
+              <game :authorized="authorized"></game>
+              <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
+                <div v-if="authorized">
+                    <div class="user_logout_button" v-on:click="logout">logout</div>
+                    <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
+                <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout"></wall>
               </div>
-              <div v-if="profile" class="user_profile">
+              <div v-show="profile" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
                 <div id="user_update_avatar" v-on:click="updateAvatar"></div>
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
@@ -143,24 +199,18 @@ Vue.component('user', {
       profile: false,
       winP: 0,
       loseP: 0,
-      error: null,
-      im: null,
-      auth: ['login', 'registration'],
-      selectedAuth: 'login',
-      message: null,
+      im: 'im',
     };
   },
   methods: {
-    thankYou(login) {
-      console.log('TY');
-      this.selectedAuth = 'another';
-      this.message = 'Hello ' + login + '! Thank you for registration';
-      setTimeout(
-        function () {
-          this.selectedAuth = 'login';
-        }.bind(this),
-        3000,
-      );
+    logout() {
+      this.authorized = false;
+      this.profile = false;
+      this.login = null;
+    },
+    authSuccess(im) {
+      this.im = im;
+      this.authorized = true;
     },
     async updateAvatar() {
       this.im.url_avatar = await axios
@@ -176,39 +226,10 @@ Vue.component('user', {
         this.profile = true;
       }
     },
-    async authorize(login, password) {
-      if (this.authorized) {
-        this.authorized = false;
-        this.profile = false;
-        this.login = null;
-        this.error = null;
-      } else {
-        if (!login) {
-          this.error = 'please enter login';
-          return;
-        } else if (!password) {
-          this.error = 'please enter password';
-          return;
-        }
-        this.im = await axios.post('/users/' + login).then(function (res) {
-          return res.data;
-        });
-        if (this.im) {
-          if (bcrypt.compareSync(password, this.im.password)) {
-            this.authorized = true;
-            this.password = null;
-            this.error = null;
-          } else {
-            this.error = 'Wrong password';
-          }
-        } else {
-          this.error = "User with login '" + login + "' not registered";
-        }
-      }
-    },
   },
   modules: {
     user: 'chat',
     game: 'game',
+    wall: 'wall',
   },
 });
