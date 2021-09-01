@@ -79,10 +79,6 @@ Vue.component('user_register', {
 Vue.component('user_login', {
   props: {
     error: {
-      type: Boolean,
-      required: true,
-    },
-    error_message: {
       required: true,
     },
   },
@@ -90,7 +86,7 @@ Vue.component('user_login', {
                     v-on:keyup.enter="authorize"><br>
                     pass: <input v-model="password" type="password" class="input"
                     v-on:keyup.enter="authorize">
-                    <p v-if="error">error: {{ error_message }}</p>
+                    <p v-if="error">error: {{ error }}</p>
                     <div class="user_login_button"
                     v-on:click="authorize">login</div>
                     <img src="https://yt3.ggpht.com/ytc/AAUvwniWlUa-gZ5YNz8-2Mtada9CZOHaX8o4nGaq5JWc=s900-c-k-c0x00ffffff-no-rj" id="intra_img"></div>`,
@@ -124,7 +120,7 @@ Vue.component('user', {
                     {{ tab }}
                     </span>
                     <user_login v-show="selectedAuth === 'login'"
-                    :error="error" :error_message="error_message"
+                    :error="error"
                     @authorization="authorize"></user_login>
                     <user_register
                     v-show="selectedAuth === 'registration'"
@@ -147,8 +143,7 @@ Vue.component('user', {
       profile: false,
       winP: 0,
       loseP: 0,
-      error: false,
-      error_message: null,
+      error: null,
       im: null,
       auth: ['login', 'registration'],
       selectedAuth: 'login',
@@ -186,15 +181,13 @@ Vue.component('user', {
         this.authorized = false;
         this.profile = false;
         this.login = null;
-        this.error = false;
+        this.error = null;
       } else {
         if (!login) {
-          this.error = true;
-          this.error_message = 'please enter login';
+          this.error = 'please enter login';
           return;
         } else if (!password) {
-          this.error = true;
-          this.error_message = 'please enter password';
+          this.error = 'please enter password';
           return;
         }
         this.im = await axios.post('/users/' + login).then(function (res) {
@@ -204,13 +197,12 @@ Vue.component('user', {
           if (bcrypt.compareSync(password, this.im.password)) {
             this.authorized = true;
             this.password = null;
+            this.error = null;
           } else {
-            this.error_message = 'Wrong password';
-            this.error = true;
+            this.error = 'Wrong password';
           }
         } else {
-          this.error = true;
-          this.error_message = "User with login '" + login + "' not registered";
+          this.error = "User with login '" + login + "' not registered";
         }
       }
     },
