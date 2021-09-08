@@ -135,6 +135,7 @@ Vue.component('wall', {
       auth: ['login', 'registration'],
       selectedAuth: 'login',
       message: null,
+      users: null,
     };
   },
   methods: {
@@ -146,14 +147,23 @@ Vue.component('wall', {
         this.error = 'please enter password';
         return;
       }
-      this.im = await axios.post('/users/' + login).then(function (res) {
-        return res.data;
-      });
+      this.im = await axios
+        .post('/users/login', { login: login })
+        .then(function (res) {
+          return res.data;
+        });
       if (this.im) {
         if (bcrypt.compareSync(password, this.im.password)) {
           this.im.password = null;
           this.error = null;
-          this.$emit('authSuccess', this.im);
+          this.users = await axios
+            .get('/users/getOnline')
+            .then(function (response) {
+              return response.data;
+            });
+          this.$emit('authSuccess', this.im, this.users);
+          this.users = null;
+          this.im = null;
         } else {
           this.error = 'Wrong password';
         }
@@ -172,11 +182,16 @@ Vue.component('wall', {
       );
     },
   },
+  modules: {
+    user_login: 'user_login',
+    user_register: 'user_register',
+  },
 });
 
 Vue.component('user', {
   template: `<div>
-              <chat :authorized="authorized" :im="im"></chat>
+              <div @login="addUser"></div>
+              <chat :authorized="authorized" :im="im" :users="users"></chat>
               <game :authorized="authorized"></game>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
@@ -194,22 +209,60 @@ Vue.component('user', {
   data() {
     return {
       authorized: false,
-      user: 'User',
-      ladder: 'play',
       profile: false,
       winP: 0,
-      loseP: 0,
+      games: 0,
       im: 'im',
+      users: null,
+      eventSource: null,
     };
   },
   methods: {
-    logout() {
+    addUser() {
+      console.log('new user: ' + this.eventSource.data);
+      this.users.push(this.eventSource.data);
+    },
+    async logout() {
+      await axios.post('/users/logout', { user: this.im });
       this.authorized = false;
       this.profile = false;
-      this.login = null;
+      this.users = null;
+      this.im = 'im';
     },
-    authSuccess(im) {
+    authSuccess(im, users) {
       this.im = im;
+      this.eventSource = new EventSource('/users/login?login=' + this.im.login);
+      this.eventSource.addEventListener('login', (event) => {
+        const user = JSON.parse(event.data);
+        if (
+          this.users
+            .map(function (e) {
+              return e.login;
+            })
+            .indexOf(user.login) === -1
+        )
+          this.users.push(user);
+      });
+      this.eventSource.addEventListener('logout_SSE', (event) => {
+        const user = JSON.parse(event.data);
+        if (
+          this.users
+            .map(function (e) {
+              return e.login;
+            })
+            .indexOf(user.login) !== -1
+        ) {
+          let index = 0;
+          while (index < this.users.length) {
+            if (this.users[index].login === user.login) {
+              break;
+            }
+            ++index;
+          }
+          this.users.splice(index, 1);
+        }
+      });
+      this.users = users;
       this.authorized = true;
     },
     async updateAvatar() {
@@ -220,6 +273,7 @@ Vue.component('user', {
         });
     },
     showProfile() {
+      // console.log(this.eventSource.)
       if (this.profile) {
         this.profile = false;
       } else {
@@ -231,5 +285,12 @@ Vue.component('user', {
     user: 'chat',
     game: 'game',
     wall: 'wall',
+  },
+  mounted() {
+    // this.eventSource.addEventListener('login', (event) => {
+    //   console.log(`Сказал: ${event}`);
+    // });
+    // eventSource.onmessage = function (e) {
+    // };
   },
 });

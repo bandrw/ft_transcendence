@@ -11,6 +11,9 @@ Vue.component('chat', {
       // type: Object,
       required: true,
     },
+    users: {
+      required: true,
+    },
   },
   template: `<div>
                <div :class="classGame"
@@ -19,12 +22,12 @@ Vue.component('chat', {
                     v-if="authorized">
                       {{ type }}
                   </div>
-                <div v-if="show_chat"
+                <div v-show="show_chat && users"
                         class="chat_users_side">
                     <div class="user_in_chat"
                          v-for="user in users"
                         v-on:mouseover="userInfo(user, $event)"
-                        v-if="user.id!=im.id">
+                        v-if="user && user.login!=im.login">
                         {{ user.login }}
                     </div>
                 </div>
@@ -42,7 +45,6 @@ Vue.component('chat', {
     return {
       type: 'Chat',
       show_chat: false,
-      users: null,
       info: false,
       user: null,
       infoStyle: {
@@ -79,10 +81,5 @@ Vue.component('chat', {
         this.show_chat = true;
       }
     },
-  },
-  async mounted() {
-    this.users = await axios.get('/users/getAll').then(function (response) {
-      return response.data;
-    });
   },
 });
