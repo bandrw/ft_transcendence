@@ -219,11 +219,11 @@ Vue.component('user', {
   },
   methods: {
     addUser() {
-      console.log('new user: ' + this.eventSource.data);
       this.users.push(this.eventSource.data);
     },
-    async logout() {
-      await axios.post('/users/logout', { user: this.im });
+    logout() {
+      this.eventSource.close();
+      axios.post('/users/logout', { user: this.im });
       this.authorized = false;
       this.profile = false;
       this.users = null;
@@ -273,7 +273,6 @@ Vue.component('user', {
         });
     },
     showProfile() {
-      // console.log(this.eventSource.)
       if (this.profile) {
         this.profile = false;
       } else {
@@ -287,10 +286,10 @@ Vue.component('user', {
     wall: 'wall',
   },
   mounted() {
-    // this.eventSource.addEventListener('login', (event) => {
-    //   console.log(`Сказал: ${event}`);
-    // });
-    // eventSource.onmessage = function (e) {
-    // };
+    window.onbeforeunload = function () {
+      if (this.authorized) {
+        this.logout();
+      }
+    }.bind(this);
   },
 });

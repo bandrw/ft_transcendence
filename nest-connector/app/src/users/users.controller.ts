@@ -4,14 +4,12 @@ import {
   Res,
   Query,
   Post,
-  Param,
   Req,
   Header,
   HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Response, Request, json } from 'express';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OnlineUser } from './users.interface';
 
 @Controller('users')
@@ -66,6 +64,7 @@ export class UsersController {
         'logout_SSE',
         this.onlineUsers[index].login,
       );
+      this.onlineUsers[index].resp.end();
       this.onlineUsers.splice(index, 1);
     }
   }

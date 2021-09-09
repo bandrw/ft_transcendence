@@ -4,13 +4,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User_table } from './user.entity';
 import { Response } from 'express';
 import { AvatarGenerator } from 'random-avatar-generator';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OnlineUser } from './users.interface';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private eventEmitter: EventEmitter2,
     @InjectRepository(User_table)
     public usersRepository: Repository<User_table>,
   ) {}
