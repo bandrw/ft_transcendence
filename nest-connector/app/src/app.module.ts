@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User_table } from 'src/users/user.entity';
 import { UsersModule } from './users/users.module';
 import { JsController } from './js/js.controller';
+import { LadderModule } from './ladder/ladder.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JsController } from './js/js.controller';
       entities: [User_table],
     }),
     UsersModule,
+    LadderModule,
   ],
   controllers: [AppController, CssController, JsController],
   providers: [AppService],

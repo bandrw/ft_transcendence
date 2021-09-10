@@ -1,6 +1,6 @@
 import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User_table } from './user.entity';
 import { Response } from 'express';
 import { AvatarGenerator } from 'random-avatar-generator';
@@ -8,6 +8,7 @@ import { OnlineUser } from './users.interface';
 
 @Injectable()
 export class UsersService {
+  onlineUsers: OnlineUser[] = [];
   constructor(
     @InjectRepository(User_table)
     public usersRepository: Repository<User_table>,
@@ -47,21 +48,18 @@ export class UsersService {
     await this.usersRepository.manager.save(user);
     return ret;
   }
-  userEvent(onlineUsers: OnlineUser[], event: string, login: string) {
-    let k = 0;
-    while (k < onlineUsers.length && onlineUsers[k].login != login) {
-      ++k;
-    }
+  userEvent(event: string, user: OnlineUser) {
     let i = 0;
-    while (i < onlineUsers.length) {
-      if (onlineUsers[i].login != login) {
-        onlineUsers[i].resp.write(
+    while (i < this.onlineUsers.length) {
+      if (this.onlineUsers[i].login != user.login) {
+        this.onlineUsers[i].resp.write(
           'event: ' +
             event +
             '\ndata: ' +
             JSON.stringify({
-              login: onlineUsers[k].login,
-              url_avatar: onlineUsers[k].url_avatar,
+              login: user.login,
+              url_avatar: user.url_avatar,
+              status: user.status,
             }) +
             '\n\n',
         );

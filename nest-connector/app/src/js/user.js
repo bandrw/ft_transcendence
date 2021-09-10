@@ -192,7 +192,7 @@ Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
               <chat :authorized="authorized" :im="im" :users="users"></chat>
-              <game :authorized="authorized"></game>
+              <game :authorized="authorized" :im="im" :users="users" :enemy="enemy"></game>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
@@ -215,6 +215,7 @@ Vue.component('user', {
       im: 'im',
       users: null,
       eventSource: null,
+      enemy: null,
     };
   },
   methods: {
@@ -261,6 +262,28 @@ Vue.component('user', {
           }
           this.users.splice(index, 1);
         }
+      });
+      this.eventSource.addEventListener('status', (event) => {
+        const user = JSON.parse(event.data);
+        if (
+          this.users
+            .map(function (e) {
+              return e.login;
+            })
+            .indexOf(user.login) !== -1
+        ) {
+          let index = 0;
+          while (index < this.users.length) {
+            if (this.users[index].login === user.login) {
+              this.users[index].status = user.status;
+              break;
+            }
+            ++index;
+          }
+        }
+      });
+      this.eventSource.addEventListener('enemy', (event) => {
+        this.enemy = JSON.parse(event.data);
       });
       this.users = users;
       this.authorized = true;

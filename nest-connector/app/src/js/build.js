@@ -29778,7 +29778,6 @@ Vue.component('chat', {
       required: true,
     },
     im: {
-      // type: Object,
       required: true,
     },
     users: {
@@ -29798,8 +29797,8 @@ Vue.component('chat', {
                          v-for="user in users"
                         v-on:mouseover="userInfo(user, $event)"
                         v-if="user && user.login!=im.login">
-                        {{ user.login }}
-                    </div>
+                        {{ user.login }}<span id="chat_user_status"
+                        :style="{ backgroundColor: user.status }"></span></div>
                 </div>
           </div>
           <div v-if="info" class="chat_user_info"
@@ -29863,13 +29862,24 @@ Vue.component('chat', {
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/08/29 02:43:43 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/10 23:25:03 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
 Vue.component('game', {
   props: {
     authorized: {
       type: Boolean,
+      required: true,
+    },
+    im: {
+      required: true,
+    },
+    users: {
+      required: true,
+    },
+    enemy: {
       required: true,
     },
   },
@@ -29921,6 +29931,9 @@ Vue.component('game', {
       this.timer = 0;
       this.str_timer = null;
       this.id = null;
+      if (this.im.login) {
+        axios.get('/ladder/findGame?login=' + this.im.login + '&status=green');
+      }
     },
     cancel(e) {
       clearInterval(this.id);
@@ -29950,6 +29963,7 @@ Vue.component('game', {
     },
     findGame() {
       if (!this.enemy && !this.game) {
+        axios.get('/ladder/findGame?login=' + this.im.login + '&status=yellow');
         this.game = true;
         this.ladder = 'search ...';
         this.id = setInterval(
@@ -29957,8 +29971,7 @@ Vue.component('game', {
             if (this.authorized) {
               this.timer += 0.1;
               this.str_timer = this.timer.toFixed(1);
-              if (this.timer >= 3) {
-                this.enemy = true;
+              if (this.enemy) {
                 clearInterval(this.id);
                 this.waiting();
               }
@@ -29974,7 +29987,7 @@ Vue.component('game', {
   },
 });
 
-},{}],226:[function(require,module,exports){
+},{"axios":16}],226:[function(require,module,exports){
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 chat = require('./chat');
@@ -30169,7 +30182,7 @@ Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
               <chat :authorized="authorized" :im="im" :users="users"></chat>
-              <game :authorized="authorized"></game>
+              <game :authorized="authorized" :im="im" :users="users" :enemy="enemy"></game>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
@@ -30192,6 +30205,7 @@ Vue.component('user', {
       im: 'im',
       users: null,
       eventSource: null,
+      enemy: null,
     };
   },
   methods: {
@@ -30238,6 +30252,28 @@ Vue.component('user', {
           }
           this.users.splice(index, 1);
         }
+      });
+      this.eventSource.addEventListener('status', (event) => {
+        const user = JSON.parse(event.data);
+        if (
+          this.users
+            .map(function (e) {
+              return e.login;
+            })
+            .indexOf(user.login) !== -1
+        ) {
+          let index = 0;
+          while (index < this.users.length) {
+            if (this.users[index].login === user.login) {
+              this.users[index].status = user.status;
+              break;
+            }
+            ++index;
+          }
+        }
+      });
+      this.eventSource.addEventListener('enemy', (event) => {
+        this.enemy = JSON.parse(event.data);
       });
       this.users = users;
       this.authorized = true;

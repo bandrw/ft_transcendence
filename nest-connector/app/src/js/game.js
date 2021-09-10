@@ -6,13 +6,24 @@
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/08/29 02:43:43 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/10 23:25:03 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
 Vue.component('game', {
   props: {
     authorized: {
       type: Boolean,
+      required: true,
+    },
+    im: {
+      required: true,
+    },
+    users: {
+      required: true,
+    },
+    enemy: {
       required: true,
     },
   },
@@ -64,6 +75,9 @@ Vue.component('game', {
       this.timer = 0;
       this.str_timer = null;
       this.id = null;
+      if (this.im.login) {
+        axios.get('/ladder/findGame?login=' + this.im.login + '&status=green');
+      }
     },
     cancel(e) {
       clearInterval(this.id);
@@ -93,6 +107,7 @@ Vue.component('game', {
     },
     findGame() {
       if (!this.enemy && !this.game) {
+        axios.get('/ladder/findGame?login=' + this.im.login + '&status=yellow');
         this.game = true;
         this.ladder = 'search ...';
         this.id = setInterval(
@@ -100,8 +115,7 @@ Vue.component('game', {
             if (this.authorized) {
               this.timer += 0.1;
               this.str_timer = this.timer.toFixed(1);
-              if (this.timer >= 3) {
-                this.enemy = true;
+              if (this.enemy) {
                 clearInterval(this.id);
                 this.waiting();
               }

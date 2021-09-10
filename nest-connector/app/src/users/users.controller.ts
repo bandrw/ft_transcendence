@@ -7,14 +7,13 @@ import {
   Req,
   Header,
   HttpCode,
+  Injectable,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Response, Request, json } from 'express';
 import { OnlineUser } from './users.interface';
-
 @Controller('users')
 export class UsersController {
-  private onlineUsers: OnlineUser[] = [];
   constructor(private UsersService: UsersService) {}
 
   @Post('create')
@@ -38,8 +37,8 @@ export class UsersController {
   @Get('getOnline')
   getOnline(@Res() response: Response) {
     response.send(
-      this.onlineUsers.map(function (e) {
-        return { login: e.login, url_avatar: e.url_avatar };
+      this.UsersService.onlineUsers.map(function (e) {
+        return { login: e.login, url_avatar: e.url_avatar, status: e.status };
       }),
     );
   }
@@ -53,19 +52,18 @@ export class UsersController {
   }
   @Post('logout')
   userLogout(@Req() req: Request) {
-    const index = this.onlineUsers
+    const index = this.UsersService.onlineUsers
       .map(function (e) {
         return e.login;
       })
       .indexOf(req.body.user.login);
     if (index != -1) {
       this.UsersService.userEvent(
-        this.onlineUsers,
         'logout_SSE',
-        this.onlineUsers[index].login,
+        this.UsersService.onlineUsers[index],
       );
-      this.onlineUsers[index].resp.end();
-      this.onlineUsers.splice(index, 1);
+      this.UsersService.onlineUsers[index].resp.end();
+      this.UsersService.onlineUsers.splice(index, 1);
     }
   }
   @Get('login')
@@ -81,12 +79,14 @@ export class UsersController {
       where: { login: login },
     });
     req.socket.setTimeout(1000 * 60 * 60);
-    this.onlineUsers.push({
+    const newUser: OnlineUser = {
       login: login,
       resp: response,
       url_avatar: user.url_avatar,
-    });
-    this.UsersService.userEvent(this.onlineUsers, 'login', login);
+      status: 'green',
+    };
+    this.UsersService.onlineUsers.push(newUser);
+    this.UsersService.userEvent('login', newUser);
   }
   @Post('login')
   async authentification(@Req() req: Request, @Res() response: Response) {

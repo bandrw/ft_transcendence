@@ -8,7 +8,6 @@ Vue.component('chat', {
       required: true,
     },
     im: {
-      // type: Object,
       required: true,
     },
     users: {
@@ -28,8 +27,8 @@ Vue.component('chat', {
                          v-for="user in users"
                         v-on:mouseover="userInfo(user, $event)"
                         v-if="user && user.login!=im.login">
-                        {{ user.login }}
-                    </div>
+                        {{ user.login }}<span id="chat_user_status"
+                        :style="{ backgroundColor: user.status }"></span></div>
                 </div>
           </div>
           <div v-if="info" class="chat_user_info"
