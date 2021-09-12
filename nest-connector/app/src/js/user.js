@@ -192,7 +192,8 @@ Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
               <chat :authorized="authorized" :im="im" :users="users"></chat>
-              <game :authorized="authorized" :im="im" :users="users" :enemy="enemy"></game>
+              <game :authorized="authorized" @kickEnemy="enemy = null"
+              :im="im" :users="users" :enemy="enemy"></game>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
@@ -200,7 +201,7 @@ Vue.component('user', {
                 </div>
                 <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout"></wall>
               </div>
-              <div v-show="profile" class="user_profile">
+              <div v-show="profile && authorized" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
                 <div id="user_update_avatar" v-on:click="updateAvatar"></div>
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
@@ -212,7 +213,7 @@ Vue.component('user', {
       profile: false,
       winP: 0,
       games: 0,
-      im: 'im',
+      im: false,
       users: null,
       eventSource: null,
       enemy: null,
@@ -228,7 +229,7 @@ Vue.component('user', {
       this.authorized = false;
       this.profile = false;
       this.users = null;
-      this.im = 'im';
+      this.im = false;
     },
     authSuccess(im, users) {
       this.im = im;

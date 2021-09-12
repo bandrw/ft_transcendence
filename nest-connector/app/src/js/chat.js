@@ -8,7 +8,9 @@ Vue.component('chat', {
       required: true,
     },
     im: {
-      required: true,
+      type: [Object, Boolean],
+      default: null,
+      required: false,
     },
     users: {
       required: true,

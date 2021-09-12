@@ -19,6 +19,8 @@ export class LadderService {
     this.users.userEvent('status', this.users.onlineUsers[i]);
     if (status === 'yellow') {
       this.addToLadder(this.users.onlineUsers[i]);
+    } else if (status === 'green') {
+      this.removeFromLadder(this.users.onlineUsers[i]);
     }
     return login;
   }
@@ -49,20 +51,60 @@ export class LadderService {
       }
       ++i;
     }
+    console.log(this.lobby);
   }
   async userPersonalEvent(event: string, user: OnlineUser, login: string) {
     let i = 0;
     while (i < this.users.onlineUsers.length) {
       if (this.users.onlineUsers[i].login === login) {
-        this.users.onlineUsers[i].resp.write(
-          `event: ${event}\ndata: ${JSON.stringify({
+        let data;
+        if (user) {
+          data = JSON.stringify({
             login: user.login,
             url_avatar: user.url_avatar,
             status: user.status,
-          })}\n\n`,
+          });
+        } else {
+          data = false;
+        }
+        this.users.onlineUsers[i].resp.write(
+          `event: ${event}\ndata: ${data}\n\n`,
         );
       }
       ++i;
     }
+  }
+  removeFromLadder(user: OnlineUser) {
+    let i = 0;
+    while (i < this.lobby.length) {
+      if (this.lobby[i].first && this.lobby[i].first.login === user.login) {
+        this.lobby[i].first = null;
+        if (this.lobby[i].second && this.lobby[i].second.status === 'orange') {
+          this.lobby[i].second.status = 'yellow';
+          this.users.userEvent('status', this.lobby[i].second);
+          this.userPersonalEvent(
+            'enemy',
+            this.lobby[i].first,
+            this.lobby[i].second.login,
+          );
+          this.lobby[i].first = this.lobby[i].second;
+          this.lobby[i].second = null;
+        }
+        break;
+      } else if (
+        this.lobby[i].second &&
+        this.lobby[i].second.login === user.login
+      ) {
+        this.lobby[i].second = null;
+        if (this.lobby[i].first && this.lobby[i].first.status === 'orange') {
+          this.lobby[i].first.status = 'yellow';
+          this.users.userEvent('status', this.lobby[i].first);
+          this.userPersonalEvent('enemy', null, this.lobby[i].first.login);
+        }
+        break;
+      }
+      ++i;
+    }
+    console.log(this.lobby);
   }
 }
