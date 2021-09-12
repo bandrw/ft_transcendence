@@ -29864,7 +29864,7 @@ Vue.component('chat', {
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/12 03:53:03 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/12 03:53:54 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -29974,9 +29974,6 @@ Vue.component('game', {
             clearInterval(this.acceptInterval);
             this.ladder = 'search ...';
             this.breaker = false;
-            // this.clearData();
-            // this.game = false;
-            // this.findGame();
           }
           if (this.authorized && this.timerAccept > 0.1) {
             this.timerAccept -= 0.1;
@@ -29993,7 +29990,6 @@ Vue.component('game', {
         }.bind(this),
         100,
       );
-      // clearInterval(this.findInterval);
     },
     findGame() {
       if (!this.enemy && !this.game) {
@@ -30008,7 +30004,6 @@ Vue.component('game', {
               this.str_timerFind = this.timerFind.toFixed(1);
               if (this.enemy && !this.breaker) {
                 this.breaker = true;
-                // clearInterval(this.findInterval);
                 this.waiting();
               }
             } else {

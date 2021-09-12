@@ -27,6 +27,9 @@ export class LadderService {
   addToLadder(user: OnlineUser) {
     let i = 0;
     let userInLadder = false;
+    this.lobby = this.lobby.filter(function (val) {
+      return val.first !== null || val.second !== null;
+    });
     while (!userInLadder) {
       if (!this.lobby[i] || !this.lobby[i].first) {
         this.lobby[i] = { first: user, second: null };
@@ -34,25 +37,33 @@ export class LadderService {
       } else if (!this.lobby[i].second) {
         this.lobby[i].second = user;
         userInLadder = true;
-        this.lobby[i].first.status = 'orange';
-        this.lobby[i].second.status = 'orange';
-        this.users.userEvent('status', this.lobby[i].first);
-        this.users.userEvent('status', this.lobby[i].second);
-        this.userPersonalEvent(
-          'enemy',
-          this.lobby[i].first,
-          this.lobby[i].second.login,
-        );
-        this.userPersonalEvent(
-          'enemy',
-          this.lobby[i].second,
-          this.lobby[i].first.login,
-        );
+        this.sendEvents(i);
       }
       ++i;
     }
-    console.log(this.lobby);
   }
+
+  sendEvents(i: number) {
+    this.lobby[i].first.status = 'orange';
+    this.lobby[i].second.status = 'orange';
+    this.users.userEvent('status', this.lobby[i].first);
+    this.users.userEvent('status', this.lobby[i].second);
+    this.userPersonalEvent(
+      'enemy',
+      this.lobby[i].first,
+      this.lobby[i].second.login,
+    );
+    this.userPersonalEvent(
+      'enemy',
+      this.lobby[i].second,
+      this.lobby[i].first.login,
+    );
+  }
+  //
+  // sendSingleEvents(user: OnlineUser) {
+  //
+  // }
+
   async userPersonalEvent(event: string, user: OnlineUser, login: string) {
     let i = 0;
     while (i < this.users.onlineUsers.length) {
@@ -89,6 +100,7 @@ export class LadderService {
           );
           this.lobby[i].first = this.lobby[i].second;
           this.lobby[i].second = null;
+          this.findAnotherLobby(i);
         }
         break;
       } else if (
@@ -100,11 +112,31 @@ export class LadderService {
           this.lobby[i].first.status = 'yellow';
           this.users.userEvent('status', this.lobby[i].first);
           this.userPersonalEvent('enemy', null, this.lobby[i].first.login);
+          this.findAnotherLobby(i);
         }
         break;
       }
       ++i;
     }
-    console.log(this.lobby);
+  }
+
+  findAnotherLobby(userIndex: number) {
+    let k = 0;
+    while (k < this.lobby.length) {
+      if (k != userIndex) {
+        if (this.lobby[k].first && !this.lobby[k].second) {
+          this.lobby[k].second = this.lobby[userIndex].first;
+          this.lobby[userIndex].first = null;
+          this.sendEvents(k);
+          break;
+        } else if (!this.lobby[k].first && this.lobby[k].second) {
+          this.lobby[k].first = this.lobby[userIndex].first;
+          this.lobby[userIndex].first = null;
+          this.sendEvents(k);
+          break;
+        }
+      }
+      ++k;
+    }
   }
 }
