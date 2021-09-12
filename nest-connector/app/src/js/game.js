@@ -6,7 +6,7 @@
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/12 03:53:54 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/13 00:17:01 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -26,13 +26,15 @@ Vue.component('game', {
       required: true,
     },
     enemy: {
-      required: true,
+      type: [Object, Boolean],
+      default: null,
+      required: false,
     },
   },
   template: `<div v-on:click="findGame"
                   :class="classGame">
                   <div v-if="enemy">
-                    <div class="accept_button">{{ ladder }}</div>
+                    <div class="accept_button" @click="gameAccept">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancelAccept">cancel</div>
                     <div class="timeout">{{ str_timerAccept }}</div>
                     <div id="game_you"><img :src="im.url_avatar" width="100%" height="100%"></div>
@@ -76,6 +78,9 @@ Vue.component('game', {
     },
   },
   methods: {
+    gameAccept() {
+      axios.get('/ladder/gameAccept?login=' + this.im.login);
+    },
     async clearData() {
       this.game = false;
       this.ladder = 'play';
@@ -107,7 +112,7 @@ Vue.component('game', {
       e.stopPropagation();
     },
     waiting() {
-      this.timerAccept = 100;
+      this.timerAccept = 10;
       this.str_timerAccept = null;
       this.ladder = 'accept';
       this.acceptInterval = setInterval(
@@ -116,6 +121,8 @@ Vue.component('game', {
             clearInterval(this.acceptInterval);
             this.ladder = 'search ...';
             this.breaker = false;
+            axios.get('ladder/systemStatus?login=' + this.im.login);
+            return;
           }
           if (this.authorized && this.timerAccept > 0.1) {
             this.timerAccept -= 0.1;

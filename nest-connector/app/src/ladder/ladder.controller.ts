@@ -9,4 +9,14 @@ export class LadderController {
   findGame(@Query('login') login, @Query('status') status) {
     return this.ladder.updateStatus(login, status);
   }
+
+  @Get('systemStatus')
+  systemStatus(@Query('login') login) {
+    return this.ladder.traceLadder(login);
+  }
+
+  // @Get('gameAccept')
+  // gameAccept(@Query('login') login) {
+  //
+  // }
 }

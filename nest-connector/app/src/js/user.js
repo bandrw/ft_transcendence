@@ -192,7 +192,7 @@ Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
               <chat :authorized="authorized" :im="im" :users="users"></chat>
-              <game :authorized="authorized" @kickEnemy="enemy = null"
+              <game :authorized="authorized" @kickEnemy="enemy = false"
               :im="im" :users="users" :enemy="enemy"></game>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
@@ -216,7 +216,7 @@ Vue.component('user', {
       im: false,
       users: null,
       eventSource: null,
-      enemy: null,
+      enemy: false,
     };
   },
   methods: {
@@ -230,6 +230,7 @@ Vue.component('user', {
       this.profile = false;
       this.users = null;
       this.im = false;
+      this.enemy = false;
     },
     authSuccess(im, users) {
       this.im = im;
@@ -282,7 +283,7 @@ Vue.component('user', {
             }
             ++index;
           }
-          if (this.enemy.login === user.login) {
+          if (this.enemy && this.enemy.login === user.login) {
             this.enemy.status = user.status;
             this.enemy.url_avatar = user.url_avatar;
           }
@@ -290,6 +291,7 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('enemy', (event) => {
         this.enemy = JSON.parse(event.data);
+        console.log('new enemy: ' + this.enemy);
       });
       this.users = users;
       this.authorized = true;

@@ -10,6 +10,23 @@ export class LadderService {
     @Inject(UsersService)
     private users: UsersService,
   ) {}
+
+  traceLadder(login: string) {
+    let i = 0;
+    while (i < this.lobby.length) {
+      if (
+        (this.lobby[i].first && this.lobby[i].first.login === login) ||
+        (this.lobby[i].second && this.lobby[i].second.login === login)
+      ) {
+        break;
+      }
+      ++i;
+    }
+    if (i !== this.lobby.length) {
+      this.findAnotherLobby(i);
+    }
+  }
+
   updateStatus(login: string, status: string) {
     let i = 0;
     while (this.users.onlineUsers[i].login != login) {
@@ -27,9 +44,9 @@ export class LadderService {
   addToLadder(user: OnlineUser) {
     let i = 0;
     let userInLadder = false;
-    this.lobby = this.lobby.filter(function (val) {
-      return val.first !== null || val.second !== null;
-    });
+    // this.lobby = this.lobby.filter(function (val) {
+    //   return val.first !== null || val.second !== null;
+    // });
     while (!userInLadder) {
       if (!this.lobby[i] || !this.lobby[i].first) {
         this.lobby[i] = { first: user, second: null };
@@ -60,14 +77,7 @@ export class LadderService {
     );
   }
 
-  sendSingleEvents(userIndex: number) {
-    this.lobby[userIndex].first.status = 'yellow';
-    this.users.userEvent('updateUser', this.lobby[userIndex].first);
-    this.userPersonalEvent('enemy', null, this.lobby[userIndex].first.login);
-    this.findAnotherLobby(userIndex);
-  }
-
-  async userPersonalEvent(event: string, user: OnlineUser, login: string) {
+  userPersonalEvent(event: string, user: OnlineUser, login: string) {
     let i = 0;
     while (i < this.users.onlineUsers.length) {
       if (this.users.onlineUsers[i].login === login) {
@@ -94,10 +104,14 @@ export class LadderService {
     while (i < this.lobby.length) {
       if (this.lobby[i].first && this.lobby[i].first.login === user.login) {
         this.lobby[i].first = null;
-        if (this.lobby[i].second && this.lobby[i].second.status === 'orange') {
+        if (this.lobby[i].second) {
           this.lobby[i].first = this.lobby[i].second;
           this.lobby[i].second = null;
           this.sendSingleEvents(i);
+        } else {
+          this.lobby = this.lobby.filter(function (val) {
+            return val.first !== null || val.second !== null;
+          });
         }
         break;
       } else if (
@@ -105,8 +119,12 @@ export class LadderService {
         this.lobby[i].second.login === user.login
       ) {
         this.lobby[i].second = null;
-        if (this.lobby[i].first && this.lobby[i].first.status === 'orange') {
+        if (this.lobby[i].first) {
           this.sendSingleEvents(i);
+        } else {
+          this.lobby = this.lobby.filter(function (val) {
+            return val.first !== null || val.second !== null;
+          });
         }
         break;
       }
@@ -114,7 +132,13 @@ export class LadderService {
     }
   }
 
-  findAnotherLobby(userIndex: number) {
+  sendSingleEvents(userIndex: number) {
+    this.lobby[userIndex].first.status = 'yellow';
+    this.users.userEvent('updateUser', this.lobby[userIndex].first);
+    this.userPersonalEvent('enemy', null, this.lobby[userIndex].first.login);
+  }
+
+  findAnotherLobby(userIndex: number): boolean {
     let k = 0;
     while (k < this.lobby.length) {
       if (k != userIndex) {
@@ -122,15 +146,16 @@ export class LadderService {
           this.lobby[k].second = this.lobby[userIndex].first;
           this.lobby[userIndex].first = null;
           this.sendEvents(k);
-          break;
+          return true;
         } else if (!this.lobby[k].first && this.lobby[k].second) {
           this.lobby[k].first = this.lobby[userIndex].first;
           this.lobby[userIndex].first = null;
           this.sendEvents(k);
-          break;
+          return true;
         }
       }
       ++k;
     }
+    return false;
   }
 }
