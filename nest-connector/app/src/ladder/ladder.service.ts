@@ -16,7 +16,7 @@ export class LadderService {
       ++i;
     }
     this.users.onlineUsers[i].status = status;
-    this.users.userEvent('status', this.users.onlineUsers[i]);
+    this.users.userEvent('updateUser', this.users.onlineUsers[i]);
     if (status === 'yellow') {
       this.addToLadder(this.users.onlineUsers[i]);
     } else if (status === 'green') {
@@ -46,8 +46,8 @@ export class LadderService {
   sendEvents(i: number) {
     this.lobby[i].first.status = 'orange';
     this.lobby[i].second.status = 'orange';
-    this.users.userEvent('status', this.lobby[i].first);
-    this.users.userEvent('status', this.lobby[i].second);
+    this.users.userEvent('updateUser', this.lobby[i].first);
+    this.users.userEvent('updateUser', this.lobby[i].second);
     this.userPersonalEvent(
       'enemy',
       this.lobby[i].first,
@@ -59,10 +59,13 @@ export class LadderService {
       this.lobby[i].first.login,
     );
   }
-  //
-  // sendSingleEvents(user: OnlineUser) {
-  //
-  // }
+
+  sendSingleEvents(userIndex: number) {
+    this.lobby[userIndex].first.status = 'yellow';
+    this.users.userEvent('updateUser', this.lobby[userIndex].first);
+    this.userPersonalEvent('enemy', null, this.lobby[userIndex].first.login);
+    this.findAnotherLobby(userIndex);
+  }
 
   async userPersonalEvent(event: string, user: OnlineUser, login: string) {
     let i = 0;
@@ -85,22 +88,16 @@ export class LadderService {
       ++i;
     }
   }
+
   removeFromLadder(user: OnlineUser) {
     let i = 0;
     while (i < this.lobby.length) {
       if (this.lobby[i].first && this.lobby[i].first.login === user.login) {
         this.lobby[i].first = null;
         if (this.lobby[i].second && this.lobby[i].second.status === 'orange') {
-          this.lobby[i].second.status = 'yellow';
-          this.users.userEvent('status', this.lobby[i].second);
-          this.userPersonalEvent(
-            'enemy',
-            this.lobby[i].first,
-            this.lobby[i].second.login,
-          );
           this.lobby[i].first = this.lobby[i].second;
           this.lobby[i].second = null;
-          this.findAnotherLobby(i);
+          this.sendSingleEvents(i);
         }
         break;
       } else if (
@@ -109,10 +106,7 @@ export class LadderService {
       ) {
         this.lobby[i].second = null;
         if (this.lobby[i].first && this.lobby[i].first.status === 'orange') {
-          this.lobby[i].first.status = 'yellow';
-          this.users.userEvent('status', this.lobby[i].first);
-          this.userPersonalEvent('enemy', null, this.lobby[i].first.login);
-          this.findAnotherLobby(i);
+          this.sendSingleEvents(i);
         }
         break;
       }

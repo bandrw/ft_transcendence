@@ -30285,7 +30285,7 @@ Vue.component('user', {
           this.users.splice(index, 1);
         }
       });
-      this.eventSource.addEventListener('status', (event) => {
+      this.eventSource.addEventListener('updateUser', (event) => {
         const user = JSON.parse(event.data);
         if (
           this.users
@@ -30298,9 +30298,14 @@ Vue.component('user', {
           while (index < this.users.length) {
             if (this.users[index].login === user.login) {
               this.users[index].status = user.status;
+              this.users[index].url_avatar = user.url_avatar;
               break;
             }
             ++index;
+          }
+          if (this.enemy.login === user.login) {
+            this.enemy.status = user.status;
+            this.enemy.url_avatar = user.url_avatar;
           }
         }
       });

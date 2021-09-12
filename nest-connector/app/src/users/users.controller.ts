@@ -78,7 +78,7 @@ export class UsersController {
     const user = await this.UsersService.usersRepository.findOne({
       where: { login: login },
     });
-    req.socket.setTimeout(1000 * 60 * 60);
+    req.socket.setTimeout(1000 * 60 * 60 * 60);
     const newUser: OnlineUser = {
       login: login,
       resp: response,

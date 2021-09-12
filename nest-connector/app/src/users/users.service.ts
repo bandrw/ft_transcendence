@@ -46,6 +46,14 @@ export class UsersService {
     const ret = generator.generateRandomAvatar(salt);
     user.url_avatar = ret;
     await this.usersRepository.manager.save(user);
+    let i = 0;
+    while (i < this.onlineUsers.length) {
+      if (this.onlineUsers[i].login == user.login) {
+        this.onlineUsers[i].url_avatar = ret;
+        this.userEvent('updateUser', this.onlineUsers[i]);
+      }
+      ++i;
+    }
     return ret;
   }
   userEvent(event: string, user: OnlineUser) {
