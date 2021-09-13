@@ -15,6 +15,19 @@ export class LadderController {
     return this.ladder.traceLadder(login);
   }
 
+  // @Get('enemyEmit')
+  // enemyEmit(@Query('login') login) {
+  //   let i = 0;
+  //   while (i < this.ladder.lobby.length) {
+  //     if (
+  //       this.ladder.lobby[i].first.login === login
+  //     ) {
+  //       this.ladder.sendSingleEvents(i);
+  //     }
+  //     ++i;
+  //   }
+  // }
+
   // @Get('gameAccept')
   // gameAccept(@Query('login') login) {
   //

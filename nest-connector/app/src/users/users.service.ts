@@ -1,4 +1,4 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable, Res, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User_table } from './user.entity';
@@ -13,6 +13,7 @@ export class UsersService {
     @InjectRepository(User_table)
     public usersRepository: Repository<User_table>,
   ) {}
+
   async findAll(@Res() response: Response) {
     response.send(
       await this.usersRepository.find({ select: ['login', 'url_avatar'] }),

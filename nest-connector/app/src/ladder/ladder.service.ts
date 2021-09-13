@@ -5,7 +5,7 @@ import { OnlineUser } from '../users/users.interface';
 
 @Injectable()
 export class LadderService {
-  private lobby: Ladder[] = [];
+  public lobby: Ladder[] = [];
   constructor(
     @Inject(UsersService)
     private users: UsersService,
@@ -44,9 +44,6 @@ export class LadderService {
   addToLadder(user: OnlineUser) {
     let i = 0;
     let userInLadder = false;
-    // this.lobby = this.lobby.filter(function (val) {
-    //   return val.first !== null || val.second !== null;
-    // });
     while (!userInLadder) {
       if (!this.lobby[i] || !this.lobby[i].first) {
         this.lobby[i] = { first: user, second: null };

@@ -5,6 +5,12 @@ chat = require('./game');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcryptjs');
 
+Vue.directive('focus', {
+  inserted: function (el) {
+    el.focus();
+  },
+});
+
 Vue.component('user_register', {
   template: `<div><div id="user_register_login">login: <input v-model="login" type="text"
                     v-on:keyup.enter="register"></div>
@@ -88,11 +94,13 @@ Vue.component('user_login', {
     error: {
       required: true,
     },
+    authorized: {
+      required: true,
+      type: Boolean,
+    },
   },
-  template: `<div style="margin-left: 5%">login: <input v-model="login" type="text" class="input"
-                    v-on:keyup.enter="authorize"><br>
-                    pass: <input v-model="password" type="password" class="input"
-                    v-on:keyup.enter="authorize">
+  template: `<div style="margin-left: 5%">login: <input v-model="login" type="text" class="input" v-focus><br>
+                    pass: <input v-model="password" type="password" class="input">
                     <p v-if="error">error: {{ error }}</p>
                     <div class="user_login_button"
                     v-on:click="authorize">login</div>
@@ -109,9 +117,28 @@ Vue.component('user_login', {
       this.password = null;
     },
   },
+  mounted() {
+    document.addEventListener(
+      'keydown',
+      function (event) {
+        if (event.key === 'Enter') {
+          if (!this.authorized) {
+            console.log('here');
+            this.authorize(this.login, this.password);
+          }
+        }
+      }.bind(this),
+    );
+  },
 });
 
 Vue.component('wall', {
+  props: {
+    authorized: {
+      required: true,
+      type: Boolean,
+    },
+  },
   template: `<div><span v-for="tab in auth"  class="tab"
                     v-on:click="selectedAuth=tab"
                     v-show="selectedAuth!=='another'"
@@ -120,6 +147,7 @@ Vue.component('wall', {
                     </span>
                     <user_login v-show="selectedAuth === 'login'"
                     :error="error"
+                    :authorized="authorized"
                     @authorization="authorize"></user_login>
                     <user_register
                     v-show="selectedAuth === 'registration'"
@@ -128,7 +156,6 @@ Vue.component('wall', {
                     id="thank_you"><h4>{{ message }}</h4></div></div>`,
   data() {
     return {
-      authorized: false,
       im: null,
       profile: false,
       error: null,
@@ -199,7 +226,7 @@ Vue.component('user', {
                     <div class="user_logout_button" v-on:click="logout">logout</div>
                     <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
-                <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout"></wall>
+                <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout" :authorized="authorized"></wall>
               </div>
               <div v-show="profile && authorized" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
@@ -223,14 +250,14 @@ Vue.component('user', {
     addUser() {
       this.users.push(this.eventSource.data);
     },
-    logout() {
+    async logout() {
       this.eventSource.close();
-      axios.post('/users/logout', { user: this.im });
+      await axios.post('/users/logout', { user: this.im });
+      this.enemy = false;
       this.authorized = false;
       this.profile = false;
       this.users = null;
       this.im = false;
-      this.enemy = false;
     },
     authSuccess(im, users) {
       this.im = im;
@@ -291,7 +318,6 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('enemy', (event) => {
         this.enemy = JSON.parse(event.data);
-        console.log('new enemy: ' + this.enemy);
       });
       this.users = users;
       this.authorized = true;

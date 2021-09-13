@@ -6,7 +6,7 @@
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/13 00:17:01 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/13 17:34:41 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -59,6 +59,7 @@ Vue.component('game', {
       findInterval: null,
       acceptInterval: null,
       breaker: false,
+      cancelEventName: false,
     };
   },
   computed: {
@@ -112,6 +113,7 @@ Vue.component('game', {
       e.stopPropagation();
     },
     waiting() {
+      this.cancelEventName = 'cancelAccept';
       this.timerAccept = 10;
       this.str_timerAccept = null;
       this.ladder = 'accept';
@@ -130,8 +132,12 @@ Vue.component('game', {
               this.str_timerAccept = this.timerAccept.toFixed(1);
             } else if (this.timerAccept < 7) {
               this.str_timerAccept = this.timerAccept.toFixed(0);
+            } else if (this.str_timerAccept === '0.1') {
+              clearInterval(this.findInterval);
+              this.clearData();
             }
           } else {
+            console.log('clear');
             clearInterval(this.acceptInterval);
             clearInterval(this.findInterval);
             this.clearData();
@@ -142,8 +148,11 @@ Vue.component('game', {
     },
     findGame() {
       if (!this.enemy && !this.game) {
+        this.cancelEventName = 'cancelFind';
         this.game = true;
         this.breaker = false;
+        this.timerFind = 0;
+        this.str_timerFind = null;
         axios.get('/ladder/findGame?login=' + this.im.login + '&status=yellow');
         this.ladder = 'search ...';
         this.findInterval = setInterval(

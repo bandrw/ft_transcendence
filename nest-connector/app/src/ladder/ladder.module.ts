@@ -7,5 +7,6 @@ import { LadderService } from './ladder.service';
   controllers: [LadderController],
   imports: [UsersModule],
   providers: [LadderService],
+  exports: [LadderService],
 })
 export class LadderModule {}

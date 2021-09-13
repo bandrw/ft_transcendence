@@ -29864,7 +29864,7 @@ Vue.component('chat', {
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/13 00:17:01 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/13 17:34:41 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -29917,6 +29917,7 @@ Vue.component('game', {
       findInterval: null,
       acceptInterval: null,
       breaker: false,
+      cancelEventName: false,
     };
   },
   computed: {
@@ -29970,6 +29971,7 @@ Vue.component('game', {
       e.stopPropagation();
     },
     waiting() {
+      this.cancelEventName = 'cancelAccept';
       this.timerAccept = 10;
       this.str_timerAccept = null;
       this.ladder = 'accept';
@@ -29988,8 +29990,12 @@ Vue.component('game', {
               this.str_timerAccept = this.timerAccept.toFixed(1);
             } else if (this.timerAccept < 7) {
               this.str_timerAccept = this.timerAccept.toFixed(0);
+            } else if (this.str_timerAccept === '0.1') {
+              clearInterval(this.findInterval);
+              this.clearData();
             }
           } else {
+            console.log('clear');
             clearInterval(this.acceptInterval);
             clearInterval(this.findInterval);
             this.clearData();
@@ -30000,8 +30006,11 @@ Vue.component('game', {
     },
     findGame() {
       if (!this.enemy && !this.game) {
+        this.cancelEventName = 'cancelFind';
         this.game = true;
         this.breaker = false;
+        this.timerFind = 0;
+        this.str_timerFind = null;
         axios.get('/ladder/findGame?login=' + this.im.login + '&status=yellow');
         this.ladder = 'search ...';
         this.findInterval = setInterval(
@@ -30032,6 +30041,12 @@ chat = require('./chat');
 chat = require('./game');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcryptjs');
+
+Vue.directive('focus', {
+  inserted: function (el) {
+    el.focus();
+  },
+});
 
 Vue.component('user_register', {
   template: `<div><div id="user_register_login">login: <input v-model="login" type="text"
@@ -30116,11 +30131,13 @@ Vue.component('user_login', {
     error: {
       required: true,
     },
+    authorized: {
+      required: true,
+      type: Boolean,
+    },
   },
-  template: `<div style="margin-left: 5%">login: <input v-model="login" type="text" class="input"
-                    v-on:keyup.enter="authorize"><br>
-                    pass: <input v-model="password" type="password" class="input"
-                    v-on:keyup.enter="authorize">
+  template: `<div style="margin-left: 5%">login: <input v-model="login" type="text" class="input" v-focus><br>
+                    pass: <input v-model="password" type="password" class="input">
                     <p v-if="error">error: {{ error }}</p>
                     <div class="user_login_button"
                     v-on:click="authorize">login</div>
@@ -30137,9 +30154,28 @@ Vue.component('user_login', {
       this.password = null;
     },
   },
+  mounted() {
+    document.addEventListener(
+      'keydown',
+      function (event) {
+        if (event.key === 'Enter') {
+          if (!this.authorized) {
+            console.log('here');
+            this.authorize(this.login, this.password);
+          }
+        }
+      }.bind(this),
+    );
+  },
 });
 
 Vue.component('wall', {
+  props: {
+    authorized: {
+      required: true,
+      type: Boolean,
+    },
+  },
   template: `<div><span v-for="tab in auth"  class="tab"
                     v-on:click="selectedAuth=tab"
                     v-show="selectedAuth!=='another'"
@@ -30148,6 +30184,7 @@ Vue.component('wall', {
                     </span>
                     <user_login v-show="selectedAuth === 'login'"
                     :error="error"
+                    :authorized="authorized"
                     @authorization="authorize"></user_login>
                     <user_register
                     v-show="selectedAuth === 'registration'"
@@ -30156,7 +30193,6 @@ Vue.component('wall', {
                     id="thank_you"><h4>{{ message }}</h4></div></div>`,
   data() {
     return {
-      authorized: false,
       im: null,
       profile: false,
       error: null,
@@ -30227,7 +30263,7 @@ Vue.component('user', {
                     <div class="user_logout_button" v-on:click="logout">logout</div>
                     <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
-                <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout"></wall>
+                <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout" :authorized="authorized"></wall>
               </div>
               <div v-show="profile && authorized" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
@@ -30251,14 +30287,14 @@ Vue.component('user', {
     addUser() {
       this.users.push(this.eventSource.data);
     },
-    logout() {
+    async logout() {
       this.eventSource.close();
-      axios.post('/users/logout', { user: this.im });
+      await axios.post('/users/logout', { user: this.im });
+      this.enemy = false;
       this.authorized = false;
       this.profile = false;
       this.users = null;
       this.im = false;
-      this.enemy = false;
     },
     authSuccess(im, users) {
       this.im = im;
@@ -30319,7 +30355,6 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('enemy', (event) => {
         this.enemy = JSON.parse(event.data);
-        console.log('new enemy: ' + this.enemy);
       });
       this.users = users;
       this.authorized = true;
