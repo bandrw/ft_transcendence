@@ -30274,7 +30274,8 @@ Vue.component('wall', {
 Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
-              <chat :authorized="authorized" :im="im" :users="users"></chat>
+              <chat :authorized="authorized" :im="im" :users="users"
+              ref="chat"></chat>
               <ladder :authorized="authorized" @kickEnemy="enemy = false"
               :im="im" :users="users" :enemy="enemy"
               ref="ladder"></ladder>
@@ -30432,6 +30433,11 @@ Vue.component('user', {
           if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
             this.$refs.ladder.findGame();
           }
+        } else if (event.key === 'Tab' && this.authorized) {
+          event.preventDefault();
+          this.showProfile();
+        } else if (event.key === ' ' && this.authorized) {
+          this.$refs.chat.showChat();
         }
       }.bind(this),
     );

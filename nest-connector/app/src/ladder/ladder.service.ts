@@ -32,10 +32,12 @@ export class LadderService {
     while (this.users.onlineUsers[i].login != login) {
       ++i;
     }
-    if (status !== 'blue') {
+    if (status === 'blue') {
+      this.users.onlineUsers[i].status = 'green';
+    } else {
       this.users.onlineUsers[i].status = status;
-      this.users.userEvent('updateUser', this.users.onlineUsers[i]);
     }
+    this.users.userEvent('updateUser', this.users.onlineUsers[i]);
     if (status === 'yellow') {
       this.addToLadder(this.users.onlineUsers[i]);
     } else if (status === 'green') {
