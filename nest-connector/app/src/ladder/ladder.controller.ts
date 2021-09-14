@@ -5,7 +5,7 @@ import { LadderService } from './ladder.service';
 export class LadderController {
   constructor(private ladder: LadderService) {}
 
-  @Get('findGame')
+  @Get('gameStatus')
   findGame(@Query('login') login, @Query('status') status) {
     return this.ladder.updateStatus(login, status);
   }
@@ -15,21 +15,8 @@ export class LadderController {
     return this.ladder.traceLadder(login);
   }
 
-  // @Get('enemyEmit')
-  // enemyEmit(@Query('login') login) {
-  //   let i = 0;
-  //   while (i < this.ladder.lobby.length) {
-  //     if (
-  //       this.ladder.lobby[i].first.login === login
-  //     ) {
-  //       this.ladder.sendSingleEvents(i);
-  //     }
-  //     ++i;
-  //   }
-  // }
-
-  // @Get('gameAccept')
-  // gameAccept(@Query('login') login) {
+  // @Get('AwayFromKeyboard')
+  // AwayFromKeyboard(@Query('login') login) {
   //
   // }
 }

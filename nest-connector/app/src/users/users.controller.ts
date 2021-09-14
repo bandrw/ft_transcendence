@@ -7,10 +7,9 @@ import {
   Req,
   Header,
   HttpCode,
-  Injectable,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Response, Request, json } from 'express';
+import { Response, Request } from 'express';
 import { OnlineUser } from './users.interface';
 @Controller('users')
 export class UsersController {
@@ -66,6 +65,14 @@ export class UsersController {
       this.UsersService.onlineUsers.splice(index, 1);
     }
   }
+
+  @Get('checkExist')
+  async checkExist(@Query('login') login) {
+    return await this.UsersService.usersRepository.findOne({
+      where: { login: login },
+    });
+  }
+
   @Get('login')
   @Header('Content-Type', 'text/event-stream')
   @Header('Transfer-Encoding', 'chunked')

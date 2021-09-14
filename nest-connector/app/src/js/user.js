@@ -12,12 +12,19 @@ Vue.directive('focus', {
 });
 
 Vue.component('user_register', {
-  template: `<div><div id="user_register_login">login: <input v-model="login" type="text"
-                    v-on:keyup.enter="register"></div>
-                    <div id="user_register_pass1">pass: <input v-model="password1" type="password"
-                    v-on:keyup.enter="register"></div>
-                    <div id="user_register_pass2">repeat: <input v-model="password2" type="password"
-                    v-on:keyup.enter="register"></div>
+  props: {
+    authorized: {
+      required: true,
+      type: Boolean,
+    },
+    selectedAuth: {
+      required: true,
+      type: String,
+    },
+  },
+  template: `<div><div id="user_register_login">login: <input v-model="login" type="text"></div>
+                    <div id="user_register_pass1">pass: <input v-model="password1" type="password"></div>
+                    <div id="user_register_pass2">repeat: <input v-model="password2" type="password"></div>
                     <p v-if="error" id="user_register_error_message">error: {{ error }}</p>
                     <div class="user_login_button"
                     v-on:click="register">login</div>
@@ -31,7 +38,7 @@ Vue.component('user_register', {
     };
   },
   methods: {
-    creating() {
+    async creating() {
       bcrypt.hash(
         this.password1,
         10,
@@ -77,15 +84,29 @@ Vue.component('user_register', {
       } else if (this.password1.length < 6) {
         this.error = 'password too short';
       } else if (
-        await axios.post('/users/' + this.login).then(function (res) {
-          return res.data;
-        })
+        await axios
+          .get('/users/checkExist?login=' + this.login)
+          .then(function (res) {
+            return res.data;
+          })
       ) {
         this.error = 'user with the same login already exist';
       } else {
         this.creating();
       }
     },
+  },
+  mounted() {
+    document.addEventListener(
+      'keydown',
+      function (event) {
+        if (event.key === 'Enter') {
+          if (!this.authorized && this.selectedAuth === 'registration') {
+            this.register();
+          }
+        }
+      }.bind(this),
+    );
   },
 });
 
@@ -97,6 +118,10 @@ Vue.component('user_login', {
     authorized: {
       required: true,
       type: Boolean,
+    },
+    selectedAuth: {
+      required: true,
+      type: String,
     },
   },
   template: `<div style="margin-left: 5%">login: <input v-model="login" type="text" class="input" v-focus><br>
@@ -122,9 +147,8 @@ Vue.component('user_login', {
       'keydown',
       function (event) {
         if (event.key === 'Enter') {
-          if (!this.authorized) {
-            console.log('here');
-            this.authorize(this.login, this.password);
+          if (!this.authorized && this.selectedAuth === 'login') {
+            this.authorize();
           }
         }
       }.bind(this),
@@ -148,8 +172,11 @@ Vue.component('wall', {
                     <user_login v-show="selectedAuth === 'login'"
                     :error="error"
                     :authorized="authorized"
+                    :selectedAuth="selectedAuth"
                     @authorization="authorize"></user_login>
                     <user_register
+                    :authorized="authorized"
+                    :selectedAuth="selectedAuth"
                     v-show="selectedAuth === 'registration'"
                     @register="thankYou"></user_register>
                     <div v-show="selectedAuth === 'another'"
@@ -219,8 +246,9 @@ Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
               <chat :authorized="authorized" :im="im" :users="users"></chat>
-              <game :authorized="authorized" @kickEnemy="enemy = false"
-              :im="im" :users="users" :enemy="enemy"></game>
+              <ladder :authorized="authorized" @kickEnemy="enemy = false"
+              :im="im" :users="users" :enemy="enemy"
+              ref="ladder"></ladder>
               <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-if="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
@@ -251,6 +279,16 @@ Vue.component('user', {
       this.users.push(this.eventSource.data);
     },
     async logout() {
+      if (this.$refs.ladder.game) {
+        if (this.$refs.ladder.enemy) {
+          clearInterval(this.$refs.ladder.acceptInterval);
+          clearInterval(this.$refs.ladder.findInterval);
+          this.$refs.ladder.clearData();
+        } else {
+          clearInterval(this.$refs.ladder.findInterval);
+          this.$refs.ladder.clearData();
+        }
+      }
       this.eventSource.close();
       await axios.post('/users/logout', { user: this.im });
       this.enemy = false;
@@ -339,7 +377,7 @@ Vue.component('user', {
   },
   modules: {
     user: 'chat',
-    game: 'game',
+    ladder: 'ladder',
     wall: 'wall',
   },
   mounted() {
@@ -348,5 +386,25 @@ Vue.component('user', {
         this.logout();
       }
     }.bind(this);
+    document.addEventListener(
+      'keydown',
+      function (event) {
+        if (event.key === 'Escape') {
+          if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
+            this.logout();
+          } else if (this.authorized && this.$refs.ladder.game) {
+            if (!this.enemy) {
+              this.$refs.ladder.cancelFind(event);
+            } else {
+              this.$refs.ladder.cancelAccept(event);
+            }
+          }
+        } else if (event.key === 'Enter') {
+          if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
+            this.$refs.ladder.findGame();
+          }
+        }
+      }.bind(this),
+    );
   },
 });

@@ -32,15 +32,31 @@ export class LadderService {
     while (this.users.onlineUsers[i].login != login) {
       ++i;
     }
-    this.users.onlineUsers[i].status = status;
-    this.users.userEvent('updateUser', this.users.onlineUsers[i]);
+    if (status !== 'blue') {
+      this.users.onlineUsers[i].status = status;
+      this.users.userEvent('updateUser', this.users.onlineUsers[i]);
+    }
     if (status === 'yellow') {
       this.addToLadder(this.users.onlineUsers[i]);
     } else if (status === 'green') {
-      this.removeFromLadder(this.users.onlineUsers[i]);
+      this.removeFromLadder(
+        this.users.onlineUsers[i],
+        this.sendSingleEvents.bind(this),
+      );
+    } else if (status === 'blue') {
+      this.removeFromLadder(
+        this.users.onlineUsers[i],
+        this.awayFromKeyboard.bind(this),
+      );
     }
     return login;
   }
+
+  awayFromKeyboard(userIndex) {
+    this.lobby[userIndex].first.status = 'yellow';
+    this.users.userEvent('updateUser', this.lobby[userIndex].first);
+  }
+
   addToLadder(user: OnlineUser) {
     let i = 0;
     let userInLadder = false;
@@ -96,7 +112,7 @@ export class LadderService {
     }
   }
 
-  removeFromLadder(user: OnlineUser) {
+  removeFromLadder(user: OnlineUser, func) {
     let i = 0;
     while (i < this.lobby.length) {
       if (this.lobby[i].first && this.lobby[i].first.login === user.login) {
@@ -104,7 +120,7 @@ export class LadderService {
         if (this.lobby[i].second) {
           this.lobby[i].first = this.lobby[i].second;
           this.lobby[i].second = null;
-          this.sendSingleEvents(i);
+          func(i);
         } else {
           this.lobby = this.lobby.filter(function (val) {
             return val.first !== null || val.second !== null;
@@ -117,7 +133,7 @@ export class LadderService {
       ) {
         this.lobby[i].second = null;
         if (this.lobby[i].first) {
-          this.sendSingleEvents(i);
+          func(i);
         } else {
           this.lobby = this.lobby.filter(function (val) {
             return val.first !== null || val.second !== null;
