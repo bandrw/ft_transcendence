@@ -29864,7 +29864,7 @@ Vue.component('chat', {
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/14 06:37:26 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/16 00:54:10 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -29892,11 +29892,13 @@ Vue.component('ladder', {
   template: `<div v-on:click="findGame"
                   :class="classGame">
                   <div v-if="enemy">
-                    <div class="accept_button" @click="gameAccept">{{ ladder }}</div>
+                    <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancelAccept">cancel</div>
                     <div class="timeout">{{ str_timerAccept }}</div>
-                    <div id="game_you"><img :src="im.url_avatar" width="100%" height="100%"></div>
-                    <div id="game_enemy"><img :src="enemy.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_ready_you" :style="{ backgroundColor: readyStatus }"></div>
+                    <div id="ladder_ready_enemy" :style="{ backgroundColor: enemy.readyStatus }"></div>
+                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%"></div>
                   </div>
                   <div v-else>
                     <p v-if="authorized">{{ ladder }}
@@ -29904,8 +29906,7 @@ Vue.component('ladder', {
                         <div class="cancel" v-on:click="cancelFind">cancel</div>
                     </div>
                   </p>
-                  </div>
-             </div>`,
+                  </div></div>`,
   data() {
     return {
       ladder: 'play',
@@ -29917,6 +29918,7 @@ Vue.component('ladder', {
       findInterval: null,
       acceptInterval: null,
       breaker: false,
+      readyStatus: 'yellow',
     };
   },
   computed: {
@@ -29933,8 +29935,13 @@ Vue.component('ladder', {
     },
   },
   methods: {
+    gameReady() {
+      clearInterval(this.acceptInterval);
+      clearInterval(this.findInterval);
+    },
     gameAccept() {
-      axios.get('/ladder/gameAccept?login=' + this.im.login);
+      this.readyStatus = 'green';
+      axios.get('/ladder/gameStatus?login=' + this.enemy.login + '&status=red');
     },
     clearData(status = 'green') {
       this.game = false;
@@ -29987,9 +29994,17 @@ Vue.component('ladder', {
               this.str_timerAccept = this.timerAccept.toFixed(0);
             }
           } else {
-            clearInterval(this.acceptInterval);
-            clearInterval(this.findInterval);
-            this.clearData('blue');
+            if (this.readyStatus === 'yellow') {
+              clearInterval(this.acceptInterval);
+              clearInterval(this.findInterval);
+              this.clearData('blue');
+            } else if (this.readyStatus === 'green') {
+              this.$emit('kickEnemy');
+              clearInterval(this.acceptInterval);
+              this.ladder = 'search ...';
+              this.breaker = false;
+              axios.get('ladder/systemStatus?login=' + this.im.login);
+            }
           }
         }.bind(this),
         100,
@@ -30012,6 +30027,7 @@ Vue.component('ladder', {
               this.str_timerFind = this.timerFind.toFixed(1);
               if (this.enemy && !this.breaker) {
                 this.breaker = true;
+                this.readyStatus = 'yellow';
                 this.waiting();
               }
             } else {
@@ -30030,7 +30046,7 @@ Vue.component('ladder', {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 chat = require('./chat');
-chat = require('./game');
+chat = require('./ladder');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcryptjs');
 
@@ -30274,13 +30290,15 @@ Vue.component('wall', {
 Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
-              <chat :authorized="authorized" :im="im" :users="users"
-              ref="chat"></chat>
+              <transition name="chat">
+                <chat :authorized="authorized" :im="im" :users="users"
+                ref="chat" v-show="!gameR"></chat>
+              </transition>
               <ladder :authorized="authorized" @kickEnemy="enemy = false"
-              :im="im" :users="users" :enemy="enemy"
-              ref="ladder"></ladder>
-              <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
-                <div v-if="authorized">
+               :im="im" :users="users" :enemy="enemy"
+              ref="ladder" v-show="!gameR"></ladder>
+              <div v-show="!gameR" :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
+                <div v-show="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
                     <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
@@ -30302,6 +30320,7 @@ Vue.component('user', {
       users: null,
       eventSource: null,
       enemy: false,
+      gameR: false,
     };
   },
   methods: {
@@ -30386,6 +30405,14 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('enemy', (event) => {
         this.enemy = JSON.parse(event.data);
+        this.enemy.readyStatus = 'yellow';
+      });
+      this.eventSource.addEventListener('enemyIsReady', () => {
+        this.enemy.readyStatus = 'green';
+      });
+      this.eventSource.addEventListener('gameIsReady', () => {
+        this.$refs.ladder.gameReady();
+        this.gameR = true;
       });
       this.users = users;
       this.authorized = true;
@@ -30420,18 +30447,37 @@ Vue.component('user', {
       'keydown',
       function (event) {
         if (event.key === 'Escape') {
-          if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
+          if (
+            this.$refs.ladder &&
+            this.authorized &&
+            !this.$refs.ladder.game &&
+            !this.enemy
+          ) {
             this.logout();
-          } else if (this.authorized && this.$refs.ladder.game) {
+          } else if (
+            this.$refs.ladder &&
+            this.authorized &&
+            this.$refs.ladder.game
+          ) {
             if (!this.enemy) {
               this.$refs.ladder.cancelFind(event);
-            } else {
+            } else if (this.enemy && !this.gameR) {
               this.$refs.ladder.cancelAccept(event);
+            } else if (this.enemy && this.gameR) {
+              this.gameR = false;
+              this.$refs.ladder.clearData('blue');
             }
           }
         } else if (event.key === 'Enter') {
           if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
             this.$refs.ladder.findGame();
+          } else if (
+            this.authorized &&
+            this.$refs.ladder.game &&
+            this.enemy &&
+            !this.gameR
+          ) {
+            this.$refs.ladder.gameAccept();
           }
         } else if (event.key === 'Tab' && this.authorized) {
           event.preventDefault();
@@ -30444,4 +30490,4 @@ Vue.component('user', {
   },
 });
 
-},{"./chat":224,"./game":225,"axios":16,"bcryptjs":44}]},{},[223]);
+},{"./chat":224,"./ladder":225,"axios":16,"bcryptjs":44}]},{},[223]);

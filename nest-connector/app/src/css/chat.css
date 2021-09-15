@@ -61,3 +61,7 @@
     right: 1%;
     position: absolute;
 }
+
+.chat-enter-active, .chat-leave-active {
+    transition: opacity .5s;
+}

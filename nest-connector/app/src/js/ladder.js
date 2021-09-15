@@ -6,7 +6,7 @@
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/14 06:37:26 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/16 00:54:10 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -34,11 +34,13 @@ Vue.component('ladder', {
   template: `<div v-on:click="findGame"
                   :class="classGame">
                   <div v-if="enemy">
-                    <div class="accept_button" @click="gameAccept">{{ ladder }}</div>
+                    <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancelAccept">cancel</div>
                     <div class="timeout">{{ str_timerAccept }}</div>
-                    <div id="game_you"><img :src="im.url_avatar" width="100%" height="100%"></div>
-                    <div id="game_enemy"><img :src="enemy.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_ready_you" :style="{ backgroundColor: readyStatus }"></div>
+                    <div id="ladder_ready_enemy" :style="{ backgroundColor: enemy.readyStatus }"></div>
+                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%"></div>
                   </div>
                   <div v-else>
                     <p v-if="authorized">{{ ladder }}
@@ -46,8 +48,7 @@ Vue.component('ladder', {
                         <div class="cancel" v-on:click="cancelFind">cancel</div>
                     </div>
                   </p>
-                  </div>
-             </div>`,
+                  </div></div>`,
   data() {
     return {
       ladder: 'play',
@@ -59,6 +60,7 @@ Vue.component('ladder', {
       findInterval: null,
       acceptInterval: null,
       breaker: false,
+      readyStatus: 'yellow',
     };
   },
   computed: {
@@ -75,8 +77,13 @@ Vue.component('ladder', {
     },
   },
   methods: {
+    gameReady() {
+      clearInterval(this.acceptInterval);
+      clearInterval(this.findInterval);
+    },
     gameAccept() {
-      axios.get('/ladder/gameAccept?login=' + this.im.login);
+      this.readyStatus = 'green';
+      axios.get('/ladder/gameStatus?login=' + this.enemy.login + '&status=red');
     },
     clearData(status = 'green') {
       this.game = false;
@@ -129,9 +136,17 @@ Vue.component('ladder', {
               this.str_timerAccept = this.timerAccept.toFixed(0);
             }
           } else {
-            clearInterval(this.acceptInterval);
-            clearInterval(this.findInterval);
-            this.clearData('blue');
+            if (this.readyStatus === 'yellow') {
+              clearInterval(this.acceptInterval);
+              clearInterval(this.findInterval);
+              this.clearData('blue');
+            } else if (this.readyStatus === 'green') {
+              this.$emit('kickEnemy');
+              clearInterval(this.acceptInterval);
+              this.ladder = 'search ...';
+              this.breaker = false;
+              axios.get('ladder/systemStatus?login=' + this.im.login);
+            }
           }
         }.bind(this),
         100,
@@ -154,6 +169,7 @@ Vue.component('ladder', {
               this.str_timerFind = this.timerFind.toFixed(1);
               if (this.enemy && !this.breaker) {
                 this.breaker = true;
+                this.readyStatus = 'yellow';
                 this.waiting();
               }
             } else {

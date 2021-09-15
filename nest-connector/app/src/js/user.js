@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 chat = require('./chat');
-chat = require('./game');
+chat = require('./ladder');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcryptjs');
 
@@ -245,13 +245,15 @@ Vue.component('wall', {
 Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
-              <chat :authorized="authorized" :im="im" :users="users"
-              ref="chat"></chat>
+              <transition name="chat">
+                <chat :authorized="authorized" :im="im" :users="users"
+                ref="chat" v-show="!gameR"></chat>
+              </transition>
               <ladder :authorized="authorized" @kickEnemy="enemy = false"
-              :im="im" :users="users" :enemy="enemy"
-              ref="ladder"></ladder>
-              <div :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
-                <div v-if="authorized">
+               :im="im" :users="users" :enemy="enemy"
+              ref="ladder" v-show="!gameR"></ladder>
+              <div v-show="!gameR" :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
+                <div v-show="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
                     <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
@@ -273,6 +275,7 @@ Vue.component('user', {
       users: null,
       eventSource: null,
       enemy: false,
+      gameR: false,
     };
   },
   methods: {
@@ -357,6 +360,14 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('enemy', (event) => {
         this.enemy = JSON.parse(event.data);
+        this.enemy.readyStatus = 'yellow';
+      });
+      this.eventSource.addEventListener('enemyIsReady', () => {
+        this.enemy.readyStatus = 'green';
+      });
+      this.eventSource.addEventListener('gameIsReady', () => {
+        this.$refs.ladder.gameReady();
+        this.gameR = true;
       });
       this.users = users;
       this.authorized = true;
@@ -391,18 +402,37 @@ Vue.component('user', {
       'keydown',
       function (event) {
         if (event.key === 'Escape') {
-          if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
+          if (
+            this.$refs.ladder &&
+            this.authorized &&
+            !this.$refs.ladder.game &&
+            !this.enemy
+          ) {
             this.logout();
-          } else if (this.authorized && this.$refs.ladder.game) {
+          } else if (
+            this.$refs.ladder &&
+            this.authorized &&
+            this.$refs.ladder.game
+          ) {
             if (!this.enemy) {
               this.$refs.ladder.cancelFind(event);
-            } else {
+            } else if (this.enemy && !this.gameR) {
               this.$refs.ladder.cancelAccept(event);
+            } else if (this.enemy && this.gameR) {
+              this.gameR = false;
+              this.$refs.ladder.clearData('blue');
             }
           }
         } else if (event.key === 'Enter') {
           if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
             this.$refs.ladder.findGame();
+          } else if (
+            this.authorized &&
+            this.$refs.ladder.game &&
+            this.enemy &&
+            !this.gameR
+          ) {
+            this.$refs.ladder.gameAccept();
           }
         } else if (event.key === 'Tab' && this.authorized) {
           event.preventDefault();

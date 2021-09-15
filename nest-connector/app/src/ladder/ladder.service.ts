@@ -50,6 +50,29 @@ export class LadderService {
         this.users.onlineUsers[i],
         this.awayFromKeyboard.bind(this),
       );
+    } else if (status === 'red') {
+      this.userPersonalEvent('enemyIsReady', this.users.onlineUsers[i], login);
+      let k = 0;
+      while (k < this.lobby.length) {
+        if (
+          (this.lobby[k].first.login === login ||
+            this.lobby[k].second.login === login) &&
+          this.lobby[k].first.status === 'red' &&
+          this.lobby[k].second.status === 'red'
+        ) {
+          this.userPersonalEvent(
+            'gameIsReady',
+            null,
+            this.lobby[k].first.login,
+          );
+          this.userPersonalEvent(
+            'gameIsReady',
+            null,
+            this.lobby[k].second.login,
+          );
+        }
+        ++k;
+      }
     }
     return login;
   }
