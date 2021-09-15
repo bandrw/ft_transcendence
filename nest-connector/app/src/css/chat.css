@@ -63,5 +63,5 @@
 }
 
 .chat-enter-active, .chat-leave-active {
-    transition: opacity .5s;
+    transition: opacity 3.5s;
 }

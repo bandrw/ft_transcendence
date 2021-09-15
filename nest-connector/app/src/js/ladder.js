@@ -6,7 +6,7 @@
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/16 00:54:10 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/16 02:32:15 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -32,7 +32,7 @@ Vue.component('ladder', {
     },
   },
   template: `<div v-on:click="findGame"
-                  :class="classGame">
+                  :class="classGame" class="Jquery_bundle">
                   <div v-if="enemy">
                     <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancelAccept">cancel</div>
@@ -82,6 +82,7 @@ Vue.component('ladder', {
       clearInterval(this.findInterval);
     },
     gameAccept() {
+      // $('#chat').fadeOut(1000);
       this.readyStatus = 'green';
       axios.get('/ladder/gameStatus?login=' + this.enemy.login + '&status=red');
     },

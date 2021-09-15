@@ -29785,12 +29785,16 @@ Vue.component('chat', {
     users: {
       required: true,
     },
+    gameR: {
+      type: Boolean,
+      required: true,
+    },
   },
-  template: `<div>
+  template: `<div class="Jquery_bundle">
                <div :class="classGame"
                v-on:click="showChat">
                   <div class="chat_performance" 
-                    v-if="authorized">
+                    v-show="authorized">
                       {{ type }}
                   </div>
                 <div v-show="show_chat && users"
@@ -29809,8 +29813,7 @@ Vue.component('chat', {
             <img :src="user.url_avatar"
             class="user_profile_avatar">
             <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
-          </div>
-        </div>
+          </div></div>
   `,
   data() {
     return {
@@ -29864,7 +29867,7 @@ Vue.component('chat', {
 /*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/16 00:54:10 by pfile            ###   ########lyon.fr   */
+/*   Updated: 2021/09/16 02:32:15 by pfile            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -29890,7 +29893,7 @@ Vue.component('ladder', {
     },
   },
   template: `<div v-on:click="findGame"
-                  :class="classGame">
+                  :class="classGame" class="Jquery_bundle">
                   <div v-if="enemy">
                     <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancelAccept">cancel</div>
@@ -29940,6 +29943,7 @@ Vue.component('ladder', {
       clearInterval(this.findInterval);
     },
     gameAccept() {
+      // $('#chat').fadeOut(1000);
       this.readyStatus = 'green';
       axios.get('/ladder/gameStatus?login=' + this.enemy.login + '&status=red');
     },
@@ -30290,21 +30294,19 @@ Vue.component('wall', {
 Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
-              <transition name="chat">
                 <chat :authorized="authorized" :im="im" :users="users"
-                ref="chat" v-show="!gameR"></chat>
-              </transition>
+                ref="chat" :gameR="gameR"></chat>
               <ladder :authorized="authorized" @kickEnemy="enemy = false"
                :im="im" :users="users" :enemy="enemy"
-              ref="ladder" v-show="!gameR"></ladder>
-              <div v-show="!gameR" :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
+              ref="ladder"></ladder>
+              <div class="Jquery_bundle" :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-show="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
                     <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
                 <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout" :authorized="authorized"></wall>
               </div>
-              <div v-show="profile && authorized" class="user_profile">
+              <div v-show="profile && authorized && !gameR" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
                 <div id="user_update_avatar" v-on:click="updateAvatar"></div>
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
@@ -30412,6 +30414,7 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('gameIsReady', () => {
         this.$refs.ladder.gameReady();
+        $('.Jquery_bundle').fadeOut(1000);
         this.gameR = true;
       });
       this.users = users;
@@ -30464,6 +30467,7 @@ Vue.component('user', {
             } else if (this.enemy && !this.gameR) {
               this.$refs.ladder.cancelAccept(event);
             } else if (this.enemy && this.gameR) {
+              $('.Jquery_bundle').fadeIn(1000);
               this.gameR = false;
               this.$refs.ladder.clearData('blue');
             }

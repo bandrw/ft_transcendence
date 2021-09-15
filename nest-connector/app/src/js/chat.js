@@ -15,12 +15,16 @@ Vue.component('chat', {
     users: {
       required: true,
     },
+    gameR: {
+      type: Boolean,
+      required: true,
+    },
   },
-  template: `<div>
+  template: `<div class="Jquery_bundle">
                <div :class="classGame"
                v-on:click="showChat">
                   <div class="chat_performance" 
-                    v-if="authorized">
+                    v-show="authorized">
                       {{ type }}
                   </div>
                 <div v-show="show_chat && users"
@@ -39,8 +43,7 @@ Vue.component('chat', {
             <img :src="user.url_avatar"
             class="user_profile_avatar">
             <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
-          </div>
-        </div>
+          </div></div>
   `,
   data() {
     return {

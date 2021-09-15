@@ -245,21 +245,19 @@ Vue.component('wall', {
 Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
-              <transition name="chat">
                 <chat :authorized="authorized" :im="im" :users="users"
-                ref="chat" v-show="!gameR"></chat>
-              </transition>
+                ref="chat" :gameR="gameR"></chat>
               <ladder :authorized="authorized" @kickEnemy="enemy = false"
                :im="im" :users="users" :enemy="enemy"
-              ref="ladder" v-show="!gameR"></ladder>
-              <div v-show="!gameR" :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
+              ref="ladder"></ladder>
+              <div class="Jquery_bundle" :class="{ user_authorized: authorized, user_unauthorized: !authorized }">
                 <div v-show="authorized">
                     <div class="user_logout_button" v-on:click="logout">logout</div>
                     <div class="user_profile_button" v-on:click="showProfile">{{ im.login }}</div>
                 </div>
                 <wall v-show="!authorized" @authSuccess="authSuccess" @logout="logout" :authorized="authorized"></wall>
               </div>
-              <div v-show="profile && authorized" class="user_profile">
+              <div v-show="profile && authorized && !gameR" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
                 <div id="user_update_avatar" v-on:click="updateAvatar"></div>
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
@@ -367,6 +365,7 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('gameIsReady', () => {
         this.$refs.ladder.gameReady();
+        $('.Jquery_bundle').fadeOut(1000);
         this.gameR = true;
       });
       this.users = users;
@@ -419,6 +418,7 @@ Vue.component('user', {
             } else if (this.enemy && !this.gameR) {
               this.$refs.ladder.cancelAccept(event);
             } else if (this.enemy && this.gameR) {
+              $('.Jquery_bundle').fadeIn(1000);
               this.gameR = false;
               this.$refs.ladder.clearData('blue');
             }
