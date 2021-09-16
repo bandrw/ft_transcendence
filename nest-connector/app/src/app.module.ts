@@ -7,6 +7,7 @@ import { User_table } from 'src/users/user.entity';
 import { UsersModule } from './users/users.module';
 import { JsController } from './js/js.controller';
 import { LadderModule } from './ladder/ladder.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LadderModule } from './ladder/ladder.module';
     }),
     UsersModule,
     LadderModule,
+    GameModule,
   ],
   controllers: [AppController, CssController, JsController],
   providers: [AppService],
