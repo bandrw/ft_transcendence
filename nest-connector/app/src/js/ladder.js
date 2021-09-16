@@ -37,17 +37,16 @@ Vue.component('ladder', {
                     <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancelAccept">cancel</div>
                     <div class="timeout">{{ str_timerAccept }}</div>
-                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%" alt=""></div>
                     <div id="ladder_ready_you" :style="{ backgroundColor: readyStatus }"></div>
                     <div id="ladder_ready_enemy" :style="{ backgroundColor: enemy.readyStatus }"></div>
-                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%" alt=""></div>
                   </div>
                   <div v-else>
-                    <p v-if="authorized">{{ ladder }}
+                    <p v-if="authorized">{{ ladder }}</p>
                     <div v-if="gameFinding">{{ str_timerFind }}
                         <div class="cancel" v-on:click="cancelFind">cancel</div>
                     </div>
-                  </p>
                   </div></div>`,
   data() {
     return {

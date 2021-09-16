@@ -32,7 +32,7 @@ Vue.component('chat', {
                     <div class="user_in_chat"
                          v-for="user in users"
                         v-on:mouseover="userInfo(user, $event)"
-                        v-if="user && user.login!=im.login">
+                        v-if="user && user.login!==im.login">
                         {{ user.login }}<span id="chat_user_status"
                         :style="{ backgroundColor: user.status }"></span></div>
                 </div>

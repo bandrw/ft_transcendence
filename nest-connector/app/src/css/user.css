@@ -1,4 +1,6 @@
 .user_authorized {
+    min-width: 300px;
+    min-height: 150px;
     width: 20%;
     height: 10%;
     background-color: crimson;
@@ -8,21 +10,28 @@
 }
 
 .user_unauthorized {
-    width: 35%;
-    height: 30%;
-    background-color: chartreuse;
+    width: 50%;
+    height: 27%;
+    min-width: 500px;
+    min-height: 250px;
+    max-width: 600px;
+    max-height: 300px;
+    /*background-color: chartreuse;*/
     position: absolute;
-    right: 33%;
-    bottom: 35%;
+    left: 15%;
+    top: 15%;
 }
 
 .user_login_button {
-    width: 30%;
-    height: 30%;
-    background-color: gold;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #cacaca, #79E7AF);
+    box-shadow:  24px 24px 47px #9b9b9b,
+    -24px -24px 47px #ffffff;
+    width: 25%;
+    height: 25%;
     position: absolute;
     right: 5%;
-    bottom: 15%;
+    bottom: 25%;
 }
 
 .user_logout_button {
@@ -93,13 +102,38 @@
     text-decoration: underline;
 }
 
-.input {
-    margin: 2%;
+#login_login_input {
+    left: 25%;
+    top: 20%;
+    position: absolute;
+}
+
+#login_login_text {
+    left: 9%;
+    top: 16%;
+    position: absolute;
+}
+
+#login_password_input {
+    left: 7%;
+    top: 45%;
+    position: absolute;
+}
+
+#login_password_text {
+    left: 25%;
+    top: 59%;
+    position: absolute;
+}
+
+.user_login_button > p {
+    font-size: large;
+    text-align: center;
 }
 
 #intra_img {
-    width: 12%;
-    height: 27%;
+    width: 15%;
+    height: 20%;
     right: 5%;
     top: 10%;
     position: absolute;
@@ -133,4 +167,9 @@
 #thank_you {
     text-align: center;
     top: 40%;
+}
+
+#login_error {
+    position: absolute;
+    bottom: 0;
 }

@@ -29802,7 +29802,7 @@ Vue.component('chat', {
                     <div class="user_in_chat"
                          v-for="user in users"
                         v-on:mouseover="userInfo(user, $event)"
-                        v-if="user && user.login!=im.login">
+                        v-if="user && user.login!==im.login">
                         {{ user.login }}<span id="chat_user_status"
                         :style="{ backgroundColor: user.status }"></span></div>
                 </div>
@@ -29898,17 +29898,16 @@ Vue.component('ladder', {
                     <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
                     <div class="decline_button" v-on:click="cancelAccept">cancel</div>
                     <div class="timeout">{{ str_timerAccept }}</div>
-                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%" alt=""></div>
                     <div id="ladder_ready_you" :style="{ backgroundColor: readyStatus }"></div>
                     <div id="ladder_ready_enemy" :style="{ backgroundColor: enemy.readyStatus }"></div>
-                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%"></div>
+                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%" alt=""></div>
                   </div>
                   <div v-else>
-                    <p v-if="authorized">{{ ladder }}
+                    <p v-if="authorized">{{ ladder }}</p>
                     <div v-if="gameFinding">{{ str_timerFind }}
                         <div class="cancel" v-on:click="cancelFind">cancel</div>
                     </div>
-                  </p>
                   </div></div>`,
   data() {
     return {
@@ -30128,6 +30127,8 @@ Vue.component('user_register', {
         this.error = 'please enter password again';
       } else if (this.login.length < 4) {
         this.error = 'login too short';
+      } else if (this.login.length > 16) {
+        this.error = 'login too long';
       } else if (this.password1 !== this.password2) {
         this.error = 'passwords are not equal';
       } else if (this.password1.length < 6) {
@@ -30173,11 +30174,11 @@ Vue.component('user_login', {
       type: String,
     },
   },
-  template: `<div style="margin-left: 5%">login: <input v-model="login" type="text" class="input" v-focus><br>
-                    pass: <input v-model="password" type="password" class="input">
-                    <p v-if="error">error: {{ error }}</p>
+  template: `<div><div id="login_login_text"><p>user > </p></div><div id="login_login_input"><input v-model="login" type="text" class="input" v-focus placeholder="between 4 and 16 symbols"></div>
+                    <div id="login_password_text"><p>password ^ </p></div><div id="login_password_input"><input v-model="password" type="password" class="input"  placeholder="6 and more symbols"></div>
+                    <div id="login_error"><p v-if="error">error: {{ error }}</p></div>
                     <div class="user_login_button"
-                    v-on:click="authorize">login</div>
+                    v-on:click="authorize"><p>login</p></div>
                     <img src="https://yt3.ggpht.com/ytc/AAUvwniWlUa-gZ5YNz8-2Mtada9CZOHaX8o4nGaq5JWc=s900-c-k-c0x00ffffff-no-rj" id="intra_img"></div>`,
   data() {
     return {
@@ -30271,7 +30272,7 @@ Vue.component('wall', {
           this.error = 'Wrong password';
         }
       } else {
-        this.error = "User with login '" + login + "' not registered";
+        this.error = "User with login '" + login + "' not found";
       }
     },
     thankYou(login) {
