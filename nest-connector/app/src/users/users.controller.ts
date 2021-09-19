@@ -61,8 +61,42 @@ export class UsersController {
         'logout_SSE',
         this.UsersService.onlineUsers[index],
       );
+      // let i = 0;
+      // while (i < this.UsersService.onlineUsers.length) {
+      //   if (this.UsersService.onlineUsers[i]) {
+      //     console.log(this.UsersService.onlineUsers[i].login);
+      //   } else {
+      //     console.log('null');
+      //   }
+      //   ++i;
+      // }
       this.UsersService.onlineUsers[index].resp.end();
       this.UsersService.onlineUsers.splice(index, 1);
+      // i = 0;
+      // while (i < this.UsersService.onlineUsers.length) {
+      //   if (this.UsersService.onlineUsers[i]) {
+      //     console.log(this.UsersService.onlineUsers[i].login);
+      //   } else {
+      //     console.log('null');
+      //   }
+      //   ++i;
+      // }
+      this.UsersService.onlineUsers = this.UsersService.onlineUsers.filter(
+        function (val) {
+          if (val) {
+            return val;
+          }
+        },
+      );
+      // i = 0;
+      // while (i < this.UsersService.onlineUsers.length) {
+      //   if (this.UsersService.onlineUsers[i]) {
+      //     console.log(this.UsersService.onlineUsers[i].login);
+      //   } else {
+      //     console.log('null');
+      //   }
+      //   ++i;
+      // }
     }
   }
 

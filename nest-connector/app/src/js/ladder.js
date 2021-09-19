@@ -81,7 +81,6 @@ Vue.component('ladder', {
       clearInterval(this.findInterval);
     },
     gameAccept() {
-      // $('#chat').fadeOut(1000);
       this.readyStatus = 'green';
       axios.get('/ladder/gameStatus?login=' + this.enemy.login + '&status=red');
     },

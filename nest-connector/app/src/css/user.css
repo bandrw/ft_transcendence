@@ -1,6 +1,6 @@
 .user_authorized {
-    min-width: 300px;
-    min-height: 150px;
+    min-width: 100px;
+    min-height: 50px;
     width: 20%;
     height: 10%;
     background-color: crimson;

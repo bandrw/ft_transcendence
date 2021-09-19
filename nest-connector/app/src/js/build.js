@@ -29767,291 +29767,11 @@ new Vue({
   },
 });
 
-},{"./user":226,"axios":16}],224:[function(require,module,exports){
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const axios = require('axios');
-
-Vue.component('chat', {
-  props: {
-    authorized: {
-      type: Boolean,
-      required: true,
-    },
-    im: {
-      type: [Object, Boolean],
-      default: null,
-      required: false,
-    },
-    users: {
-      required: true,
-    },
-    gameR: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  template: `<div class="Jquery_bundle">
-               <div :class="classGame"
-               v-on:click="showChat">
-                  <div class="chat_performance" 
-                    v-show="authorized">
-                      {{ type }}
-                  </div>
-                <div v-show="show_chat && users"
-                        class="chat_users_side">
-                    <div class="user_in_chat"
-                         v-for="user in users"
-                        v-on:mouseover="userInfo(user, $event)"
-                        v-if="user && user.login!==im.login">
-                        {{ user.login }}<span id="chat_user_status"
-                        :style="{ backgroundColor: user.status }"></span></div>
-                </div>
-          </div>
-          <div v-if="info" class="chat_user_info"
-          :style="{ left: infoStyle.left, top: infoStyle.top }">
-            {{ user.login }}
-            <img :src="user.url_avatar"
-            class="user_profile_avatar">
-            <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
-          </div></div>
-  `,
-  data() {
-    return {
-      type: 'Chat',
-      show_chat: false,
-      info: false,
-      user: null,
-      infoStyle: {
-        left: null,
-        top: null,
-      },
-    };
-  },
-  computed: {
-    classGame: function () {
-      if (this.authorized) {
-        return {
-          chat_opened: this.show_chat,
-          chat_closed: !this.show_chat,
-        };
-      } else {
-        this.show_chat = false;
-        this.info = false;
-      }
-    },
-  },
-  methods: {
-    userInfo(user, e) {
-      this.info = true;
-      this.user = user;
-      this.infoStyle.left = e.pageX.toString() + 'px';
-      this.infoStyle.top = e.pageY.toString() + 'px';
-    },
-    showChat() {
-      if (this.show_chat) {
-        this.show_chat = false;
-        this.info = false;
-      } else {
-        this.show_chat = true;
-      }
-    },
-  },
-});
-
-},{"axios":16}],225:[function(require,module,exports){
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   game.js                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
-/*   Updated: 2021/09/16 02:32:15 by pfile            ###   ########lyon.fr   */
-/*                                                                            */
-/* ************************************************************************** */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const axios = require('axios');
-Vue.component('ladder', {
-  props: {
-    authorized: {
-      type: Boolean,
-      required: true,
-    },
-    im: {
-      type: [Object, Boolean],
-      default: null,
-      required: false,
-    },
-    users: {
-      required: true,
-    },
-    enemy: {
-      type: [Object, Boolean],
-      default: null,
-      required: false,
-    },
-  },
-  template: `<div v-on:click="findGame"
-                  :class="classGame" class="Jquery_bundle">
-                  <div v-if="enemy">
-                    <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
-                    <div class="decline_button" v-on:click="cancelAccept">cancel</div>
-                    <div class="timeout">{{ str_timerAccept }}</div>
-                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%" alt=""></div>
-                    <div id="ladder_ready_you" :style="{ backgroundColor: readyStatus }"></div>
-                    <div id="ladder_ready_enemy" :style="{ backgroundColor: enemy.readyStatus }"></div>
-                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%" alt=""></div>
-                  </div>
-                  <div v-else>
-                    <p v-if="authorized">{{ ladder }}</p>
-                    <div v-if="gameFinding">{{ str_timerFind }}
-                        <div class="cancel" v-on:click="cancelFind">cancel</div>
-                    </div>
-                  </div></div>`,
-  data() {
-    return {
-      ladder: 'play',
-      game: false,
-      timerFind: 0,
-      str_timerAccept: null,
-      timerAccept: 0,
-      str_timerFind: null,
-      findInterval: null,
-      acceptInterval: null,
-      breaker: false,
-      readyStatus: 'yellow',
-    };
-  },
-  computed: {
-    gameFinding: function () {
-      return this.game && !this.enemy && this.authorized;
-    },
-    classGame: function () {
-      if (this.authorized) {
-        return {
-          search_ladder: !this.enemy,
-          game_accept: this.enemy,
-        };
-      }
-    },
-  },
-  methods: {
-    gameReady() {
-      clearInterval(this.acceptInterval);
-      clearInterval(this.findInterval);
-    },
-    gameAccept() {
-      // $('#chat').fadeOut(1000);
-      this.readyStatus = 'green';
-      axios.get('/ladder/gameStatus?login=' + this.enemy.login + '&status=red');
-    },
-    clearData(status = 'green') {
-      this.game = false;
-      this.ladder = 'play';
-      this.timerFind = 0;
-      this.str_timerFind = null;
-      this.timerAccept = 0;
-      this.str_timerAccept = null;
-      this.findInterval = null;
-      this.acceptInterval = null;
-      this.breaker = false;
-      if (this.im) {
-        axios.get(
-          '/ladder/gameStatus?login=' + this.im.login + '&status=' + status,
-        );
-      }
-      if (this.enemy) {
-        this.$emit('kickEnemy');
-      }
-    },
-    cancelFind(e) {
-      clearInterval(this.findInterval);
-      this.clearData();
-      e.stopPropagation();
-    },
-    cancelAccept(e) {
-      clearInterval(this.acceptInterval);
-      clearInterval(this.findInterval);
-      this.clearData();
-      e.stopPropagation();
-    },
-    waiting() {
-      this.timerAccept = 10;
-      this.str_timerAccept = null;
-      this.ladder = 'accept';
-      this.acceptInterval = setInterval(
-        function () {
-          if (!this.enemy) {
-            clearInterval(this.acceptInterval);
-            this.ladder = 'search ...';
-            this.breaker = false;
-            axios.get('ladder/systemStatus?login=' + this.im.login);
-            return;
-          }
-          if (this.authorized && this.timerAccept > 0.1) {
-            this.timerAccept -= 0.1;
-            if (this.timerAccept < 3) {
-              this.str_timerAccept = this.timerAccept.toFixed(1);
-            } else if (this.timerAccept < 7) {
-              this.str_timerAccept = this.timerAccept.toFixed(0);
-            }
-          } else {
-            if (this.readyStatus === 'yellow') {
-              clearInterval(this.acceptInterval);
-              clearInterval(this.findInterval);
-              this.clearData('blue');
-            } else if (this.readyStatus === 'green') {
-              this.$emit('kickEnemy');
-              clearInterval(this.acceptInterval);
-              this.ladder = 'search ...';
-              this.breaker = false;
-              axios.get('ladder/systemStatus?login=' + this.im.login);
-            }
-          }
-        }.bind(this),
-        100,
-      );
-    },
-    findGame() {
-      if (!this.enemy && !this.game) {
-        this.game = true;
-        this.breaker = false;
-        this.timerFind = 0;
-        this.str_timerFind = null;
-        axios.get(
-          '/ladder/gameStatus?login=' + this.im.login + '&status=yellow',
-        );
-        this.ladder = 'search ...';
-        this.findInterval = setInterval(
-          function () {
-            if (this.authorized) {
-              this.timerFind += 0.1;
-              this.str_timerFind = this.timerFind.toFixed(1);
-              if (this.enemy && !this.breaker) {
-                this.breaker = true;
-                this.readyStatus = 'yellow';
-                this.waiting();
-              }
-            } else {
-              clearInterval(this.findInterval);
-              this.clearData();
-            }
-          }.bind(this),
-          100,
-        );
-      }
-    },
-  },
-});
-
-},{"axios":16}],226:[function(require,module,exports){
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const axios = require('axios');
-chat = require('./chat');
-chat = require('./ladder');
+},{"./user":227,"axios":16}],224:[function(require,module,exports){
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcryptjs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
 
 Vue.directive('focus', {
   inserted: function (el) {
@@ -30292,6 +30012,290 @@ Vue.component('wall', {
   },
 });
 
+},{"axios":16,"bcryptjs":44}],225:[function(require,module,exports){
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
+
+Vue.component('chat', {
+  props: {
+    authorized: {
+      type: Boolean,
+      required: true,
+    },
+    im: {
+      type: [Object, Boolean],
+      default: null,
+      required: false,
+    },
+    users: {
+      required: true,
+    },
+    gameR: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  template: `<div class="Jquery_bundle">
+               <div :class="classGame"
+               v-on:click="showChat">
+                  <div class="chat_performance" 
+                    v-show="authorized">
+                      {{ type }}
+                  </div>
+                <div v-show="show_chat && users"
+                        class="chat_users_side">
+                    <div class="user_in_chat"
+                         v-for="user in users"
+                        v-on:mouseover="userInfo(user, $event)"
+                        v-if="user && user.login!==im.login">
+                        {{ user.login }}<span id="chat_user_status"
+                        :style="{ backgroundColor: user.status }"></span></div>
+                </div>
+          </div>
+          <div v-if="info" class="chat_user_info"
+          :style="{ left: infoStyle.left, top: infoStyle.top }">
+            {{ user.login }}
+            <img :src="user.url_avatar"
+            class="user_profile_avatar">
+            <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
+          </div></div>
+  `,
+  data() {
+    return {
+      type: 'Chat',
+      show_chat: false,
+      info: false,
+      user: null,
+      infoStyle: {
+        left: null,
+        top: null,
+      },
+    };
+  },
+  computed: {
+    classGame: function () {
+      if (this.authorized) {
+        return {
+          chat_opened: this.show_chat,
+          chat_closed: !this.show_chat,
+        };
+      } else {
+        this.show_chat = false;
+        this.info = false;
+      }
+    },
+  },
+  methods: {
+    userInfo(user, e) {
+      this.info = true;
+      this.user = user;
+      this.infoStyle.left = e.pageX.toString() + 'px';
+      this.infoStyle.top = e.pageY.toString() + 'px';
+    },
+    showChat() {
+      if (this.show_chat) {
+        this.show_chat = false;
+        this.info = false;
+      } else {
+        this.show_chat = true;
+      }
+    },
+  },
+});
+
+},{"axios":16}],226:[function(require,module,exports){
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   game.js                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pfile <pfile@student.21-school.ru>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/28 19:10:07 by pfile             #+#    #+#             */
+/*   Updated: 2021/09/16 02:32:15 by pfile            ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
+Vue.component('ladder', {
+  props: {
+    authorized: {
+      type: Boolean,
+      required: true,
+    },
+    im: {
+      type: [Object, Boolean],
+      default: null,
+      required: false,
+    },
+    users: {
+      required: true,
+    },
+    enemy: {
+      type: [Object, Boolean],
+      default: null,
+      required: false,
+    },
+  },
+  template: `<div v-on:click="findGame"
+                  :class="classGame" class="Jquery_bundle">
+                  <div v-if="enemy">
+                    <div v-show="readyStatus === 'yellow'" class="accept_button" @click="gameAccept">{{ ladder }}</div>
+                    <div class="decline_button" v-on:click="cancelAccept">cancel</div>
+                    <div class="timeout">{{ str_timerAccept }}</div>
+                    <div id="ladder_you"><img :src="im.url_avatar" width="100%" height="100%" alt=""></div>
+                    <div id="ladder_ready_you" :style="{ backgroundColor: readyStatus }"></div>
+                    <div id="ladder_ready_enemy" :style="{ backgroundColor: enemy.readyStatus }"></div>
+                    <div id="ladder_enemy"><img :src="enemy.url_avatar" width="100%" height="100%" alt=""></div>
+                  </div>
+                  <div v-else>
+                    <p v-if="authorized">{{ ladder }}</p>
+                    <div v-if="gameFinding">{{ str_timerFind }}
+                        <div class="cancel" v-on:click="cancelFind">cancel</div>
+                    </div>
+                  </div></div>`,
+  data() {
+    return {
+      ladder: 'play',
+      game: false,
+      timerFind: 0,
+      str_timerAccept: null,
+      timerAccept: 0,
+      str_timerFind: null,
+      findInterval: null,
+      acceptInterval: null,
+      breaker: false,
+      readyStatus: 'yellow',
+    };
+  },
+  computed: {
+    gameFinding: function () {
+      return this.game && !this.enemy && this.authorized;
+    },
+    classGame: function () {
+      if (this.authorized) {
+        return {
+          search_ladder: !this.enemy,
+          game_accept: this.enemy,
+        };
+      }
+    },
+  },
+  methods: {
+    gameReady() {
+      clearInterval(this.acceptInterval);
+      clearInterval(this.findInterval);
+    },
+    gameAccept() {
+      this.readyStatus = 'green';
+      axios.get('/ladder/gameStatus?login=' + this.enemy.login + '&status=red');
+    },
+    clearData(status = 'green') {
+      this.game = false;
+      this.ladder = 'play';
+      this.timerFind = 0;
+      this.str_timerFind = null;
+      this.timerAccept = 0;
+      this.str_timerAccept = null;
+      this.findInterval = null;
+      this.acceptInterval = null;
+      this.breaker = false;
+      if (this.im) {
+        axios.get(
+          '/ladder/gameStatus?login=' + this.im.login + '&status=' + status,
+        );
+      }
+      if (this.enemy) {
+        this.$emit('kickEnemy');
+      }
+    },
+    cancelFind(e) {
+      clearInterval(this.findInterval);
+      this.clearData();
+      e.stopPropagation();
+    },
+    cancelAccept(e) {
+      clearInterval(this.acceptInterval);
+      clearInterval(this.findInterval);
+      this.clearData();
+      e.stopPropagation();
+    },
+    waiting() {
+      this.timerAccept = 10;
+      this.str_timerAccept = null;
+      this.ladder = 'accept';
+      this.acceptInterval = setInterval(
+        function () {
+          if (!this.enemy) {
+            clearInterval(this.acceptInterval);
+            this.ladder = 'search ...';
+            this.breaker = false;
+            axios.get('ladder/systemStatus?login=' + this.im.login);
+            return;
+          }
+          if (this.authorized && this.timerAccept > 0.1) {
+            this.timerAccept -= 0.1;
+            if (this.timerAccept < 3) {
+              this.str_timerAccept = this.timerAccept.toFixed(1);
+            } else if (this.timerAccept < 7) {
+              this.str_timerAccept = this.timerAccept.toFixed(0);
+            }
+          } else {
+            if (this.readyStatus === 'yellow') {
+              clearInterval(this.acceptInterval);
+              clearInterval(this.findInterval);
+              this.clearData('blue');
+            } else if (this.readyStatus === 'green') {
+              this.$emit('kickEnemy');
+              clearInterval(this.acceptInterval);
+              this.ladder = 'search ...';
+              this.breaker = false;
+              axios.get('ladder/systemStatus?login=' + this.im.login);
+            }
+          }
+        }.bind(this),
+        100,
+      );
+    },
+    findGame() {
+      if (!this.enemy && !this.game) {
+        this.game = true;
+        this.breaker = false;
+        this.timerFind = 0;
+        this.str_timerFind = null;
+        axios.get(
+          '/ladder/gameStatus?login=' + this.im.login + '&status=yellow',
+        );
+        this.ladder = 'search ...';
+        this.findInterval = setInterval(
+          function () {
+            if (this.authorized) {
+              this.timerFind += 0.1;
+              this.str_timerFind = this.timerFind.toFixed(1);
+              if (this.enemy && !this.breaker) {
+                this.breaker = true;
+                this.readyStatus = 'yellow';
+                this.waiting();
+              }
+            } else {
+              clearInterval(this.findInterval);
+              this.clearData();
+            }
+          }.bind(this),
+          100,
+        );
+      }
+    },
+  },
+});
+
+},{"axios":16}],227:[function(require,module,exports){
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
+chat = require('./chat');
+ladder = require('./ladder');
+wall = require('./authorization');
+
 Vue.component('user', {
   template: `<div>
               <div @login="addUser"></div>
@@ -30488,11 +30492,15 @@ Vue.component('user', {
           event.preventDefault();
           this.showProfile();
         } else if (event.key === ' ' && this.authorized) {
-          this.$refs.chat.showChat();
+          if (this.gameR) {
+            axios.get('game/launchBall?login=' + this.im.login);
+          } else {
+            this.$refs.chat.showChat();
+          }
         }
       }.bind(this),
     );
   },
 });
 
-},{"./chat":224,"./ladder":225,"axios":16,"bcryptjs":44}]},{},[223]);
+},{"./authorization":224,"./chat":225,"./ladder":226,"axios":16}]},{},[223]);

@@ -2,6 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { Ladder } from './ladder.interface';
 import { OnlineUser } from '../users/users.interface';
+import { GameService } from '../game/game.service';
+import { Game } from '../game/game';
+import { Gamer } from '../game/gamer.interface';
 
 @Injectable()
 export class LadderService {
@@ -9,6 +12,8 @@ export class LadderService {
   constructor(
     @Inject(UsersService)
     private users: UsersService,
+    @Inject(GameService)
+    private games: GameService,
   ) {}
 
   traceLadder(login: string) {
@@ -51,30 +56,52 @@ export class LadderService {
         this.awayFromKeyboard.bind(this),
       );
     } else if (status === 'red') {
-      this.userPersonalEvent('enemyIsReady', this.users.onlineUsers[i], login);
-      let k = 0;
-      while (k < this.lobby.length) {
-        if (
-          (this.lobby[k].first.login === login ||
-            this.lobby[k].second.login === login) &&
-          this.lobby[k].first.status === 'red' &&
-          this.lobby[k].second.status === 'red'
-        ) {
-          this.userPersonalEvent(
-            'gameIsReady',
-            null,
-            this.lobby[k].first.login,
-          );
-          this.userPersonalEvent(
-            'gameIsReady',
-            null,
-            this.lobby[k].second.login,
-          );
-        }
-        ++k;
-      }
+      this.gameStart(i, login);
     }
-    return login;
+  }
+
+  gameStart(userIndex, login) {
+    this.userPersonalEvent(
+      'enemyIsReady',
+      this.users.onlineUsers[userIndex],
+      login,
+    );
+    let k = 0;
+    while (k < this.lobby.length) {
+      if (
+        this.lobby[k].first &&
+        this.lobby[k].second &&
+        (this.lobby[k].first.login === login ||
+          this.lobby[k].second.login === login) &&
+        this.lobby[k].first.status === 'red' &&
+        this.lobby[k].second.status === 'red'
+      ) {
+        this.userPersonalEvent('gameIsReady', null, this.lobby[k].first.login);
+        this.userPersonalEvent('gameIsReady', null, this.lobby[k].second.login);
+        this.games.startGame(
+          this.buildGame(this.lobby[k].first, this.lobby[k].second),
+        );
+      }
+      ++k;
+    }
+  }
+
+  buildGame(first: OnlineUser, second: OnlineUser): Game {
+    const gamer1: Gamer = {
+      user: first,
+      gamePoints: 0,
+      platformWide: 10,
+      platformSpeed: 1,
+      position: 50,
+    };
+    const gamer2: Gamer = {
+      user: second,
+      gamePoints: 0,
+      platformWide: 10,
+      platformSpeed: 1,
+      position: 50,
+    };
+    return new Game(gamer1, gamer2);
   }
 
   awayFromKeyboard(userIndex) {

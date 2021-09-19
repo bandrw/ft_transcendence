@@ -1,4 +1,4 @@
-import { Injectable, Res, OnModuleInit } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User_table } from './user.entity';
