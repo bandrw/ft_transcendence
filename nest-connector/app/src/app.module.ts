@@ -18,7 +18,7 @@ import { GameModule } from './game/game.module';
       username: 'pfile',
       password: 'pfile',
       database: 'pfile',
-      synchronize: false,
+      synchronize: true,
       entities: [User_table],
     }),
     UsersModule,

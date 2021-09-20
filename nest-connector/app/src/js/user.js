@@ -3,9 +3,11 @@ const axios = require('axios');
 chat = require('./chat');
 ladder = require('./ladder');
 wall = require('./authorization');
+game = require('./game');
 
 Vue.component('user', {
   template: `<div>
+              <game v-show="gameR"></game>
               <div @login="addUser"></div>
                 <chat :authorized="authorized" :im="im" :users="users"
                 ref="chat" :gameR="gameR"></chat>
@@ -152,6 +154,7 @@ Vue.component('user', {
     user: 'chat',
     ladder: 'ladder',
     wall: 'wall',
+    game: 'game',
   },
   mounted() {
     window.onbeforeunload = function () {

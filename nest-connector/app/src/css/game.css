@@ -1,0 +1,21 @@
+#game_you {
+    bottom: 0;
+    height: 1%;
+    position: absolute;
+    background-color: yellow;
+}
+
+#game_enemy {
+    top: 0;
+    height: 1%;
+    position: absolute;
+    background-color: blue;
+}
+
+#game_ball {
+    width: 5%;
+    height: 5%;
+    position: absolute;
+    background-color: darkorange;
+    border-radius: 50%;
+}

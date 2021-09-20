@@ -29767,7 +29767,7 @@ new Vue({
   },
 });
 
-},{"./user":227,"axios":16}],224:[function(require,module,exports){
+},{"./user":228,"axios":16}],224:[function(require,module,exports){
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcryptjs');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -30104,6 +30104,31 @@ Vue.component('chat', {
 });
 
 },{"axios":16}],226:[function(require,module,exports){
+Vue.component('game', {
+  // props: {
+  //   initBallPosX: {
+  //     type: Number,
+  //     required: true,
+  //   },
+  // },
+  template: `<div>
+   <div id="game_you" :style="{ right: youPosX + '%', width: youWidth + '%' }"></div>
+   <div id="game_enemy" :style="{ right: enemyPosX + '%', width: enemyWidth + '%' }"></div>
+   <div id="game_ball" :style="{ right: ballPosX + '%' , bottom: ballPosY + '%' }"></div>
+</div>`,
+  data() {
+    return {
+      youPosX: 50,
+      youWidth: 10,
+      enemyPosX: 50,
+      enemyWidth: 10,
+      ballPosX: 50,
+      ballPosY: 1,
+    };
+  },
+});
+
+},{}],227:[function(require,module,exports){
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -30289,15 +30314,17 @@ Vue.component('ladder', {
   },
 });
 
-},{"axios":16}],227:[function(require,module,exports){
+},{"axios":16}],228:[function(require,module,exports){
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 chat = require('./chat');
 ladder = require('./ladder');
 wall = require('./authorization');
+game = require('./game');
 
 Vue.component('user', {
   template: `<div>
+              <game v-show="gameR"></game>
               <div @login="addUser"></div>
                 <chat :authorized="authorized" :im="im" :users="users"
                 ref="chat" :gameR="gameR"></chat>
@@ -30444,6 +30471,7 @@ Vue.component('user', {
     user: 'chat',
     ladder: 'ladder',
     wall: 'wall',
+    game: 'game',
   },
   mounted() {
     window.onbeforeunload = function () {
@@ -30503,4 +30531,4 @@ Vue.component('user', {
   },
 });
 
-},{"./authorization":224,"./chat":225,"./ladder":226,"axios":16}]},{},[223]);
+},{"./authorization":224,"./chat":225,"./game":226,"./ladder":227,"axios":16}]},{},[223]);
