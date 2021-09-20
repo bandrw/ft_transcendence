@@ -7,7 +7,7 @@ game = require('./game');
 
 Vue.component('user', {
   template: `<div>
-              <game v-show="gameR"></game>
+              <game v-show="gameR" ref="game"></game>
               <div @login="addUser"></div>
                 <chat :authorized="authorized" :im="im" :users="users"
                 ref="chat" :gameR="gameR"></chat>
@@ -131,6 +131,10 @@ Vue.component('user', {
         this.$refs.ladder.gameReady();
         $('.Jquery_bundle').fadeOut(1000);
         this.gameR = true;
+      });
+      this.eventSource.addEventListener('gameSettings', (event) => {
+        const gameSettings = JSON.parse(event.data);
+        this.$refs.game.setSettings(gameSettings);
       });
       this.users = users;
       this.authorized = true;

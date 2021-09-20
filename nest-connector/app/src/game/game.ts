@@ -6,6 +6,8 @@ export class Game {
   private map: any;
   private BallPosX: number;
   private BallPosY: number;
+  private starterOne: boolean;
+  private starterTwo: boolean;
   constructor(
     public playerOne: G,
     public playerTwo: G,
@@ -19,7 +21,37 @@ export class Game {
       this.playerTwo.position -
       this.playerTwo.platformWide / 2 +
       this.playerTwo.platformWide * Math.random();
-    this.BallPosY = 1;
+    if (Math.random() > 0.5) {
+      this.starterOne = true;
+      this.starterTwo = false;
+      this.BallPosY = 3;
+    } else {
+      this.starterOne = false;
+      this.starterTwo = true;
+      this.BallPosY = 97;
+    }
     this.ballSpeed = ballSpeed;
+    this.playerOne.user.resp.write(
+      `event: gameSettings\ndata: ${JSON.stringify({
+        BallPosX: this.BallPosX,
+        BallPosY: this.BallPosY,
+        starter: this.starterOne,
+        enemyGameSettings: {
+          platformWide: this.playerTwo.platformWide,
+          platformSpeed: this.playerTwo.platformSpeed,
+        },
+      })}\n\n`,
+    );
+    this.playerTwo.user.resp.write(
+      `event: gameSettings\ndata: ${JSON.stringify({
+        BallPosX: this.BallPosX,
+        BallPosY: this.BallPosY,
+        starter: this.starterTwo,
+        enemyGameSettings: {
+          platformWide: this.playerOne.platformWide,
+          platformSpeed: this.playerOne.platformSpeed,
+        },
+      })}\n\n`,
+    );
   }
 }
