@@ -2,13 +2,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { Ladder } from './ladder.interface';
 import { OnlineUser } from '../users/users.interface';
-import { GameService } from '../game/game.service';
 import { Game } from '../game/game';
 import { Gamer } from '../game/gamer.interface';
+import { GameService } from '../game/game.service';
 
 @Injectable()
 export class LadderService {
   public lobby: Ladder[] = [];
+  public lobbyId = 0;
   constructor(
     @Inject(UsersService)
     private users: UsersService,
@@ -101,7 +102,8 @@ export class LadderService {
       platformSpeed: 1,
       position: 50,
     };
-    return new Game(gamer1, gamer2);
+    ++this.lobbyId;
+    return new Game(gamer1, gamer2, this.lobbyId - 1);
   }
 
   awayFromKeyboard(userIndex) {

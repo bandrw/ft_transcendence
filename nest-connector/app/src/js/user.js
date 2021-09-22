@@ -4,6 +4,7 @@ chat = require('./chat');
 ladder = require('./ladder');
 wall = require('./authorization');
 game = require('./game');
+io = require('socket.io/client-dist/socket.io');
 
 Vue.component('user', {
   template: `<div>
@@ -161,6 +162,7 @@ Vue.component('user', {
     game: 'game',
   },
   mounted() {
+    this.socket = io('http://localhost:3000');
     window.onbeforeunload = function () {
       if (this.authorized) {
         this.logout();
@@ -208,7 +210,7 @@ Vue.component('user', {
           this.showProfile();
         } else if (event.key === ' ' && this.authorized) {
           if (this.gameR) {
-            axios.get('game/launchBall?login=' + this.im.login);
+            this.socket.emit('start', JSON.stringify(this.im));
           } else {
             this.$refs.chat.showChat();
           }

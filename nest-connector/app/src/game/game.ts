@@ -6,11 +6,12 @@ export class Game {
   private map: any;
   private BallPosX: number;
   private BallPosY: number;
-  private starterOne: boolean;
-  private starterTwo: boolean;
+  public starterOne: boolean;
+  public starterTwo: boolean;
   constructor(
     public playerOne: G,
     public playerTwo: G,
+    public id: number,
     pointsForWin = 3,
     map = null,
     ballSpeed = 1.3,

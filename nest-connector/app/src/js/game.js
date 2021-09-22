@@ -13,6 +13,7 @@ Vue.component('game', {
       ballPosX: 0,
       ballPosY: 0,
       enemySpeed: 1,
+      socket: null,
     };
   },
   computed: {

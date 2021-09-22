@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { JsController } from './js/js.controller';
 import { LadderModule } from './ladder/ladder.module';
 import { GameModule } from './game/game.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import {WebSocketGateway} from "@nestjs/websockets";
 
 @Module({
   imports: [
@@ -24,8 +26,10 @@ import { GameModule } from './game/game.module';
     UsersModule,
     LadderModule,
     GameModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController, CssController, JsController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+}
