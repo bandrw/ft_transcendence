@@ -25,11 +25,11 @@ export class Game {
     if (Math.random() > 0.5) {
       this.starterOne = true;
       this.starterTwo = false;
-      this.BallPosY = 3;
+      this.BallPosY = 97;
     } else {
       this.starterOne = false;
       this.starterTwo = true;
-      this.BallPosY = 97;
+      this.BallPosY = 3;
     }
     this.ballSpeed = ballSpeed;
     this.playerOne.user.resp.write(
@@ -37,6 +37,7 @@ export class Game {
         BallPosX: this.BallPosX,
         BallPosY: this.BallPosY,
         starter: this.starterOne,
+        id: this.id,
         enemyGameSettings: {
           platformWide: this.playerTwo.platformWide,
           platformSpeed: this.playerTwo.platformSpeed,
@@ -48,6 +49,7 @@ export class Game {
         BallPosX: this.BallPosX,
         BallPosY: this.BallPosY,
         starter: this.starterTwo,
+        id: this.id,
         enemyGameSettings: {
           platformWide: this.playerOne.platformWide,
           platformSpeed: this.playerOne.platformSpeed,

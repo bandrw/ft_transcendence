@@ -10,7 +10,6 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
 import { GameService } from './game.service';
-import { json } from 'express';
 
 @WebSocketGateway()
 export class EventsGame
@@ -23,23 +22,18 @@ export class EventsGame
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
   @SubscribeMessage('start')
-  launchBall(@MessageBody() user: string) {
+  launchBall(player: Socket, @MessageBody() user: string) {
     console.log(user);
     const u = JSON.parse(user);
-    let i = 0;
-    while (i < this.gameService.gamers.length) {
-      if (
-        this.gameService.gamers[i].playerTwo.user.login === u.login &&
-        this.gameService.gamers[i].starterTwo
-      ) {
-        break;
-      } else if (
-        this.gameService.gamers[i].playerOne.user.login === u.login &&
-        this.gameService.gamers[i].starterOne
-      ) {
-        break;
-      }
-      ++i;
+    this.logger.log(player);
+    if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
+      this.gameService.gamers[u.id].playerOne.user.resp.write(
+        `event: bellLaunch\ndata: \n\n`,
+      );
+    } else {
+      this.gameService.gamers[u.id].playerTwo.user.resp.write(
+        `event: bellLaunch\ndata: \n\n`,
+      );
     }
   }
 
