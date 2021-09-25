@@ -68,32 +68,21 @@ Vue.component('game', {
       this.interval = setInterval(
         function () {
           console.log(this.ballPosX);
-          if (this.ballPosY > 0 && this.ballPosY < 100) {
-            if (!tumbler && this.ballPosX > 0 && this.ballPosX < 100) {
-              this.ballPosX = this.ballPosX + sin * 0.1;
-              this.ballPosY = this.ballPosY + cos * 0.1;
-            } else {
-              if (!tumbler) {
-                tumbler = true;
-              } else {
-                if (type) {
-                  this.ballPosX = this.ballPosX - sin * 0.1;
-                  this.ballPosY = this.ballPosY + cos * 0.1;
-                } else {
-                  this.ballPosX = this.ballPosX - sin * 0.1;
-                  this.ballPosY = this.ballPosY + cos * 0.1;
-                }
-                if (!(this.ballPosX > 0 && this.ballPosX < 100)) {
-                  tumbler = false;
-                }
-              } else {
-                clearInterval(this.interval);
-                this.ballInAction(type);
-              }
-            }
-          } else {
-            clearInterval(this.interval);
-            this.ballInAction(!type);
+          if (this.ballPosY > 0 && this.ballPosY < 100 && this.ballPosX > 0 && this.ballPosX < 100) {
+            this.ballPosY += sin;
+            this.ballPosX += cos;
+          } else if (this.ballPosX >= 100) {
+            cos *= -1;
+            this.ballPosX += cos;
+          } else if (this.ballPosX <= 0) {
+            cos *= -1;
+            this.ballPosX += cos;
+          } else if (this.ballPosY <= 0) {
+            sin *= -1;
+            this.ballPosY += sin;
+          } else if (this.ballPosY >= 0) {
+            sin *= -1;
+            this.ballPosY += sin;
           }
         }.bind(this),
         10,
