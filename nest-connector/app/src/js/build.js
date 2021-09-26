@@ -36311,18 +36311,24 @@ Vue.component('game', {
       );
     },
     movePlatformRight() {
-      this.platformIntervalOne = setInterval(function () {
-        if (this.youPosX - 1 - this.youWidth / 2 >= 0) {
-          this.youPosX -= 1;
-        }
-      }.bind(this), 15);
+      if (!this.platformIntervalOne) {
+        this.platformIntervalOne = setInterval(function () {
+          if (this.youPosX - 1 - this.youWidth / 2 > 0) {
+            this.youPosX -= 1;
+            this.$emit('socketEmit');
+          }
+        }.bind(this), 15);
+      }
     },
     movePlatformLeft() {
-      this.platformIntervalTwo = setInterval(function () {
-        if (this.youPosX + 1 + this.youWidth / 2 <= 100) {
-          this.youPosX += 1;
-        }
-      }.bind(this), 15);
+      if (!this.platformIntervalTwo) {
+        this.platformIntervalTwo = setInterval(function () {
+          if (this.youPosX + 1 + this.youWidth / 2 < 100) {
+            this.youPosX += 1;
+            this.$emit('socketEmit');
+          }
+        }.bind(this), 15);
+      }
     },
   },
 });
@@ -36524,7 +36530,7 @@ io = require('socket.io/client-dist/socket.io');
 
 Vue.component('user', {
   template: `<div>
-              <game v-show="gameR" ref="game"></game>
+              <game v-show="gameR" ref="game" @socketEmit="socketEmit"></game>
               <div @login="addUser"></div>
                 <chat :authorized="authorized" :im="im" :users="users"
                 ref="chat" :gameR="gameR"></chat>
@@ -36558,6 +36564,12 @@ Vue.component('user', {
     };
   },
   methods: {
+    socketEmit() {
+      this.socket.emit('platformPosition', JSON.stringify({
+        login: this.im.login,
+        id: this.$refs.game.id,
+        enemyPlatformX: this.$refs.game.youPosX}));
+    },
     addUser() {
       this.users.push(this.eventSource.data);
     },
@@ -36693,8 +36705,10 @@ Vue.component('user', {
     document.addEventListener('keyup', function (event) {
       if (event.key === 'ArrowRight') {
         clearInterval(this.$refs.game.platformIntervalOne);
+        this.$refs.game.platformIntervalOne = false;
       } else if (event.key === 'ArrowLeft') {
         clearInterval(this.$refs.game.platformIntervalTwo);
+        this.$refs.game.platformIntervalTwo = false;
       }
     }.bind(this));
     document.addEventListener(
@@ -36702,16 +36716,8 @@ Vue.component('user', {
       function (event) {
         if (event.key === 'ArrowRight' && this.gameR) {
           this.$refs.game.movePlatformRight();
-          this.socket.emit('platformPosition', JSON.stringify({
-            login: this.im.login,
-            id: this.$refs.game.id,
-            enemyPlatformX: this.$refs.game.youPosX}));
         } else if (event.key === 'ArrowLeft' && this.gameR) {
           this.$refs.game.movePlatformLeft();
-          this.socket.emit('platformPosition', JSON.stringify({
-            login: this.im.login,
-            id: this.$refs.game.id,
-            enemyPlatformX: this.$refs.game.youPosX}));
         } else if (event.key === 'Escape') {
           if (
             this.$refs.ladder &&

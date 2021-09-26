@@ -87,18 +87,24 @@ Vue.component('game', {
       );
     },
     movePlatformRight() {
-      this.platformIntervalOne = setInterval(function () {
-        if (this.youPosX - 1 - this.youWidth / 2 >= 0) {
-          this.youPosX -= 1;
-        }
-      }.bind(this), 15);
+      if (!this.platformIntervalOne) {
+        this.platformIntervalOne = setInterval(function () {
+          if (this.youPosX - 1 - this.youWidth / 2 > 0) {
+            this.youPosX -= 1;
+            this.$emit('socketEmit');
+          }
+        }.bind(this), 15);
+      }
     },
     movePlatformLeft() {
-      this.platformIntervalTwo = setInterval(function () {
-        if (this.youPosX + 1 + this.youWidth / 2 <= 100) {
-          this.youPosX += 1;
-        }
-      }.bind(this), 15);
+      if (!this.platformIntervalTwo) {
+        this.platformIntervalTwo = setInterval(function () {
+          if (this.youPosX + 1 + this.youWidth / 2 < 100) {
+            this.youPosX += 1;
+            this.$emit('socketEmit');
+          }
+        }.bind(this), 15);
+      }
     },
   },
 });
