@@ -139,7 +139,10 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('bellLaunch', () => {
         this.$refs.game.ballInAction();
-      })
+      });
+      this.eventSource.addEventListener('enemyPosition', (event) => {
+        this.$refs.game.enemyPosX = event.data;
+      });
       this.users = users;
       this.authorized = true;
     },
@@ -171,10 +174,29 @@ Vue.component('user', {
         this.logout();
       }
     }.bind(this);
+    document.addEventListener('keyup', function (event) {
+      if (event.key === 'ArrowRight') {
+        clearInterval(this.$refs.game.platformIntervalOne);
+      } else if (event.key === 'ArrowLeft') {
+        clearInterval(this.$refs.game.platformIntervalTwo);
+      }
+    }.bind(this));
     document.addEventListener(
       'keydown',
       function (event) {
-        if (event.key === 'Escape') {
+        if (event.key === 'ArrowRight' && this.gameR) {
+          this.$refs.game.movePlatformRight();
+          this.socket.emit('platformPosition', JSON.stringify({
+            login: this.im.login,
+            id: this.$refs.game.id,
+            enemyPlatformX: this.$refs.game.youPosX}));
+        } else if (event.key === 'ArrowLeft' && this.gameR) {
+          this.$refs.game.movePlatformLeft();
+          this.socket.emit('platformPosition', JSON.stringify({
+            login: this.im.login,
+            id: this.$refs.game.id,
+            enemyPlatformX: this.$refs.game.youPosX}));
+        } else if (event.key === 'Escape') {
           if (
             this.$refs.ladder &&
             this.authorized &&
@@ -214,7 +236,6 @@ Vue.component('user', {
         } else if (event.key === ' ' && this.authorized) {
           if (this.gameR && this.$refs.game.starter) {
             this.$refs.game.ballInAction(true);
-            console.log('action');
             this.socket.emit(
               'start',
               JSON.stringify({ login: this.im.login, id: this.$refs.game.id }),

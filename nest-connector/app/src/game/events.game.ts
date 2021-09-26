@@ -22,10 +22,8 @@ export class EventsGame
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
   @SubscribeMessage('start')
-  launchBall(player: Socket, @MessageBody() user: string) {
-    console.log(user);
+  launchBall(@MessageBody() user: string) {
     const u = JSON.parse(user);
-    this.logger.log(player);
     if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
       this.gameService.gamers[u.id].playerOne.user.resp.write(
         `event: bellLaunch\ndata: \n\n`,
@@ -33,6 +31,19 @@ export class EventsGame
     } else {
       this.gameService.gamers[u.id].playerTwo.user.resp.write(
         `event: bellLaunch\ndata: \n\n`,
+      );
+    }
+  }
+  @SubscribeMessage('platformPosition')
+  platformPosition(@MessageBody() user: string) {
+    const u = JSON.parse(user);
+    if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
+      this.gameService.gamers[u.id].playerOne.user.resp.write(
+        `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
+      );
+    } else {
+      this.gameService.gamers[u.id].playerTwo.user.resp.write(
+        `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
       );
     }
   }

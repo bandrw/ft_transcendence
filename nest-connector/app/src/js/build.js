@@ -36243,6 +36243,8 @@ Vue.component('game', {
       angle: 0,
       starter: false,
       id: 0,
+      platformIntervalOne: false,
+      platformIntervalTwo: false,
     };
   },
   computed: {
@@ -36262,11 +36264,9 @@ Vue.component('game', {
   methods: {
     setSettings: function (gameSettings) {
       clearInterval(this.interval);
-      console.log('settings');
       this.enemyWidth = gameSettings.enemyGameSettings.platformWide;
       this.enemySpeed = gameSettings.enemyGameSettings.platformSpeed;
       this.id = gameSettings.id;
-      console.log(gameSettings.starter);
       if (gameSettings.starter) {
         this.ballPosY = 100 - gameSettings.BallPosY;
         this.ballPosX = 100 - gameSettings.BallPosX;
@@ -36288,10 +36288,8 @@ Vue.component('game', {
         cos = -Math.cos(angle);
         sin = -Math.sin(angle);
       }
-      let tumbler = false;
       this.interval = setInterval(
         function () {
-          console.log(this.ballPosX);
           if (this.ballPosY > 0 && this.ballPosY < 100 && this.ballPosX > 0 && this.ballPosX < 100) {
             this.ballPosY += sin;
             this.ballPosX += cos;
@@ -36304,13 +36302,27 @@ Vue.component('game', {
           } else if (this.ballPosY <= 0) {
             sin *= -1;
             this.ballPosY += sin;
-          } else if (this.ballPosY >= 0) {
+          } else if (this.ballPosY >= 100) {
             sin *= -1;
             this.ballPosY += sin;
           }
         }.bind(this),
         10,
       );
+    },
+    movePlatformRight() {
+      this.platformIntervalOne = setInterval(function () {
+        if (this.youPosX - 1 - this.youWidth / 2 >= 0) {
+          this.youPosX -= 1;
+        }
+      }.bind(this), 15);
+    },
+    movePlatformLeft() {
+      this.platformIntervalTwo = setInterval(function () {
+        if (this.youPosX + 1 + this.youWidth / 2 <= 100) {
+          this.youPosX += 1;
+        }
+      }.bind(this), 15);
     },
   },
 });
@@ -36643,7 +36655,10 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('bellLaunch', () => {
         this.$refs.game.ballInAction();
-      })
+      });
+      this.eventSource.addEventListener('enemyPosition', (event) => {
+        this.$refs.game.enemyPosX = event.data;
+      });
       this.users = users;
       this.authorized = true;
     },
@@ -36675,10 +36690,29 @@ Vue.component('user', {
         this.logout();
       }
     }.bind(this);
+    document.addEventListener('keyup', function (event) {
+      if (event.key === 'ArrowRight') {
+        clearInterval(this.$refs.game.platformIntervalOne);
+      } else if (event.key === 'ArrowLeft') {
+        clearInterval(this.$refs.game.platformIntervalTwo);
+      }
+    }.bind(this));
     document.addEventListener(
       'keydown',
       function (event) {
-        if (event.key === 'Escape') {
+        if (event.key === 'ArrowRight' && this.gameR) {
+          this.$refs.game.movePlatformRight();
+          this.socket.emit('platformPosition', JSON.stringify({
+            login: this.im.login,
+            id: this.$refs.game.id,
+            enemyPlatformX: this.$refs.game.youPosX}));
+        } else if (event.key === 'ArrowLeft' && this.gameR) {
+          this.$refs.game.movePlatformLeft();
+          this.socket.emit('platformPosition', JSON.stringify({
+            login: this.im.login,
+            id: this.$refs.game.id,
+            enemyPlatformX: this.$refs.game.youPosX}));
+        } else if (event.key === 'Escape') {
           if (
             this.$refs.ladder &&
             this.authorized &&
@@ -36718,7 +36752,6 @@ Vue.component('user', {
         } else if (event.key === ' ' && this.authorized) {
           if (this.gameR && this.$refs.game.starter) {
             this.$refs.game.ballInAction(true);
-            console.log('action');
             this.socket.emit(
               'start',
               JSON.stringify({ login: this.im.login, id: this.$refs.game.id }),
