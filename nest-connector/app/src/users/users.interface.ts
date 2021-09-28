@@ -3,4 +3,6 @@ export interface OnlineUser {
   url_avatar: string;
   resp: any;
   status: string;
+  games: number;
+  wins: number;
 }

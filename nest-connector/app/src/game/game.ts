@@ -1,7 +1,7 @@
 import { Gamer as G } from './gamer.interface';
 
 export class Game {
-  private pointsForWin: number;
+  public pointsForWin: number;
   private ballSpeed: number;
   private map: any;
   private BallPosX: number;
@@ -56,5 +56,7 @@ export class Game {
         },
       })}\n\n`,
     );
+    this.playerOne.gamePoints = 0;
+    this.playerTwo.gamePoints = 0;
   }
 }

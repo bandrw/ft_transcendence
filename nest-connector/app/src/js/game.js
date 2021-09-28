@@ -66,7 +66,12 @@ Vue.component('game', {
       }
       this.interval = setInterval(
         function () {
-          if (this.ballPosY > 0 && this.ballPosY < 100 && this.ballPosX > 0 && this.ballPosX < 100) {
+          if (
+            this.ballPosY > 0 &&
+            this.ballPosY < 100 &&
+            this.ballPosX > 0 &&
+            this.ballPosX < 100
+          ) {
             this.ballPosY += sin;
             this.ballPosX += cos;
           } else if (this.ballPosX >= 100) {
@@ -88,22 +93,28 @@ Vue.component('game', {
     },
     movePlatformRight() {
       if (!this.platformIntervalOne) {
-        this.platformIntervalOne = setInterval(function () {
-          if (this.youPosX - 1 - this.youWidth / 2 > 0) {
-            this.youPosX -= 1;
-            this.$emit('socketEmit');
-          }
-        }.bind(this), 15);
+        this.platformIntervalOne = setInterval(
+          function () {
+            if (this.youPosX - 1 - this.youWidth / 2 > 0) {
+              this.youPosX -= 1;
+              this.$emit('socketEmit');
+            }
+          }.bind(this),
+          15,
+        );
       }
     },
     movePlatformLeft() {
       if (!this.platformIntervalTwo) {
-        this.platformIntervalTwo = setInterval(function () {
-          if (this.youPosX + 1 + this.youWidth / 2 < 100) {
-            this.youPosX += 1;
-            this.$emit('socketEmit');
-          }
-        }.bind(this), 15);
+        this.platformIntervalTwo = setInterval(
+          function () {
+            if (this.youPosX + 1 + this.youWidth / 2 < 100) {
+              this.youPosX += 1;
+              this.$emit('socketEmit');
+            }
+          }.bind(this),
+          15,
+        );
       }
     },
   },

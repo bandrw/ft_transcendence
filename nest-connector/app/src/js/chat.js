@@ -39,7 +39,7 @@ Vue.component('chat', {
           </div>
           <div v-if="info" class="chat_user_info"
           :style="{ left: infoStyle.left, top: infoStyle.top }">
-            {{ user.login }}
+            {{ user.login }} <span :style="{color: pinColor(user.winP)}"><p>{{ winPercent(user.wins, user.games, user) }}%</p></span>
             <img :src="user.url_avatar"
             class="user_profile_avatar">
             <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
@@ -71,6 +71,25 @@ Vue.component('chat', {
     },
   },
   methods: {
+    pinColor(winP) {
+      if (!winP) {
+        return 'white';
+      } else if (winP < 45) {
+        return 'red';
+      } else if (winP < 50) {
+        return 'yellow';
+      } else if (winP < 55) {
+        return 'green';
+      } else if (winP < 60) {
+        return 'blue';
+      } else if (winP < 65) {
+        return 'blueviolet';
+      }
+    },
+    winPercent(wins, games, user) {
+      user.winP = (wins / games).toFixed(2) * 100;
+      return user.winP ? user.winP : 0;
+    },
     userInfo(user, e) {
       this.info = true;
       this.user = user;

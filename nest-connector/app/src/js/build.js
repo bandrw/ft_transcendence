@@ -36172,7 +36172,7 @@ Vue.component('chat', {
           </div>
           <div v-if="info" class="chat_user_info"
           :style="{ left: infoStyle.left, top: infoStyle.top }">
-            {{ user.login }}
+            {{ user.login }} <span :style="{color: pinColor(user.winP)}"><p>{{ winPercent(user.wins, user.games, user) }}%</p></span>
             <img :src="user.url_avatar"
             class="user_profile_avatar">
             <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
@@ -36204,6 +36204,25 @@ Vue.component('chat', {
     },
   },
   methods: {
+    pinColor(winP) {
+      if (!winP) {
+        return 'white';
+      } else if (winP < 45) {
+        return 'red';
+      } else if (winP < 50) {
+        return 'yellow';
+      } else if (winP < 55) {
+        return 'green';
+      } else if (winP < 60) {
+        return 'blue';
+      } else if (winP < 65) {
+        return 'blueviolet';
+      }
+    },
+    winPercent(wins, games, user) {
+      user.winP = (wins / games).toFixed(2) * 100;
+      return user.winP ? user.winP : 0;
+    },
     userInfo(user, e) {
       this.info = true;
       this.user = user;
@@ -36290,7 +36309,12 @@ Vue.component('game', {
       }
       this.interval = setInterval(
         function () {
-          if (this.ballPosY > 0 && this.ballPosY < 100 && this.ballPosX > 0 && this.ballPosX < 100) {
+          if (
+            this.ballPosY > 0 &&
+            this.ballPosY < 100 &&
+            this.ballPosX > 0 &&
+            this.ballPosX < 100
+          ) {
             this.ballPosY += sin;
             this.ballPosX += cos;
           } else if (this.ballPosX >= 100) {
@@ -36312,22 +36336,28 @@ Vue.component('game', {
     },
     movePlatformRight() {
       if (!this.platformIntervalOne) {
-        this.platformIntervalOne = setInterval(function () {
-          if (this.youPosX - 1 - this.youWidth / 2 > 0) {
-            this.youPosX -= 1;
-            this.$emit('socketEmit');
-          }
-        }.bind(this), 15);
+        this.platformIntervalOne = setInterval(
+          function () {
+            if (this.youPosX - 1 - this.youWidth / 2 > 0) {
+              this.youPosX -= 1;
+              this.$emit('socketEmit');
+            }
+          }.bind(this),
+          15,
+        );
       }
     },
     movePlatformLeft() {
       if (!this.platformIntervalTwo) {
-        this.platformIntervalTwo = setInterval(function () {
-          if (this.youPosX + 1 + this.youWidth / 2 < 100) {
-            this.youPosX += 1;
-            this.$emit('socketEmit');
-          }
-        }.bind(this), 15);
+        this.platformIntervalTwo = setInterval(
+          function () {
+            if (this.youPosX + 1 + this.youWidth / 2 < 100) {
+              this.youPosX += 1;
+              this.$emit('socketEmit');
+            }
+          }.bind(this),
+          15,
+        );
       }
     },
   },
@@ -36547,6 +36577,9 @@ Vue.component('user', {
               <div v-show="profile && authorized && !gameR" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
                 <div id="user_update_avatar" v-on:click="updateAvatar"></div>
+                <div id="game_stats_count"><p>games: {{ im.games }}</p></div>
+                <div id="game_stats_wins"><p>wins: {{ im.wins }}</p></div>
+                <div id="game_stats_winPercent"><p>wins: {{ winPercent }}%</p></div>
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
               </div>
              </div>`,
@@ -36563,12 +36596,22 @@ Vue.component('user', {
       gameR: false,
     };
   },
+  computed: {
+    winPercent() {
+      const winP = (this.im.wins / this.im.games).toFixed(2) * 100;
+      return winP ? winP : 0;
+    },
+  },
   methods: {
     socketEmit() {
-      this.socket.emit('platformPosition', JSON.stringify({
-        login: this.im.login,
-        id: this.$refs.game.id,
-        enemyPlatformX: this.$refs.game.youPosX}));
+      this.socket.emit(
+        'platformPosition',
+        JSON.stringify({
+          login: this.im.login,
+          id: this.$refs.game.id,
+          enemyPlatformX: this.$refs.game.youPosX,
+        }),
+      );
     },
     addUser() {
       this.users.push(this.eventSource.data);
@@ -36595,6 +36638,25 @@ Vue.component('user', {
     authSuccess(im, users) {
       this.im = im;
       this.eventSource = new EventSource('/users/login?login=' + this.im.login);
+      this.eventSource.addEventListener('updateUsersStats', (event) => {
+        const stats = JSON.parse(event.data);
+        let i = 0;
+        while (i < this.users.length) {
+          if (this.im.login === stats.winner) {
+            ++this.im.games;
+            ++this.im.wins;
+          } else if (this.im.login === stats.looser) {
+            ++this.users[i].games;
+          }
+          if (this.users[i].login === stats.winner) {
+            ++this.users[i].games;
+            ++this.users[i].wins;
+          } else if (this.users[i].login === stats.looser) {
+            ++this.users[i].games;
+          }
+          ++i;
+        }
+      });
       this.eventSource.addEventListener('login', (event) => {
         const user = JSON.parse(event.data);
         if (
@@ -36702,15 +36764,18 @@ Vue.component('user', {
         this.logout();
       }
     }.bind(this);
-    document.addEventListener('keyup', function (event) {
-      if (event.key === 'ArrowRight') {
-        clearInterval(this.$refs.game.platformIntervalOne);
-        this.$refs.game.platformIntervalOne = false;
-      } else if (event.key === 'ArrowLeft') {
-        clearInterval(this.$refs.game.platformIntervalTwo);
-        this.$refs.game.platformIntervalTwo = false;
-      }
-    }.bind(this));
+    document.addEventListener(
+      'keyup',
+      function (event) {
+        if (event.key === 'ArrowRight') {
+          clearInterval(this.$refs.game.platformIntervalOne);
+          this.$refs.game.platformIntervalOne = false;
+        } else if (event.key === 'ArrowLeft') {
+          clearInterval(this.$refs.game.platformIntervalTwo);
+          this.$refs.game.platformIntervalTwo = false;
+        }
+      }.bind(this),
+    );
     document.addEventListener(
       'keydown',
       function (event) {

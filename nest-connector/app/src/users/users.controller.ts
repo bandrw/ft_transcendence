@@ -37,7 +37,13 @@ export class UsersController {
   getOnline(@Res() response: Response) {
     response.send(
       this.UsersService.onlineUsers.map(function (e) {
-        return { login: e.login, url_avatar: e.url_avatar, status: e.status };
+        return {
+          login: e.login,
+          url_avatar: e.url_avatar,
+          status: e.status,
+          games: e.games,
+          wins: e.wins,
+        };
       }),
     );
   }
@@ -98,6 +104,8 @@ export class UsersController {
       resp: response,
       url_avatar: user.url_avatar,
       status: 'green',
+      games: user.games,
+      wins: user.wins,
     };
     this.UsersService.onlineUsers.push(newUser);
     this.UsersService.userEvent('login', newUser);

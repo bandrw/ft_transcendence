@@ -48,6 +48,12 @@ export class EventsGame
     }
   }
 
+  @SubscribeMessage('gameScore')
+  async gameScore(@MessageBody() user: string) {
+    const u = JSON.parse(user);
+    await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
+  }
+
   afterInit(server: Server): any {
     this.logger.log('init');
   }

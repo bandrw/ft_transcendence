@@ -76,4 +76,13 @@ export class UsersService {
       ++i;
     }
   }
+  userStatsEvent(stats) {
+    let i = 0;
+    while (i < this.onlineUsers.length) {
+      this.onlineUsers[i].resp.write(
+        'event: updateUsersStats\ndata: ' + JSON.stringify(stats) + '\n\n',
+      );
+      ++i;
+    }
+  }
 }

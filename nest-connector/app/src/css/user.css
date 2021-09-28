@@ -1,3 +1,27 @@
+#game_stats_count {
+    width: 12%;
+    height: 5%;
+    right: 25%;
+    top: 20%;
+    position: absolute;
+}
+
+#game_stats_wins {
+    width: 12%;
+    height: 5%;
+    right: 40%;
+    top: 20%;
+    position: absolute;
+}
+
+#game_stats_winPercent {
+    width: 12%;
+    height: 5%;
+    right: 55%;
+    top: 20%;
+    position: absolute;
+}
+
 .user_authorized {
     min-width: 100px;
     min-height: 50px;

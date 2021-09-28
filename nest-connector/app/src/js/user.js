@@ -25,6 +25,9 @@ Vue.component('user', {
               <div v-show="profile && authorized && !gameR" class="user_profile">
                 <img :src="im.url_avatar" class="user_profile_avatar">
                 <div id="user_update_avatar" v-on:click="updateAvatar"></div>
+                <div id="game_stats_count"><p>games: {{ im.games }}</p></div>
+                <div id="game_stats_wins"><p>wins: {{ im.wins }}</p></div>
+                <div id="game_stats_winPercent"><p>wins: {{ winPercent }}%</p></div>
                 <div class="user_profile_close_button" v-on:click="showProfile">x</div>
               </div>
              </div>`,
@@ -41,12 +44,22 @@ Vue.component('user', {
       gameR: false,
     };
   },
+  computed: {
+    winPercent() {
+      const winP = (this.im.wins / this.im.games).toFixed(2) * 100;
+      return winP ? winP : 0;
+    },
+  },
   methods: {
     socketEmit() {
-      this.socket.emit('platformPosition', JSON.stringify({
-        login: this.im.login,
-        id: this.$refs.game.id,
-        enemyPlatformX: this.$refs.game.youPosX}));
+      this.socket.emit(
+        'platformPosition',
+        JSON.stringify({
+          login: this.im.login,
+          id: this.$refs.game.id,
+          enemyPlatformX: this.$refs.game.youPosX,
+        }),
+      );
     },
     addUser() {
       this.users.push(this.eventSource.data);
@@ -73,6 +86,25 @@ Vue.component('user', {
     authSuccess(im, users) {
       this.im = im;
       this.eventSource = new EventSource('/users/login?login=' + this.im.login);
+      this.eventSource.addEventListener('updateUsersStats', (event) => {
+        const stats = JSON.parse(event.data);
+        let i = 0;
+        while (i < this.users.length) {
+          if (this.im.login === stats.winner) {
+            ++this.im.games;
+            ++this.im.wins;
+          } else if (this.im.login === stats.looser) {
+            ++this.users[i].games;
+          }
+          if (this.users[i].login === stats.winner) {
+            ++this.users[i].games;
+            ++this.users[i].wins;
+          } else if (this.users[i].login === stats.looser) {
+            ++this.users[i].games;
+          }
+          ++i;
+        }
+      });
       this.eventSource.addEventListener('login', (event) => {
         const user = JSON.parse(event.data);
         if (
@@ -180,15 +212,18 @@ Vue.component('user', {
         this.logout();
       }
     }.bind(this);
-    document.addEventListener('keyup', function (event) {
-      if (event.key === 'ArrowRight') {
-        clearInterval(this.$refs.game.platformIntervalOne);
-        this.$refs.game.platformIntervalOne = false;
-      } else if (event.key === 'ArrowLeft') {
-        clearInterval(this.$refs.game.platformIntervalTwo);
-        this.$refs.game.platformIntervalTwo = false;
-      }
-    }.bind(this));
+    document.addEventListener(
+      'keyup',
+      function (event) {
+        if (event.key === 'ArrowRight') {
+          clearInterval(this.$refs.game.platformIntervalOne);
+          this.$refs.game.platformIntervalOne = false;
+        } else if (event.key === 'ArrowLeft') {
+          clearInterval(this.$refs.game.platformIntervalTwo);
+          this.$refs.game.platformIntervalTwo = false;
+        }
+      }.bind(this),
+    );
     document.addEventListener(
       'keydown',
       function (event) {
