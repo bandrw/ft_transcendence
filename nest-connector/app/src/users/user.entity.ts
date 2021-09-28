@@ -14,6 +14,9 @@ export class User_table {
   @Column()
   url_avatar: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({ default: 0 })
+  games: number;
+
+  @Column({ default: 0 })
+  wins: number;
 }
