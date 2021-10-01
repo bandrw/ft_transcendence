@@ -36169,6 +36169,12 @@ Vue.component('chat', {
                         {{ user.login }}<span id="chat_user_status"
                         :style="{ backgroundColor: user.status }"></span></div>
                 </div>
+                <div v-show="show_chat && messages" id="chat_messages">
+                <div v-for="Nmessage in messages">
+                    <span>{{ Nmessage }}</span>
+                </div>
+                    <input @click="messaging" id="chat_input" v-model="message">
+                </div>
           </div>
           <div v-if="info" class="chat_user_info"
           :style="{ left: infoStyle.left, top: infoStyle.top }">
@@ -36188,6 +36194,9 @@ Vue.component('chat', {
         left: null,
         top: null,
       },
+      messages: [],
+      message: '',
+      Nmessage: '',
     };
   },
   computed: {
@@ -36204,6 +36213,9 @@ Vue.component('chat', {
     },
   },
   methods: {
+    messaging() {
+      event.stopPropagation();
+    },
     pinColor(winP) {
       if (!winP) {
         return 'white';
@@ -36733,6 +36745,13 @@ Vue.component('user', {
       this.eventSource.addEventListener('enemyPosition', (event) => {
         this.$refs.game.enemyPosX = event.data;
       });
+      this.eventSource.addEventListener('getMessage', (event) => {
+        const data = JSON.parse(event.data);
+        if (data.login === this.im.login) {
+          data.login === 'you';
+        }
+        this.$refs.chat.messages.push(`${data.login}: ${data.message}`);
+      });
       this.users = users;
       this.authorized = true;
     },
@@ -36807,7 +36826,17 @@ Vue.component('user', {
             }
           }
         } else if (event.key === 'Enter') {
-          if (this.authorized && !this.$refs.ladder.game && !this.enemy) {
+          if (this.authorized && event.target.id === 'chat_input') {
+            this.socket.emit('newMessage', {
+              login: this.im.login,
+              message: this.$refs.chat.message,
+            });
+            this.$refs.chat.message = '';
+          } else if (
+            this.authorized &&
+            !this.$refs.ladder.game &&
+            !this.enemy
+          ) {
             this.$refs.ladder.findGame();
           } else if (
             this.authorized &&

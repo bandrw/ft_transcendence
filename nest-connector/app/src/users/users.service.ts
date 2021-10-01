@@ -85,4 +85,13 @@ export class UsersService {
       ++i;
     }
   }
+  broadcastEventData(event, data) {
+    let i = 0;
+    while (i < this.onlineUsers.length) {
+      this.onlineUsers[i].resp.write(
+        `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`,
+      );
+      ++i;
+    }
+  }
 }

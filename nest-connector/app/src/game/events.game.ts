@@ -10,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
 import { GameService } from './game.service';
+import { UsersService } from '../users/users.service';
 
 @WebSocketGateway()
 export class EventsGame
@@ -18,6 +19,8 @@ export class EventsGame
   constructor(
     @Inject(GameService)
     private gameService: GameService,
+    @Inject(UsersService)
+    private userService: UsersService,
   ) {}
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
@@ -53,7 +56,10 @@ export class EventsGame
     const u = JSON.parse(user);
     await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
   }
-
+  @SubscribeMessage('newMessage')
+  newMessage(@MessageBody() data: string) {
+    this.userService.broadcastEventData('getMessage', data);
+  }
   afterInit(server: Server): any {
     this.logger.log('init');
   }

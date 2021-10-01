@@ -36,6 +36,12 @@ Vue.component('chat', {
                         {{ user.login }}<span id="chat_user_status"
                         :style="{ backgroundColor: user.status }"></span></div>
                 </div>
+                <div v-show="show_chat && messages" id="chat_messages">
+                <div v-for="Nmessage in messages">
+                    <span>{{ Nmessage }}</span>
+                </div>
+                    <input @click="messaging" id="chat_input" v-model="message">
+                </div>
           </div>
           <div v-if="info" class="chat_user_info"
           :style="{ left: infoStyle.left, top: infoStyle.top }">
@@ -55,6 +61,9 @@ Vue.component('chat', {
         left: null,
         top: null,
       },
+      messages: [],
+      message: '',
+      Nmessage: '',
     };
   },
   computed: {
@@ -71,6 +80,9 @@ Vue.component('chat', {
     },
   },
   methods: {
+    messaging() {
+      event.stopPropagation();
+    },
     pinColor(winP) {
       if (!winP) {
         return 'white';

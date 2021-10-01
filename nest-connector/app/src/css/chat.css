@@ -44,6 +44,25 @@
     background-color: chocolate;
     text-align: center;
 }
+
+#chat_messages {
+    width: 64%;
+    right: 1%;
+    height: 85%;
+    bottom: 2%;
+    position: absolute;
+    background-color: #cacaca;
+}
+
+#chat_input {
+    width: 96%;
+    right: 1%;
+    height: 10%;
+    bottom: 2%;
+    position: absolute;
+    background-color: gold;
+}
+
 .chat_user_profile_close_button {
     position: absolute;
     top: 1%;
@@ -60,8 +79,4 @@
     border-radius: 50%;
     right: 1%;
     position: absolute;
-}
-
-.chat-enter-active, .chat-leave-active {
-    transition: opacity 3.5s;
 }
