@@ -29,6 +29,7 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
   }
+
   async create(login: string, password: string) {
     const user = this.usersRepository.create();
     user.password = password;

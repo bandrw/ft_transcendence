@@ -184,7 +184,7 @@ Vue.component('user', {
       this.eventSource.addEventListener('getMessage', (event) => {
         const data = JSON.parse(event.data);
         if (data.login === this.im.login) {
-          data.login === 'you';
+          data.login = 'you';
         }
         this.$refs.chat.messages.push(`${data.login}: ${data.message}`);
       });
@@ -263,11 +263,13 @@ Vue.component('user', {
           }
         } else if (event.key === 'Enter') {
           if (this.authorized && event.target.id === 'chat_input') {
-            this.socket.emit('newMessage', {
-              login: this.im.login,
-              message: this.$refs.chat.message,
-            });
-            this.$refs.chat.message = '';
+            if (this.$refs.chat.message.length > 0) {
+              this.socket.emit('newMessage', {
+                login: this.im.login,
+                message: this.$refs.chat.message,
+              });
+              this.$refs.chat.message = '';
+            }
           } else if (
             this.authorized &&
             !this.$refs.ladder.game &&
@@ -286,7 +288,9 @@ Vue.component('user', {
           event.preventDefault();
           this.showProfile();
         } else if (event.key === ' ' && this.authorized) {
-          if (this.gameR && this.$refs.game.starter) {
+          if (this.authorized && event.target.id === 'chat_input') {
+            this.$refs.message += ' ';
+          } else if (this.gameR && this.$refs.game.starter) {
             this.$refs.game.ballInAction(true);
             this.socket.emit(
               'start',
