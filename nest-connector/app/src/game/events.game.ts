@@ -41,10 +41,12 @@ export class EventsGame
   platformPosition(@MessageBody() user: string) {
     const u = JSON.parse(user);
     if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
+      this.gameService.gamers[u.id].playerOne.position = u.enemyPlatformX;
       this.gameService.gamers[u.id].playerOne.user.resp.write(
         `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
       );
     } else {
+      this.gameService.gamers[u.id].playerTwo.position = u.enemyPlatformX;
       this.gameService.gamers[u.id].playerTwo.user.resp.write(
         `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
       );
