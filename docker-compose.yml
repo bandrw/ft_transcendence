@@ -5,6 +5,8 @@ services:
     build: ./PostgreSQL/
     ports:
     - "5432:5432"
+    # volumes:
+    #   - ./PostgreSQL/data:/var/lib/postgresql/11/main
     networks:
       - transcendence
   nest:
@@ -19,6 +21,11 @@ services:
     networks:
       transcendence:
         ipv4_address: 172.20.0.5
+  web:
+    container_name: web
+    build: ./web
+    ports:
+      - "8080:8080"
 networks:
   transcendence:
     driver: bridge
