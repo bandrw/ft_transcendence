@@ -1,56 +1,56 @@
 <template>
 	<div v-if="!user.isAuthorized()" class="container">
-		<h1>Login page</h1>
+	<h1>Login page</h1>
 
-		<form
-			class="login-from"
-			v-on:submit.prevent="authorize(inputLogin, inputPassword)"
-		>
-			<input
-				name="log"
-				type="text"
-				placeholder="Login"
-				v-model="inputLogin"
-			/>
-			<input
-				name="pass"
-				type="password"
-				placeholder="Password"
-				v-model="inputPassword"
-			/>
+	<form
+		v-on:submit.prevent="authorize(inputLogin, inputPassword)"
+	>
+		<input
+			name="log"
+			type="text"
+			placeholder="Login"
+			v-model="inputLogin"
+		/>
+		<input
+			name="pass"
+			type="password"
+			placeholder="Password"
+			v-model="inputPassword"
+		/>
 
-			<span class="login-errors">
+		<span class="login-errors">
 				{{ loginErrors }}
 			</span>
 
-			<button
-				type="submit"
-				class="log-in-btn"
-			>
-				<CircleLoading
-					v-if="isLoading"
-					bg-color="white"
-					height="35px"
-					width="35px"
-				/>
-				<span v-else>
-				Log in
-			</span>
-			</button>
-		</form>
+		<button
+			type="submit"
+			class="login-btn"
+		>
+			<CircleLoading
+				v-if="isLoading"
+				bg-color="white"
+				height="35px"
+				width="35px"
+			/>
+			<span v-else>
+					Log in
+				</span>
+		</button>
+	</form>
 
-		<span class="separator">Or</span>
+	<router-link class="register-link" to="/register">
+		Register
+	</router-link>
 
-		<div class="login-services">
-			<button class="login-service" onclick="alert('not working yet')">
-				Sign in with
-				<div class="login-service-icon"/>
-			</button>
-			<button class="login-service" onclick="alert('not working yet')">
-				Register
-			</button>
-		</div>
+	<span class="separator">Or</span>
+
+	<div class="login-services">
+		<button class="login-service" onclick="alert('not working yet')">
+			Sign in with
+			<div class="login-service-icon"/>
+		</button>
 	</div>
+</div>
 </template>
 
 <script lang="ts">
@@ -59,10 +59,8 @@ import {defineComponent} from "vue";
 import CircleLoading from "@/components/CircleLoading.vue";
 import User from "@/User.ts";
 import axios from "axios";
-import {userLogin} from "@/apiTypes";
+import {userLogin} from "@/apiTypes/apiTypes";
 import * as bcryptjs from 'bcryptjs';
-
-// const bcrypt = require('bcryptjs')
 
 export default defineComponent({
 	name: "Login",
@@ -86,8 +84,7 @@ export default defineComponent({
 			}
 
 			this.isLoading = true
-			// await new Promise(f => setTimeout(f, 1000)); // just sleep for second
-			const r: userLogin = await axios.post('http://localhost:3000/users/login', { login: login })
+			const r: userLogin = await axios.post('http://localhost:3000/users/login', {login: login})
 				.then(res => {
 					return res.data
 				})
@@ -143,7 +140,7 @@ export default defineComponent({
 		margin-bottom: 30px;
 	}
 
-	.login-from {
+	form {
 		display: flex;
 		flex-direction: column;
 	}
@@ -180,8 +177,10 @@ export default defineComponent({
 		align-items: center;
 		transition: all 0.1s ease-in;
 
-		&:hover {
-			background: #42ad7b;
+		@media (hover: hover) {
+			&:hover {
+				background: #42ad7b;
+			}
 		}
 	}
 
@@ -190,11 +189,26 @@ export default defineComponent({
 		color: red;
 	}
 
+	.register-link {
+		color: #42b983;
+		font-size: 1.2em;
+		width: fit-content;
+		padding: 0;
+		margin-top: 20px;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
 	.separator {
 		margin-top: 30px;
 	}
 
 	.login-services {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 		margin-top: 30px;
 
 		.login-service {
