@@ -80,3 +80,12 @@
     right: 1%;
     position: absolute;
 }
+
+#user_personal_message {
+    position: absolute;
+    left: 3%;
+    bottom: 3%;
+    width: 35%;
+    height: 15%;
+    background-color: blueviolet;
+}

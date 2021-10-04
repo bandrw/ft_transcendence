@@ -11,7 +11,7 @@ Vue.component('user', {
               <game v-show="gameR" ref="game" @socketEmit="socketEmit"></game>
               <div @login="addUser"></div>
                 <chat :authorized="authorized" :im="im" :users="users"
-                ref="chat" :gameR="gameR"></chat>
+                ref="chat" :gameR="gameR" @personalM="personalMessage"></chat>
               <ladder :authorized="authorized" @kickEnemy="enemy = false"
                :im="im" :users="users" :enemy="enemy"
               ref="ladder"></ladder>
@@ -51,6 +51,9 @@ Vue.component('user', {
     },
   },
   methods: {
+    personalMessage(from, to) {
+      console.log(from + ` ${to}`);
+    },
     socketEmit() {
       this.socket.emit(
         'platformPosition',
@@ -239,7 +242,10 @@ Vue.component('user', {
         } else if (event.key === 'ArrowLeft' && this.gameR) {
           this.$refs.game.movePlatformLeft();
         } else if (event.key === 'Escape') {
-          if (
+          const focused = $('#chat_input');
+          if (focused.is(':focus')) {
+            focused.blur();
+          } else if (
             this.$refs.ladder &&
             this.authorized &&
             !this.$refs.ladder.game &&
