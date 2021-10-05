@@ -10,6 +10,7 @@ import { LadderModule } from './ladder/ladder.module';
 import { GameModule } from './game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import {WebSocketGateway} from "@nestjs/websockets";
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import {WebSocketGateway} from "@nestjs/websockets";
     LadderModule,
     GameModule,
     EventEmitterModule.forRoot(),
+    ChatModule,
   ],
   controllers: [AppController, CssController, JsController],
   providers: [AppService],

@@ -1,7 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { EventsGame } from './events.game';
+import { Controller } from '@nestjs/common';
 
 @Controller('game')
-export class GameController {
-  constructor(private gameService: EventsGame) {}
-}
+export class GameController {}

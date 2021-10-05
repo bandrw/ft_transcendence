@@ -36181,6 +36181,7 @@ Vue.component('chat', {
             {{ user.login }} <span :style="{color: pinColor(user.winP)}"><p>{{ winPercent(user.wins, user.games, user) }}%</p></span>
             <img :src="user.url_avatar"
             class="user_profile_avatar">
+            <div id="user_personal_message" @click="personalChatOpen(user.login)">message</div>
             <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
           </div></div>
   `,
@@ -36194,7 +36195,7 @@ Vue.component('chat', {
         left: null,
         top: null,
       },
-      messages: [],
+      chats: [{ messages: [], name: false }],
       message: '',
       Nmessage: '',
     };
@@ -36213,6 +36214,11 @@ Vue.component('chat', {
     },
   },
   methods: {
+    personalChatOpen(login) {
+      this.info = false;
+      $('#chat_input').focus();
+      axios.get(`/chat/create?from=${this.im.login}&to${login}`);
+    },
     messaging() {
       event.stopPropagation();
     },
@@ -36575,7 +36581,7 @@ Vue.component('user', {
               <game v-show="gameR" ref="game" @socketEmit="socketEmit"></game>
               <div @login="addUser"></div>
                 <chat :authorized="authorized" :im="im" :users="users"
-                ref="chat" :gameR="gameR"></chat>
+                ref="chat" :gameR="gameR" @personalM="personalMessage"></chat>
               <ladder :authorized="authorized" @kickEnemy="enemy = false"
                :im="im" :users="users" :enemy="enemy"
               ref="ladder"></ladder>
@@ -36615,6 +36621,9 @@ Vue.component('user', {
     },
   },
   methods: {
+    personalMessage(from, to) {
+      console.log(from + ` ${to}`);
+    },
     socketEmit() {
       this.socket.emit(
         'platformPosition',
@@ -36748,7 +36757,7 @@ Vue.component('user', {
       this.eventSource.addEventListener('getMessage', (event) => {
         const data = JSON.parse(event.data);
         if (data.login === this.im.login) {
-          data.login === 'you';
+          data.login = 'you';
         }
         this.$refs.chat.messages.push(`${data.login}: ${data.message}`);
       });
@@ -36803,7 +36812,10 @@ Vue.component('user', {
         } else if (event.key === 'ArrowLeft' && this.gameR) {
           this.$refs.game.movePlatformLeft();
         } else if (event.key === 'Escape') {
-          if (
+          const focused = $('#chat_input');
+          if (focused.is(':focus')) {
+            focused.blur();
+          } else if (
             this.$refs.ladder &&
             this.authorized &&
             !this.$refs.ladder.game &&
@@ -36827,11 +36839,13 @@ Vue.component('user', {
           }
         } else if (event.key === 'Enter') {
           if (this.authorized && event.target.id === 'chat_input') {
-            this.socket.emit('newMessage', {
-              login: this.im.login,
-              message: this.$refs.chat.message,
-            });
-            this.$refs.chat.message = '';
+            if (this.$refs.chat.message.length > 0) {
+              this.socket.emit('newMessage', {
+                login: this.im.login,
+                message: this.$refs.chat.message,
+              });
+              this.$refs.chat.message = '';
+            }
           } else if (
             this.authorized &&
             !this.$refs.ladder.game &&
@@ -36850,7 +36864,9 @@ Vue.component('user', {
           event.preventDefault();
           this.showProfile();
         } else if (event.key === ' ' && this.authorized) {
-          if (this.gameR && this.$refs.game.starter) {
+          if (this.authorized && event.target.id === 'chat_input') {
+            this.$refs.message += ' ';
+          } else if (this.gameR && this.$refs.game.starter) {
             this.$refs.game.ballInAction(true);
             this.socket.emit(
               'start',
