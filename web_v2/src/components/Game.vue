@@ -5,11 +5,11 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import Vue from "vue";
 import Player from "@/Player";
 import GameBall from "@/GameBall";
 
-export default defineComponent({
+export default Vue.extend({
 	name: "Game",
 	data() {
 		return {

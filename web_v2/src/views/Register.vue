@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import Vue from "vue";
 import CircleLoading from "@/components/CircleLoading.vue";
 import User from "@/User";
 import router from "@/router";
@@ -61,7 +61,7 @@ import axios from "axios";
 import * as bcryptjs from 'bcryptjs';
 import {userCreate, userLogin} from "@/apiTypes/apiTypes";
 
-export default defineComponent({
+export default Vue.extend({
 	name: "Register",
 	components: {CircleLoading},
 	props: {
@@ -95,22 +95,26 @@ export default defineComponent({
 				.catch(err => this.errors = err)
 			if (createRes.ok) {
 				// Successful registration, getting user
-				const loginRes: userLogin = await axios.post(`${process.env.VUE_APP_API_URL}/users/login`, {login: this.inputLogin})
+				const loginResponse: userLogin = await axios.get(`${process.env.VUE_APP_API_URL}/users/login`, {
+					params: { login: this.inputLogin }
+				})
 					.then(res => {
 						return res.data
 					})
 					.catch(err => this.errors = err)
-				if (loginRes.id === undefined) {
-					this.errors = 'Wrong login or password!'
+				// await axios.get(`${process.env.VUE_APP_API_URL}/users/login`, {
+				// 	params: { login: this.inputLogin }
+				// })
+				if (loginResponse.id === undefined) {
+					this.errors = 'Log in error'
 					this.isLoading = false
 					return
 				}
-				if (bcryptjs.compareSync(this.inputPassword, loginRes.password)) {
-					const user = new User();
-					user.username = loginRes.login
-					user.loginDate = Date.now()
+				if (bcryptjs.compareSync(this.inputPassword, loginResponse.password)) {
+					this.user.username = loginResponse.login
+					this.user.loginDate = Date.now()
 
-					this.$emit('update:user', user)
+					this.$emit('update:user', this.user)
 					this.errors = ''
 					await router.push('/')
 				} else {

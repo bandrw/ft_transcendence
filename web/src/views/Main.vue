@@ -3,7 +3,11 @@
 		<Header :user="this.user"/>
 		<div class="main">
 
-			<Game/>
+			<Game v-if="isGameShown"/>
+			<button
+				v-on:click="findGame"
+				class="find-game-btn"
+			>Find game</button>
 <!--			<game v-show="gameR" ref="game" @socketEmit="socketEmit"></game>-->
 <!--			<div @login="addUser"></div>-->
 <!--			<chat :authorized="authorized" :im="im" :users="users" ref="chat" :gameR="gameR"></chat>-->
@@ -38,6 +42,7 @@ import router from "@/router";
 import { defineComponent } from 'vue';
 import User from "@/User.ts";
 import Game from "@/components/Game.vue";
+import axios from "axios";
 
 export default defineComponent({
 	name: 'Main',
@@ -49,6 +54,21 @@ export default defineComponent({
 		user: {
 			type: User,
 			required: true
+		}
+	},
+	data() {
+		return {
+			isGameShown: false
+		}
+	},
+	methods: {
+		async findGame() {
+			await axios.get(`${process.env.VUE_APP_API_URL}/ladder/gameStatus`, {
+				params: {
+					login: this.user.username,
+					status: 'yellow'
+				}
+			})
 		}
 	},
 	beforeMount(): void {
@@ -63,6 +83,19 @@ export default defineComponent({
 
 .main {
 	font-size: 1em;
+
+	.find-game-btn {
+		margin-top: 50px;
+		font-size: 1.2em;
+		padding: 15px 25px;
+		color: white;
+		background: #42b983;
+		border: none;
+		outline: none;
+		border-radius: 20px;
+		cursor: pointer;
+		font-weight: bold;
+	}
 }
 
 </style>

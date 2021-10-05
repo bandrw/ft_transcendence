@@ -11,7 +11,7 @@ services:
       - transcendence
   nest:
     container_name: nest-connector
-    command: npm run start:dev
+    # command: npm run start:dev
     build:
       context: nest-connector
     ports:
@@ -21,11 +21,11 @@ services:
     networks:
       transcendence:
         ipv4_address: 172.20.0.5
-  web:
-    container_name: web
-    build: ./web
-    ports:
-      - "8080:8080"
+  # web:
+  #   container_name: web
+  #   build: ./web
+  #   ports:
+  #     - "8080:8080"
 networks:
   transcendence:
     driver: bridge

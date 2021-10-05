@@ -47,7 +47,7 @@
 	<div class="login-services">
 		<button class="login-service" onclick="alert('not working yet')">
 			Sign in with
-			<div class="login-service-icon"/>
+			<span class="login-service-icon"/>
 		</button>
 	</div>
 </div>
@@ -55,14 +55,14 @@
 
 <script lang="ts">
 import router from "@/router";
-import {defineComponent} from "vue";
+import Vue from "vue";
 import CircleLoading from "@/components/CircleLoading.vue";
 import User from "@/User.ts";
 import axios from "axios";
 import {userLogin} from "@/apiTypes/apiTypes";
 import * as bcryptjs from 'bcryptjs';
 
-export default defineComponent({
+export default Vue.extend({
 	name: "Login",
 	components: {CircleLoading},
 	props: {
@@ -84,22 +84,26 @@ export default defineComponent({
 			}
 
 			this.isLoading = true
-			const r: userLogin = await axios.post(`${process.env.VUE_APP_API_URL}/users/login`, {login: login})
+			const loginResponse: userLogin = await axios.post(`${process.env.VUE_APP_API_URL}/users/login`, {
+				login: login
+			})
 				.then(res => {
 					return res.data
 				})
 				.catch(err => this.loginErrors = err)
-			if (r.id === undefined) {
+			// await axios.get(`${process.env.VUE_APP_API_URL}/users/login`, {
+			// 	params: { login: login }
+			// })
+			if (loginResponse.id === undefined) {
 				this.loginErrors = 'Wrong login or password!'
 				this.isLoading = false
 				return
 			}
-			if (bcryptjs.compareSync(password, r.password)) {
-				const user = new User();
-				user.username = login
-				user.loginDate = Date.now()
+			if (bcryptjs.compareSync(password, loginResponse.password)) {
+				this.user.username = login
+				this.user.loginDate = Date.now()
 
-				this.$emit('update:user', user)
+				this.$emit('update:user', this.user)
 				this.loginErrors = ''
 				await router.push('/')
 			} else {
