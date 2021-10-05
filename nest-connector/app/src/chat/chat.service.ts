@@ -8,27 +8,39 @@ export class ChatService {
   private usersService: UsersService;
   private personalChats: PersonalChat[] = [];
 
-  createNewPersonalChat(loginOne: string, loginTwo: string) {
-    let userOne;
-    let userTwo;
+  createNewPersonalChat(from: string, to: string) {
+    let fromUser;
+    let toUser;
     let i = 0;
+    let fromUserIndex;
+    let toUserIndex;
     while (i < this.usersService.onlineUsers.length) {
-      if (this.usersService.onlineUsers[i].login === loginOne) {
-        userOne = this.usersService.onlineUsers[i];
-      } else if (this.usersService.onlineUsers[i].login === loginTwo) {
-        userTwo = this.usersService.onlineUsers[i];
+      if (this.usersService.onlineUsers[i].login === from) {
+        fromUser = this.usersService.onlineUsers[i];
+        fromUserIndex = i;
+      } else if (this.usersService.onlineUsers[i].login === to) {
+        toUser = this.usersService.onlineUsers[i];
+        toUserIndex = i;
       }
-      if (userOne && userTwo) {
+      if (fromUser && toUser) {
         break;
       }
       ++i;
     }
-    this.personalChats.push(
-      new PersonalChat(userOne, userTwo, this.personalChats.length),
-    );
+    if (i === this.usersService.onlineUsers.length) {
+      this.personalChats.push(
+        new PersonalChat(fromUser, toUser, this.personalChats.length),
+      );
+      this.usersService.onlineUsers[fromUserIndex].resp.write(
+        `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[toUserIndex].login}}`,
+      );
+      this.usersService.onlineUsers[toUserIndex].resp.write(
+        `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[fromUserIndex].login}}`,
+      );
+    }
   }
 
-  transferMessage(id: number, to: string, message: string) {
+  transferPersonalMessage(id: number, to: string, message: string) {
     if (this.personalChats[id].userOne.login === to) {
       this.personalChats[id].userOne.resp.write(
         `event: personalMessage\ndata: ${message}`,
