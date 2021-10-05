@@ -9,11 +9,12 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
-import { GameService } from './game.service';
-import { UsersService } from '../users/users.service';
+import { GameService } from './game/game.service';
+import { UsersService } from './users/users.service';
+import { ChatService } from './chat/chat.service';
 
 @WebSocketGateway()
-export class EventsGame
+export class Events
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
@@ -21,6 +22,8 @@ export class EventsGame
     private gameService: GameService,
     @Inject(UsersService)
     private userService: UsersService,
+    @Inject(ChatService)
+    private chatService: ChatService,
   ) {}
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
@@ -56,17 +59,22 @@ export class EventsGame
     const u = JSON.parse(user);
     await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
   }
-  @SubscribeMessage('newMessage')
-  newMessage(@MessageBody() data: string) {
-    this.userService.broadcastEventData('getMessage', data);
+  @SubscribeMessage('newPersonalMessage')
+  newPersonalMessage(@MessageBody() data: string) {
+    const messageInfo = JSON.parse(data);
+    this.chatService.transferPersonalMessage(
+      messageInfo.id,
+      messageInfo.to,
+      messageInfo.message,
+    );
   }
-  afterInit(server: Server): any {
-    this.logger.log('init');
-  }
-
-  handleConnection(client: Socket, ...args: any[]): any {
-    this.logger.log('client connected: ' + client);
-  }
+  // afterInit(server: Server): any {
+  //   this.logger.log('init');
+  // }
+  //
+  // handleConnection(client: Socket, ...args: any[]): any {
+  //   this.logger.log('client connected: ' + client);
+  // }
 
   handleDisconnect(client: Socket): any {
     this.logger.log(`Client disconnected : ${client.id}`);
