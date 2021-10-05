@@ -68,13 +68,13 @@ export class Events
       messageInfo.message,
     );
   }
-  // afterInit(server: Server): any {
-  //   this.logger.log('init');
-  // }
-  //
-  // handleConnection(client: Socket, ...args: any[]): any {
-  //   this.logger.log('client connected: ' + client);
-  // }
+  afterInit(server: Server): any {
+    this.logger.log(server);
+  }
+
+  handleConnection(client: Socket, ...args: any[]): any {
+    this.logger.log('client connected: ' + client + args);
+  }
 
   handleDisconnect(client: Socket): any {
     this.logger.log(`Client disconnected : ${client.id}`);
