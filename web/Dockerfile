@@ -4,14 +4,11 @@ WORKDIR /app
 
 EXPOSE 3000
 
-CMD ["npm", "run", "serve"]
+CMD ["npm", "run", "start"]
 
 COPY package.json ./
 COPY package-lock.json ./
 COPY tsconfig.json ./
-COPY .eslintrc.js ./
-COPY babel.config.js ./
-COPY .browserslistrc ./
 
 RUN npm install
 

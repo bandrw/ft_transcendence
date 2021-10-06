@@ -5,11 +5,11 @@ services:
     build:
       context: PostgreSQL
     ports:
-    - "5432:5432"
+      - "5432:5432"
     # volumes:
     # - ./PostgreSQL/data:/var/lib/postgresql/11/main
     networks:
-    - transcendence
+      - transcendence
     # command: /start.sh
   nest:
     container_name: nest-connector
@@ -18,16 +18,19 @@ services:
       context: nest-connector
     ports:
       - "3000:3000"
-    volumes:
-      - ./nest-connector/app:/transcendence
+    # # Dev
+    # volumes:
+    #   - ./nest-connector/app:/transcendence
     networks:
       transcendence:
         ipv4_address: 172.20.0.5
   web:
     container_name: web
     build: ./web
+    environment:
+      - REACT_APP_API_URL=http://localhost:3000
     ports:
-     - "8080:3000"
+      - "8080:3000"
 networks:
   transcendence:
     driver: bridge
