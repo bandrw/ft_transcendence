@@ -1,5 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+let bootstrap = require('bootstrap-vue');
+Vue.use(bootstrap);
 
 Vue.component('chat', {
   props: {
@@ -25,7 +28,16 @@ Vue.component('chat', {
                v-on:click="showChat">
                   <div class="chat_performance" 
                     v-show="authorized">
-                      {{ type }}
+                    <b-tabs content-class="mt-3">
+                      <div v-for="chat in chats">
+                        <b-tab :title="chat.name"  v-show="show_chat && chat.messages" id="chat_messages">
+                          <div v-for="message in chat.messages">
+                            <span>{{ message }}</span>
+                          </div>
+                          <input @click="messaging" id="chat_input" v-model="message">
+                        </b-tab>
+                      </div>
+                    </b-tabs> 
                   </div>
                 <div v-show="show_chat && users"
                         class="chat_users_side">
@@ -36,17 +48,17 @@ Vue.component('chat', {
                         {{ user.login }}<span id="chat_user_status"
                         :style="{ backgroundColor: user.status }"></span></div>
                 </div>
-                <div v-show="show_chat && messages" id="chat_messages">
-                <div v-for="Nmessage in messages">
-                    <span>{{ Nmessage }}</span>
-                </div>
-                    <input @click="messaging" id="chat_input" v-model="message">
-                </div>
+<!--                <div v-show="show_chat && messages" id="chat_messages">
+                  <div v-for="Nmessage in messages">
+                      <span>{{ Nmessage }}</span>
+                  </div>
+                  <input @click="messaging" id="chat_input" v-model="message">
+                </div>-->
           </div>
           <div v-if="info" class="chat_user_info"
           :style="{ left: infoStyle.left, top: infoStyle.top }">
             {{ user.login }} <span :style="{color: pinColor(user.winP)}"><p>{{ winPercent(user.wins, user.games, user) }}%</p></span>
-            <img :src="user.url_avatar"
+            <img :src="user.url_avatar" alt=""
             class="user_profile_avatar">
             <div id="user_personal_message" @click="personalChatOpen(user.login)">message</div>
             <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
@@ -62,9 +74,8 @@ Vue.component('chat', {
         left: null,
         top: null,
       },
-      chats: [{ messages: [], name: false }],
+      chats: [{ name: false, id: false, messages: [] }],
       message: '',
-      Nmessage: '',
     };
   },
   computed: {
@@ -84,7 +95,17 @@ Vue.component('chat', {
     personalChatOpen(login) {
       this.info = false;
       $('#chat_input').focus();
-      axios.get(`/chat/create?from=${this.im.login}&to${login}`);
+      let i = 0;
+      while (i < this.chats.length) {
+        if (this.chats[i].name === login) {
+          break;
+        }
+        ++i;
+      }
+      if (i === this.chats.length) {
+        this.chats.push({ name: login, messages: [] });
+        axios.get(`/chat/create?from=${this.im.login}&to${login}`);
+      }
     },
     messaging() {
       event.stopPropagation();

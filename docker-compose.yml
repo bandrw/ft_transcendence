@@ -23,6 +23,17 @@ services:
     networks:
       transcendence:
         ipv4_address: 172.20.0.5
+  vue:
+    volumes:
+      - ./vue/app:/transcendence
+    networks:
+      - transcendence
+    ports:
+      - "80:8080"
+    command: npm run serve
+    container_name: vue
+    build:
+      context: vue
 networks:
   transcendence:
     driver: bridge

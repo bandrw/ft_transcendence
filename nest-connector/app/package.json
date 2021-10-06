@@ -39,7 +39,9 @@
     "rxjs": "^7.2.0",
     "typeorm": "^0.2.37",
     "vue": "^2.6.14",
-    "socket.io": "^4.2.0"
+    "socket.io": "^4.2.0",
+    "bootstrap": "^5.1.2",
+    "bootstrap-vue": "^2.21.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
