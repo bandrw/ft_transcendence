@@ -83,9 +83,12 @@ export class UsersController {
 
   @Get('checkExist')
   async checkExist(@Query('login') login) {
-    return await this.UsersService.usersRepository.findOne({
+    const r = await this.UsersService.usersRepository.findOne({
       where: { login: login },
     });
+    if (r)
+      return { ok: true, msg: r }
+    return { ok: false, msg: 'User doesn\'t exists' }
   }
 
   @Get('login')
@@ -116,7 +119,12 @@ export class UsersController {
   }
   @Post('login')
   async authentification(@Req() req: Request, @Res() response: Response) {
-    response.send(await this.UsersService.login(response, req.body.login));
-    await this.emitter(req, req.body.login, response)
+    const r = await this.UsersService.login(response, req.body.login);
+    if (r) {
+      await this.emitter(req, req.body.login, response)
+      response.send({ ok: true, msg: r });
+    } else {
+      response.send({ ok: false, msh: 'User not found' })
+    }
   }
 }
