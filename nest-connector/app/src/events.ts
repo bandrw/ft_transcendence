@@ -68,6 +68,12 @@ export class Events
       messageInfo.message,
     );
   }
+
+  @SubscribeMessage('newMessage')
+  newMessage(@MessageBody() data: string) {
+    this.userService.broadcastEventData('getMessage', data);
+  }
+
   afterInit(server: Server): any {
     this.logger.log(server);
   }
