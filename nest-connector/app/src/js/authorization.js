@@ -129,7 +129,7 @@ Vue.component('user_login', {
                     <div id="login_error"><p v-if="error">error: {{ error }}</p></div>
                     <div class="user_login_button"
                     v-on:click="authorize"><p>login</p></div>
-                    <img src="https://yt3.ggpht.com/ytc/AAUvwniWlUa-gZ5YNz8-2Mtada9CZOHaX8o4nGaq5JWc=s900-c-k-c0x00ffffff-no-rj" id="intra_img"></div>`,
+                    <img src="https://yt3.ggpht.com/ytc/AAUvwniWlUa-gZ5YNz8-2Mtada9CZOHaX8o4nGaq5JWc=s900-c-k-c0x00ffffff-no-rj" id="intra_img" alt=""></div>`,
   data() {
     return {
       login: null,
@@ -139,7 +139,7 @@ Vue.component('user_login', {
   methods: {
     authorize() {
       this.$emit('authorization', this.login, this.password);
-      this.password = null;
+      this.password = '';
     },
   },
   mounted() {
