@@ -5292,7 +5292,7 @@ jQuery.event = {
 				}
 			}
 
-			// Add to the element's handler list, delegates in web
+			// Add to the element's handler list, delegates in front
 			if ( selector ) {
 				handlers.splice( handlers.delegateCount++, 0, handleObj );
 			} else {
