@@ -76,7 +76,7 @@ const Register = (props: RegisterProps) => {
 
 		setIsLoading(true)
 		setErrors('')
-		const checkExistResponse: UserCheckExist = await axios.get<UserCheckExist>(`${process.env.REACT_APP_API_URL}/users/checkExist`, {
+		const checkExistResponse: UserCheckExist = await axios.get<UserCheckExist>('/users/checkExist', {
 			params: { login: login }
 		})
 			.then(res => res.data)
@@ -88,7 +88,7 @@ const Register = (props: RegisterProps) => {
 
 		const hashedPassword = await bcryptjs.hash(password, 10)
 		const usersCreateResponse = await axios.post<any, AxiosResponse<UserCreate> >(
-			`${process.env.REACT_APP_API_URL}/users/create`, {
+			'/users/create', {
 			login: login,
 			pass: hashedPassword
 		})

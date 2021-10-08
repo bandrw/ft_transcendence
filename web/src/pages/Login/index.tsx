@@ -20,7 +20,7 @@ export const signIn = async (
 	setCurrentUser: (user: User) => void,
 	setErrors: (errors: string) => void
 ) => {
-	const r = await axios.post<any, AxiosResponse<UserLogin> >(`${process.env.REACT_APP_API_URL}/users/login`, {
+	const r = await axios.post<any, AxiosResponse<UserLogin> >('/users/login', {
 		login
 	})
 		.then(res => {

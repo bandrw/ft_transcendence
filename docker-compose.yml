@@ -31,6 +31,8 @@ services:
       - REACT_APP_API_URL=http://localhost:3000
     ports:
       - "8080:3000"
+    networks:
+      - transcendence
 networks:
   transcendence:
     driver: bridge
