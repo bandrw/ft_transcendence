@@ -1,10 +1,12 @@
 <template>
-  <div id="app">
-    <div v-if="!$store.state.authorized" id="user_unauthorized">
-      <router-link to="/">Login</router-link> |
-      <router-link to="/about">Register</router-link>
+  <div>
+    <div id="user_unauthorized">
+      <div v-if="!$store.state.authorized">
+        <router-link to="/" class="tab">Login</router-link> |
+        <router-link to="/about" class="tab">Register</router-link>
+      </div>
+      <router-view />
     </div>
-    <router-view />
   </div>
 </template>
 
@@ -23,5 +25,23 @@ body {
   position: absolute;
   left: 15%;
   top: 15%;
+}
+
+.tab {
+  text-align: left;
+  width: 20%;
+  background-color: beige;
+  font-size: larger;
+  margin: 1%;
+  top: 5%;
+}
+
+p {
+  font-family: Serif, fantasy, sans-serif;
+}
+
+input {
+  font-family: Arial sans-serif;
+  font-size: medium;
 }
 </style>

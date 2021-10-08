@@ -8,6 +8,7 @@ import {
   Header,
   HttpCode,
 } from '@nestjs/common';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UsersService } from './users.service';
 import { Response, Request } from 'express';
 import { OnlineUser } from './users.interface';
@@ -112,6 +113,7 @@ export class UsersController {
   }
   @Post('login')
   async authentification(@Req() req: Request, @Res() response: Response) {
+    console.log('loginPost');
     response.send(await this.UsersService.login(response, req.body.login));
   }
 }

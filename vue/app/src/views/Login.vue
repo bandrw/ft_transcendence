@@ -23,7 +23,9 @@
     </div>
     <div id="user_login_button" v-on:click="authorize"><p>login</p></div>
     <img
-      src="https://yt3.ggpht.com/ytc/AAUvwniWlUa-gZ5YNz8-2Mtada9CZOHaX8o4nGaq5JWc=s900-c-k-c0x00ffffff-no-rj"
+      src="../assets/intra.jpeg"
+      height="900"
+      width="900"
       id="intra_img"
       alt=""
     />
@@ -31,7 +33,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import eventService from "../services/eventService";
 import bcryptjs from "bcryptjs";
 
 export default {
@@ -39,15 +41,22 @@ export default {
     return {
       login: "",
       password: "",
-      im: {},
+      im: false,
       error: false,
       users: [],
     };
   },
   methods: {
     async authorize() {
-      this.im = axios
-        .post("nest-connector:3000/users/login", { login: this.login })
+      if (!this.login) {
+        this.error = "please enter login";
+        return;
+      } else if (!this.password) {
+        this.error = "please enter password";
+        return;
+      }
+      this.im = await eventService
+        .login(this.login)
         .then((response) => {
           return response.data;
         })
@@ -58,8 +67,8 @@ export default {
         if (bcryptjs.compareSync(this.password, this.im.password)) {
           this.im.password = false;
           this.error = false;
-          this.users = await axios
-            .get("nest-connector:3000/users/getOnline")
+          this.users = await eventService
+            .onlineUsers()
             .then(function (response) {
               return response.data;
             })
