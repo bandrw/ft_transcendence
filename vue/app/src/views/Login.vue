@@ -1,97 +1,134 @@
 <template>
   <div>
-    <b-form @submit.prevent="onSubmit" @reset.prevent="onReset" v-if="show">
-      <b-form-group
-        id="input-group-1"
-        label="Email address:"
-        label-for="input-1"
-        description="We'll never share your email with anyone else."
-      >
-        <b-form-input
-          id="input-1"
-          v-model="form.email"
-          type="email"
-          placeholder="Enter email"
-          required
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group id="input-group-2" label="Your Name:" label-for="input-2">
-        <b-form-input
-          id="input-2"
-          v-model="form.name"
-          placeholder="Enter name"
-          required
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group id="input-group-3" label="Food:" label-for="input-3">
-        <b-form-select
-          id="input-3"
-          v-model="form.food"
-          :options="foods"
-          required
-        ></b-form-select>
-      </b-form-group>
-
-      <b-form-group id="input-group-4" v-slot="{ ariaDescribedby }">
-        <b-form-checkbox-group
-          v-model="form.checked"
-          id="checkboxes-4"
-          :aria-describedby="ariaDescribedby"
-        >
-          <b-form-checkbox value="me">Check me out</b-form-checkbox>
-          <b-form-checkbox value="that">Check that out</b-form-checkbox>
-        </b-form-checkbox-group>
-      </b-form-group>
-
-      <b-button type="submit" variant="primary">Submit</b-button>
-      <b-button type="reset" variant="danger">Reset</b-button>
-    </b-form>
-    <b-card class="mt-3" header="Form Data Result">
-      <pre class="m-0">{{ form }}</pre>
-    </b-card>
+    <div id="login_login_text"><p>user ></p></div>
+    <div id="login_login_input">
+      <input
+        v-model="login"
+        type="text"
+        class="input"
+        placeholder="between 4 and 16 symbols"
+      />
+    </div>
+    <div id="login_password_text"><p>password ^</p></div>
+    <div id="login_password_input">
+      <input
+        v-model="password"
+        type="password"
+        class="input"
+        placeholder="6 and more symbols"
+      />
+    </div>
+    <div id="login_error">
+      <p v-if="error">error: {{ error }}</p>
+    </div>
+    <div id="user_login_button" v-on:click="authorize"><p>login</p></div>
+    <img
+      src="https://yt3.ggpht.com/ytc/AAUvwniWlUa-gZ5YNz8-2Mtada9CZOHaX8o4nGaq5JWc=s900-c-k-c0x00ffffff-no-rj"
+      id="intra_img"
+      alt=""
+    />
   </div>
 </template>
 
 <script>
-import Axios from "@/components/Axios.vue";
+import axios from "axios";
+import bcryptjs from "bcryptjs";
 
 export default {
   data() {
     return {
-      form: {
-        email: "",
-        name: "",
-        food: null,
-        checked: [],
-      },
-      foods: [
-        { text: "Select One", value: null },
-        "Carrots",
-        "Beans",
-        "Tomatoes",
-        "Corn",
-      ],
-      show: true,
+      login: "",
+      password: "",
+      im: {},
+      error: false,
+      users: [],
     };
   },
   methods: {
-    onSubmit() {
-      Axios.get();
-    },
-    onReset() {
-      // Reset our form values
-      this.form.email = "";
-      this.form.name = "";
-      this.form.food = null;
-      this.form.checked = [];
-      // Trick to reset/clear native browser form validation state
-      this.show = false;
-      this.$nextTick(() => {
-        this.show = true;
-      });
+    async authorize() {
+      this.im = axios
+        .post("nest-connector:3000/users/login", { login: this.login })
+        .then((response) => {
+          return response.data;
+        })
+        .catch((reason) => {
+          console.log("There was an error: " + reason.response);
+        });
+      if (this.im) {
+        if (bcryptjs.compareSync(this.password, this.im.password)) {
+          this.im.password = false;
+          this.error = false;
+          this.users = await axios
+            .get("nest-connector:3000/users/getOnline")
+            .then(function (response) {
+              return response.data;
+            })
+            .catch((reason) => {
+              console.log("There was an error: " + reason.response);
+            });
+        } else {
+          this.error = "Wrong password";
+        }
+      } else {
+        this.error = "User with login '" + this.login + "' not found";
+      }
     },
   },
 };
 </script>
+
+<style scoped>
+#login_login_input {
+  left: 25%;
+  top: 20%;
+  position: absolute;
+}
+
+#login_login_text {
+  left: 9%;
+  top: 16%;
+  position: absolute;
+}
+
+#login_password_input {
+  left: 7%;
+  top: 45%;
+  position: absolute;
+}
+
+#login_password_text {
+  left: 25%;
+  top: 59%;
+  position: absolute;
+}
+
+.user_login_button > p {
+  font-size: large;
+  text-align: center;
+}
+
+#intra_img {
+  width: 15%;
+  height: 20%;
+  right: 5%;
+  top: 10%;
+  position: absolute;
+  object-position: 75% 25%;
+}
+
+#user_login_button {
+  border-radius: 15px;
+  background: linear-gradient(145deg, #cacaca, #79e7af);
+  box-shadow: 24px 24px 47px #9b9b9b, -24px -24px 47px #ffffff;
+  width: 25%;
+  height: 25%;
+  position: absolute;
+  right: 5%;
+  bottom: 25%;
+}
+
+#login_error {
+  position: absolute;
+  bottom: 0;
+}
+</style>

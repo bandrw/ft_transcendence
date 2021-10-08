@@ -8,6 +8,7 @@ export default new Vuex.Store({
     authorized: false,
     login: "",
     password: "",
+    im: {},
   },
   mutations: {},
   actions: {},
