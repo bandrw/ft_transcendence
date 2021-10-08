@@ -9,4 +9,5 @@ import { UsersModule } from '../users/users.module';
   exports: [GameService],
   imports: [UsersModule],
 })
+// @ts-ignore
 export class GameModule {}

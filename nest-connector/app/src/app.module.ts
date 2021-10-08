@@ -33,4 +33,5 @@ import { Events } from './events';
   controllers: [AppController, CssController, JsController],
   providers: [AppService, Events],
 })
+// @ts-ignore
 export class AppModule {}

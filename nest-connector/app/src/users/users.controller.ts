@@ -117,3 +117,4 @@ export class UsersController {
     response.send(await this.UsersService.login(response, req.body.login));
   }
 }
+// @ts-ignore
