@@ -2,8 +2,11 @@
   <div>
     <div id="user_unauthorized">
       <div v-if="!$store.state.authorized">
-        <router-link to="/" class="tab">Login</router-link> |
-        <router-link to="/about" class="tab">Register</router-link>
+        <router-link :to="{ name: 'login' }" class="tab">Login</router-link> |
+        <router-link :to="{ name: 'register' }" class="tab">Register</router-link>
+      </div>
+      <div v-else>
+        <router-link :to="{ name: 'user', params: {username: 'sky'} }">User</router-link>
       </div>
       <router-view />
     </div>
