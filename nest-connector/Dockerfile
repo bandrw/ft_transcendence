@@ -11,10 +11,10 @@ RUN npm i -g @nestjs/cli
 EXPOSE 3000
 WORKDIR /transcendence
 
-# # Dev
-# CMD npm install && npm run start:dev
+# Dev
+CMD npm install && npm run start:dev
 
-# Prod
-COPY ./app /transcendence
-RUN npm install
-CMD ["npm", "run", "start"]
+## Prod
+#COPY ./app /transcendence
+#RUN npm install
+#CMD ["npm", "run", "start"]

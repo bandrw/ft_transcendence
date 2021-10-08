@@ -36181,7 +36181,6 @@ Vue.component('chat', {
             {{ user.login }} <span :style="{color: pinColor(user.winP)}"><p>{{ winPercent(user.wins, user.games, user) }}%</p></span>
             <img :src="user.url_avatar"
             class="user_profile_avatar">
-            <div id="user_personal_message" @click="personalChatOpen(user.login)">message</div>
             <div class="chat_user_profile_close_button" v-on:click="info=false">x</div>
           </div></div>
   `,
@@ -36195,7 +36194,7 @@ Vue.component('chat', {
         left: null,
         top: null,
       },
-      chats: [{ messages: [], name: false }],
+      messages: [],
       message: '',
       Nmessage: '',
     };
@@ -36214,11 +36213,6 @@ Vue.component('chat', {
     },
   },
   methods: {
-    personalChatOpen(login) {
-      this.info = false;
-      $('#chat_input').focus();
-      axios.get(`/chat/create?from=${this.im.login}&to${login}`);
-    },
     messaging() {
       event.stopPropagation();
     },

@@ -9,8 +9,8 @@ import { JsController } from './js/js.controller';
 import { LadderModule } from './ladder/ladder.module';
 import { GameModule } from './game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import {WebSocketGateway} from "@nestjs/websockets";
 import { ChatModule } from './chat/chat.module';
+import { Events } from './events';
 
 @Module({
   imports: [
@@ -27,11 +27,10 @@ import { ChatModule } from './chat/chat.module';
     UsersModule,
     LadderModule,
     GameModule,
-    EventEmitterModule.forRoot(),
     ChatModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController, CssController, JsController],
-  providers: [AppService],
+  providers: [AppService, Events],
 })
-export class AppModule {
-}
+export class AppModule {}
