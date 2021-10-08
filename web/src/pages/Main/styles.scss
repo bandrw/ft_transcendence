@@ -1,0 +1,10 @@
+.main-container {
+	padding-top: 51px;
+}
+
+.main-tmp {
+	height: calc(100vh - 51px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

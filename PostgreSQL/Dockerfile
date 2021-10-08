@@ -10,4 +10,4 @@ RUN chown postgres /etc/postgresql/11/main/pg_hba.conf
 EXPOSE 5432
 ADD postgresql.conf /etc/postgresql/11/main/
 RUN chown postgres /etc/postgresql/11/main/postgresql.conf
-CMD bash start.sh
+CMD ["bash", "start.sh"]

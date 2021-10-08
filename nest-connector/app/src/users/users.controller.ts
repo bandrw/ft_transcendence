@@ -21,12 +21,14 @@ export class UsersController {
     for (let i = 0; i < req.body.login.length; i++) {
       for (let k = 0; k < bad.length; k++) {
         if (req.body.login[i] === bad[k]) {
-          res.send(bad[k]);
+          // res.send(bad[k]);
+          res.send({ ok: false, msg: `Bad character ('${bad[k]}') in login` })
           return;
         }
       }
     }
-    res.send(true);
+    // res.send(true);
+    res.send({ ok: true, msg: 'User created' })
     await this.UsersService.create(req.body.login, req.body.pass);
   }
   @Get('getAll')
@@ -81,9 +83,12 @@ export class UsersController {
 
   @Get('checkExist')
   async checkExist(@Query('login') login) {
-    return await this.UsersService.usersRepository.findOne({
+    const r = await this.UsersService.usersRepository.findOne({
       where: { login: login },
     });
+    if (r)
+      return { ok: true, msg: r }
+    return { ok: false, msg: 'User doesn\'t exists' }
   }
 
   @Get('login')
@@ -98,6 +103,8 @@ export class UsersController {
     const user = await this.UsersService.usersRepository.findOne({
       where: { login: login },
     });
+    if (user === undefined)
+      return
     req.socket.setTimeout(1000 * 60 * 60 * 60);
     const newUser: OnlineUser = {
       login: login,
@@ -112,6 +119,12 @@ export class UsersController {
   }
   @Post('login')
   async authentification(@Req() req: Request, @Res() response: Response) {
-    response.send(await this.UsersService.login(response, req.body.login));
+    const r = await this.UsersService.login(response, req.body.login);
+    if (r) {
+      await this.emitter(req, req.body.login, response)
+      response.send({ ok: true, msg: r });
+    } else {
+      response.send({ ok: false, msh: 'User not found' })
+    }
   }
 }
