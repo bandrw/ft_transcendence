@@ -11,7 +11,7 @@ interface GameProps {
 	setCurrentUser: (arg0: User) => void
 }
 
-const Game = (props: GameProps) => {
+const Game = (_: GameProps) => {
 	const canvasRef = React.createRef<HTMLCanvasElement>()
 
 	const player = new Player()
@@ -65,13 +65,13 @@ const Game = (props: GameProps) => {
 				then = now - (elapsed % fpsInterval);
 
 				// Calculating positions (needs to be done in server)
-				if (ball.xPosition - ball.size < 0)
+				if (ball.xPosition < 0)
 					ball.angle = Math.PI - ball.angle
 				if (ball.xPosition + ball.size > canvas.width)
 					ball.angle = Math.PI - ball.angle
 				if (ball.yPosition + ball.size > canvas.height)
 					ball.angle = -ball.angle
-				if (ball.yPosition - ball.size < 0)
+				if (ball.yPosition < 0)
 					ball.angle = -ball.angle
 
 				ball.xPosition += Math.cos(ball.angle) * ball.speed
