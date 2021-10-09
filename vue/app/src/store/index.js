@@ -8,8 +8,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     authorized: false,
-    login: "",
-    password: "",
     user: {},
     error: false,
     onlineUsers: []
@@ -24,36 +22,37 @@ export default new Vuex.Store({
     SET_ERROR(state, error) {
       state.error = error
     },
-    CLEAR_USER_PASSWORD(state) {
-      state.password = ""
+    SET_ONLINE_USERS(state, users) {
+      state.onlineUsers = users
     },
     CLEAR_ERROR(state) {
       state.error = false
     },
-    SET_ONLINE_USERS(state, users) {
-      state.onlineUsers = users
+    CLEAR_USER_PASSWORD(state) {
+      state.user.password = ""
     }
   },
   actions: {
-    async fetchAuthorize(context, state) {
-      if (!state.login) {
+    async fetchAuthorize({context, state}, {login, password}) {
+      if (!login) {
         context.commit('SET_ERROR', "please enter login")
         return
-      } else if (!state.password) {
+      } else if (!password) {
         context.commit('SET_ERROR', "please enter password")
         return
       }
-      context.commit('SET_USER_ENTITY', await eventService
-        .login(state.login)
+      const user = await eventService
+        .login(login)
         .then((response) => {
           return response.data ? response.data : {}
         })
         .catch((reason) => {
-          console.log("There was an error: " + reason.response);
+          console.log("There was an error: " + reason);
           return {}
-        }))
-      if (state.user) {
-        if (cryptService.comparePassword(state.password, state.user.password)) {
+        })
+      if (user) {
+        if (cryptService.comparePassword(password, state.user.password)) {
+          context.commit('SET_USER_ENTITY', user)
           context.commit('CLEAR_USER_PASSWORD')
           context.commit('SET_ONLINE_USERS', await eventService
             .onlineUsers()
@@ -70,16 +69,28 @@ export default new Vuex.Store({
           context.commit('SET_ERROR', "Wrong password")
         }
       } else {
-        context.commit('SET_ERROR', `User with login '${state.login}' not found`)
+        context.commit('SET_ERROR', `User with login '${login}' not found`)
       }
     }
   },
   getters: {
-    usersInGame(state) {
-      return state.onlineUsers.filter(users => users.status === 'red')
+    countUsersInGame(state) {
+      return state.onlineUsers.filter(users => users.status === 'red').length
+    },
+    countOnlineUsers: state => {
+      return state.onlineUsers.length
+    },
+    countFreeUsers: state => {
+      return state.onlineUsers.filter(users => users.status === 'green').length
     },
     onlineUsers(state) {
       return state.onlineUsers
+    },
+    userByName: state => login => {
+      return state.onlineUsers.find(user => user.login === login)
+    },
+    userById(state, id) {
+      return state.onlineUsers.find(user => user.id === id)
     },
     authorized(state) {
       return state.authorized

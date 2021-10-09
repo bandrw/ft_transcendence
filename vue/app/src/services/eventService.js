@@ -1,8 +1,9 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://nest-connector:3000",
+  baseURL: "http://localhost:3000",
   withCredentials: false,
+  timeout: 1000,
   headers: {
     Accept: "application/json",
     "Content-type": "application/json",
@@ -10,10 +11,10 @@ const apiClient = axios.create({
 });
 
 export default {
-  login(login) {
-    return apiClient.post("/users/login", { login: login });
+  async login(login) {
+    return await apiClient.post("/users/login", { login: login });
   },
-  onlineUsers() {
-    return apiClient.get("/users/getOnline");
+  async onlineUsers() {
+    return await apiClient.get("/users/getOnline");
   },
 };
