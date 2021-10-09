@@ -33,24 +33,34 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters } from "vuex";
 
 export default {
   data() {
     return {
-      login: "",
-      password: "",
-    }
+      login: null,
+      password: null,
+    };
   },
   methods: {
-    async authorize() {
-      await this.$store.dispatch('fetchAuthorize', {login: this.login, password: this.password})
+    authorize() {
+      this.$store.dispatch("fetchAuthorize", {
+        login: this.login,
+        password: this.password,
+      });
+      this.login = null;
+      this.password = null;
     },
   },
   computed: {
-    ...mapGetters(['countOnlineUsers', 'countFreeUsers', 'userById', 'userByName']),
-    ...mapState(['error'])
-  }
+    ...mapGetters([
+      "countOnlineUsers",
+      "countFreeUsers",
+      "userById",
+      "userByName",
+    ]),
+    ...mapState(["error"]),
+  },
 };
 </script>
 
