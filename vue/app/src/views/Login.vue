@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   data() {
@@ -43,23 +43,20 @@ export default {
     };
   },
   methods: {
-    authorize() {
-      this.$store.dispatch("fetchAuthorize", {
+    ...mapActions("userLogin", ["fetchAuthorize"]),
+    async authorize() {
+      await this.fetchAuthorize({
         login: this.login,
         password: this.password,
       });
-      this.login = null;
-      this.password = null;
+      if (!this.error) {
+        this.login = null;
+        this.password = null;
+      }
     },
   },
   computed: {
-    ...mapGetters([
-      "countOnlineUsers",
-      "countFreeUsers",
-      "userById",
-      "userByName",
-    ]),
-    ...mapState(["error"]),
+    ...mapState("userLogin", ["error"]),
   },
 };
 </script>
@@ -89,11 +86,6 @@ export default {
   position: absolute;
 }
 
-.user_login_button > p {
-  font-size: large;
-  text-align: center;
-}
-
 #intra_img {
   width: 15%;
   height: 20%;
@@ -101,17 +93,6 @@ export default {
   top: 10%;
   position: absolute;
   object-position: 75% 25%;
-}
-
-#user_login_button {
-  border-radius: 15px;
-  background: linear-gradient(145deg, #cacaca, #79e7af);
-  box-shadow: 24px 24px 47px #9b9b9b, -24px -24px 47px #ffffff;
-  width: 25%;
-  height: 25%;
-  position: absolute;
-  right: 5%;
-  bottom: 25%;
 }
 
 #login_error {

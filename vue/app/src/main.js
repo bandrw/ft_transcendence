@@ -5,7 +5,7 @@ import store from "./store";
 import User from "./views/User";
 
 Vue.config.productionTip = false;
-Vue.component('User', User)
+Vue.component("User", User);
 
 new Vue({
   router,

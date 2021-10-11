@@ -113,8 +113,6 @@ export class UsersController {
   }
   @Post('login')
   async authentification(@Req() req: Request, @Res() response: Response) {
-    console.log('loginPost');
     response.send(await this.UsersService.login(response, req.body.login));
   }
 }
-// @ts-ignore

@@ -1,18 +1,16 @@
 <template>
   <div>
-    <div id="user_unauthorized">
-      <div v-if="!authorized">
+    <div v-if="!authorized" id="user_unauthorized">
+      <div>
         <router-link :to="{ name: 'login' }" class="tab">Login</router-link> |
         <router-link :to="{ name: 'register' }" class="tab"
           >Register</router-link
         >
       </div>
-      <div v-else>
-        <router-link :to="{ name: 'user', params: { username: 'sky' } }"
-          >User</router-link
-        >
-      </div>
       <router-view />
+    </div>
+    <div v-else>
+      <h4>Hello</h4>
     </div>
   </div>
 </template>
@@ -30,6 +28,22 @@ export default {
 <style>
 body {
   background-color: #79e7af;
+}
+
+#user_login_button > p {
+  font-size: large;
+  text-align: center;
+}
+
+#user_login_button {
+  border-radius: 15px;
+  background: linear-gradient(145deg, #cacaca, #79e7af);
+  box-shadow: 24px 24px 47px #9b9b9b, -24px -24px 47px #ffffff;
+  width: 25%;
+  height: 25%;
+  position: absolute;
+  right: 5%;
+  bottom: 25%;
 }
 
 #user_unauthorized {

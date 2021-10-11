@@ -17,4 +17,10 @@ export default {
   async onlineUsers() {
     return await apiClient.get("/users/getOnline");
   },
+  async checkExist(login) {
+    return await apiClient.get("/users/checkExist?login=" + login);
+  },
+  async createUser(data) {
+    return await apiClient.post("/users/create", data);
+  },
 };
