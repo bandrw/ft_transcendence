@@ -3,13 +3,14 @@ import './styles.scss'
 import React from 'react';
 import { useHistory } from "react-router-dom";
 
-import { User } from "../../classes/User";
-import Game from "../../components/Game";
+// import Game from "../../components/Game";
 import Header from "../../components/Header";
+import { User } from "../../models/User";
+import FindGame from "./FindGame";
 
 interface MainProps {
 	currentUser: User,
-	setCurrentUser: (arg0: User) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
 }
 
 const Main = (props: MainProps) => {
@@ -23,9 +24,13 @@ const Main = (props: MainProps) => {
 	return (
 		<div className='main-container'>
 			<Header currentUser={props.currentUser} setCurrentUser={props.setCurrentUser} />
-			<div className='main-tmp'>
-				<Game currentUser={props.currentUser} setCurrentUser={props.setCurrentUser}/>
-			</div>
+			<FindGame currentUser={props.currentUser} />
+			{/*<div className='main-tmp'>*/}
+			{/*	<Game*/}
+			{/*		currentUser={props.currentUser}*/}
+			{/*		setCurrentUser={props.setCurrentUser}*/}
+			{/*	/>*/}
+			{/*</div>*/}
 		</div>
 	)
 }

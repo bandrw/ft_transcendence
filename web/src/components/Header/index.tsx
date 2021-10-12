@@ -3,11 +3,11 @@ import './styles.scss'
 import React from 'react';
 import { Link } from "react-router-dom";
 
-import { User } from "../../classes/User";
+import { User } from "../../models/User";
 
 interface HeaderProps {
 	currentUser: User,
-	setCurrentUser: (arg0: User) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
 }
 
 const Header = (props: HeaderProps) => {

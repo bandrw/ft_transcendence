@@ -6,15 +6,15 @@ import React from 'react';
 import { Link, useHistory } from "react-router-dom";
 
 import { UserCheckExist, UserCreate } from "../../apiTypes/apiTypes";
-import { User } from "../../classes/User";
 import CircleLoading from "../../components/CircleLoading";
+import { User } from "../../models/User";
 import { signIn } from "../Login";
 
 const validateInput = (
 	login: string,
 	password: string,
 	passwordConfirmation: string,
-	setErrors: (error: string) => void
+	setErrors: React.Dispatch<React.SetStateAction<string> >
 ): boolean => {
 	if (!login) {
 		setErrors('Enter login')
@@ -46,7 +46,7 @@ const validateInput = (
 
 interface RegisterProps {
 	currentUser: User,
-	setCurrentUser: (arg0: User) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
 }
 
 const Register = (props: RegisterProps) => {

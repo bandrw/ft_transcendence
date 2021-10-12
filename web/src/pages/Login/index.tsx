@@ -6,19 +6,19 @@ import React from 'react';
 import { Link, useHistory } from "react-router-dom";
 
 import { UserLogin } from "../../apiTypes/apiTypes";
-import { User } from "../../classes/User";
 import CircleLoading from "../../components/CircleLoading";
+import { User } from "../../models/User";
 
 interface LoginProps {
 	currentUser: User,
-	setCurrentUser: (arg0: User) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
 }
 
 export const signIn = async (
 	login: string,
 	password: string,
-	setCurrentUser: (user: User) => void,
-	setErrors: (errors: string) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
+	setErrors: React.Dispatch<React.SetStateAction<string> >
 ) => {
 	const r = await axios.post<any, AxiosResponse<UserLogin> >('/users/login', {
 		login

@@ -2,6 +2,10 @@
 /dist
 /node_modules
 
+src/js/build.js
+src/js/jquery.js
+src/js/vue.js
+
 # Logs
 logs
 *.log

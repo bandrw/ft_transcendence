@@ -8,9 +8,11 @@ import {
   Header,
   HttpCode,
 } from '@nestjs/common';
+
 import { UsersService } from './users.service';
 import { Response, Request } from 'express';
 import { OnlineUser } from './users.interface';
+
 @Controller('users')
 export class UsersController {
   constructor(private UsersService: UsersService) {}
@@ -22,13 +24,13 @@ export class UsersController {
       for (let k = 0; k < bad.length; k++) {
         if (req.body.login[i] === bad[k]) {
           // res.send(bad[k]);
-          res.send({ ok: false, msg: `Bad character ('${bad[k]}') in login` })
+          res.send({ ok: false, msg: `Bad character ('${bad[k]}') in login` });
           return;
         }
       }
     }
     // res.send(true);
-    res.send({ ok: true, msg: 'User created' })
+    res.send({ ok: true, msg: 'User created' });
     await this.UsersService.create(req.body.login, req.body.pass);
   }
   @Get('getAll')
@@ -86,9 +88,8 @@ export class UsersController {
     const r = await this.UsersService.usersRepository.findOne({
       where: { login: login },
     });
-    if (r)
-      return { ok: true, msg: r }
-    return { ok: false, msg: 'User doesn\'t exists' }
+    if (r) return { ok: true, msg: r };
+    return { ok: false, msg: "User doesn't exist" };
   }
 
   @Get('login')
@@ -103,8 +104,7 @@ export class UsersController {
     const user = await this.UsersService.usersRepository.findOne({
       where: { login: login },
     });
-    if (user === undefined)
-      return
+    if (user === undefined) return;
     req.socket.setTimeout(1000 * 60 * 60 * 60);
     const newUser: OnlineUser = {
       login: login,
@@ -121,10 +121,10 @@ export class UsersController {
   async authentification(@Req() req: Request, @Res() response: Response) {
     const r = await this.UsersService.login(response, req.body.login);
     if (r) {
-      await this.emitter(req, req.body.login, response)
+      await this.emitter(req, req.body.login, response);
       response.send({ ok: true, msg: r });
     } else {
-      response.send({ ok: false, msh: 'User not found' })
+      response.send({ ok: false, msg: 'User not found' });
     }
   }
 }

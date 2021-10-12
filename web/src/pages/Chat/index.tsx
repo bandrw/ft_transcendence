@@ -3,12 +3,12 @@ import './styles.scss'
 import React from 'react';
 import { useHistory } from "react-router-dom";
 
-import { User } from "../../classes/User";
 import Header from "../../components/Header";
+import { User } from "../../models/User";
 
 interface ChatProps {
 	currentUser: User,
-	setCurrentUser: (arg0: User) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
 }
 
 const Chat = (props: ChatProps) => {

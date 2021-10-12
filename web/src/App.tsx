@@ -3,7 +3,7 @@ import './App.scss';
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import { User } from "./classes/User";
+import { User } from "./models/User";
 import Chat from "./pages/Chat";
 import Login from './pages/Login'
 import Main from "./pages/Main";
@@ -11,6 +11,9 @@ import Register from "./pages/Register";
 
 const App = () => {
 	const [currentUser, setCurrentUser] =  React.useState(new User())
+	// const user = new User()
+	// user.username = 'kfriese'
+	// const [currentUser, setCurrentUser] =  React.useState(user)
 
 	return (
 		<Router>
