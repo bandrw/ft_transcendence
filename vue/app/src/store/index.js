@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import * as userRegister from "./modules/userRegister";
-import * as userLogin from "./modules/userLogin";
+import * as login from "./modules/login";
+import * as ladder from "./modules/ladder";
 
 Vue.use(Vuex);
 
@@ -10,6 +10,7 @@ export default new Vuex.Store({
     authorized: false,
     user: {},
     onlineUsers: [],
+    enemy: {},
   },
   mutations: {
     SET_AUTHORIZE(state, status) {
@@ -21,6 +22,9 @@ export default new Vuex.Store({
     },
     SET_ONLINE_USERS(state, users) {
       state.onlineUsers = users;
+    },
+    SET_ENEMY(state, enemy) {
+      state.enemy = enemy;
     },
   },
   actions: {
@@ -41,27 +45,15 @@ export default new Vuex.Store({
       return state.onlineUsers.filter((users) => users.status === "green")
         .length;
     },
-    onlineUsers(state) {
-      return state.onlineUsers;
-    },
     userByName: (state) => (login) => {
       return state.onlineUsers.find((user) => user.login === login);
     },
     userById(state, id) {
       return state.onlineUsers.find((user) => user.id === id);
     },
-    authorized(state) {
-      return state.authorized;
-    },
-    error(state) {
-      return state.error;
-    },
-    user(state) {
-      return state.user;
-    },
   },
   modules: {
-    userRegister,
-    userLogin,
+    login: login,
+    ladder: ladder,
   },
 });

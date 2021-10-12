@@ -43,7 +43,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions("userLogin", ["fetchAuthorize"]),
+    ...mapActions("login", ["fetchAuthorize"]),
     async authorize() {
       await this.fetchAuthorize({
         login: this.login,
@@ -56,7 +56,7 @@ export default {
     },
   },
   computed: {
-    ...mapState("userLogin", ["error"]),
+    ...mapState("login", ["error"]),
   },
 };
 </script>

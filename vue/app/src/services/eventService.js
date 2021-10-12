@@ -23,4 +23,12 @@ export default {
   async createUser(data) {
     return await apiClient.post("/users/create", data);
   },
+  async setStatus(login, status = "green") {
+    return await apiClient.get(
+      `/ladder/gameStatus?login=${login}&status=${status}`
+    );
+  },
+  async systemStatus(login) {
+    return await apiClient.get(`ladder/systemStatus?login=${login}`);
+  },
 };
