@@ -41,9 +41,8 @@ export const mutations = {
       state.str_timerAccept = state.timerAccept.toFixed(0);
     }
   },
-  PRE_ACCEPT(state) {
-    state.breaker = true;
-    state.readyStatus = "yellow";
+  SET_READY_STATUS(state, status) {
+    state.readyStatus = status;
   },
   SET_GAME(state, game) {
     state.game = game;
@@ -57,15 +56,7 @@ export const mutations = {
   SET_FIND_INTERVAL(state, interval) {
     state.findInterval = interval;
   },
-};
-
-export const actions = {
-  clearIntervals({ commit }) {
-    commit("CLEAR_ACCEPT_INTERVAL");
-    commit("CLEAR_FIND_INTERVAL");
-  },
-  reset({ commit, dispatch }) {
-    dispatch("clearIntervals");
-    commit("CLEAR_LADDER");
+  SET_ACCEPT_INTERVAL(state, interval) {
+    this.state.acceptInterval = interval;
   },
 };

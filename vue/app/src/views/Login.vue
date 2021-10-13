@@ -33,30 +33,51 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapActions } from "vuex";
+import eventService from "../services/eventService";
+import cryptService from "../services/cryptService";
 
 export default {
   data() {
     return {
       login: null,
       password: null,
+      error: null,
     };
   },
   methods: {
-    ...mapActions("login", ["fetchAuthorize"]),
+    ...mapActions(["setUsers"]),
     async authorize() {
-      await this.fetchAuthorize({
-        login: this.login,
-        password: this.password,
+      if (!this.login) {
+        this.error = "please enter login";
+        return;
+      } else if (!this.password) {
+        this.error = "please enter password";
+        return;
+      }
+      const user = await eventService.login(this.login).then((response) => {
+        return response.data;
       });
+      if (user) {
+        if (cryptService.comparePassword(this.password, user.password)) {
+          const onlineUsers = await eventService
+            .onlineUsers()
+            .then(function (response) {
+              return response.data ? response.data : [];
+            });
+          this.setUsers({ users: onlineUsers, user: user });
+          this.error = null;
+        } else {
+          this.error = "Wrong password";
+        }
+      } else {
+        this.error = `User with login '${this.login}' not found`;
+      }
       if (!this.error) {
         this.login = null;
         this.password = null;
       }
     },
-  },
-  computed: {
-    ...mapState("login", ["error"]),
   },
 };
 </script>

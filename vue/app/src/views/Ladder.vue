@@ -51,11 +51,11 @@ export default {
       "str_timerAccept",
       "str_timerFind",
     ]),
+    gameFinding: function () {
+      return this.game && !this.enemy && this.authorized;
+    },
     idGame: function () {
-      return {
-        search_ladder: !this.enemy,
-        game_accept: this.enemy,
-      };
+      return this.enemy ? "game_accept" : "search_ladder";
     },
   },
   methods: {
@@ -64,16 +64,19 @@ export default {
       "CLEAR_FIND_INTERVAL",
       "CLEAR_LADDER",
       "FIND_TICK",
-      "PRE_ACCEPT",
+      "SET_READY_STATUS",
       "SET_GAME",
       "SET_BREAKER",
       "SET_LADDER",
       "SET_FIND_INTERVAL",
       "ACCEPT_TICK",
+      "SET_ACCEPT_INTERVAL",
     ]),
     ...mapMutations(["SET_ENEMY"]),
-    // ...mapActions("ladder", ["clearIntervals", "reset"]),
-    ...mapState(["enemy", "user"]),
+    gameAccept() {
+      this.SET_READY_STATUS("green");
+      eventService.setStatus(this.enemy.login, "red");
+    },
     clearIntervals: function () {
       this.CLEAR_ACCEPT_INTERVAL();
       this.CLEAR_FIND_INTERVAL();
@@ -100,7 +103,8 @@ export default {
       if (this.authorized) {
         this.FIND_TICK();
         if (this.enemy && !this.breaker) {
-          this.PRE_ACCEPT();
+          this.SET_BREAKER(true);
+          this.SET_READY_STATUS("yellow");
           this.waiting();
         }
       } else {
@@ -112,6 +116,7 @@ export default {
       if (!this.enemy && !this.game) {
         this.SET_GAME(true);
         this.SET_BREAKER(false);
+        console.log(`user login: ${this.user.login}`);
         eventService.setStatus(this.user.login, "yellow");
         this.SET_LADDER("search ...");
         this.SET_FIND_INTERVAL(setInterval(this.findChecker, 100));
@@ -141,7 +146,7 @@ export default {
     },
     waiting() {
       this.SET_LADDER("accept");
-      this.acceptInterval = setInterval(this.acceptChecker, 100);
+      this.SET_ACCEPT_INTERVAL(setInterval(this.acceptChecker, 100));
     },
   },
 };

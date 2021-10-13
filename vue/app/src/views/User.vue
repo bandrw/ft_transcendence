@@ -10,7 +10,7 @@
       <router-view />
     </div>
     <div v-else>
-      <h4>Hello</h4>
+      <Ladder />
     </div>
   </div>
 </template>

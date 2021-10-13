@@ -1,6 +1,5 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import * as login from "./modules/login";
 import * as ladder from "./modules/ladder";
 
 Vue.use(Vuex);
@@ -8,9 +7,9 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     authorized: false,
-    user: {},
+    user: false,
     onlineUsers: [],
-    enemy: {},
+    enemy: false,
   },
   mutations: {
     SET_AUTHORIZE(state, status) {
@@ -28,10 +27,11 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    setUsers({ commit }, data) {
+    setUsers({ commit, state }, data) {
       commit("SET_ONLINE_USERS", data.users);
       commit("SET_USER_ENTITY", data.user);
       commit("SET_AUTHORIZE", true);
+      console.log(state.user);
     },
   },
   getters: {
@@ -53,7 +53,6 @@ export default new Vuex.Store({
     },
   },
   modules: {
-    login: login,
     ladder: ladder,
   },
 });

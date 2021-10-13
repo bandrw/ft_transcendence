@@ -7,6 +7,7 @@ export class LadderController {
 
   @Get('gameStatus')
   findGame(@Query('login') login, @Query('status') status) {
+    console.log(`login ${login} status ${status}`);
     this.ladder.updateStatus(login, status);
   }
 
