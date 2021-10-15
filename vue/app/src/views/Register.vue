@@ -1,5 +1,6 @@
 <template>
   <div>
+<!--    <BaseInput />-->
     <div id="user_register_login">
       login: <input v-model="login" type="text" />
     </div>
@@ -20,8 +21,10 @@
 <script>
 import eventService from "../services/eventService";
 import cryptService from "../services/cryptService";
+// import BaseInput from "./BaseInput";
 
 export default {
+  // components: { BaseInput },
   data() {
     return {
       password1: null,

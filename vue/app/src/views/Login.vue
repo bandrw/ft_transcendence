@@ -1,5 +1,6 @@
 <template>
   <div>
+    <event-source ref="eventSource" />
     <div id="login_login_text"><p>user ></p></div>
     <div id="login_login_input">
       <input
@@ -33,7 +34,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import eventService from "../services/eventService";
 import cryptService from "../services/cryptService";
 
@@ -44,6 +45,9 @@ export default {
       password: null,
       error: null,
     };
+  },
+  computed: {
+    ...mapState(["user"]),
   },
   methods: {
     ...mapActions(["setUsers"]),
@@ -67,6 +71,7 @@ export default {
             });
           this.setUsers({ users: onlineUsers, user: user });
           this.error = null;
+          this.$refs.eventSource.listenEvents();
         } else {
           this.error = "Wrong password";
         }

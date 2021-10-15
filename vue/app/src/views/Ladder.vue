@@ -116,7 +116,6 @@ export default {
       if (!this.enemy && !this.game) {
         this.SET_GAME(true);
         this.SET_BREAKER(false);
-        console.log(`user login: ${this.user.login}`);
         eventService.setStatus(this.user.login, "yellow");
         this.SET_LADDER("search ...");
         this.SET_FIND_INTERVAL(setInterval(this.findChecker, 100));
