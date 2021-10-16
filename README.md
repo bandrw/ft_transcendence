@@ -1,9 +1,9 @@
 # ft_transcendence
 
 запросы к серверу:
-/path/to/nest
-- describe
+* /path/to/nest            describe
+* ...
 
 ответы на клиент:
-/event/on/react
-- describe
+* /event/on/react          describe
+* ...
