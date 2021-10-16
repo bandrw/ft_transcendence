@@ -17,7 +17,11 @@ export default {
       "INCREMENT_USER_WINS",
       "INCREMENT_USER_GAMES",
       "DEL_USER",
+      "SET_ENEMY",
+      "SET_ENEMY_READY_STATUS",
     ]),
+    ...mapMutations("ladder", ["CLEAR_ACCEPT_INTERVAL", "CLEAR_FIND_INTERVAL"]),
+    ...mapMutations("game", ["SET_GAME_IN_PROGRESS"]),
     addUser(event) {
       const user = JSON.parse(event.data);
       let i = 0;
@@ -59,29 +63,38 @@ export default {
         ++index;
       }
     },
-    updateUser() {
+    updateUser(event) {
       const user = JSON.parse(event.data);
-      if (
-        this.users
-          .map(function (e) {
-            return e.login;
-          })
-          .indexOf(user.login) !== -1
-      ) {
-        let index = 0;
-        while (index < this.users.length) {
-          if (this.users[index].login === user.login) {
-            this.users[index].status = user.status;
-            this.users[index].url_avatar = user.url_avatar;
-            break;
-          }
-          ++index;
+      let index = 0;
+      while (index < this.users.length) {
+        if (this.users[index].login === user.login) {
+          this.users[index].status = user.status;
+          this.users[index].url_avatar = user.url_avatar;
+          break;
         }
-        if (this.enemy && this.enemy.login === user.login) {
-          this.enemy.status = user.status;
-          this.enemy.url_avatar = user.url_avatar;
-        }
+        ++index;
       }
+      if (this.enemy && this.enemy.login === user.login) {
+        this.enemy.status = user.status;
+        this.enemy.url_avatar = user.url_avatar;
+      }
+    },
+    setEnemy(event) {
+      const enemy = JSON.parse(event.data);
+      this.SET_ENEMY(enemy);
+      this.SET_ENEMY_READY_STATUS("yellow");
+    },
+    enemyIsReady() {
+      this.SET_ENEMY_READY_STATUS("green");
+    },
+    gameIsReady() {
+      this.CLEAR_FIND_INTERVAL();
+      this.CLEAR_ACCEPT_INTERVAL();
+      this.SET_GAME_IN_PROGRESS(true);
+      //fadeOut
+    },
+    gameSettings(event) {
+      const gameSettings = JSON.parse(event.data);
     },
     listenEvents() {
       this.CREATE_EVENT_SOURCE(this.user.login);
@@ -91,6 +104,11 @@ export default {
         this.updateUserStats
       );
       this.eventSource.addEventListener("logout_SSE", this.logoutSSE);
+      this.eventSource.addEventListener("updateUser", this.updateUser);
+      this.eventSource.addEventListener("enemy", this.setEnemy);
+      this.eventSource.addEventListener("enemyIsReady", this.enemyIsReady);
+      this.eventSource.addEventListener("gameIsReady", this.gameIsReady);
+      this.eventSource.addEventListener("gameSettings", this.gameSettings);
     },
   },
 };
