@@ -13,7 +13,7 @@ import { GameService } from './game/game.service';
 import { UsersService } from './users/users.service';
 import { ChatService } from './chat/chat.service';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class Events
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

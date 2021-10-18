@@ -1,4 +1,4 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Inject, Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User_table } from './user.entity';
@@ -73,6 +73,7 @@ export class UsersService {
             }) +
             '\n\n',
         );
+        console.log(`[userEvent] Event ${event} sent to ${user.login}`);
       }
       ++i;
     }

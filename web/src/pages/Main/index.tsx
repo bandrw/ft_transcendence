@@ -1,38 +1,51 @@
-import './styles.scss'
+import './styles.scss';
 
+import { UserStatus } from "apiTypes/apiTypes";
+import Game from "components/Game";
+import Header from "components/Header";
+import { User } from "models/User";
+import FindGame from "pages/Main/FindGame";
 import React from 'react';
 import { useHistory } from "react-router-dom";
 
-// import Game from "../../components/Game";
-import Header from "../../components/Header";
-import { User } from "../../models/User";
-import FindGame from "./FindGame";
-
 interface MainProps {
 	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
+	status: UserStatus,
+	setStatus: React.Dispatch<React.SetStateAction<UserStatus> >
 }
 
-const Main = (props: MainProps) => {
+const Main = ({ currentUser, setCurrentUser, status, setStatus }: MainProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
-		if (!props.currentUser.isAuthorized())
-			history.push('/login')
-	}, [history, props.currentUser])
+		if (!currentUser.isAuthorized())
+			history.push('/login');
+	}, [history, currentUser]);
 
 	return (
 		<div className='main-container'>
-			<Header currentUser={props.currentUser} setCurrentUser={props.setCurrentUser} />
-			<FindGame currentUser={props.currentUser} />
-			{/*<div className='main-tmp'>*/}
-			{/*	<Game*/}
-			{/*		currentUser={props.currentUser}*/}
-			{/*		setCurrentUser={props.setCurrentUser}*/}
-			{/*	/>*/}
-			{/*</div>*/}
+			<Header
+				currentUser={currentUser}
+				setCurrentUser={setCurrentUser}
+				status={status}
+			/>
+			{
+				status !== UserStatus.InGame
+					?	<FindGame
+							currentUser={currentUser}
+							status={status}
+							setStatus={setStatus}
+						/>
+					:	<div className='main-tmp'>
+							<Game
+								currentUser={currentUser}
+								setCurrentUser={setCurrentUser}
+							/>
+						</div>
+			}
 		</div>
-	)
-}
+	);
+};
 
 export default Main;

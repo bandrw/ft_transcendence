@@ -1,14 +1,13 @@
-import './styles.scss'
+import './styles.scss';
 
+import { UserCheckExist, UserCreate } from "apiTypes/apiTypes";
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
+import CircleLoading from "components/CircleLoading";
+import { User } from "models/User";
+import { signIn } from "pages/Login";
 import React from 'react';
 import { Link, useHistory } from "react-router-dom";
-
-import { UserCheckExist, UserCreate } from "../../apiTypes/apiTypes";
-import CircleLoading from "../../components/CircleLoading";
-import { User } from "../../models/User";
-import { signIn } from "../Login";
 
 const validateInput = (
 	login: string,
@@ -17,32 +16,32 @@ const validateInput = (
 	setErrors: React.Dispatch<React.SetStateAction<string> >
 ): boolean => {
 	if (!login) {
-		setErrors('Enter login')
-		return false
+		setErrors('Enter login');
+		return false;
 	}
 	if (!password) {
-		setErrors('Enter password')
-		return false
+		setErrors('Enter password');
+		return false;
 	}
 	if (login.length < 4) {
-		setErrors('Login is too short')
-		return false
+		setErrors('Login is too short');
+		return false;
 	}
 	if (login.length > 16) {
-		setErrors('Login is too long')
-		return false
+		setErrors('Login is too long');
+		return false;
 	}
 	if (password.length < 6) {
-		setErrors('Password is too short')
-		return false
+		setErrors('Password is too short');
+		return false;
 	}
 	if (password !== passwordConfirmation) {
-		setErrors('Passwords are not equal')
-		return false
+		setErrors('Passwords are not equal');
+		return false;
 	}
-	setErrors('')
-	return true
-}
+	setErrors('');
+	return true;
+};
 
 interface RegisterProps {
 	currentUser: User,
@@ -54,53 +53,53 @@ const Register = (props: RegisterProps) => {
 
 	React.useEffect(() => {
 		if (props.currentUser.isAuthorized())
-			history.push('/')
-	}, [history, props.currentUser])
+			history.push('/');
+	}, [history, props.currentUser]);
 
-	const loginRef = React.createRef<HTMLInputElement>()
-	const passwordRef = React.createRef<HTMLInputElement>()
-	const passwordConfirmRef = React.createRef<HTMLInputElement>()
+	const loginRef = React.createRef<HTMLInputElement>();
+	const passwordRef = React.createRef<HTMLInputElement>();
+	const passwordConfirmRef = React.createRef<HTMLInputElement>();
 
-	const [errors, setErrors] = React.useState<string>('')
-	const [isLoading, setIsLoading] = React.useState<boolean>(false)
+	const [errors, setErrors] = React.useState<string>('');
+	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
 	const register = async (e: React.FormEvent) => {
-		e.preventDefault()
+		e.preventDefault();
 
-		const login = loginRef.current?.value || ''
-		const password = passwordRef.current?.value || ''
-		const passwordConfirm = passwordConfirmRef.current?.value || ''
+		const login = loginRef.current?.value || '';
+		const password = passwordRef.current?.value || '';
+		const passwordConfirm = passwordConfirmRef.current?.value || '';
 
 		if (!validateInput(login, password, passwordConfirm, setErrors))
-			return
+			return;
 
-		setIsLoading(true)
-		setErrors('')
+		setIsLoading(true);
+		setErrors('');
 		const checkExistResponse: UserCheckExist = await axios.get<UserCheckExist>('/users/checkExist', {
 			params: { login: login }
 		})
-			.then(res => res.data)
+			.then(res => res.data);
 		if (checkExistResponse.ok) {
-			setErrors('User with this login already exists')
-			setIsLoading(false)
-			return
+			setErrors('User with this login already exists');
+			setIsLoading(false);
+			return;
 		}
 
-		const hashedPassword = await bcryptjs.hash(password, 10)
+		const hashedPassword = await bcryptjs.hash(password, 10);
 		const usersCreateResponse = await axios.post<any, AxiosResponse<UserCreate> >(
 			'/users/create', {
 			login: login,
 			pass: hashedPassword
 		})
-			.then(res => res.data)
+			.then(res => res.data);
 		if (usersCreateResponse.ok) {
 			await signIn(login, password, props.setCurrentUser, setErrors)
-				.catch(err => setErrors(err.toString()))
+				.catch(err => setErrors(err.toString()));
 		} else {
-			setErrors(usersCreateResponse.msg)
+			setErrors(usersCreateResponse.msg);
 		}
-		setIsLoading(false)
-	}
+		setIsLoading(false);
+	};
 
 	return (
 		<div className='register-container'>
@@ -147,7 +146,7 @@ const Register = (props: RegisterProps) => {
 				Sign in
 			</Link>
 		</div>
-	)
-}
+	);
+};
 
 export default Register;

@@ -1,4 +1,4 @@
-import './styles.scss'
+import './styles.scss';
 
 import React from 'react';
 
@@ -9,9 +9,9 @@ interface CircleLoadingProps {
 }
 
 const CircleLoading = ({ bgColor = '#000', width = '50px', height = '50px' }: CircleLoadingProps) => {
-	const divArray = []
+	const divArray = [];
 	for (let i = 0; i < 12; ++i)
-		divArray.push(<div/>)
+		divArray.push(<div/>);
 
 	return (
 		<div
@@ -22,7 +22,7 @@ const CircleLoading = ({ bgColor = '#000', width = '50px', height = '50px' }: Ci
 				divArray.map((item, i) => <div key={i} style={{ backgroundColor: bgColor }}/>)
 			}
 		</div>
-	)
-}
+	);
+};
 
 export default CircleLoading;

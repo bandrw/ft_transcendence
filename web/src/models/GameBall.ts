@@ -1,10 +1,10 @@
 export default class GameBall {
 	constructor() {
-		this.xPosition = 0
-		this.yPosition = 0
-		this.size = 15
-		this.speed = 7
-		this.angle = 2 * Math.PI * Math.random()
+		this.xPosition = 0;
+		this.yPosition = 0;
+		this.size = 15;
+		this.speed = 7;
+		this.angle = 2 * Math.PI * Math.random();
 	}
 
 	xPosition: number

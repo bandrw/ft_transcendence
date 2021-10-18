@@ -48,8 +48,21 @@ header {
 			.user-img {
 				width: 30px;
 				height: 30px;
-				border: 1px solid #ccc;
 				border-radius: 50%;
+				background-repeat: no-repeat;
+				background-position: center;
+				background-size: 100%;
+				position: relative;
+
+				.user-status {
+					width: 8px;
+					height: 8px;
+					background: none;
+					position: absolute;
+					bottom: 0;
+					right: 0;
+					border-radius: 8px;
+				}
 			}
 
 			.user-username {

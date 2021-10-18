@@ -5,13 +5,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './App';
+import { socket, SocketContext } from "./context/socket";
 import reportWebVitals from './reportWebVitals';
 
-axios.defaults.baseURL = process.env.REACT_APP_API_URL
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 ReactDOM.render(
 		<React.StrictMode>
-			<App/>
+			<SocketContext.Provider value={socket}>
+				<App/>
+			</SocketContext.Provider>
 		</React.StrictMode>,
 		document.getElementById('root')
 );

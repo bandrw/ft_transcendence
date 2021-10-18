@@ -1,19 +1,22 @@
 import './App.scss';
 
+import { User } from "models/User";
+import Chat from "pages/Chat";
+import Login from 'pages/Login';
+import Main from "pages/Main";
+import Register from "pages/Register";
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import { User } from "./models/User";
-import Chat from "./pages/Chat";
-import Login from './pages/Login'
-import Main from "./pages/Main";
-import Register from "./pages/Register";
+import { UserStatus } from "./apiTypes/apiTypes";
 
 const App = () => {
-	const [currentUser, setCurrentUser] =  React.useState(new User())
-	// const user = new User()
-	// user.username = 'kfriese'
-	// const [currentUser, setCurrentUser] =  React.useState(user)
+	const [status, setStatus] = React.useState<UserStatus>(UserStatus.Regular);
+
+	const [currentUser, setCurrentUser] =  React.useState(new User());
+	// const user = new User();
+	// user.username = 'admin';
+	// const [currentUser, setCurrentUser] =  React.useState(user);
 
 	return (
 		<Router>
@@ -37,6 +40,7 @@ const App = () => {
 					<Chat
 						currentUser={currentUser}
 						setCurrentUser={setCurrentUser}
+						status={status}
 					/>
 				</Route>
 
@@ -44,12 +48,14 @@ const App = () => {
 					<Main
 						currentUser={currentUser}
 						setCurrentUser={setCurrentUser}
+						status={status}
+						setStatus={setStatus}
 					/>
 				</Route>
 
 			</Switch>
 		</Router>
 	);
-}
+};
 
 export default App;

@@ -34,6 +34,7 @@ export class LadderService {
   }
 
   updateStatus(login: string, status: string) {
+    console.log(`[updateStatus] ${login} to ${status}`);
     let i = 0;
     while (this.users.onlineUsers[i].login != login) {
       ++i;
@@ -59,6 +60,8 @@ export class LadderService {
     } else if (status === 'red') {
       this.gameStart(i, login);
     }
+    console.log('lobby:');
+    console.log(this.lobby);
   }
 
   gameStart(userIndex, login) {
@@ -142,6 +145,7 @@ export class LadderService {
       this.lobby[i].second,
       this.lobby[i].first.login,
     );
+    console.log('[sendEvents] Events sent');
   }
 
   userPersonalEvent(event: string, user: OnlineUser, login: string) {
@@ -161,6 +165,10 @@ export class LadderService {
         this.users.onlineUsers[i].resp.write(
           `event: ${event}\ndata: ${data}\n\n`,
         );
+        if (user)
+          console.log(
+            `[userPersonalEvent] Event ${event} sent to ${user.login}`,
+          );
       }
       ++i;
     }

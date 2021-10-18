@@ -22,9 +22,25 @@ type UserCheckExist = {
 	msg: string | GetUser
 }
 
+type UpdateUser = {
+	login: string,
+	status: string,
+	url_avatar: string
+}
+
+export enum UserStatus {
+	Regular = 'green',
+	Searching = 'yellow',
+	FoundEnemy = 'orange',
+	Accepted = 'red',
+	InGame = 'inGame',
+	Declined = 'blue'
+}
+
 export type {
 	GetUser,
+	UpdateUser,
 	UserCheckExist,
 	UserCreate,
 	UserLogin
-}
+};

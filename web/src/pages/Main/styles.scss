@@ -1,5 +1,9 @@
 .main-container {
 	padding-top: 51px;
+	height: calc(100vh - 51px);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .main-tmp {

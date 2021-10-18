@@ -1,13 +1,12 @@
-import './styles.scss'
+import './styles.scss';
 
+import { UserLogin } from "apiTypes/apiTypes";
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
+import CircleLoading from "components/CircleLoading";
+import { User } from "models/User";
 import React from 'react';
 import { Link, useHistory } from "react-router-dom";
-
-import { UserLogin } from "../../apiTypes/apiTypes";
-import CircleLoading from "../../components/CircleLoading";
-import { User } from "../../models/User";
 
 interface LoginProps {
 	currentUser: User,
@@ -25,54 +24,55 @@ export const signIn = async (
 	})
 		.then(res => {
 			if (res.data.ok && bcryptjs.compareSync(password, res.data.msg.password)) {
-				const usr = new User()
-				usr.username = res.data.msg.login
-				usr.loginDate = Date.now()
-				setCurrentUser(usr)
-				return true
+				const usr = new User();
+				usr.username = res.data.msg.login;
+				usr.urlAvatar = res.data.msg.url_avatar;
+				usr.loginDate = Date.now();
+				setCurrentUser(usr);
+				return true;
 			}
-			setErrors('Wrong username or password')
-			return false
-		})
+			setErrors('Wrong username or password');
+			return false;
+		});
 	if (!r)
-		throw Error()
-}
+		throw Error();
+};
 
 const Login = (props: LoginProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
 		if (props.currentUser.isAuthorized())
-			history.push('/')
-	}, [history, props.currentUser])
+			history.push('/');
+	}, [history, props.currentUser]);
 
-	const loginRef = React.createRef<HTMLInputElement>()
-	const passwordRef = React.createRef<HTMLInputElement>()
+	const loginRef = React.createRef<HTMLInputElement>();
+	const passwordRef = React.createRef<HTMLInputElement>();
 
 	const [loginErrors, setLoginErrors] = React.useState<string>('');
-	const [isLoading, setIsLoading] = React.useState<boolean>(false)
+	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
 	return (
 		<div className='login-container'>
 			<h1>Login page</h1>
 
 			<form onSubmit={(e) => {
-				e.preventDefault()
+				e.preventDefault();
 
-				setIsLoading(true)
+				setIsLoading(true);
 
 				const login = loginRef.current?.value || '';
-				const password = passwordRef.current?.value || ''
+				const password = passwordRef.current?.value || '';
 
 				signIn(login, password, props.setCurrentUser, setLoginErrors)
 					.then(() => {
-						setIsLoading(false)
-						history.push('/')
+						setIsLoading(false);
+						history.push('/');
 					})
 					.catch(() => {
-						setIsLoading(false)
-						setLoginErrors('Wrong login or password')
-					})
+						setIsLoading(false);
+						setLoginErrors('Wrong login or password');
+					});
 			}}
 			>
 				<input
@@ -123,7 +123,7 @@ const Login = (props: LoginProps) => {
 				</button>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
 export default Login;
