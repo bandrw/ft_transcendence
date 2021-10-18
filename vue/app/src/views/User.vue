@@ -11,6 +11,7 @@
     </div>
     <div v-else>
       <Ladder />
+      <Game />
     </div>
   </div>
 </template>

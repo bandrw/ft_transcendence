@@ -43,14 +43,14 @@ Vue.component('game', {
       this.enemyWidth = gameSettings.enemyGameSettings.platformWide;
       this.enemySpeed = gameSettings.enemyGameSettings.platformSpeed;
       this.id = gameSettings.id;
-      if (gameSettings.starter) {
+      this.starter = gameSettings.starter;
+      if (this.starter) {
         this.ballPosY = 100 - gameSettings.BallPosY;
         this.ballPosX = 100 - gameSettings.BallPosX;
       } else {
         this.ballPosY = gameSettings.BallPosY;
         this.ballPosX = gameSettings.BallPosX;
       }
-      this.starter = gameSettings.starter;
     },
     ballInAction(type = false) {
       let angle = 45;

@@ -21,7 +21,15 @@ export default {
       "SET_ENEMY_READY_STATUS",
     ]),
     ...mapMutations("ladder", ["CLEAR_ACCEPT_INTERVAL", "CLEAR_FIND_INTERVAL"]),
-    ...mapMutations("game", ["SET_GAME_IN_PROGRESS"]),
+    ...mapMutations("game", [
+      "CLEAR_BALL_INTERVAL",
+      "SET_ENEMY_WIDTH",
+      "SET_ENEMY_SPEED",
+      "SET_ID",
+      "SET_BALL_POS_X",
+      "SET_BALL_POS_Y",
+      "SET_GAME_IN_PROGRESS",
+    ]),
     addUser(event) {
       const user = JSON.parse(event.data);
       let i = 0;
@@ -95,6 +103,17 @@ export default {
     },
     gameSettings(event) {
       const gameSettings = JSON.parse(event.data);
+      this.SET_ENEMY_WIDTH(gameSettings.enemyGameSettings.platformWide);
+      this.SET_ENEMY_SPEED(gameSettings.enemyGameSettings.platformSpeed);
+      this.SET_ID(gameSettings.id);
+      this.SET_STARTER(gameSettings.starter);
+      if (this.starter) {
+        this.SET_BALL_POS_Y(100 - gameSettings.BallPosY);
+        this.SET_BALL_POS_X(100 - gameSettings.BallPosX);
+      } else {
+        this.SET_BALL_POS_Y(gameSettings.BallPosY);
+        this.SET_BALL_POS_X(gameSettings.BallPosX);
+      }
     },
     listenEvents() {
       this.CREATE_EVENT_SOURCE(this.user.login);
