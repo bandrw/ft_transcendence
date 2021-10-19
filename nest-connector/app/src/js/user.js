@@ -175,7 +175,7 @@ Vue.component('user', {
         const gameSettings = JSON.parse(event.data);
         this.$refs.game.setSettings(gameSettings);
       });
-      this.eventSource.addEventListener('bellLaunch', () => {
+      this.eventSource.addEventListener('ballLaunch', () => {
         this.$refs.game.ballInAction();
       });
       this.eventSource.addEventListener('enemyPosition', (event) => {

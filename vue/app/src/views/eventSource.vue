@@ -7,6 +7,7 @@ import { mapState, mapMutations } from "vuex";
 export default {
   computed: {
     ...mapState(["eventSource", "users", "user", "enemy"]),
+    ...mapState("game", ["you", "enemy", "ball", "starter"]),
   },
   methods: {
     ...mapMutations([
@@ -29,6 +30,8 @@ export default {
       "SET_BALL_POS_X",
       "SET_BALL_POS_Y",
       "SET_GAME_IN_PROGRESS",
+      "SET_BALL_SIN",
+      "SET_BALL_COS",
     ]),
     addUser(event) {
       const user = JSON.parse(event.data);
@@ -115,6 +118,43 @@ export default {
         this.SET_BALL_POS_X(gameSettings.BallPosX);
       }
     },
+    ballInAction() {
+      if (
+          this.ballPosY > 0 &&
+          this.ballPosY < 100 &&
+          this.ballPosX > 0 &&
+          this.ballPosX < 100
+      ) {
+        this.ballPosY += sin;
+        this.ballPosX += cos;
+      } else if (this.ballPosX >= 100) {
+        cos *= -1;
+        this.ballPosX += cos;
+      } else if (this.ballPosX <= 0) {
+        cos *= -1;
+        this.ballPosX += cos;
+      } else if (this.ballPosY <= 0) {
+        sin *= -1;
+        this.ballPosY += sin;
+      } else if (this.ballPosY >= 100) {
+        sin *= -1;
+        this.ballPosY += sin;
+      }
+    },
+    ballLaunch() {
+      if (this.starter) {
+        this.SET_BALL_SIN(Math.sin(this.ball.angle));
+        this.SET_BALL_COS(Math.cos(this.ball.angle));
+      } else {
+        this.SET_BALL_SIN(-Math.sin(this.ball.angle));
+        this.SET_BALL_COS(-Math.cos(this.ball.angle));
+      }
+      this.interval = setInterval(
+          this.ballInAction,
+          10,
+      );
+    },
+    },
     listenEvents() {
       this.CREATE_EVENT_SOURCE(this.user.login);
       this.eventSource.addEventListener("login", this.addUser);
@@ -128,6 +168,7 @@ export default {
       this.eventSource.addEventListener("enemyIsReady", this.enemyIsReady);
       this.eventSource.addEventListener("gameIsReady", this.gameIsReady);
       this.eventSource.addEventListener("gameSettings", this.gameSettings);
+      this.eventSource.addEventListener("ballLaunch", this.ballLaunch);
     },
   },
 };

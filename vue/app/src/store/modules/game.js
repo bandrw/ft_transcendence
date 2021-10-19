@@ -19,7 +19,9 @@ export const state = {
     posY: 0,
     speed: 0,
     interval: null,
-    angle: 0,
+    angle: 45,
+    sin: null,
+    cos: null,
   },
   starter: false,
   id: 0,
@@ -49,5 +51,11 @@ export const mutations = {
   },
   SET_STARTER(state, starter) {
     state.starter = starter;
+  },
+  SET_BALL_SIN(state, sin) {
+    state.ball.sin = sin;
+  },
+  SET_BALL_COS(state, cos) {
+    state.ball.cos = cos;
   },
 };

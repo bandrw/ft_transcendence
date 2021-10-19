@@ -32,11 +32,11 @@ export class Events
     const u = JSON.parse(user);
     if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
       this.gameService.gamers[u.id].playerOne.user.resp.write(
-        `event: bellLaunch\ndata: \n\n`,
+        `event: ballLaunch\ndata: \n\n`,
       );
     } else {
       this.gameService.gamers[u.id].playerTwo.user.resp.write(
-        `event: bellLaunch\ndata: \n\n`,
+        `event: ballLaunch\ndata: \n\n`,
       );
     }
   }
