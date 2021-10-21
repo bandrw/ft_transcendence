@@ -73,4 +73,7 @@ export const mutations = {
   SWAP_SIGN_COS(state) {
     state.ball.cos *= -1;
   },
+  SET_ENEMY_POS_X(state, pos) {
+    state.enemy.posX = pos;
+  },
 };

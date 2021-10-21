@@ -37,6 +37,7 @@ export default {
       "ADD_BALL_POS_Y",
       "SWAP_SIGN_SIN",
       "SWAP_SIGN_COS",
+      "SET_ENEMY_POS_X",
     ]),
     addUser(event) {
       const user = JSON.parse(event.data);
@@ -156,6 +157,9 @@ export default {
       }
       this.SET_BALL_INTERVAL(setInterval(this.ballInAction, 10));
     },
+    enemyPosition(event) {
+      this.SET_ENEMY_POS_X(event.data);
+    },
     listenEvents() {
       this.CREATE_EVENT_SOURCE(this.user.login);
       this.eventSource.addEventListener("login", this.addUser);
@@ -170,6 +174,8 @@ export default {
       this.eventSource.addEventListener("gameIsReady", this.gameIsReady);
       this.eventSource.addEventListener("gameSettings", this.gameSettings);
       this.eventSource.addEventListener("ballLaunch", this.ballLaunch);
+      this.eventSource.addEventListener("enemyPosition", this.enemyPosition);
+      // this.eventSource.addEventListener("getMessage")
     },
   },
 };
