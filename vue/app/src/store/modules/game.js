@@ -34,6 +34,9 @@ export const mutations = {
   CLEAR_BALL_INTERVAL(state) {
     clearInterval(state.ball.interval);
   },
+  SET_BALL_INTERVAL(state, interval) {
+    state.ball.interval = interval;
+  },
   SET_ENEMY_WIDTH(state, width) {
     state.enemy.width = width;
   },
@@ -49,6 +52,12 @@ export const mutations = {
   SET_BALL_POS_Y(state, posY) {
     state.ball.posY = posY;
   },
+  ADD_BALL_POS_X(state, add) {
+    state.ball.posX += add;
+  },
+  ADD_BALL_POS_Y(state, add) {
+    state.ball.posY += add;
+  },
   SET_STARTER(state, starter) {
     state.starter = starter;
   },
@@ -57,5 +66,11 @@ export const mutations = {
   },
   SET_BALL_COS(state, cos) {
     state.ball.cos = cos;
+  },
+  SWAP_SIGN_SIN(state) {
+    state.ball.sin *= -1;
+  },
+  SWAP_SIGN_COS(state) {
+    state.ball.cos *= -1;
   },
 };

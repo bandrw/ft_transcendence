@@ -47,4 +47,3 @@ export class GameService {
     });
   }
 }
-// @ts-ignore

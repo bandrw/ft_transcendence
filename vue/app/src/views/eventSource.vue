@@ -32,6 +32,11 @@ export default {
       "SET_GAME_IN_PROGRESS",
       "SET_BALL_SIN",
       "SET_BALL_COS",
+      "SET_BALL_INTERVAL",
+      "ADD_BALL_POS_X",
+      "ADD_BALL_POS_Y",
+      "SWAP_SIGN_SIN",
+      "SWAP_SIGN_COS",
     ]),
     addUser(event) {
       const user = JSON.parse(event.data);
@@ -120,25 +125,25 @@ export default {
     },
     ballInAction() {
       if (
-          this.ballPosY > 0 &&
-          this.ballPosY < 100 &&
-          this.ballPosX > 0 &&
-          this.ballPosX < 100
+        this.ball.posY > 0 &&
+        this.ball.posY < 100 &&
+        this.ball.posX > 0 &&
+        this.ball.posX < 100
       ) {
-        this.ballPosY += sin;
-        this.ballPosX += cos;
+        this.ADD_BALL_POS_Y(this.ball.sin);
+        this.ADD_BALL_POS_X(this.ball.cos);
       } else if (this.ballPosX >= 100) {
-        cos *= -1;
-        this.ballPosX += cos;
+        this.SWAP_SIGN_COS();
+        this.ADD_BALL_POS_X(this.ball.cos);
       } else if (this.ballPosX <= 0) {
-        cos *= -1;
-        this.ballPosX += cos;
+        this.SWAP_SIGN_COS();
+        this.ADD_BALL_POS_X(this.ball.cos);
       } else if (this.ballPosY <= 0) {
-        sin *= -1;
-        this.ballPosY += sin;
+        this.SWAP_SIGN_SIN();
+        this.ADD_BALL_POS_Y(this.ball.sin);
       } else if (this.ballPosY >= 100) {
-        sin *= -1;
-        this.ballPosY += sin;
+        this.SWAP_SIGN_SIN();
+        this.ADD_BALL_POS_Y(this.ball.sin);
       }
     },
     ballLaunch() {
@@ -149,11 +154,7 @@ export default {
         this.SET_BALL_SIN(-Math.sin(this.ball.angle));
         this.SET_BALL_COS(-Math.cos(this.ball.angle));
       }
-      this.interval = setInterval(
-          this.ballInAction,
-          10,
-      );
-    },
+      this.SET_BALL_INTERVAL(setInterval(this.ballInAction, 10));
     },
     listenEvents() {
       this.CREATE_EVENT_SOURCE(this.user.login);
