@@ -97,6 +97,10 @@ export class LadderService {
       platformWide: 10,
       platformSpeed: 1,
       position: 50,
+      controls: {
+        arrowUp: false,
+        arrowDown: false,
+      },
     };
     const gamer2: Gamer = {
       user: second,
@@ -104,6 +108,10 @@ export class LadderService {
       platformWide: 10,
       platformSpeed: 1,
       position: 50,
+      controls: {
+        arrowUp: false,
+        arrowDown: false,
+      },
     };
     ++this.lobbyId;
     return new Game(gamer1, gamer2, this.games.gamers.length);

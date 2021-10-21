@@ -39,6 +39,21 @@ type GameSettings = {
 	}
 }
 
+type GameLoop = {
+	leftPlayer: {
+		x: number,
+		y: number
+	},
+	rightPlayer: {
+		x: number,
+		y: number
+	},
+	ball: {
+		x: number,
+		y: number
+	}
+}
+
 export enum UserStatus {
 	Regular = 'green',
 	Searching = 'yellow',
@@ -49,6 +64,7 @@ export enum UserStatus {
 }
 
 export type {
+	GameLoop,
 	GameSettings,
 	GetUser,
 	UpdateUser,

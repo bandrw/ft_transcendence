@@ -3,7 +3,7 @@ import './styles.scss';
 import Game from "components/Game";
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { GameSettings, UpdateUser, UserStatus } from "models/apiTypes";
+import { GameLoop, GameSettings, UpdateUser, UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import React, { useEffect } from 'react';
@@ -26,6 +26,21 @@ const Main = ({ currentUser, setCurrentUser, status, setStatus }: MainProps) => 
 
 	const [infoBoardContent, setInfoBoardContent] = React.useState<JSX.Element>(<div>Welcome to the game!</div>);
 	const enemyRef = React.useRef<UpdateUser | null>(null);
+	const gameLoopRef = React.useRef<GameLoop>({
+		leftPlayer: {
+			x: 0,
+			y: 0
+		},
+		rightPlayer: {
+			x: 0,
+			y: 0
+		},
+		ball: {
+			x: 0,
+			y: 0
+		}
+	});
+	const gameIdRef = React.useRef<number | null>(null);
 
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
 
@@ -41,6 +56,7 @@ const Main = ({ currentUser, setCurrentUser, status, setStatus }: MainProps) => 
 			login: currentUser.username,
 			id: gameSettings.id
 		};
+		gameIdRef.current = gameSettings.id;
 		setTimeout(() => socket.emit('start', JSON.stringify(data)), 3000);
 	};
 
@@ -64,6 +80,10 @@ const Main = ({ currentUser, setCurrentUser, status, setStatus }: MainProps) => 
 		setStatus(UserStatus.InGame);
 	};
 
+	const gameLoopHandler = (e: any) => {
+		gameLoopRef.current = JSON.parse(e.data);
+	};
+
 	useEffect(() => {
 		if (!currentUser.isAuthorized())
 			return;
@@ -75,8 +95,9 @@ const Main = ({ currentUser, setCurrentUser, status, setStatus }: MainProps) => 
 		eventSource.addEventListener('gameIsReady', gameIsReadyHandler);
 		eventSource.addEventListener('gameSettings', gameSettingsHandler);
 		eventSource.addEventListener('ballLaunch', ballLaunchHandler);
+		eventSource.addEventListener('gameLoop', gameLoopHandler);
 
-		console.log('[Game] eventSource listeners added');
+		console.log('[Main] eventSource listeners added');
 
 		return () => {
 			eventSource.removeEventListener('updateUser', updateUserHandler);
@@ -84,9 +105,10 @@ const Main = ({ currentUser, setCurrentUser, status, setStatus }: MainProps) => 
 			eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
 			eventSource.removeEventListener('gameSettings', gameSettingsHandler);
 			eventSource.removeEventListener('ballLaunch', ballLaunchHandler);
+			eventSource.removeEventListener('gameLoop', gameLoopHandler);
 
 			eventSource.close();
-			console.log('[Game] eventSource listeners removed');
+			console.log('[Main] eventSource listeners removed');
 		};
 	}, [currentUser]);
 
@@ -114,6 +136,8 @@ const Main = ({ currentUser, setCurrentUser, status, setStatus }: MainProps) => 
 								setInfoBoardContent={setInfoBoardContent}
 								enemyInfo={enemyRef.current}
 								currentUser={currentUser}
+								gameLoopRef={gameLoopRef}
+								gameIdRef={gameIdRef}
 							/>
 						</div>
 			}

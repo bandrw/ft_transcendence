@@ -6,4 +6,8 @@ export interface Gamer {
   platformSpeed: number;
   platformWide: number;
   user: OnlineUser;
+  controls: {
+    arrowUp: boolean;
+    arrowDown: boolean;
+  };
 }

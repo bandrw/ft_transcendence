@@ -12,7 +12,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class EventsGame
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

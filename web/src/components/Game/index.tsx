@@ -1,6 +1,7 @@
 import './styles.scss';
 
-import { UpdateUser } from "models/apiTypes";
+import { SocketContext } from "context/socket";
+import { GameLoop, UpdateUser } from "models/apiTypes";
 import GameBall from "models/GameBall";
 import Player from "models/Player";
 import { User } from "models/User";
@@ -10,27 +11,24 @@ import { clearInterval, setInterval } from "timers";
 interface GameProps {
 	setInfoBoardContent: React.Dispatch<React.SetStateAction<JSX.Element> >,
 	enemyInfo: UpdateUser | null,
-	currentUser: User
+	currentUser: User,
+	gameLoopRef: React.MutableRefObject<GameLoop>,
+	gameIdRef: React.MutableRefObject<number | null>
 }
 
-const Game = ({ setInfoBoardContent, enemyInfo, currentUser }: GameProps) => {
+const Game = ({ setInfoBoardContent, enemyInfo, currentUser, gameLoopRef, gameIdRef }: GameProps) => {
 	if (!enemyInfo)
 		throw Error('No enemy info');
 
-	// const socket = React.useContext(SocketContext);
+	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const player = new Player();
 	const enemy = new Player();
 	const ball = new GameBall();
-	const controlsRef = React.useRef({
-		arrowUp: false,
-		arrowDown: false
-	});
 
 	const playerWidth = 15;
 	const playerMargin = 15;
 	const playerHeight = 150;
-	const playerStep = 5;
 
 	const clearPositions = () => {
 		const canvas = canvasRef.current;
@@ -102,55 +100,15 @@ const Game = ({ setInfoBoardContent, enemyInfo, currentUser }: GameProps) => {
 	};
 
 	const runGame = () => {
-		// socket.emit('start');
-
-		clearPositions();
-
 		let fpsInterval: number, now: number, then: number, elapsed: number;
 		const fps = 60;
 
 		const updatePositions = () => {
-			const canvas = canvasRef.current;
-			if (!canvas)
-				return ;
-
-			// const winMargin = 5;
-			//
-			// if (ball.xPosition <= winMargin)
-			// 	props.setEnemyScore((prev) => prev + 1)
-			// else if (ball.xPosition + ball.size >= canvas.width - winMargin)
-			// 	props.setPlayerScore((prev) => prev + 1)
-
-			if (ball.xPosition < 0)
-				ball.angle = Math.PI - ball.angle;
-			if (ball.xPosition + ball.size > canvas.width)
-				ball.angle = Math.PI - ball.angle;
-			if (ball.yPosition + ball.size > canvas.height)
-				ball.angle = -ball.angle;
-			if (ball.yPosition < 0)
-				ball.angle = -ball.angle;
-
-			ball.xPosition += Math.cos(ball.angle) * ball.speed;
-			ball.yPosition += Math.sin(ball.angle) * ball.speed;
-			if (controlsRef.current.arrowUp && player.yPosition >= playerStep)
-				player.yPosition -= playerStep;
-			if (controlsRef.current.arrowDown && player.yPosition < canvas.height - playerHeight)
-				player.yPosition += playerStep;
-
-			enemy.yPosition = ball.yPosition - playerHeight / 2;
-			if (enemy.yPosition < 0)
-				enemy.yPosition = 0;
-			if (enemy.yPosition + playerHeight > canvas.height)
-				enemy.yPosition = canvas.height - playerHeight;
-
-			if (ball.xPosition <= playerMargin + playerWidth &&
-					ball.yPosition + ball.size >= player.yPosition &&
-					ball.yPosition < player.yPosition + playerHeight)
-				ball.angle = Math.PI - ball.angle;
-			else if (ball.xPosition >= canvas.width - playerMargin - playerWidth - ball.size &&
-					ball.yPosition + ball.size >= enemy.yPosition &&
-					ball.yPosition < enemy.yPosition + playerHeight)
-				ball.angle = Math.PI - ball.angle;
+			const gameLoop = gameLoopRef.current;
+			player.yPosition = gameLoop.leftPlayer.y;
+			enemy.yPosition = gameLoop.rightPlayer.y;
+			ball.yPosition = gameLoop.ball.y;
+			ball.xPosition = gameLoop.ball.x;
 		};
 
 		const animate = () => {
@@ -172,17 +130,33 @@ const Game = ({ setInfoBoardContent, enemyInfo, currentUser }: GameProps) => {
 	};
 
 	const keyDownHandler = (e: KeyboardEvent) => {
-		if (e.key === 'ArrowDown')
-			controlsRef.current.arrowDown = true;
-		else if (e.key === 'ArrowUp')
-			controlsRef.current.arrowUp = true;
+		if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
+			const data = {
+				login: currentUser.username,
+				gameId: gameIdRef.current,
+				key: e.key
+			};
+			socket.emit('keyDown', JSON.stringify(data));
+		}
+		// if (e.key === 'ArrowDown')
+		// 	controlsRef.current.arrowDown = true;
+		// else if (e.key === 'ArrowUp')
+		// 	controlsRef.current.arrowUp = true;
 	};
 
 	const keyUpHandler = (e: KeyboardEvent) => {
-		if (e.key === 'ArrowDown')
-			controlsRef.current.arrowDown = false;
-		else if (e.key === 'ArrowUp')
-			controlsRef.current.arrowUp = false;
+		if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
+			const data = {
+				login: currentUser.username,
+				gameId: gameIdRef.current,
+				key: e.key
+			};
+			socket.emit('keyUp', JSON.stringify(data));
+		}
+		// if (e.key === 'ArrowDown')
+		// 	controlsRef.current.arrowDown = false;
+		// else if (e.key === 'ArrowUp')
+		// 	controlsRef.current.arrowUp = false;
 	};
 
 	useEffect(() => {
