@@ -1,7 +1,9 @@
+import { Response } from 'express';
+
 export interface OnlineUser {
   login: string;
   url_avatar: string;
-  resp: any;
+  resp: Response;
   status: string;
   games: number;
   wins: number;

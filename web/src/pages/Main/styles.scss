@@ -9,6 +9,17 @@
 .main-tmp {
 	height: calc(100vh - 51px);
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+
+	.info-board {
+		padding: 10px 20px;
+		margin-bottom: 10px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: 1px solid #ccc;
+		font-size: 1.5em;
+	}
 }

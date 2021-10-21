@@ -1,5 +1,6 @@
 import './App.scss';
 
+import { UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Chat";
 import Login from 'pages/Login';
@@ -7,8 +8,6 @@ import Main from "pages/Main";
 import Register from "pages/Register";
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
-import { UserStatus } from "./apiTypes/apiTypes";
 
 const App = () => {
 	const [status, setStatus] = React.useState<UserStatus>(UserStatus.Regular);

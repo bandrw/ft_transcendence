@@ -24,19 +24,24 @@ export class EventsGame
   ) {}
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
+
   @SubscribeMessage('start')
   launchBall(@MessageBody() user: string) {
-    const u = JSON.parse(user);
-    if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
-      this.gameService.gamers[u.id].playerOne.user.resp.write(
-        `event: bellLaunch\ndata: \n\n`,
-      );
-    } else {
-      this.gameService.gamers[u.id].playerTwo.user.resp.write(
-        `event: bellLaunch\ndata: \n\n`,
-      );
-    }
+    console.log('events.game start', user);
+    console.log(this.gameService.gamers);
+    // console.log('[launchBall]', user);
+    // const u = JSON.parse(user);
+    // if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
+    //   this.gameService.gamers[u.id].playerOne.user.resp.write(
+    //     `event: ballLaunch\ndata: \n\n`,
+    //   );
+    // } else {
+    //   this.gameService.gamers[u.id].playerTwo.user.resp.write(
+    //     `event: ballLaunch\ndata: \n\n`,
+    //   );
+    // }
   }
+
   @SubscribeMessage('platformPosition')
   platformPosition(@MessageBody() user: string) {
     const u = JSON.parse(user);
@@ -58,10 +63,12 @@ export class EventsGame
     const u = JSON.parse(user);
     await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
   }
+
   @SubscribeMessage('newMessage')
   newMessage(@MessageBody() data: string) {
     this.userService.broadcastEventData('getMessage', data);
   }
+
   afterInit(server: Server): any {
     this.logger.log('init');
   }

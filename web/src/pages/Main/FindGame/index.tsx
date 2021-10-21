@@ -2,17 +2,11 @@ import './styles.scss';
 
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UpdateUser, UserStatus } from "apiTypes/apiTypes";
 import axios from "axios";
+import { UpdateUser, UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 import { clearInterval, setInterval } from "timers";
-
-interface FindGameProps {
-	currentUser: User,
-	status: string,
-	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>
-}
 
 interface AcceptWindowProps {
 	status: UserStatus,
@@ -47,10 +41,12 @@ const AcceptWindow = ({ status, setStatus, enemy, enemyIsReady }: AcceptWindowPr
 		};
 	}, []);
 
+	const declineGameCallback = React.useCallback(declineGame, [setStatus]);
+
 	React.useEffect(() => {
 		if (timeLeft < 0)
-			declineGame();
-	}, [timeLeft]);
+			declineGameCallback();
+	}, [timeLeft, declineGameCallback]);
 
 	return (
 		<div className='accept-window-wrapper'>
@@ -73,13 +69,21 @@ const AcceptWindow = ({ status, setStatus, enemy, enemyIsReady }: AcceptWindowPr
 	);
 };
 
-const FindGame = ({ currentUser, status, setStatus }: FindGameProps) => {
+interface FindGameProps {
+	currentUser: User,
+	status: string,
+	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
+	enemyRef: React.MutableRefObject<UpdateUser | null>,
+	enemyIsReady: boolean
+}
+
+const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: FindGameProps) => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
-	const enemyRef = React.useRef<UpdateUser | null>(null);
-	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
+		if (!currentUser.isAuthorized())
+			return ;
 		if (status === UserStatus.InGame) {
 			return ;
 		}
@@ -95,7 +99,6 @@ const FindGame = ({ currentUser, status, setStatus }: FindGameProps) => {
 				status: status
 			}
 		}).then(() => {
-			console.log('status changed to ' + status);
 			switch (status) {
 				case UserStatus.Regular: {
 					if (timerIntervalRef.current)
@@ -109,61 +112,7 @@ const FindGame = ({ currentUser, status, setStatus }: FindGameProps) => {
 				}
 			}
 		});
-	}, [status, currentUser.username]);
-
-	const updateUserHandler = (e: any) => {
-		const data: UpdateUser = JSON.parse(e.data);
-		console.log('[updateUserHandler]', data, enemyRef.current);
-		if (!enemyRef.current && status !== UserStatus.Regular) {
-			setStatus(UserStatus.Regular);
-			console.log('[1] status set to ' + UserStatus.Regular);
-		} else if (enemyRef.current && data.login === enemyRef.current.login && (data.status === UserStatus.Declined || data.status === UserStatus.Regular)) {
-			setStatus(UserStatus.Regular);
-			console.log('[2] status set to ' + UserStatus.Regular);
-		} else if (enemyRef.current && data.login === enemyRef.current.login && data.status === UserStatus.Accepted) {
-			setEnemyIsReady(true);
-		}
-	};
-
-	const enemyHandler = (e: any) => {
-		const data: UpdateUser  = JSON.parse(e.data);
-		console.log('[enemyHandler]', data);
-		enemyRef.current = data;
-		setStatus(UserStatus.FoundEnemy);
-		console.log('[3] status set to ' + UserStatus.FoundEnemy);
-	};
-
-	const enemyIsReadyHandler = () => {
-		console.log('[enemyIsReadyHandler]');
-	};
-
-	const gameIsReadyHandler = () => {
-		console.log('[gameIsReadyHandler]');
-		setStatus(UserStatus.InGame);
-	};
-
-	React.useEffect(() => {
-		if (!process.env.REACT_APP_API_URL)
-			throw Error('REACT_APP_API_URL is empty');
-		const eventSource = new EventSource(`${process.env.REACT_APP_API_URL}/users/login?login=${currentUser.username}`);
-
-		eventSource.addEventListener('updateUser', updateUserHandler);
-		eventSource.addEventListener('enemy', enemyHandler);
-		eventSource.addEventListener('enemyIsReady', enemyIsReadyHandler);
-		eventSource.addEventListener('gameIsReady', gameIsReadyHandler);
-
-		console.log('eventSource listeners added');
-
-		return () => {
-			eventSource.removeEventListener('updateUser', updateUserHandler);
-			eventSource.removeEventListener('enemy', enemyHandler);
-			eventSource.removeEventListener('enemyIsReady', enemyIsReadyHandler);
-			eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
-
-			eventSource.close();
-			console.log('eventSource listeners removed');
-		};
-	}, []);
+	}, [status, currentUser, currentUser.username]);
 
 	if (status === UserStatus.Searching)
 		return (

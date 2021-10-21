@@ -1,9 +1,9 @@
 import './styles.scss';
 
-import { UserCheckExist, UserCreate } from "apiTypes/apiTypes";
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
+import { UserCheckExist, UserCreate } from "models/apiTypes";
 import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
@@ -48,13 +48,13 @@ interface RegisterProps {
 	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
 }
 
-const Register = (props: RegisterProps) => {
+const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
-		if (props.currentUser.isAuthorized())
+		if (currentUser.isAuthorized())
 			history.push('/');
-	}, [history, props.currentUser]);
+	}, [history, currentUser]);
 
 	const loginRef = React.createRef<HTMLInputElement>();
 	const passwordRef = React.createRef<HTMLInputElement>();
@@ -93,7 +93,7 @@ const Register = (props: RegisterProps) => {
 		})
 			.then(res => res.data);
 		if (usersCreateResponse.ok) {
-			await signIn(login, password, props.setCurrentUser, setErrors)
+			await signIn(login, password, setCurrentUser, setErrors)
 				.catch(err => setErrors(err.toString()));
 		} else {
 			setErrors(usersCreateResponse.msg);

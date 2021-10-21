@@ -25,21 +25,24 @@ export class Events
     @Inject(ChatService)
     private chatService: ChatService,
   ) {}
+
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
+
   @SubscribeMessage('start')
   launchBall(@MessageBody() user: string) {
     const u = JSON.parse(user);
     if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
       this.gameService.gamers[u.id].playerOne.user.resp.write(
-        `event: bellLaunch\ndata: \n\n`,
+        `event: ballLaunch\ndata: \n\n`,
       );
     } else {
       this.gameService.gamers[u.id].playerTwo.user.resp.write(
-        `event: bellLaunch\ndata: \n\n`,
+        `event: ballLaunch\ndata: \n\n`,
       );
     }
   }
+
   @SubscribeMessage('platformPosition')
   platformPosition(@MessageBody() user: string) {
     const u = JSON.parse(user);
@@ -61,6 +64,7 @@ export class Events
     const u = JSON.parse(user);
     await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
   }
+
   @SubscribeMessage('newPersonalMessage')
   newPersonalMessage(@MessageBody() data: string) {
     const messageInfo = JSON.parse(data);
@@ -81,7 +85,7 @@ export class Events
   }
 
   handleConnection(client: Socket, ...args: any[]): any {
-    this.logger.log('client connected: ' + client + args);
+    this.logger.log('client connected: ' + client.id + args);
   }
 
   handleDisconnect(client: Socket): any {

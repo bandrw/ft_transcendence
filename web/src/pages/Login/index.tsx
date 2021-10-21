@@ -1,9 +1,9 @@
 import './styles.scss';
 
-import { UserLogin } from "apiTypes/apiTypes";
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
+import { UserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 import { Link, useHistory } from "react-router-dom";
@@ -34,17 +34,18 @@ export const signIn = async (
 			setErrors('Wrong username or password');
 			return false;
 		});
+	await axios.get('/users/getOnline').then((r) => console.log(r.data));
 	if (!r)
 		throw Error();
 };
 
-const Login = (props: LoginProps) => {
+const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
-		if (props.currentUser.isAuthorized())
+		if (currentUser.isAuthorized())
 			history.push('/');
-	}, [history, props.currentUser]);
+	}, [history, currentUser]);
 
 	const loginRef = React.createRef<HTMLInputElement>();
 	const passwordRef = React.createRef<HTMLInputElement>();
@@ -64,7 +65,7 @@ const Login = (props: LoginProps) => {
 				const login = loginRef.current?.value || '';
 				const password = passwordRef.current?.value || '';
 
-				signIn(login, password, props.setCurrentUser, setLoginErrors)
+				signIn(login, password, setCurrentUser, setLoginErrors)
 					.then(() => {
 						setIsLoading(false);
 						history.push('/');
@@ -80,12 +81,14 @@ const Login = (props: LoginProps) => {
 					type='text'
 					placeholder='Login'
 					ref={loginRef}
+					defaultValue='admin'
 				/>
 				<input
 					name='password'
 					type='password'
 					placeholder='Password'
 					ref={passwordRef}
+					defaultValue='123123'
 				/>
 				<span className='login-errors'>
 					{loginErrors}

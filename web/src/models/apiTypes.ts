@@ -28,6 +28,17 @@ type UpdateUser = {
 	url_avatar: string
 }
 
+type GameSettings = {
+	BallPosX: number,
+	BallPosY: number,
+	starter: boolean,
+	id: number,
+	enemyGameSettings: {
+		platformWide: number,
+		platformSpeed: number
+	}
+}
+
 export enum UserStatus {
 	Regular = 'green',
 	Searching = 'yellow',
@@ -38,6 +49,7 @@ export enum UserStatus {
 }
 
 export type {
+	GameSettings,
 	GetUser,
 	UpdateUser,
 	UserCheckExist,

@@ -4,7 +4,7 @@ import { User } from "models/User";
 import React from 'react';
 import { Link } from "react-router-dom";
 
-import { UserStatus } from "../../apiTypes/apiTypes";
+import { UserStatus } from "../../models/apiTypes";
 
 interface HeaderProps {
 	currentUser: User,

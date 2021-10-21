@@ -113,9 +113,14 @@ export class UsersController {
       games: user.games,
       wins: user.wins,
     };
-    this.UsersService.onlineUsers.push(newUser);
+    const index = this.UsersService.onlineUsers
+      .map((usr) => usr.login)
+      .indexOf(login);
+    if (index === -1) this.UsersService.onlineUsers.push(newUser);
+    else this.UsersService.onlineUsers[index] = newUser;
     this.UsersService.userEvent('login', newUser);
   }
+
   @Post('login')
   async authentication(@Req() req: Request, @Res() response: Response) {
     const r = await this.UsersService.login(response, req.body.login);
