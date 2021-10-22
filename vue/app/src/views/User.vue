@@ -10,18 +10,26 @@
       <router-view />
     </div>
     <div v-else>
-      <Ladder />
-      <Game />
+      <game v-if="gameInProgress" />
+      <Ladder v-else />
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
+// import io from "socket.io/client-dist/socket.io";
 
 export default {
   computed: {
     ...mapState(["authorized"]),
+    ...mapState("game", ["gameInProgress"]),
+  },
+  methods: {
+    ...mapMutations(["SET_SOCKET"]),
+  },
+  mounted() {
+    // this.SET_SOCKET(io("http://localhost:3000"));
   },
 };
 </script>

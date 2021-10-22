@@ -76,4 +76,19 @@ export const mutations = {
   SET_ENEMY_POS_X(state, pos) {
     state.enemy.posX = pos;
   },
+  SET_YOU_INTERVAL(state, interval) {
+    state.you.interval = interval;
+  },
+  CLEAR_YOU_INTERVAL(state) {
+    clearInterval(state.you.interval);
+  },
+  SET_ENEMY_INTERVAL(state, interval) {
+    state.enemy.interval = interval;
+  },
+  CLEAR_ENEMY_INTERVAL(state) {
+    clearInterval(state.enemy.interval);
+  },
+  ADD_YOU_POS_X(state, pos) {
+    state.you.posX += pos;
+  },
 };

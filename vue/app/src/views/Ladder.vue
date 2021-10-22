@@ -135,6 +135,7 @@ export default {
       if (this.authorized && this.timerAccept > 0.1) {
         this.ACCEPT_TICK();
       } else {
+        this.clearIntervals();
         if (this.readyStatus === "yellow") {
           this.clearData("blue");
         } else if (this.readyStatus === "green") {

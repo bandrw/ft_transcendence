@@ -1,6 +1,5 @@
 <template>
   <div>
-<!--    <BaseInput />-->
     <div id="user_register_login">
       login: <input v-model="login" type="text" />
     </div>
@@ -21,10 +20,8 @@
 <script>
 import eventService from "../services/eventService";
 import cryptService from "../services/cryptService";
-// import BaseInput from "./BaseInput";
 
 export default {
-  // components: { BaseInput },
   data() {
     return {
       password1: null,
@@ -60,10 +57,11 @@ export default {
         setTimeout(this.clearMessage, 3000);
       }
     },
-    async creating(err, hash) {
-      await eventService
+    creating(err, hash) {
+      eventService
         .createUser({ pass: hash, login: this.login })
         .then(this.checkBadSymbols);
+      this.clear();
     },
     getResponse(res) {
       return res.data;
@@ -88,7 +86,8 @@ export default {
       ) {
         this.error = "user with the same login already exist";
       } else {
-        await cryptService.hash(this.password1, 10, this.creating);
+        cryptService.hash(this.password1, 10, this.creating);
+        return;
       }
       this.clear();
     },

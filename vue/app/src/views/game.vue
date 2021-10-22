@@ -20,7 +20,8 @@ import { mapState, mapMutations } from "vuex";
 
 export default {
   computed: {
-    ...mapState("game", ["you", "enemy", "ball"]),
+    ...mapState("game", ["you", "enemy", "ball", "id"]),
+    ...mapState(["socket", "user"]),
     youRealPosX: function () {
       return this.you.posX - this.you.width / 2;
     },
@@ -42,7 +43,40 @@ export default {
       "SET_ID",
       "SET_BALL_POS_X",
       "SET_BALL_POS_Y",
+      "SET_YOU_INTERVAL",
+      "ADD_YOU_POS_X",
+      "SET_ENEMY_INTERVAL",
     ]),
+    platformEvent() {
+      const data = JSON.stringify({
+        login: this.user.login,
+        id: this.id,
+        enemyPlatformX: this.you.posX,
+      });
+      this.socket.emit("platformPosition", data);
+    },
+    moveRight() {
+      if (this.you.posX - 1 - this.you.width / 2 > 0) {
+        this.ADD_YOU_POS_X(-1);
+        this.platformEvent();
+      }
+    },
+    moveLeft() {
+      if (this.youPosX + 1 + this.youWidth / 2 < 100) {
+        this.ADD_YOU_POS_X(1);
+        this.platformEvent();
+      }
+    },
+    movePlatformRight() {
+      if (!this.you.interval) {
+        this.SET_YOU_INTERVAL(setInterval(this.moveRight, 15));
+      }
+    },
+    movePlatformLeft() {
+      if (!this.enemy.interval) {
+        this.SET_ENEMY_INTERVAL(setInterval(this.moveLeft, 15));
+      }
+    },
   },
 };
 </script>

@@ -3,7 +3,7 @@ export const namespaced = true;
 export const state = {
   timerFind: 0,
   str_timerFind: null,
-  timerAccept: 0,
+  timerAccept: 10,
   str_timerAccept: null,
   findInterval: null,
   acceptInterval: null,

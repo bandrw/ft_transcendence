@@ -12,6 +12,7 @@ export default new Vuex.Store({
     users: [],
     enemy: false,
     eventSource: false,
+    socket: null,
   },
   mutations: {
     CREATE_EVENT_SOURCE(state, login) {
@@ -52,6 +53,9 @@ export default new Vuex.Store({
     },
     SET_ENEMY_READY_STATUS(state, readyStatus) {
       state.enemy.readyStatus = readyStatus;
+    },
+    SET_SOCKET(state, socket) {
+      state.socket = socket;
     },
   },
   actions: {
