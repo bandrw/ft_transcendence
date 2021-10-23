@@ -1,8 +1,9 @@
 import './styles.scss';
 
+import { faBell } from "@fortawesome/free-solid-svg-icons/faBell";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { User } from "models/User";
 import React from 'react';
-import { Link } from "react-router-dom";
 
 import { UserStatus } from "../../models/apiTypes";
 
@@ -16,27 +17,29 @@ const Header = ({ currentUser, setCurrentUser, status }: HeaderProps) => {
 	return (
 		<header>
 			<div className='header-container'>
-				<h1>
-					ft_transcendence
+				<h1 style={{ letterSpacing: '2px' }}>
+					FT
 				</h1>
 
-				<div className='links'>
-					<Link to='/'>
-						Home
-					</Link>
-					<Link to='/chat'>
-						Chat
-					</Link>
-				</div>
+				{/*<div className='links'>*/}
+				{/*	<Link to='/'>*/}
+				{/*		Home*/}
+				{/*	</Link>*/}
+				{/*	<Link to='/chat'>*/}
+				{/*		Chat*/}
+				{/*	</Link>*/}
+				{/*</div>*/}
 
-				<div className='user'>
-					<div className='user-img' style={{ backgroundImage: `url(${currentUser.urlAvatar})` }}>
+				<div className='header-buttons'>
+					<button className='notifications-btn'>
+						<FontAwesomeIcon icon={faBell}/>
+					</button>
+					<button
+						style={{ backgroundImage: `url(${currentUser.urlAvatar})` }}
+						className='user-btn'
+					>
 						<div className='user-status' style={{ backgroundColor: status }}/>
-					</div>
-					<div className='user-username'>
-						{currentUser.username}
-					</div>
-					<button className='user-btn'/>
+					</button>
 				</div>
 			</div>
 		</header>

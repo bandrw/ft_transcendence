@@ -1,0 +1,55 @@
+.recent-games {
+	margin-top: 40px;
+	padding: 30px 40px;
+
+	.recent-games-title {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+
+		& > span {
+			text-align: left;
+			font-size: 1.4em;
+		}
+
+		& > button {
+			background: none;
+			border: none;
+			cursor: pointer;
+			outline: none;
+			font-size: 1.5em;
+			padding: 10px;
+
+			& > svg {
+				color: #aaa;
+			}
+		}
+	}
+
+	.recent-game {
+		font-size: 1.1em;
+		width: calc(100% - 30px);
+		display: flex;
+		padding: 10px 15px;
+		align-items: center;
+		justify-content: space-between;
+
+		.recent-game-img {
+			width: 40px;
+			height: 50px;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: 100%;
+		}
+
+		.recent-game-win {
+			color: #3cb768;
+		}
+
+		.recent-game-lose {
+
+			color: #e30000;
+		}
+	}
+}

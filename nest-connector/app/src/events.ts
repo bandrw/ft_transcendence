@@ -33,11 +33,11 @@ export class Events
   launchBall(@MessageBody() user: string) {
     const u = JSON.parse(user);
     const game = this.gameService.gamers[u.id];
-    if (game.playerTwo.user.login === u.login) {
-      game.playerOne.user.resp.write(`event: ballLaunch\ndata: \n\n`);
-    } else {
-      game.playerTwo.user.resp.write(`event: ballLaunch\ndata: \n\n`);
-    }
+    // if (game.playerTwo.user.login === u.login) {
+    //   game.playerOne.user.resp.write(`event: ballLaunch\ndata: \n\n`);
+    // } else {
+    //   game.playerTwo.user.resp.write(`event: ballLaunch\ndata: \n\n`);
+    // }
 
     game.gameInterval = setInterval(() => {
       game.updatePositions();

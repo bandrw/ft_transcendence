@@ -5,13 +5,24 @@
 }
 
 body {
+	background: #1a1b1f;
 	font-size: 16px;
 	position: relative;
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
-	color: #2c3e50;
+	color: white;
+}
+
+::-webkit-scrollbar {
+	background: #20222a;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #2c2f3a;
+	border-radius: 1ex;
+	-webkit-border-radius: 1ex;
 }
 
 //code {

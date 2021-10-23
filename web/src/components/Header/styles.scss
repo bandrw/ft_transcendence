@@ -4,15 +4,21 @@ header {
 	left: 0;
 	right: 0;
 	display: flex;
-	height: 50px;
+	height: 80px;
 	justify-content: center;
-	border-bottom: 1px solid #42b983;
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	background: rgba(#1a1b1f, 0.8);
+	//border-bottom: 1px solid #42b983;
 
 	.header-container {
 		display: flex;
 		align-items: center;
-		width: 1024px;
+		justify-content: space-between;
+		width: calc(100% - 80px);
+		max-width: calc(2560px - 80px);
 		height: 100%;
+		padding: 0 40px;
 
 		h1 {
 			color: #42b983;
@@ -31,55 +37,51 @@ header {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				color: #2c3e50;
+				color: white;
 			}
 		}
 
-		.user {
-			width: calc(20% - 20px);
-			padding: 0 10px;
+		.header-buttons {
 			display: flex;
-			justify-content: space-between;
 			align-items: center;
-			border: 1px solid #2c3e50;
-			border-radius: 5px;
-			height: 80%;
 
-			.user-img {
-				width: 30px;
-				height: 30px;
-				border-radius: 50%;
-				background-repeat: no-repeat;
-				background-position: center;
-				background-size: 100%;
-				position: relative;
-
-				.user-status {
-					width: 8px;
-					height: 8px;
-					background: none;
-					position: absolute;
-					bottom: 0;
-					right: 0;
-					border-radius: 8px;
-				}
-			}
-
-			.user-username {
-				width: 60%;
-				height: 35px;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-
-			.user-btn {
-				width: 30px;
-				height: 30px;
-				background: #ccc;
+			& > button {
+				cursor: pointer;
+				width: 55px;
+				height: 60px;
+				border-radius: 18px;
 				border: none;
 				outline: none;
-				cursor: pointer;
+				font-size: 1.5em;
+				margin-right: 40px;
+				background-color: #21232b;
+
+				&:last-child {
+					margin-right: 0;
+				}
+			}
+		}
+
+		.notifications-btn {
+			& > svg {
+				color: white;
+			}
+		}
+
+		.user-btn {
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: 90%;
+			position: relative;
+
+			.user-status {
+				width: 9px;
+				height: 9px;
+				background: none;
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				border-radius: 8px;
 			}
 		}
 	}

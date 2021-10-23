@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from "axios";
 import { UpdateUser, UserStatus } from "models/apiTypes";
@@ -9,13 +9,14 @@ import React from 'react';
 import { clearInterval, setInterval } from "timers";
 
 interface AcceptWindowProps {
+	currentUser: User,
 	status: UserStatus,
 	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
 	enemy: UpdateUser | null,
 	enemyIsReady: boolean
 }
 
-const AcceptWindow = ({ status, setStatus, enemy, enemyIsReady }: AcceptWindowProps) => {
+const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: AcceptWindowProps) => {
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 	const [timeLeft, setTimeLeft] = React.useState<number>(20);
 
@@ -48,19 +49,45 @@ const AcceptWindow = ({ status, setStatus, enemy, enemyIsReady }: AcceptWindowPr
 			declineGameCallback();
 	}, [timeLeft, declineGameCallback]);
 
+	if (!enemy)
+		throw Error('No enemy');
+
 	return (
 		<div className='accept-window-wrapper'>
 			<div className='accept-window'>
 				<p>Game is ready!</p>
-				<div>{enemy ? enemy.login : 'null'}</div>
-				<div>{enemyIsReady ? 'He is ready' : 'He is not ready yet'}</div>
+				<div className='accept-window-info'>
+					<div className='accept-window-info-player'>
+						<div
+							style={{
+								backgroundImage: `url(${currentUser.urlAvatar})`,
+								borderColor: status === UserStatus.Accepted ? '#29aa44' : 'transparent'
+							}}
+							className='accept-window-info-img'
+						/>
+						<div className='accept-window-info-username'>{currentUser.username}</div>
+					</div>
+					<div className='accept-window-info-player'>
+						<div
+							style={{
+								backgroundImage: `url(${enemy.url_avatar})`,
+								borderColor: enemyIsReady ? '#29aa44' : 'transparent'
+							}}
+							className='accept-window-info-img'
+						/>
+						<div className='accept-window-info-username'>{enemy ? enemy.login : '[Unknown]'}</div>
+					</div>
+				</div>
 				<div className='accept-window-accept'>
-					<button
-						className='accept-btn'
-						onClick={acceptGame}
-					>
-						{status === UserStatus.Accepted ? 'Accepted, nice!' : 'Accept'}
-					</button>
+					{
+						status === UserStatus.Accepted
+							? <div className='accept-btn accept-btn-accepted'>
+									<FontAwesomeIcon icon={faCheck}/>
+								</div>
+							: <button className='accept-btn' onClick={acceptGame}>
+									Accept
+								</button>
+					}
 					<button className='decline-btn' onClick={declineGame}>Decline</button>
 					<span>{`${timeLeft} s`}</span>
 				</div>
@@ -71,7 +98,7 @@ const AcceptWindow = ({ status, setStatus, enemy, enemyIsReady }: AcceptWindowPr
 
 interface FindGameProps {
 	currentUser: User,
-	status: string,
+	status: UserStatus,
 	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
 	enemyRef: React.MutableRefObject<UpdateUser | null>,
 	enemyIsReady: boolean
@@ -116,24 +143,28 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 
 	if (status === UserStatus.Searching)
 		return (
-			<div className='find-game'>
-				<div className='find-game-searching'>
-					<span>Searching</span>
-					<span className='find-game-searching-time'>{`${passedTime.toFixed(1)} s`}</span>
+			<div className='find-game main-block'>
+				<div className='find-game-img'/>
+				<div className='find-game-back'>
+					<div className='find-game-searching'>
+						<span>Searching</span>
+						<span className='find-game-searching-time'>{`${passedTime.toFixed(1)} s`}</span>
+					</div>
+					<button
+						onClick={() => setStatus(UserStatus.Regular)}
+						className='find-game-cancel'
+					>
+						<FontAwesomeIcon icon={faTimesCircle}/>
+					</button>
 				</div>
-				<button
-					onClick={() => setStatus(UserStatus.Regular)}
-					className='find-game-cancel'
-				>
-					<FontAwesomeIcon icon={faTimesCircle}/>
-				</button>
 			</div>
 		);
 
 	if (status === UserStatus.FoundEnemy || status === UserStatus.Accepted)
 		return (
-			<div className='find-game'>
+			<div className='find-game main-block'>
 				<AcceptWindow
+					currentUser={currentUser}
 					status={status}
 					setStatus={setStatus}
 					enemy={enemyRef.current}
@@ -143,13 +174,17 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 		);
 
 	return (
-		<div className='find-game'>
-			<button
-				onClick={() => setStatus(UserStatus.Searching)}
-				className='find-game-btn'
-			>
-				Find game
-			</button>
+		<div className='find-game main-block'>
+			<div className='find-game-img'/>
+			<div className='find-game-back'>
+				<span>Find game</span>
+				<button
+					onClick={() => setStatus(UserStatus.Searching)}
+					className='find-game-btn'
+				>
+					<FontAwesomeIcon icon={faPlay}/>
+				</button>
+			</div>
 		</div>
 	);
 };

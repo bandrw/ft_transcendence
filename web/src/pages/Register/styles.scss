@@ -18,16 +18,18 @@
 
 	input {
 		border-radius: 15px;
-		width: calc(400px - 40px);
+		width: calc(400px - 52px);
 		border: 1px solid #2c3e50;
 		outline: none;
-		font-size: 1em;
-		padding: 12px 20px;
+		font-size: 1.2em;
+		padding: 16px 26px;
 		margin-bottom: 15px;
 		transition: all 0.1s ease-in;
+		background: transparent;
+		color: white;
 
 		&:focus {
-			border-color: #42b983;
+			border-color: #29aa44;
 		}
 	}
 
@@ -39,7 +41,7 @@
 		font-size: 1.2em;
 		font-weight: bold;
 		padding: 10px 12px;
-		background: #42b983;
+		background: #29aa44;
 		border: none;
 		outline: none;
 		color: white;
@@ -50,11 +52,11 @@
 
 		@media (hover: hover) {
 			&:hover {
-				background: #3dc083;
+				background: #21b941;
 			}
 		}
 		&:active {
-			background: #42a979;
+			opacity: 0.8;
 		}
 	}
 
@@ -65,7 +67,7 @@
 	}
 
 	.register-link {
-		color: #42b983;
+		color: #29aa44;
 		font-size: 1.2em;
 		width: fit-content;
 		padding: 0;

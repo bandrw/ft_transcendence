@@ -6,19 +6,44 @@ import GameBall from "models/GameBall";
 import Player from "models/Player";
 import { User } from "models/User";
 import React, { useEffect } from 'react';
+import { useHistory } from "react-router-dom";
 import { clearInterval, setInterval } from "timers";
 
 interface GameProps {
-	setInfoBoardContent: React.Dispatch<React.SetStateAction<JSX.Element> >,
 	enemyInfo: UpdateUser | null,
 	currentUser: User,
 	gameLoopRef: React.MutableRefObject<GameLoop>,
-	gameIdRef: React.MutableRefObject<number | null>
+	gameIdRef: React.MutableRefObject<number | null>,
+	eventSourceRef: React.MutableRefObject<EventSource | null>
 }
 
-const Game = ({ setInfoBoardContent, enemyInfo, currentUser, gameLoopRef, gameIdRef }: GameProps) => {
-	if (!enemyInfo)
-		throw Error('No enemy info');
+const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }: GameProps) => {
+	const history = useHistory();
+
+	React.useEffect(() => {
+		if (!enemyInfo)
+			history.push('/');
+	}, [history, enemyInfo]);
+
+	const [infoBoardContent, setInfoBoardContent] = React.useState<JSX.Element>(<div>Welcome to the game!</div>);
+
+	const gameLoopHandler = (e: any) => {
+		gameLoopRef.current = JSON.parse(e.data);
+	};
+
+	React.useEffect(() => {
+		const eventSource = eventSourceRef.current;
+		if (!eventSource)
+			return ;
+
+		eventSource.addEventListener('gameLoop', gameLoopHandler);
+		console.log('[Game] eventSource listeners added');
+
+		return () => {
+			eventSource.removeEventListener('gameLoop', gameLoopHandler);
+			console.log('[Game] eventSource listeners removed');
+		};
+	}, [eventSourceRef]);
 
 	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -175,7 +200,7 @@ const Game = ({ setInfoBoardContent, enemyInfo, currentUser, gameLoopRef, gameId
 		setInfoBoardContent(<div>{timeUntilStart}</div>);
 		const interval = setInterval(() => {
 			--timeUntilStart;
-			if (timeUntilStart === 0) {
+			if (timeUntilStart === 0 && enemyInfo) {
 				setInfoBoardContent(
 					<div>
 						<span>{currentUser.username}</span>
@@ -189,15 +214,20 @@ const Game = ({ setInfoBoardContent, enemyInfo, currentUser, gameLoopRef, gameId
 				setInfoBoardContent(<div>{timeUntilStart}</div>);
 			}
 		}, 1000);
-	}, []);
+	}, [currentUser.username, enemyInfo]);
 
 	return (
-		<canvas
-			id="game-canvas"
-			width="1024px"
-			height="600px"
-			ref={canvasRef}
-		/>
+		<div className='game-container'>
+			<div className='info-board'>
+				{infoBoardContent}
+			</div>
+			<canvas
+				id="game-canvas"
+				width="1024px"
+				height="600px"
+				ref={canvasRef}
+			/>
+		</div>
 	);
 };
 
