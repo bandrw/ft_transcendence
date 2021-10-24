@@ -6,12 +6,21 @@ import User from "./views/User";
 import Ladder from "./views/Ladder";
 import eventSource from "./views/eventSource";
 import game from "./views/game";
+import io from "socket.io/client-dist/socket.io";
+import VueSocketIO from "vue-socket.io";
+import chat from "./views/chat";
 
 Vue.config.productionTip = false;
+Vue.use(
+  new VueSocketIO({
+    connection: io("http://localhost:3000", { transports: ["websocket"] }),
+  })
+);
 Vue.component("User", User);
 Vue.component("Ladder", Ladder);
 Vue.component("eventSource", eventSource);
 Vue.component("game", game);
+Vue.component("chat", chat);
 
 new Vue({
   router,

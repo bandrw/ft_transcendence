@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as ladder from "./modules/ladder";
 import * as game from "./modules/game";
+import * as chat from "./modules/chat";
 
 Vue.use(Vuex);
 
@@ -12,7 +13,7 @@ export default new Vuex.Store({
     users: [],
     enemy: false,
     eventSource: false,
-    socket: null,
+    // socket: null,
   },
   mutations: {
     CREATE_EVENT_SOURCE(state, login) {
@@ -54,9 +55,9 @@ export default new Vuex.Store({
     SET_ENEMY_READY_STATUS(state, readyStatus) {
       state.enemy.readyStatus = readyStatus;
     },
-    SET_SOCKET(state, socket) {
-      state.socket = socket;
-    },
+    // SET_SOCKET(state, socket) {
+    //   state.socket = socket;
+    // },
   },
   actions: {
     setUsers({ commit }, data) {
@@ -66,25 +67,13 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    countUsersInGame(state) {
-      return state.onlineUsers.filter((users) => users.status === "red").length;
-    },
-    countOnlineUsers: (state) => {
-      return state.onlineUsers.length;
-    },
-    countFreeUsers: (state) => {
-      return state.onlineUsers.filter((users) => users.status === "green")
-        .length;
-    },
-    userByName: (state) => (login) => {
-      return state.onlineUsers.find((user) => user.login === login);
-    },
-    userById(state, id) {
-      return state.onlineUsers.find((user) => user.id === id);
+    usersExceptByName(state) {
+      return state.users.filter((users) => users.login !== state.user.login);
     },
   },
   modules: {
     ladder: ladder,
     game: game,
+    chat: chat,
   },
 });

@@ -21,7 +21,7 @@ import { mapState, mapMutations } from "vuex";
 export default {
   computed: {
     ...mapState("game", ["you", "enemy", "ball", "id"]),
-    ...mapState(["socket", "user"]),
+    ...mapState(["user"]),
     youRealPosX: function () {
       return this.you.posX - this.you.width / 2;
     },
@@ -53,7 +53,7 @@ export default {
         id: this.id,
         enemyPlatformX: this.you.posX,
       });
-      this.socket.emit("platformPosition", data);
+      this.$socket.emit("platformPosition", data);
     },
     moveRight() {
       if (this.you.posX - 1 - this.you.width / 2 > 0) {

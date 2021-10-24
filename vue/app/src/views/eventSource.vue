@@ -38,6 +38,7 @@ export default {
       "SWAP_SIGN_SIN",
       "SWAP_SIGN_COS",
       "SET_ENEMY_POS_X",
+      "SET_STARTER",
     ]),
     addUser(event) {
       const user = JSON.parse(event.data);
