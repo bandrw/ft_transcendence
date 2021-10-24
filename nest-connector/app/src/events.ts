@@ -54,37 +54,37 @@ export class Events
   }
 
   @SubscribeMessage('keyDown')
-  keyDownHandler(@MessageBody() user: string) {
-    const u = JSON.parse(user);
-    const game = this.gameService.gamers[u.gameId];
-    if (game.playerOne.user.login === u.login) {
-      if (u.key === 'ArrowUp')
+  keyDownHandler(@MessageBody() data: string) {
+    const user = JSON.parse(data);
+    const game = this.gameService.gamers[user.gameId];
+    if (game.playerOne.user.login === user.login) {
+      if (user.key === 'ArrowUp')
         game.playerOne.controls.arrowUp = true;
-      if (u.key === 'ArrowDown')
+      if (user.key === 'ArrowDown')
         game.playerOne.controls.arrowDown = true;
     }
-    if (game.playerTwo.user.login === u.login) {
-      if (u.key === 'ArrowUp')
+    if (game.playerTwo.user.login === user.login) {
+      if (user.key === 'ArrowUp')
         game.playerTwo.controls.arrowUp = true;
-      if (u.key === 'ArrowDown')
+      if (user.key === 'ArrowDown')
         game.playerTwo.controls.arrowDown = true;
     }
   }
 
   @SubscribeMessage('keyUp')
-  keyUpHandler(@MessageBody() user: string) {
-    const u = JSON.parse(user);
-    const game = this.gameService.gamers[u.gameId];
-    if (game.playerOne.user.login === u.login) {
-      if (u.key === 'ArrowUp')
+  keyUpHandler(@MessageBody() data: string) {
+    const user = JSON.parse(data);
+    const game = this.gameService.gamers[user.gameId];
+    if (game.playerOne.user.login === user.login) {
+      if (user.key === 'ArrowUp')
         game.playerOne.controls.arrowUp = false;
-      if (u.key === 'ArrowDown')
+      if (user.key === 'ArrowDown')
         game.playerOne.controls.arrowDown = false;
     }
-    if (game.playerTwo.user.login === u.login) {
-      if (u.key === 'ArrowUp')
+    if (game.playerTwo.user.login === user.login) {
+      if (user.key === 'ArrowUp')
         game.playerTwo.controls.arrowUp = false;
-      if (u.key === 'ArrowDown')
+      if (user.key === 'ArrowDown')
         game.playerTwo.controls.arrowDown = false;
     }
   }

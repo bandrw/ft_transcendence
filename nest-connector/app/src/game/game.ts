@@ -2,15 +2,15 @@ import { Gamer as G } from './gamer.interface';
 
 export class Game {
   public pointsForWin: number;
-  private ballSpeed: number;
-  private map: any;
-  private BallPosX: number;
-  private BallPosY: number;
-  public starterOne: boolean;
-  public starterTwo: boolean;
+  // private ballSpeed: number;
+  // private map: any;
+  // private BallPosX: number;
+  // private BallPosY: number;
+  // public starterOne: boolean;
+  // public starterTwo: boolean;
   public readonly fps = 60;
   public gameInterval: NodeJS.Timer;
-  public coordinates = {
+  public readonly coordinates = {
     leftPlayer: {
       x: 0,
       y: 0,
@@ -24,7 +24,7 @@ export class Game {
       y: 0,
     },
   };
-  public gameSettings = {
+  private gameSettings = {
     canvasWidth: 1024,
     canvasHeight: 600,
     playerWidth: 15,
@@ -32,9 +32,13 @@ export class Game {
     playerHeight: 150,
     playerStep: 3,
     ballSize: 15,
-    ballAngle: (Math.random() * Math.PI / 2) - Math.PI / 4,
-    ballSpeed: 3,
+    ballAngle: 0,
+    ballSpeed: 4,
   };
+  private score = {
+    leftPlayer: 0,
+    rightPlayer: 0
+  }
 
   constructor(
     public playerOne: G,
@@ -45,79 +49,76 @@ export class Game {
     ballSpeed = 1.3,
   ) {
     this.pointsForWin = pointsForWin;
-    this.map = map;
-    this.BallPosX =
-      this.playerTwo.position -
-      this.playerTwo.platformWide / 2 +
-      this.playerTwo.platformWide * Math.random();
-    if (Math.random() > 0.5) {
-      this.starterOne = true;
-      this.starterTwo = false;
-      this.BallPosY = 97;
-    } else {
-      this.starterOne = false;
-      this.starterTwo = true;
-      this.BallPosY = 3;
-    }
-    this.ballSpeed = ballSpeed;
-    this.playerOne.user.resp.write(
-      `event: gameSettings\ndata: ${JSON.stringify({
-        BallPosX: this.BallPosX,
-        BallPosY: this.BallPosY,
-        starter: this.starterOne,
-        id: this.id,
-        enemyGameSettings: {
-          platformWide: this.playerTwo.platformWide,
-          platformSpeed: this.playerTwo.platformSpeed,
-        },
-      })}\n\n`,
-    );
-    this.playerTwo.user.resp.write(
-      `event: gameSettings\ndata: ${JSON.stringify({
-        BallPosX: this.BallPosX,
-        BallPosY: this.BallPosY,
-        starter: this.starterTwo,
-        id: this.id,
-        enemyGameSettings: {
-          platformWide: this.playerOne.platformWide,
-          platformSpeed: this.playerOne.platformSpeed,
-        },
-      })}\n\n`,
-    );
+    // this.map = map;
+    // this.BallPosX =
+    //   this.playerTwo.position -
+    //   this.playerTwo.platformWide / 2 +
+    //   this.playerTwo.platformWide * Math.random();
+    // if (Math.random() > 0.5) {
+    //   this.starterOne = true;
+    //   this.starterTwo = false;
+    //   this.BallPosY = 97;
+    // } else {
+    //   this.starterOne = false;
+    //   this.starterTwo = true;
+    //   this.BallPosY = 3;
+    // }
+    // this.ballSpeed = ballSpeed;
+    const gameSettingsMsg = `event: gameSettings\ndata: ${JSON.stringify({
+      id: this.id,
+    })}\n\n`;
+    this.playerOne.user.resp.write(gameSettingsMsg);
+    this.playerTwo.user.resp.write(gameSettingsMsg);
     this.playerOne.gamePoints = 0;
     this.playerTwo.gamePoints = 0;
+    this.resetPositions(true);
+  }
 
-    this.coordinates.leftPlayer.y = Math.round(
-      (this.gameSettings.canvasHeight - this.gameSettings.playerHeight) / 2,
-    );
-    this.coordinates.rightPlayer.y = Math.round(
-      (this.gameSettings.canvasHeight - this.gameSettings.playerHeight) / 2,
-    );
-    this.coordinates.ball.x = Math.round(
-      (this.gameSettings.canvasWidth - this.gameSettings.ballSize) / 2,
-    );
-    this.coordinates.ball.y = Math.round(
-      (this.gameSettings.canvasHeight - this.gameSettings.ballSize) / 2,
-    );
-    if (Math.round(Math.random() * 10) % 2 === 0)
+  resetPositions(withPlatforms = false) {
+    if (withPlatforms) {
+      this.coordinates.leftPlayer.y = Math.round((this.gameSettings.canvasHeight - this.gameSettings.playerHeight) / 2);
+      this.coordinates.rightPlayer.y = Math.round((this.gameSettings.canvasHeight - this.gameSettings.playerHeight) / 2);
+    }
+    this.coordinates.ball.x = Math.round((this.gameSettings.canvasWidth - this.gameSettings.ballSize) / 2);
+    this.coordinates.ball.y = Math.round(Math.random() * (this.gameSettings.canvasHeight - this.gameSettings.ballSize));
+    this.gameSettings.ballAngle = (Math.random() * Math.PI / 2) - Math.PI / 4;
+    if (Math.random() < 0.5)
       this.gameSettings.ballAngle += Math.PI;
   }
 
+  private sendMsg(event: string, data: string) {
+    const scoreMsg = `event: ${event}\ndata: ${data}\n\n`;
+    this.playerOne.user.resp.write(scoreMsg);
+    this.playerTwo.user.resp.write(scoreMsg);
+    // ... and other watchers
+  }
+
   updatePositions() {
-    // // if (ball.xPosition <= winMargin)
-    // // 	props.setEnemyScore((prev) => prev + 1)
-    // // else if (ball.xPosition + ball.size >= canvas.width - winMargin)
-    // // 	props.setPlayerScore((prev) => prev + 1)
+    // Score
+    if (this.coordinates.ball.x < 0 - this.gameSettings.ballSize) {
+      ++this.score.rightPlayer;
+      this.sendMsg('gameScore', JSON.stringify(this.score));
+      this.resetPositions();
+      this.sendMsg('playSound', 'pong-sound-3');
+    }
+    if (this.coordinates.ball.x > this.gameSettings.canvasWidth) {
+      ++this.score.leftPlayer;
+      this.sendMsg('gameScore', JSON.stringify(this.score));
+      this.resetPositions();
+      this.sendMsg('playSound', 'pong-sound-3');
+    }
 
     // Ball bouncing
-    if (this.coordinates.ball.x < 0)
-      this.gameSettings.ballAngle = Math.PI - this.gameSettings.ballAngle;
-    if (this.coordinates.ball.x + this.gameSettings.ballSize > this.gameSettings.canvasWidth)
-      this.gameSettings.ballAngle = Math.PI - this.gameSettings.ballAngle;
-    if (this.coordinates.ball.y + this.gameSettings.ballSize > this.gameSettings.canvasHeight)
-      this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
-    if (this.coordinates.ball.y < 0)
-      this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
+    const bounceOffTheNorthWall = this.coordinates.ball.y + this.gameSettings.ballSize > this.gameSettings.canvasHeight;
+    const bounceOffTheSouthWall = this.coordinates.ball.y < 0;
+    if (bounceOffTheNorthWall || bounceOffTheSouthWall)
+    {
+      if (bounceOffTheNorthWall)
+        this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
+      if (bounceOffTheSouthWall)
+        this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
+      this.sendMsg('playSound', 'pong-sound-1');
+    }
 
     // Ball moving
     this.coordinates.ball.x += Math.cos(this.gameSettings.ballAngle) * this.gameSettings.ballSpeed;
@@ -136,13 +137,35 @@ export class Game {
       this.coordinates.rightPlayer.y += this.gameSettings.playerStep;
 
     // Ball collision with platforms
-    if (this.coordinates.ball.x <= this.gameSettings.playerMargin + this.gameSettings.playerWidth &&
-        this.coordinates.ball.y + this.gameSettings.ballSize >= this.coordinates.leftPlayer.y &&
-        this.coordinates.ball.y < this.coordinates.leftPlayer.y + this.gameSettings.playerHeight)
-      this.gameSettings.ballAngle = Math.PI - this.gameSettings.ballAngle;
-    else if (this.coordinates.ball.x >= this.gameSettings.canvasWidth - this.gameSettings.playerMargin - this.gameSettings.playerWidth - this.gameSettings.ballSize &&
-        this.coordinates.ball.y + this.gameSettings.ballSize >= this.coordinates.rightPlayer.y &&
-        this.coordinates.ball.y < this.coordinates.rightPlayer.y + this.gameSettings.playerHeight)
-      this.gameSettings.ballAngle = Math.PI - this.gameSettings.ballAngle;
+    const bounceOffTheLeftPlayer = this.coordinates.ball.x <= this.gameSettings.playerMargin + this.gameSettings.playerWidth &&
+      this.coordinates.ball.y + this.gameSettings.ballSize >= this.coordinates.leftPlayer.y &&
+      this.coordinates.ball.y < this.coordinates.leftPlayer.y + this.gameSettings.playerHeight;
+    const bounceOffTheRightPlayer = this.coordinates.ball.x >= this.gameSettings.canvasWidth - this.gameSettings.playerMargin - this.gameSettings.playerWidth - this.gameSettings.ballSize &&
+      this.coordinates.ball.y + this.gameSettings.ballSize >= this.coordinates.rightPlayer.y &&
+      this.coordinates.ball.y < this.coordinates.rightPlayer.y + this.gameSettings.playerHeight;
+    if (bounceOffTheLeftPlayer || bounceOffTheRightPlayer) {
+      let k;
+      if (bounceOffTheLeftPlayer)
+        k = (this.coordinates.ball.y + this.gameSettings.ballSize / 2 - this.coordinates.leftPlayer.y) / this.gameSettings.playerHeight;
+      else
+        k = (this.coordinates.ball.y + this.gameSettings.ballSize / 2 - this.coordinates.rightPlayer.y) / this.gameSettings.playerHeight;
+      if (k >= 0 && k < 1 / 8)
+        this.gameSettings.ballAngle = -Math.PI / 4;
+      else if (k >= 1 / 8 && k < 2 / 8)
+        this.gameSettings.ballAngle = -Math.PI / 6;
+      else if (k >= 2 / 8 && k < 3 / 8)
+        this.gameSettings.ballAngle = -Math.PI / 12;
+      else if (k >= 3 / 8 && k < 5 / 8)
+        this.gameSettings.ballAngle = 0;
+      else if (k >= 5 / 8 && k < 6 / 8)
+        this.gameSettings.ballAngle = Math.PI / 12;
+      else if (k >= 6 / 8 && k < 7 / 8)
+        this.gameSettings.ballAngle = Math.PI / 6;
+      else if (k >= 7 / 8 && k < 8 / 8)
+        this.gameSettings.ballAngle = Math.PI / 4;
+      if (bounceOffTheRightPlayer)
+        this.gameSettings.ballAngle = Math.PI - this.gameSettings.ballAngle;
+      this.sendMsg('playSound', 'pong-sound-2');
+    }
   }
 }

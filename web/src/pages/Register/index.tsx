@@ -113,18 +113,21 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 					type='text'
 					placeholder='Login'
 					ref={loginRef}
+					autoComplete='username'
 				/>
 				<input
 					name='password'
 					type='password'
 					placeholder='Password'
 					ref={passwordRef}
+					autoComplete='new-password'
 				/>
 				<input
 					name='password-confirm'
 					type='password'
 					placeholder='Confirm password'
 					ref={passwordConfirmRef}
+					autoComplete='new-password'
 				/>
 				<span className='errors'>
 					{errors}

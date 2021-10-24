@@ -82,6 +82,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					placeholder='Login'
 					ref={loginRef}
 					defaultValue='admin'
+					autoComplete='username'
 				/>
 				<input
 					name='password'
@@ -89,6 +90,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					placeholder='Password'
 					ref={passwordRef}
 					defaultValue='123123'
+					autoComplete='current-password'
 				/>
 				<span className='login-errors'>
 					{loginErrors}

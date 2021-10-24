@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 * {
 	padding: 0;
 	margin: 0;
@@ -25,7 +27,13 @@ body {
 	-webkit-border-radius: 1ex;
 }
 
-//code {
-//	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-//	monospace;
-//}
+:-webkit-autofill::first-line,
+:-webkit-autofill,
+:-webkit-autofill:hover,
+:-webkit-autofill:focus,
+:-webkit-autofill:active {
+	font-size: 1.5em;
+	color: white;
+	-webkit-box-shadow: 0 0 0 1000px #1a1b1f inset;
+	transition: box-shadow 0s;
+}
