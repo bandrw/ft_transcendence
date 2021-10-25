@@ -19,9 +19,12 @@ export default {
       "INCREMENT_USER_GAMES",
       "DEL_USER",
       "SET_ENEMY",
+    ]),
+    ...mapMutations("ladder", [
+      "CLEAR_ACCEPT_INTERVAL",
+      "CLEAR_FIND_INTERVAL",
       "SET_ENEMY_READY_STATUS",
     ]),
-    ...mapMutations("ladder", ["CLEAR_ACCEPT_INTERVAL", "CLEAR_FIND_INTERVAL"]),
     ...mapMutations("game", [
       "CLEAR_BALL_INTERVAL",
       "SET_ENEMY_WIDTH",

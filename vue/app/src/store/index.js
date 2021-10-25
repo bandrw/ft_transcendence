@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import * as ladder from "./modules/ladder";
 import * as game from "./modules/game";
 import * as chat from "./modules/chat";
+import * as profile from "./modules/profile";
 
 Vue.use(Vuex);
 
@@ -13,13 +14,15 @@ export default new Vuex.Store({
     users: [],
     enemy: false,
     eventSource: false,
-    // socket: null,
   },
   mutations: {
     CREATE_EVENT_SOURCE(state, login) {
       state.eventSource = new EventSource(
         `http://localhost:3000/users/login?login=${login}`
       );
+    },
+    CLOSE_EVENT_SOURCE(state) {
+      state.eventSource.close();
     },
     ADD_USER(state, user) {
       state.users.push(user);
@@ -46,18 +49,15 @@ export default new Vuex.Store({
       state.user = entity;
       state.user.password = null;
     },
-    SET_ONLINE_USERS(state, users) {
-      state.onlineUsers = users;
+    SET_USERS(state, users) {
+      state.users = users;
     },
     SET_ENEMY(state, enemy) {
       state.enemy = enemy;
     },
-    SET_ENEMY_READY_STATUS(state, readyStatus) {
-      state.enemy.readyStatus = readyStatus;
+    CLEAR_USER(state) {
+      state.user = null;
     },
-    // SET_SOCKET(state, socket) {
-    //   state.socket = socket;
-    // },
   },
   actions: {
     setUsers({ commit }, data) {
@@ -75,5 +75,6 @@ export default new Vuex.Store({
     ladder: ladder,
     game: game,
     chat: chat,
+    profile: profile,
   },
 });

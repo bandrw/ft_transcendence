@@ -19,7 +19,7 @@
       ></div>
       <div
         id="ladder_ready_enemy"
-        :style="{ backgroundColor: enemy.readyStatus }"
+        :style="{ backgroundColor: enemyReadyStatus }"
       ></div>
       <div id="ladder_enemy">
         <img :src="enemy.url_avatar" width="100%" height="100%" alt="" />
@@ -47,6 +47,7 @@ export default {
       "ladder",
       "breaker",
       "readyStatus",
+      "enemyReadyStatus",
       "timerAccept",
       "str_timerAccept",
       "str_timerFind",

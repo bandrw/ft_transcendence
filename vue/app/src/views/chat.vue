@@ -18,11 +18,16 @@
           ></span>
         </div>
       </div>
-      <div id="chat_messages">
+      <div v-show="show_chat" id="chat_messages">
         <div v-for="message in messages" :key="message">
           <span>{{ message }}</span>
         </div>
-        <input @click.prevent="" id="chat_input" v-model="message">
+        <input
+          v-if="show_chat"
+          @click.prevent=""
+          id="chat_input"
+          v-model="message"
+        />
       </div>
     </div>
     <div
@@ -31,10 +36,10 @@
       :style="{ left: infoStyle.left, top: infoStyle.top }"
     >
       {{ user.login }}
-      <span :style="{ color: pinColor(user.winP) }"
-        ><p>{{ winPercent(user.wins, user.games, user) }}%</p></span
+      <span :style="{ color: pinColor(user_in_chat.winP) }"
+        ><p>{{ winPercent(user_in_chat.wins, user_in_chat.games, user_in_chat) }}%</p></span
       >
-      <img :src="user.url_avatar" class="user_profile_avatar" alt="" />
+      <img :src="user_in_chat.url_avatar" class="user_profile_avatar" alt="" />
       <div class="chat_user_profile_close_button" v-on:click="SET_INFO(false)">
         x
       </div>
@@ -52,7 +57,14 @@ export default {
     };
   },
   computed: {
-    ...mapState("chat", ["show_chat", "messages", "infoStyle", "type", "info"]),
+    ...mapState("chat", [
+      "show_chat",
+      "messages",
+      "infoStyle",
+      "type",
+      "info",
+      "user_in_chat",
+    ]),
     ...mapGetters(["usersExceptByName"]),
     classGame: function () {
       return {

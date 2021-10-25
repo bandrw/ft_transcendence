@@ -4,11 +4,11 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class GameService {
-  public gamers: G[] = [];
+  public games: G[] = [];
   @Inject(UsersService)
   userService: UsersService;
   startGame(Game: G) {
-    this.gamers.push(Game);
+    this.games.push(Game);
   }
   async chooseUser(game: G, login: string) {
     if (game.playerTwo.user.login === login) {

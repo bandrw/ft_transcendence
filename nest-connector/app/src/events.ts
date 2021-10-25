@@ -30,12 +30,12 @@ export class Events
   @SubscribeMessage('start')
   launchBall(@MessageBody() user: string) {
     const u = JSON.parse(user);
-    if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
-      this.gameService.gamers[u.id].playerOne.user.resp.write(
+    if (this.gameService.games[u.id].playerTwo.user.login === u.login) {
+      this.gameService.games[u.id].playerOne.user.resp.write(
         `event: ballLaunch\ndata: \n\n`,
       );
     } else {
-      this.gameService.gamers[u.id].playerTwo.user.resp.write(
+      this.gameService.games[u.id].playerTwo.user.resp.write(
         `event: ballLaunch\ndata: \n\n`,
       );
     }
@@ -43,12 +43,12 @@ export class Events
   @SubscribeMessage('platformPosition')
   platformPosition(@MessageBody() user: string) {
     const u = JSON.parse(user);
-    if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
-      this.gameService.gamers[u.id].playerOne.user.resp.write(
+    if (this.gameService.games[u.id].playerTwo.user.login === u.login) {
+      this.gameService.games[u.id].playerOne.user.resp.write(
         `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
       );
     } else {
-      this.gameService.gamers[u.id].playerTwo.user.resp.write(
+      this.gameService.games[u.id].playerTwo.user.resp.write(
         `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
       );
     }
@@ -57,7 +57,7 @@ export class Events
   @SubscribeMessage('gameScore')
   async gameScore(@MessageBody() user: string) {
     const u = JSON.parse(user);
-    await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
+    await this.gameService.chooseUser(this.gameService.games[u.id], u.login);
   }
   @SubscribeMessage('newPersonalMessage')
   newPersonalMessage(@MessageBody() data: string) {

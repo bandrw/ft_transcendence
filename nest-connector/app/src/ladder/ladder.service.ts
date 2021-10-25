@@ -103,7 +103,7 @@ export class LadderService {
       position: 50,
     };
     ++this.lobbyId;
-    return new Game(gamer1, gamer2, this.games.gamers.length);
+    return new Game(gamer1, gamer2, this.games.games.length);
   }
 
   awayFromKeyboard(userIndex) {

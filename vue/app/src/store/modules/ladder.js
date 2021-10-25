@@ -11,9 +11,13 @@ export const state = {
   game: false,
   breaker: false,
   readyStatus: "yellow",
+  enemyReadyStatus: "yellow",
 };
 
 export const mutations = {
+  SET_ENEMY_READY_STATUS(state, readyStatus) {
+    state.enemyReadyStatus = readyStatus;
+  },
   CLEAR_ACCEPT_INTERVAL(state) {
     clearInterval(state.acceptInterval);
     state.str_timerAccept = null;
@@ -57,6 +61,6 @@ export const mutations = {
     state.findInterval = interval;
   },
   SET_ACCEPT_INTERVAL(state, interval) {
-    this.state.acceptInterval = interval;
+    state.acceptInterval = interval;
   },
 };
