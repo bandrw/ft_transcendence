@@ -81,12 +81,14 @@ export const mutations = {
   },
   CLEAR_YOU_INTERVAL(state) {
     clearInterval(state.you.interval);
+    state.you.interval = false;
   },
   SET_ENEMY_INTERVAL(state, interval) {
     state.enemy.interval = interval;
   },
   CLEAR_ENEMY_INTERVAL(state) {
     clearInterval(state.enemy.interval);
+    state.enemy.interval = false;
   },
   ADD_YOU_POS_X(state, pos) {
     state.you.posX += pos;

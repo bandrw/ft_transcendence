@@ -199,11 +199,7 @@ Vue.component('user', {
         });
     },
     showProfile() {
-      if (this.profile) {
-        this.profile = false;
-      } else {
-        this.profile = true;
-      }
+      this.profile = !this.profile;
     },
   },
   modules: {

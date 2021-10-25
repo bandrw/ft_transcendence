@@ -11,32 +11,46 @@
     </div>
     <div v-else class="user_authorized">
       <div class="user_logout_button" v-on:click="logout">logout</div>
-      <div class="user_profile_button" v-on:click="showProfile">{{ user.login }}</div>
+      <div class="user_profile_button" v-on:click="showProfile">
+        {{ user.login }}
+      </div>
     </div>
     <div v-show="profile && authorized && !gameInProgress" class="user_profile">
-      <img :src="user.url_avatar" class="user_profile_avatar">
+      <img :src="user.url_avatar" class="user_profile_avatar" alt="" />
       <div id="user_update_avatar" v-on:click="updateAvatar"></div>
-      <div id="game_stats_count"><p>games: {{ user.games }}</p></div>
-      <div id="game_stats_wins"><p>wins: {{ user.wins }}</p></div>
-      <div id="game_stats_winPercent"><p>wins: {{ winPercent }}%</p></div>
+      <div id="game_stats_count">
+        <p>games: {{ user.games }}</p>
+      </div>
+      <div id="game_stats_wins">
+        <p>wins: {{ user.wins }}</p>
+      </div>
+      <div id="game_stats_winPercent">
+        <p>wins: {{ winPercent }}%</p>
+      </div>
       <div class="user_profile_close_button" v-on:click="showProfile">x</div>
     </div>
-    <game v-if="gameInProgress" />
-    <Ladder ref="Ladder" v-else />
-    <chat v-if="!gameInProgress" />
+    <game ref="game" v-if="gameInProgress && authorized" />
+    <Ladder ref="Ladder" v-if="!gameInProgress && authorized" />
+    <chat v-if="!gameInProgress && authorized" />
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
+import eventService from "../services/eventService";
 
 export default {
   computed: {
+    winPercent() {
+      const winP = (this.user.wins / this.user.games).toFixed(2) * 100;
+      return winP ? winP : 0;
+    },
     ...mapState(["authorized", "user"]),
     ...mapState("profile", ["profile"]),
     ...mapState("game", ["gameInProgress", "gameInProgress", "enemy"]),
   },
   methods: {
+    ...mapMutations("game", ["CLEAR_YOU_INTERVAL", "CLEAR_ENEMY_INTERVAL"]),
     ...mapMutations("profile", ["SET_PROFILE"]),
     ...mapMutations("ladder", ["CLEAR_FIND_INTERVAL", "CLEAR_ACCEPT_INTERVAL"]),
     ...mapMutations([
@@ -45,6 +59,7 @@ export default {
       "SET_AUTHORIZE",
       "SET_USERS",
       "CLEAR_USER",
+      "SET_NEW_USER_AVATAR",
     ]),
     async logout() {
       if (this.gameInProgress) {
@@ -57,6 +72,41 @@ export default {
         this.CLEAR_USER();
       }
     },
+    showProfile() {
+      this.SET_PROFILE(!this.profile);
+    },
+    getData(res) {
+      return res.data;
+    },
+    async updateAvatar() {
+      const avatar = eventService
+        .updateAvatar(this.user.login)
+        .then(this.getData);
+      this.SET_NEW_USER_AVATAR(avatar);
+    },
+  },
+  logoutIfAuthorized() {
+    if (this.authorized) {
+      this.logout();
+    }
+  },
+  stopPlatform(event) {
+    if (event.key === "ArrowRight") {
+      this.CLEAR_YOU_INTERVAL();
+    } else if (event.key === "ArrowLeft") {
+      this.CLEAR_ENEMY_INTERVAL();
+    }
+  },
+  keyEvents(event) {
+    if (event.key === "ArrowRight" && this.gameInProgress) {
+      this.$refs.game.movePlatformRight();
+    } else if (event.key === "ArrowLeft" && this.gameInProgress) {
+      this.$refs.game.movePlatformLeft();
+    }
+  },
+  mounted() {
+    window.onbeforeunload = this.logoutIfAuthorized;
+    document.addEventListener("keyup", this.stopPlatform);
   },
 };
 </script>
@@ -133,18 +183,6 @@ input {
   position: absolute;
   right: 0;
   top: 0;
-}
-
-.user_unauthorized {
-  width: 50%;
-  height: 27%;
-  min-width: 500px;
-  min-height: 250px;
-  max-width: 600px;
-  max-height: 300px;
-  position: absolute;
-  left: 15%;
-  top: 15%;
 }
 
 .user_logout_button {

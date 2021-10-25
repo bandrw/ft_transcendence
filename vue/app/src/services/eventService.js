@@ -21,7 +21,6 @@ export default {
     return await apiClient.get("/users/checkExist?login=" + login);
   },
   async createUser(data) {
-    console.log(data);
     return await apiClient.post("/users/create", data);
   },
   async setStatus(login, status = "green") {
@@ -31,5 +30,8 @@ export default {
   },
   async systemStatus(login) {
     return await apiClient.get(`ladder/systemStatus?login=${login}`);
+  },
+  async updateAvatar(login) {
+    return await apiClient.get(`/users/avatar?login=${login}`);
   },
 };

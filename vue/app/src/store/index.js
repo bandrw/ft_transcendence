@@ -58,10 +58,13 @@ export default new Vuex.Store({
     CLEAR_USER(state) {
       state.user = null;
     },
+    SET_NEW_USER_AVATAR(state, avatar) {
+      state.user.url_avatar = avatar;
+    },
   },
   actions: {
     setUsers({ commit }, data) {
-      commit("SET_ONLINE_USERS", data.users);
+      commit("SET_USERS", data.users);
       commit("SET_USER_ENTITY", data.user);
       commit("SET_AUTHORIZE", true);
     },

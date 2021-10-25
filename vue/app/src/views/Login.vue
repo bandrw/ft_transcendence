@@ -62,6 +62,10 @@ export default {
       const user = await eventService.login(this.login).then((response) => {
         return response.data;
       });
+      if (user === "doubleLogin") {
+        this.error = "user with the same login already in game";
+        return;
+      }
       if (user) {
         if (cryptService.comparePassword(this.password, user.password)) {
           const onlineUsers = await eventService
