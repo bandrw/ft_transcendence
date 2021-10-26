@@ -110,11 +110,13 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
 	React.useEffect(() => {
+		let isMounted = true;
+
 		if (!currentUser.isAuthorized())
 			return ;
-		if (status === UserStatus.InGame) {
+		if (status === UserStatus.InGame)
 			return ;
-		}
+
 		if (status === UserStatus.FoundEnemy) {
 			if (timerIntervalRef.current)
 				clearInterval(timerIntervalRef.current);
@@ -127,6 +129,9 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 				status: status
 			}
 		}).then(() => {
+			if (!isMounted)
+				return ;
+
 			switch (status) {
 				case UserStatus.Regular: {
 					if (timerIntervalRef.current)
@@ -140,6 +145,10 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 				}
 			}
 		});
+
+		return () => {
+			isMounted = false;
+		};
 	}, [status, currentUser, currentUser.username]);
 
 	if (status === UserStatus.Searching)

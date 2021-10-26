@@ -15,6 +15,7 @@
     "@types/react-dom": "17.0.9",
     "axios": "0.22.0",
     "bcryptjs": "2.4.3",
+    "eslint-plugin-react-hooks": "4.2.0",
     "react": "17.0.2",
     "react-awesome-reveal": "3.8.1",
     "react-dom": "17.0.2",
@@ -45,7 +46,9 @@
       "object-curly-newline": "off",
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
-      "semi": "error"
+      "semi": "error",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn"
     },
     "parserOptions": {
       "ecmaVersion": 6,
@@ -61,7 +64,8 @@
     },
     "parser": "babel-eslint",
     "plugins": [
-      "simple-import-sort"
+      "simple-import-sort",
+      "react-hooks"
     ]
   },
   "browserslist": {

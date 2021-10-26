@@ -54,7 +54,7 @@ const Main = ({ currentUser, status, setStatus, enemyRef, gameSettingsRef, event
 				setUsers(fetchedUsers);
 			})
 			.catch();
-	}, []);
+	}, [currentUser]);
 
 	React.useEffect(() => {
 		usersRef.current = users;
@@ -62,47 +62,12 @@ const Main = ({ currentUser, status, setStatus, enemyRef, gameSettingsRef, event
 
 	const socket = React.useContext(SocketContext);
 
-	const gameSettingsHandler = (e: any) => {
-		const gameSettings: GameSettings = JSON.parse(e.data);
-		gameSettingsRef.current = gameSettings;
-		const data = {
-			login: currentUser.username,
-			id: gameSettings.id
-		};
-		setTimeout(() => socket.emit('start', JSON.stringify(data)), 3000);
-	};
-
-	const updateUserHandler = (e: any) => {
-		const data: UpdateUser = JSON.parse(e.data);
-
-		const newUsers: UpdateUser[] = [];
-		for (let i = 0; i < usersRef.current.length; ++i) {
-			if (usersRef.current[i].login === data.login)
-				newUsers.push(data);
-			else
-				newUsers.push(usersRef.current[i]);
-		}
-		setUsers(newUsers);
-
-		if (!enemyRef.current && status !== UserStatus.Regular) {
-			setStatus(UserStatus.Regular);
-		} else if (enemyRef.current && data.login === enemyRef.current.login && (data.status === UserStatus.Declined || data.status === UserStatus.Regular)) {
-			setStatus(UserStatus.Regular);
-		} else if (enemyRef.current && data.login === enemyRef.current.login && data.status === UserStatus.Accepted) {
-			setEnemyIsReady(true);
-		}
-	};
-
-	const enemyHandler = (e: any) => {
-		enemyRef.current = JSON.parse(e.data);
-		setStatus(UserStatus.FoundEnemy);
-	};
-
-	const gameIsReadyHandler = () => {
-		setStatus(UserStatus.InGame);
-	};
+	const eventSourceInitializedRef = React.useRef(false);
 
 	useEffect(() => {
+		if (eventSourceInitializedRef.current)
+			return ;
+
 		if (!currentUser.isAuthorized())
 			return;
 
@@ -110,23 +75,65 @@ const Main = ({ currentUser, status, setStatus, enemyRef, gameSettingsRef, event
 		if (!eventSource)
 			return ;
 
+		const gameSettingsHandler = (e: any) => {
+			const gameSettings: GameSettings = JSON.parse(e.data);
+			gameSettingsRef.current = gameSettings;
+			const data = {
+				login: currentUser.username,
+				id: gameSettings.id
+			};
+			setTimeout(() => socket.emit('start', JSON.stringify(data)), 3000);
+		};
+
+		const updateUserHandler = (e: any) => {
+			const data: UpdateUser = JSON.parse(e.data);
+
+			const newUsers: UpdateUser[] = [];
+			for (let i = 0; i < usersRef.current.length; ++i) {
+				if (usersRef.current[i].login === data.login)
+					newUsers.push(data);
+				else
+					newUsers.push(usersRef.current[i]);
+			}
+			setUsers(newUsers);
+
+			if (!enemyRef.current && status !== UserStatus.Regular) {
+				setStatus(UserStatus.Regular);
+			} else if (enemyRef.current && data.login === enemyRef.current.login && (data.status === UserStatus.Declined || data.status === UserStatus.Regular)) {
+				setStatus(UserStatus.Regular);
+			} else if (enemyRef.current && data.login === enemyRef.current.login && data.status === UserStatus.Accepted) {
+				setEnemyIsReady(true);
+			}
+		};
+
+		const enemyHandler = (e: any) => {
+			enemyRef.current = JSON.parse(e.data);
+			setStatus(UserStatus.FoundEnemy);
+		};
+
+		const gameIsReadyHandler = () => {
+			setStatus(UserStatus.InGame);
+		};
+
 		eventSource.addEventListener('updateUser', updateUserHandler);
 		eventSource.addEventListener('enemy', enemyHandler);
 		eventSource.addEventListener('gameIsReady', gameIsReadyHandler);
 		eventSource.addEventListener('gameSettings', gameSettingsHandler);
+		eventSourceInitializedRef.current = true;
 
 		console.log('[Main] eventSource listeners added');
 
-		return () => {
-			eventSource.removeEventListener('updateUser', updateUserHandler);
-			eventSource.removeEventListener('enemy', enemyHandler);
-			eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
-			eventSource.removeEventListener('gameSettings', gameSettingsHandler);
-
-			// eventSource.close();
-			console.log('[Main] eventSource listeners removed');
-		};
-	}, [currentUser]);
+		// return () => {
+		// 	eventSource.removeEventListener('updateUser', updateUserHandler);
+		// 	eventSource.removeEventListener('enemy', enemyHandler);
+		// 	eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
+		// 	eventSource.removeEventListener('gameSettings', gameSettingsHandler);
+		// 	eventSourceInitializedRef.current = false;
+		//
+		// 	// eventSource.close();
+		// 	console.log('[Main] eventSource listeners removed');
+		// };
+	});
 
 	const filteredUsers: UpdateUser[] = [];
 	for (let i in users) {
