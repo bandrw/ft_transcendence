@@ -1,6 +1,6 @@
 import './App.scss';
 
-import { GameLoop, UpdateUser, UserStatus } from "models/apiTypes";
+import { GameSettings, UpdateUser, UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Chat";
 import Game from "pages/Game";
@@ -16,21 +16,7 @@ const App = () => {
 
 	const [status, setStatus] = React.useState<UserStatus>(UserStatus.Regular);
 	const enemyRef = React.useRef<UpdateUser | null>(null);
-	const gameLoopRef = React.useRef<GameLoop>({
-		leftPlayer: {
-			x: 0,
-			y: 0
-		},
-		rightPlayer: {
-			x: 0,
-			y: 0
-		},
-		ball: {
-			x: 0,
-			y: 0
-		}
-	});
-	const gameIdRef = React.useRef<number | null>(null);
+	const gameSettingsRef = React.useRef<GameSettings | null>(null);
 	const eventSourceRef = React.useRef<EventSource | null>(null);
 	const [currentUser, setCurrentUser] =  React.useState(new User());
 	// const user = new User();
@@ -51,7 +37,7 @@ const App = () => {
 	if (!isDesktop)
 		return (
 			<div style={{ fontSize: '2em', marginTop: '100px' }}>
-				Device is too small :(
+				Window is too small :(
 			</div>
 		);
 
@@ -85,8 +71,7 @@ const App = () => {
 					<Game
 						enemyInfo={enemyRef.current}
 						currentUser={currentUser}
-						gameLoopRef={gameLoopRef}
-						gameIdRef={gameIdRef}
+						gameSettingsRef={gameSettingsRef}
 						eventSourceRef={eventSourceRef}
 					/>
 				</Route>
@@ -94,12 +79,10 @@ const App = () => {
 				<Route exact path='/'>
 					<Main
 						currentUser={currentUser}
-						setCurrentUser={setCurrentUser}
 						status={status}
 						setStatus={setStatus}
 						enemyRef={enemyRef}
-						gameLoopRef={gameLoopRef}
-						gameIdRef={gameIdRef}
+						gameSettingsRef={gameSettingsRef}
 						eventSourceRef={eventSourceRef}
 					/>
 				</Route>

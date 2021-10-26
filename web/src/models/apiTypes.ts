@@ -29,29 +29,45 @@ type UpdateUser = {
 }
 
 type GameSettings = {
-	BallPosX: number,
-	BallPosY: number,
-	starter: boolean,
 	id: number,
-	enemyGameSettings: {
-		platformWide: number,
-		platformSpeed: number
-	}
+	canvasWidth: number,
+	canvasHeight: number,
+	playerWidth: number,
+	playerMargin: number,
+	playerHeight: number,
+	playerStep: number,
+	ballSize: number,
+	ballAngle: number,
+	ballSpeed: number,
+	fps: number,
+	leftPlayerUsername: string,
+	rightPlayerUsername: string
 }
 
 type GameLoop = {
-	leftPlayer: {
+	b: {
 		x: number,
 		y: number
 	},
-	rightPlayer: {
-		x: number,
+	lP: {
 		y: number
 	},
-	ball: {
-		x: number,
+	rP: {
 		y: number
 	}
+}
+
+type GetOnline = {
+	games: number,
+	login: string,
+	status: string,
+	url_avatar: string,
+	wins: number
+}
+
+type GetAll = {
+	login: string,
+	url_avatar: string
 }
 
 export enum UserStatus {
@@ -60,12 +76,15 @@ export enum UserStatus {
 	FoundEnemy = 'orange',
 	Accepted = 'red',
 	InGame = 'inGame',
-	Declined = 'blue'
+	Declined = 'blue',
+	Offline = 'offline'
 }
 
 export type {
 	GameLoop,
 	GameSettings,
+	GetAll,
+	GetOnline,
 	GetUser,
 	UpdateUser,
 	UserCheckExist,

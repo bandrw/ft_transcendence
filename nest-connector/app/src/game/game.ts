@@ -2,21 +2,12 @@ import { Gamer as G } from './gamer.interface';
 
 export class Game {
   public pointsForWin: number;
-  // private ballSpeed: number;
-  // private map: any;
-  // private BallPosX: number;
-  // private BallPosY: number;
-  // public starterOne: boolean;
-  // public starterTwo: boolean;
-  public readonly fps = 60;
   public gameInterval: NodeJS.Timer;
   public readonly coordinates = {
     leftPlayer: {
-      x: 0,
       y: 0,
     },
     rightPlayer: {
-      x: 0,
       y: 0,
     },
     ball: {
@@ -24,7 +15,9 @@ export class Game {
       y: 0,
     },
   };
+  public readonly fps = 60;
   private gameSettings = {
+    id: this.id,
     canvasWidth: 1024,
     canvasHeight: 600,
     playerWidth: 15,
@@ -34,6 +27,9 @@ export class Game {
     ballSize: 15,
     ballAngle: 0,
     ballSpeed: 4,
+    fps: this.fps,
+    leftPlayerUsername: this.playerOne.user.login,
+    rightPlayerUsername: this.playerTwo.user.login
   };
   private score = {
     leftPlayer: 0,
@@ -43,32 +39,9 @@ export class Game {
   constructor(
     public playerOne: G,
     public playerTwo: G,
-    public id: number,
-    pointsForWin = 3,
-    map = null,
-    ballSpeed = 1.3,
+    public id: number
   ) {
-    this.pointsForWin = pointsForWin;
-    // this.map = map;
-    // this.BallPosX =
-    //   this.playerTwo.position -
-    //   this.playerTwo.platformWide / 2 +
-    //   this.playerTwo.platformWide * Math.random();
-    // if (Math.random() > 0.5) {
-    //   this.starterOne = true;
-    //   this.starterTwo = false;
-    //   this.BallPosY = 97;
-    // } else {
-    //   this.starterOne = false;
-    //   this.starterTwo = true;
-    //   this.BallPosY = 3;
-    // }
-    // this.ballSpeed = ballSpeed;
-    const gameSettingsMsg = `event: gameSettings\ndata: ${JSON.stringify({
-      id: this.id,
-    })}\n\n`;
-    this.playerOne.user.resp.write(gameSettingsMsg);
-    this.playerTwo.user.resp.write(gameSettingsMsg);
+    this.sendMsg('gameSettings', JSON.stringify(this.gameSettings));
     this.playerOne.gamePoints = 0;
     this.playerTwo.gamePoints = 0;
     this.resetPositions(true);
@@ -86,7 +59,7 @@ export class Game {
       this.gameSettings.ballAngle += Math.PI;
   }
 
-  private sendMsg(event: string, data: string) {
+  public sendMsg(event: string, data: string) {
     const scoreMsg = `event: ${event}\ndata: ${data}\n\n`;
     this.playerOne.user.resp.write(scoreMsg);
     this.playerTwo.user.resp.write(scoreMsg);
@@ -108,22 +81,6 @@ export class Game {
       this.sendMsg('playSound', 'pong-sound-3');
     }
 
-    // Ball bouncing
-    const bounceOffTheNorthWall = this.coordinates.ball.y + this.gameSettings.ballSize > this.gameSettings.canvasHeight;
-    const bounceOffTheSouthWall = this.coordinates.ball.y < 0;
-    if (bounceOffTheNorthWall || bounceOffTheSouthWall)
-    {
-      if (bounceOffTheNorthWall)
-        this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
-      if (bounceOffTheSouthWall)
-        this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
-      this.sendMsg('playSound', 'pong-sound-1');
-    }
-
-    // Ball moving
-    this.coordinates.ball.x += Math.cos(this.gameSettings.ballAngle) * this.gameSettings.ballSpeed;
-    this.coordinates.ball.y += Math.sin(this.gameSettings.ballAngle) * this.gameSettings.ballSpeed;
-
     // PlayerOne moving
     if (this.playerOne.controls.arrowUp && this.coordinates.leftPlayer.y >= this.gameSettings.playerStep)
       this.coordinates.leftPlayer.y -= this.gameSettings.playerStep;
@@ -135,6 +92,15 @@ export class Game {
       this.coordinates.rightPlayer.y -= this.gameSettings.playerStep;
     if (this.playerTwo.controls.arrowDown && this.coordinates.rightPlayer.y < this.gameSettings.canvasHeight - this.gameSettings.playerHeight)
       this.coordinates.rightPlayer.y += this.gameSettings.playerStep;
+
+    // Ball bouncing (walls)
+    const bounceOffTheNorthWall = this.coordinates.ball.y + this.gameSettings.ballSize >= this.gameSettings.canvasHeight;
+    const bounceOffTheSouthWall = this.coordinates.ball.y <= 0;
+    if (bounceOffTheNorthWall || bounceOffTheSouthWall)
+    {
+      this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
+      this.sendMsg('playSound', 'pong-sound-1');
+    }
 
     // Ball collision with platforms
     const bounceOffTheLeftPlayer = this.coordinates.ball.x <= this.gameSettings.playerMargin + this.gameSettings.playerWidth &&
@@ -167,5 +133,9 @@ export class Game {
         this.gameSettings.ballAngle = Math.PI - this.gameSettings.ballAngle;
       this.sendMsg('playSound', 'pong-sound-2');
     }
+
+    // Ball moving
+    this.coordinates.ball.x += Math.cos(this.gameSettings.ballAngle) * this.gameSettings.ballSpeed;
+    this.coordinates.ball.y += Math.sin(this.gameSettings.ballAngle) * this.gameSettings.ballSpeed;
   }
 }

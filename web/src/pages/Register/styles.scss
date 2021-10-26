@@ -9,6 +9,10 @@
 
 	h1 {
 		margin-bottom: 30px;
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 
 	form {
@@ -27,6 +31,10 @@
 		transition: all 0.1s ease-in;
 		background: transparent;
 		color: white;
+
+		&::selection {
+			background: #29aa44;
+		}
 
 		&:focus {
 			border-color: #29aa44;

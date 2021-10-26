@@ -6,6 +6,7 @@ import axios from "axios";
 import { UpdateUser, UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
+import { Fade } from "react-awesome-reveal";
 import { clearInterval, setInterval } from "timers";
 
 interface AcceptWindowProps {
@@ -134,7 +135,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 					break;
 				}
 				case UserStatus.Searching: {
-					timerIntervalRef.current = setInterval(() => setPassedTime(prev => prev + 0.1), 100);
+					timerIntervalRef.current = setInterval(() => setPassedTime(prev => prev + 1), 1000);
 					break;
 				}
 			}
@@ -148,7 +149,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 				<div className='find-game-back'>
 					<div className='find-game-searching'>
 						<span>Searching</span>
-						<span className='find-game-searching-time'>{`${passedTime.toFixed(1)} s`}</span>
+						<span className='find-game-searching-time'>{`${passedTime} s`}</span>
 					</div>
 					<button
 						onClick={() => setStatus(UserStatus.Regular)}
@@ -162,7 +163,10 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 
 	if (status === UserStatus.FoundEnemy || status === UserStatus.Accepted)
 		return (
-			<div className='find-game main-block'>
+			<Fade
+				className='find-game main-block'
+				style={{ animationFillMode: 'backwards' }}
+			>
 				<AcceptWindow
 					currentUser={currentUser}
 					status={status}
@@ -170,7 +174,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 					enemy={enemyRef.current}
 					enemyIsReady={enemyIsReady}
 				/>
-			</div>
+			</Fade>
 		);
 
 	return (

@@ -5,4 +5,66 @@
 	.social-title {
 		font-size: 1.4em;
 	}
+
+	.social-block {
+		padding: 15px 0;
+		margin-top: 15px;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		position: relative;
+		z-index: 1;
+
+		.social-block-title {
+			display: flex;
+			align-items: center;
+
+			& > svg {
+				color: #bbb;
+				font-size: 0.3em;
+				margin: 0 7px;
+			}
+		}
+
+		span {
+			text-align: left;
+			font-size: 0.9em;
+			font-weight: 450;
+			letter-spacing: 1px;
+			color: #bbb;
+		}
+
+		ul {
+			list-style-type: none;
+		}
+
+		.social-block-user {
+			display: flex;
+			justify-content: space-between;
+			margin: 15px 0;
+			align-items: center;
+
+			.social-block-user-img {
+				position: relative;
+				background-color: #2c2f3a;
+				border-radius: 18px;
+				width: 50px;
+				height: 50px;
+				background-position: center;
+				background-size: 90%;
+				background-repeat: no-repeat;
+				margin-right: 25px;
+			}
+
+			.social-block-user-username {
+				font-size: 1.2em;
+			}
+
+			.social-block-user-status-description {
+				text-align: right;
+				width: 150px;
+				color: #bbb;
+			}
+		}
+	}
 }

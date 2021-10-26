@@ -9,11 +9,10 @@ import { UserStatus } from "../../models/apiTypes";
 
 interface HeaderProps {
 	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
 	status: UserStatus
 }
 
-const Header = ({ currentUser, setCurrentUser, status }: HeaderProps) => {
+const Header = ({ currentUser, status }: HeaderProps) => {
 	return (
 		<header>
 			<div className='header-container'>

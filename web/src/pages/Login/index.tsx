@@ -34,7 +34,6 @@ export const signIn = async (
 			setErrors('Wrong username or password');
 			return false;
 		});
-	await axios.get('/users/getOnline').then((r) => console.log(r.data));
 	if (!r)
 		throw Error();
 };

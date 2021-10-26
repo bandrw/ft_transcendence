@@ -32,8 +32,18 @@ body {
 :-webkit-autofill:hover,
 :-webkit-autofill:focus,
 :-webkit-autofill:active {
-	font-size: 1.5em;
+	font-size: 1em;
 	color: white;
 	-webkit-box-shadow: 0 0 0 1000px #1a1b1f inset;
 	transition: box-shadow 0s;
+}
+
+.user-status {
+	width: 9px;
+	height: 9px;
+	background: none;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	border-radius: 8px;
 }

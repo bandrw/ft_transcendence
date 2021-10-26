@@ -30,26 +30,19 @@ export class Events
   private logger: Logger = new Logger('AppGateway');
 
   @SubscribeMessage('start')
-  launchBall(@MessageBody() user: string) {
-    const u = JSON.parse(user);
-    const game = this.gameService.gamers[u.id];
-    // if (game.playerTwo.user.login === u.login) {
-    //   game.playerOne.user.resp.write(`event: ballLaunch\ndata: \n\n`);
-    // } else {
-    //   game.playerTwo.user.resp.write(`event: ballLaunch\ndata: \n\n`);
-    // }
+  launchBall(@MessageBody() data: string) {
+    const user = JSON.parse(data);
+    const game = this.gameService.gamers[user.id];
 
     game.gameInterval = setInterval(() => {
       game.updatePositions();
 
-      const resp1 = game.playerOne.user.resp;
-      const resp2 = game.playerTwo.user.resp;
-      resp1.write(
-        `event: gameLoop\ndata: ${JSON.stringify(game.coordinates)}\n\n`,
-      );
-      resp2.write(
-        `event: gameLoop\ndata: ${JSON.stringify(game.coordinates)}\n\n`,
-      );
+      const gameLoopData = {
+        b: game.coordinates.ball,
+        lP: game.coordinates.leftPlayer,
+        rP: game.coordinates.rightPlayer
+      };
+      game.sendMsg('gameLoop', JSON.stringify(gameLoopData));
     }, 1000 / game.fps);
   }
 

@@ -2,31 +2,6 @@
 	margin-top: 40px;
 	padding: 30px 40px;
 
-	.recent-games-title {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 10px;
-
-		& > span {
-			text-align: left;
-			font-size: 1.4em;
-		}
-
-		& > button {
-			background: none;
-			border: none;
-			cursor: pointer;
-			outline: none;
-			font-size: 1.5em;
-			padding: 10px;
-
-			& > svg {
-				color: #aaa;
-			}
-		}
-	}
-
 	.recent-game {
 		font-size: 1.1em;
 		width: calc(100% - 30px);
@@ -34,13 +9,18 @@
 		padding: 10px 15px;
 		align-items: center;
 		justify-content: space-between;
+		position: relative;
+		z-index: 1;
 
 		.recent-game-img {
-			width: 40px;
+			position: relative;
+			width: 50px;
 			height: 50px;
 			background-position: center;
 			background-repeat: no-repeat;
-			background-size: 100%;
+			background-size: 90%;
+			background-color: #2c2f3a;
+			border-radius: 18px;
 		}
 
 		.recent-game-win {
@@ -48,7 +28,6 @@
 		}
 
 		.recent-game-lose {
-
 			color: #e30000;
 		}
 	}

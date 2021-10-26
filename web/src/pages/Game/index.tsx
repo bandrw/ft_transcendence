@@ -1,7 +1,7 @@
 import './styles.scss';
 
 import { SocketContext } from "context/socket";
-import { GameLoop, UpdateUser } from "models/apiTypes";
+import { GameLoop, GameSettings, UpdateUser } from "models/apiTypes";
 import GameBall from "models/GameBall";
 import Player from "models/Player";
 import { User } from "models/User";
@@ -12,12 +12,11 @@ import { clearInterval, setInterval } from "timers";
 interface GameProps {
 	enemyInfo: UpdateUser | null,
 	currentUser: User,
-	gameLoopRef: React.MutableRefObject<GameLoop>,
-	gameIdRef: React.MutableRefObject<number | null>,
+	gameSettingsRef: React.MutableRefObject<GameSettings | null>,
 	eventSourceRef: React.MutableRefObject<EventSource | null>
 }
 
-const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }: GameProps) => {
+const Game = ({ enemyInfo, currentUser, gameSettingsRef, eventSourceRef }: GameProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
@@ -25,15 +24,29 @@ const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }
 			history.push('/');
 	}, [history, enemyInfo]);
 
-	const [infoBoardContent, setInfoBoardContent] = React.useState<JSX.Element>(<div>Welcome to the game!</div>);
+	const socket = React.useContext(SocketContext);
+	const canvasRef = React.useRef<HTMLCanvasElement>(null);
+	const leftPlayer = new Player();
+	const rightPlayer = new Player();
+	const ball = new GameBall();
+
+	const [infoBoardContent, setInfoBoardContent] = React.useState<JSX.Element>(<div/>);
 	const score = { leftPlayer: 0, rightPlayer: 0 };
-	const controls = {
-		arrowDown: false,
-		arrowUp: false
-	};
 
 	const gameLoopHandler = (e: any) => {
-		gameLoopRef.current = JSON.parse(e.data);
+		const gameSettings = gameSettingsRef.current;
+		if (!gameSettings)
+			return ;
+
+		const data: GameLoop = JSON.parse(e.data);
+		if (data.b) {
+			ball.xPosition = data.b.x;
+			ball.yPosition = data.b.y;
+		}
+		if (data.lP)
+			leftPlayer.yPosition = data.lP.y;
+		if (data.rP)
+			rightPlayer.yPosition = data.rP.y;
 	};
 
 	const gameScoreHandler = (e: any) => {
@@ -79,20 +92,15 @@ const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }
 		};
 	}, [eventSourceRef]);
 
-	const socket = React.useContext(SocketContext);
-	const canvasRef = React.useRef<HTMLCanvasElement>(null);
-	const player = new Player();
-	const enemy = new Player();
-	const ball = new GameBall();
-
 	const playerWidth = 15;
 	const playerMargin = 15;
 	const playerHeight = 150;
 
 	const drawBackground = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
 		ctx.beginPath();
-		ctx.fillStyle = '#000';
+		ctx.fillStyle = '#111';
 		ctx.rect(0, 0, canvas.width, canvas.height);
+		ctx.fill();
 		ctx.closePath();
 
 		ctx.beginPath();
@@ -108,7 +116,10 @@ const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }
 	};
 
 	const drawUserRectangle = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-		ctx.rect(playerMargin, player.yPosition, playerWidth, playerHeight);
+		if (leftPlayer.username === currentUser.username)
+			ctx.rect(playerMargin, leftPlayer.yPosition, playerWidth, playerHeight);
+		else if (rightPlayer.username === currentUser.username)
+			ctx.rect(canvas.width - playerWidth - playerMargin, rightPlayer.yPosition, playerWidth, playerHeight);
 		ctx.fill();
 	};
 
@@ -124,7 +135,10 @@ const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }
 	};
 
 	const drawEnemyRectangle = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-		ctx.rect(canvas.width - playerWidth - playerMargin, enemy.yPosition, playerWidth, playerHeight);
+		if (leftPlayer.username === currentUser.username)
+			ctx.rect(canvas.width - playerWidth - playerMargin, rightPlayer.yPosition, playerWidth, playerHeight);
+		else if (rightPlayer.username === currentUser.username)
+			ctx.rect(playerMargin, leftPlayer.yPosition, playerWidth, playerHeight);
 		ctx.fill();
 	};
 
@@ -162,76 +176,85 @@ const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }
 		const canvas = canvasRef.current;
 		if (!canvas)
 			return ;
-		player.yPosition = Math.round((canvas.height - playerHeight) / 2);
-		enemy.yPosition = Math.round((canvas.height - playerHeight) / 2);
+
+		const gameSettings = gameSettingsRef.current;
+		if (!gameSettings)
+			return ;
+
+		ball.angle = 0;
+		ball.speed = gameSettings.ballSpeed;
+		ball.size = gameSettings.ballSize;
 		ball.xPosition = -ball.size;
 		ball.yPosition = 0;
-		ball.angle = 2 * Math.PI * Math.random();
+		leftPlayer.yPosition = Math.round((canvas.height - playerHeight) / 2);
+		rightPlayer.yPosition = Math.round((canvas.height - playerHeight) / 2);
+		leftPlayer.username = gameSettings.leftPlayerUsername;
+		rightPlayer.username = gameSettings.rightPlayerUsername;
 
 		render();
 	};
 
 	const runGame = () => {
-		let fpsInterval: number, now: number, then: number, elapsed: number;
 		const fps = 60;
 
-		const updatePositions = () => {
-			const gameLoop = gameLoopRef.current;
-			player.yPosition = gameLoop.leftPlayer.y;
-			enemy.yPosition = gameLoop.rightPlayer.y;
-			ball.yPosition = gameLoop.ball.y;
-			ball.xPosition = gameLoop.ball.x;
-		};
-
-		const animate = () => {
-			requestAnimationFrame(animate);
-			now = Date.now();
-			elapsed = now - then;
-			if (elapsed > fpsInterval) {
-				then = now - (elapsed % fpsInterval);
-
-				updatePositions();
-				render();
-
-			}
-		};
-
-		fpsInterval = 1000 / fps;
-		then = Date.now();
-		animate();
+		setInterval(render, 1000 / fps);
 	};
 
 	const keyDownHandler = (e: KeyboardEvent) => {
+		const gameSettings = gameSettingsRef.current;
+		if (!gameSettings)
+			return ;
+
+		let currentPlayer;
+		if (currentUser.username === leftPlayer.username)
+			currentPlayer = leftPlayer;
+		else if (currentUser.username === rightPlayer.username)
+			currentPlayer = rightPlayer;
+		else
+			return ;
+
 		if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
-			if (e.key === 'ArrowDown' && controls.arrowDown)
+			if (e.key === 'ArrowDown' && currentPlayer.controls.arrowDown)
 				return ;
-			if (e.key === 'ArrowUp' && controls.arrowUp)
+			if (e.key === 'ArrowUp' && currentPlayer.controls.arrowUp)
 				return ;
 			const data = {
 				login: currentUser.username,
-				gameId: gameIdRef.current,
+				gameId: gameSettingsRef.current?.id,
 				key: e.key
 			};
 			socket.emit('keyDown', JSON.stringify(data));
 			if (e.key === 'ArrowDown')
-				controls.arrowDown = true;
+				currentPlayer.controls.arrowDown = true;
 			else if (e.key === 'ArrowUp')
-				controls.arrowUp = true;
+				currentPlayer.controls.arrowUp = true;
 		}
 	};
 
 	const keyUpHandler = (e: KeyboardEvent) => {
+		const gameSettings = gameSettingsRef.current;
+		if (!gameSettings)
+			return ;
+
+		let currentPlayer;
+		if (currentUser.username === leftPlayer.username)
+			currentPlayer = leftPlayer;
+		else if (currentUser.username === rightPlayer.username)
+			currentPlayer = rightPlayer;
+		else
+			return ;
+
 		if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
 			const data = {
 				login: currentUser.username,
-				gameId: gameIdRef.current,
+				gameId: gameSettingsRef.current?.id,
 				key: e.key
 			};
 			socket.emit('keyUp', JSON.stringify(data));
 			if (e.key === 'ArrowDown')
-				controls.arrowDown = false;
+				currentPlayer.controls.arrowDown = false;
 			else if (e.key === 'ArrowUp')
-				controls.arrowUp = false;
+				currentPlayer.controls.arrowUp = false;
 		}
 	};
 
@@ -248,17 +271,11 @@ const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }
 
 	useEffect(() => {
 		let timeUntilStart = 3;
-		setInfoBoardContent(<div>{timeUntilStart}</div>);
+		setInfoBoardContent(<div className='info-board-timer'>{timeUntilStart}</div>);
 		const interval = setInterval(() => {
 			--timeUntilStart;
 			if (timeUntilStart === 0 && enemyInfo) {
-				setInfoBoardContent(
-					<div>
-						<span>{currentUser.username}</span>
-						<span style={{ margin: '0 10px' }}>VS</span>
-						<span>{enemyInfo.login}</span>
-					</div>
-				);
+				setInfoBoardContent(<div/>);
 				runGame();
 				clearInterval(interval);
 			} else {
@@ -267,10 +284,34 @@ const Game = ({ enemyInfo, currentUser, gameLoopRef, gameIdRef, eventSourceRef }
 		}, 1000);
 	}, [currentUser.username, enemyInfo]);
 
+	let leftPlayerImg = '';
+	let rightPlayerImg = '';
+	if (leftPlayer.username === enemyInfo?.login) {
+		leftPlayerImg = enemyInfo?.url_avatar;
+		rightPlayerImg = currentUser.urlAvatar;
+	} else {
+		leftPlayerImg = currentUser.urlAvatar;
+		rightPlayerImg = enemyInfo?.url_avatar || '';
+	}
+
 	return (
 		<div className='game-container'>
 			<div className='info-board'>
+				<div className='info-board-user info-board-left-user'>
+					<div
+						className='info-board-user-img'
+						style={{ backgroundImage: `url(${leftPlayerImg})` }}
+					/>
+					<div className='info-board-user-name'>{gameSettingsRef.current?.leftPlayerUsername}</div>
+				</div>
 				{infoBoardContent}
+				<div className='info-board-user info-board-right-user'>
+					<div className='info-board-user-name'>{gameSettingsRef.current?.rightPlayerUsername}</div>
+					<div
+						className='info-board-user-img'
+						style={{ backgroundImage: `url(${rightPlayerImg})` }}
+					/>
+				</div>
 			</div>
 			<canvas
 				id="game-canvas"

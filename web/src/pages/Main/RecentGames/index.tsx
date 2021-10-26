@@ -44,28 +44,34 @@ const RecentGames = () => {
 
 	return (
 		<div className='main-block recent-games'>
-			<div className='recent-games-title'>
+			<div className='main-block-title'>
 				<span>Recent games</span>
 				<button>
 					<FontAwesomeIcon icon={faArrowRight}/>
 				</button>
 			</div>
 			{
-				recentGames.map((game, i) =>
-					<div className='recent-game' key={i}>
-						<div
-							style={{ backgroundImage: `url(${game.enemy.avatar})` }}
-							className='recent-game-img'
-						/>
-						<div>{game.enemy.login}</div>
-						{
-							game.won
-								? <div className='recent-game-win'>Win</div>
-								: <div className='recent-game-lose'>Lose</div>
-						}
-						<div>{game.date}</div>
-					</div>
-				)
+				recentGames.map((game, i) => {
+					const enemyColor = 'blue';
+
+					return (
+						<div className='recent-game' key={i}>
+							<div
+								style={{ backgroundImage: `url(${game.enemy.avatar})` }}
+								className='recent-game-img'
+							>
+								<div className='user-status' style={{ backgroundColor: enemyColor }}/>
+							</div>
+							<div>{game.enemy.login}</div>
+							{
+								game.won
+									? <div className='recent-game-win'>Win</div>
+									: <div className='recent-game-lose'>Lose</div>
+							}
+							<div>{game.date}</div>
+						</div>
+					);
+				})
 			}
 		</div>
 	);
