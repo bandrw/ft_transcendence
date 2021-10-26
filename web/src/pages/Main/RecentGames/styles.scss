@@ -1,6 +1,8 @@
 .recent-games {
 	margin-top: 40px;
 	padding: 30px 40px;
+	position: relative;
+	z-index: 1;
 
 	.recent-game {
 		font-size: 1.1em;

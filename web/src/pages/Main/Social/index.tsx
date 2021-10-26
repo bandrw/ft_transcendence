@@ -49,7 +49,7 @@ const Social = ({ users }: SocialProps) => {
 			cascade={true}
 			triggerOnce={true}
 			damping={0.4}
-			style={{ animationFillMode: 'backwards' }}
+			// style={{ animationFillMode: 'backwards' }}
 		>
 			<div className='main-block-title'>
 				<span>People</span>

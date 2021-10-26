@@ -21,7 +21,14 @@ interface MainProps {
 	eventSourceRef: React.MutableRefObject<EventSource | null>
 }
 
-const Main = ({ currentUser, status, setStatus, enemyRef, gameSettingsRef, eventSourceRef }: MainProps) => {
+const Main: React.FC<MainProps> = ({
+		currentUser,
+		status,
+		setStatus,
+		enemyRef,
+		gameSettingsRef,
+		eventSourceRef
+	}) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
@@ -151,9 +158,7 @@ const Main = ({ currentUser, status, setStatus, enemyRef, gameSettingsRef, event
 				<div className='main-center'>
 					<Fade
 						triggerOnce={true}
-						cascade={true}
-						damping={0.15}
-						style={{ animationFillMode: 'backwards' }}
+						style={{ position: 'relative', zIndex: 9 }}
 					>
 						<FindGame
 							currentUser={currentUser}
@@ -162,13 +167,19 @@ const Main = ({ currentUser, status, setStatus, enemyRef, gameSettingsRef, event
 							enemyRef={enemyRef}
 							enemyIsReady={enemyIsReady}
 						/>
+					</Fade>
+					<Fade
+						delay={100}
+						triggerOnce={true}
+						style={{ position: 'relative', zIndex: 8 }}
+					>
 						<RecentGames/>
 					</Fade>
 				</div>
 				<div className='main-right'>
 					<Fade
+						delay={100}
 						triggerOnce={true}
-						style={{ animationFillMode: 'backwards' }}
 						className='main-block social'
 					>
 						<Social

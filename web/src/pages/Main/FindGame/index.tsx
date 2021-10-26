@@ -172,18 +172,34 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 
 	if (status === UserStatus.FoundEnemy || status === UserStatus.Accepted)
 		return (
-			<Fade
-				className='find-game main-block'
-				style={{ animationFillMode: 'backwards' }}
-			>
-				<AcceptWindow
-					currentUser={currentUser}
-					status={status}
-					setStatus={setStatus}
-					enemy={enemyRef.current}
-					enemyIsReady={enemyIsReady}
-				/>
-			</Fade>
+			<div className='find-game main-block'>
+				<div className='find-game-img'/>
+				<div className='find-game-back'>
+					<div className='find-game-searching'>
+						<span>Searching</span>
+						<span className='find-game-searching-time'>{`${passedTime} s`}</span>
+					</div>
+					<button
+						onClick={() => setStatus(UserStatus.Regular)}
+						className='find-game-cancel'
+					>
+						<FontAwesomeIcon icon={faTimesCircle}/>
+					</button>
+				</div>
+				<Fade
+					duration={500}
+					triggerOnce={true}
+					style={{ position: 'fixed' }}
+				>
+					<AcceptWindow
+						currentUser={currentUser}
+						status={status}
+						setStatus={setStatus}
+						enemy={enemyRef.current}
+						enemyIsReady={enemyIsReady}
+					/>
+				</Fade>
+			</div>
 		);
 
 	return (

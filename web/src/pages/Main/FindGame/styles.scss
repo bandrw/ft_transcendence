@@ -7,6 +7,8 @@
 	width: calc(100% - 80px);
 	height: 240px;
 	padding: 30px 40px;
+	position: relative;
+	z-index: 9;
 
 	.find-game-img {
 		width: 100%;
