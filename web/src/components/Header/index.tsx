@@ -2,17 +2,17 @@ import './styles.scss';
 
 import { faBell } from "@fortawesome/free-solid-svg-icons/faBell";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 
-import { UserStatus } from "../../models/apiTypes";
-
 interface HeaderProps {
 	currentUser: User,
-	status: UserStatus
+	status: UserStatus,
+	centerBlock?: JSX.Element
 }
 
-const Header = ({ currentUser, status }: HeaderProps) => {
+const Header = ({ currentUser, status, centerBlock }: HeaderProps) => {
 	return (
 		<header>
 			<div className='header-container'>
@@ -20,14 +20,7 @@ const Header = ({ currentUser, status }: HeaderProps) => {
 					FT
 				</h1>
 
-				{/*<div className='links'>*/}
-				{/*	<Link to='/'>*/}
-				{/*		Home*/}
-				{/*	</Link>*/}
-				{/*	<Link to='/chat'>*/}
-				{/*		Chat*/}
-				{/*	</Link>*/}
-				{/*</div>*/}
+				{centerBlock && centerBlock}
 
 				<div className='header-buttons'>
 					<button className='notifications-btn'>

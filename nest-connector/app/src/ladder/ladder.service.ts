@@ -182,6 +182,18 @@ export class LadderService {
     }
   }
 
+  private gameStop() {
+    for (let j = 0; j < this.lobby.length; ++j) {
+      for (let k = 0; k < this.games.gamers.length; ++k) {
+        const game = this.games.gamers[k];
+        if (game.playerOne.user.login === this.lobby[j].first?.login || game.playerOne.user.login === this.lobby[j].second?.login ||
+            game.playerTwo.user.login === this.lobby[j].first?.login || game.playerTwo.user.login === this.lobby[j].second?.login) {
+          clearInterval(game.gameInterval);
+        }
+      }
+    }
+  }
+
   removeFromLadder(user: OnlineUser, func) {
     let i = 0;
     while (i < this.lobby.length) {
@@ -191,7 +203,9 @@ export class LadderService {
           this.lobby[i].first = this.lobby[i].second;
           this.lobby[i].second = null;
           func(i);
+          this.gameStop();
         } else {
+          this.gameStop();
           this.lobby = this.lobby.filter(function (val) {
             return val.first !== null || val.second !== null;
           });
@@ -203,11 +217,21 @@ export class LadderService {
       ) {
         this.lobby[i].second = null;
         if (this.lobby[i].first) {
+          this.gameStop();
           func(i);
         } else {
+          this.gameStop();
           this.lobby = this.lobby.filter(function (val) {
             return val.first !== null || val.second !== null;
           });
+        }
+        // Game Stop
+        for (let j = 0; j < this.lobby.length; ++j) {
+          for (let k = 0; k < this.games.gamers.length; ++k) {
+            const game = this.games.gamers[k];
+            if (game.playerOne.user.login === this.lobby[j].first?.login || game.playerTwo.user.login === this.lobby[j].second?.login)
+              clearInterval(game.gameInterval);
+          }
         }
         break;
       }

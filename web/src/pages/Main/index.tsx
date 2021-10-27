@@ -18,16 +18,18 @@ interface MainProps {
 	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
 	enemyRef: React.MutableRefObject<UpdateUser | null>,
 	gameSettingsRef: React.MutableRefObject<GameSettings | null>,
-	eventSourceRef: React.MutableRefObject<EventSource | null>
+	eventSourceRef: React.MutableRefObject<EventSource | null>,
+	mainEventSourceInitializedRef: React.MutableRefObject<boolean>
 }
 
 const Main: React.FC<MainProps> = ({
-		currentUser,
-		status,
-		setStatus,
-		enemyRef,
-		gameSettingsRef,
-		eventSourceRef
+																		 currentUser,
+																		 status,
+																		 setStatus,
+																		 enemyRef,
+																		 gameSettingsRef,
+																		 eventSourceRef,
+																		 mainEventSourceInitializedRef
 	}) => {
 	const history = useHistory();
 
@@ -46,11 +48,16 @@ const Main: React.FC<MainProps> = ({
 	const usersRef = React.useRef<UpdateUser[]>([]);
 
 	React.useEffect(() => {
+		let isMounted = true;
+
 		if (!currentUser.isAuthorized())
 			return ;
 
 		axios.get<GetAll[]>('/users/getAll')
 			.then(res => {
+				if (!isMounted)
+					return ;
+
 				const fetchedUsers = res.data.map((usr: GetAll) => {
 					return {
 						login: usr.login,
@@ -59,8 +66,11 @@ const Main: React.FC<MainProps> = ({
 					};
 				});
 				setUsers(fetchedUsers);
-			})
-			.catch();
+			});
+
+		return () => {
+			isMounted = false;
+		};
 	}, [currentUser]);
 
 	React.useEffect(() => {
@@ -69,10 +79,8 @@ const Main: React.FC<MainProps> = ({
 
 	const socket = React.useContext(SocketContext);
 
-	const eventSourceInitializedRef = React.useRef(false);
-
 	useEffect(() => {
-		if (eventSourceInitializedRef.current)
+		if (mainEventSourceInitializedRef.current)
 			return ;
 
 		if (!currentUser.isAuthorized())
@@ -126,7 +134,7 @@ const Main: React.FC<MainProps> = ({
 		eventSource.addEventListener('enemy', enemyHandler);
 		eventSource.addEventListener('gameIsReady', gameIsReadyHandler);
 		eventSource.addEventListener('gameSettings', gameSettingsHandler);
-		eventSourceInitializedRef.current = true;
+		mainEventSourceInitializedRef.current = true;
 
 		console.log('[Main] eventSource listeners added');
 

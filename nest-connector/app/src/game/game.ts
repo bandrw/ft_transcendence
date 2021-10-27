@@ -2,7 +2,7 @@ import { Gamer as G } from './gamer.interface';
 
 export class Game {
   public pointsForWin: number;
-  public gameInterval: NodeJS.Timer;
+  public gameInterval: NodeJS.Timer | null = null;
   public readonly coordinates = {
     leftPlayer: {
       y: 0,
@@ -23,10 +23,10 @@ export class Game {
     playerWidth: 15,
     playerMargin: 15,
     playerHeight: 150,
-    playerStep: 3,
+    playerStep: 6,
     ballSize: 15,
     ballAngle: 0,
-    ballSpeed: 4,
+    ballSpeed: 8,
     fps: this.fps,
     leftPlayerUsername: this.playerOne.user.login,
     rightPlayerUsername: this.playerTwo.user.login
@@ -115,7 +115,7 @@ export class Game {
         k = (this.coordinates.ball.y + this.gameSettings.ballSize / 2 - this.coordinates.leftPlayer.y) / this.gameSettings.playerHeight;
       else
         k = (this.coordinates.ball.y + this.gameSettings.ballSize / 2 - this.coordinates.rightPlayer.y) / this.gameSettings.playerHeight;
-      if (k >= 0 && k < 1 / 8)
+      if (k < 1 / 8)
         this.gameSettings.ballAngle = -Math.PI / 4;
       else if (k >= 1 / 8 && k < 2 / 8)
         this.gameSettings.ballAngle = -Math.PI / 6;
@@ -127,7 +127,7 @@ export class Game {
         this.gameSettings.ballAngle = Math.PI / 12;
       else if (k >= 6 / 8 && k < 7 / 8)
         this.gameSettings.ballAngle = Math.PI / 6;
-      else if (k >= 7 / 8 && k < 8 / 8)
+      else if (k >= 7 / 8)
         this.gameSettings.ballAngle = Math.PI / 4;
       if (bounceOffTheRightPlayer)
         this.gameSettings.ballAngle = Math.PI - this.gameSettings.ballAngle;

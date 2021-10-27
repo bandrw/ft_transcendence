@@ -34,16 +34,17 @@ export class Events
     const user = JSON.parse(data);
     const game = this.gameService.gamers[user.id];
 
-    game.gameInterval = setInterval(() => {
-      game.updatePositions();
+    if (!game.gameInterval) // мини костыль, т.к. start отсылают два клиента и запускалось 2 интервала
+      game.gameInterval = setInterval(() => {
+        game.updatePositions();
 
-      const gameLoopData = {
-        b: game.coordinates.ball,
-        lP: game.coordinates.leftPlayer,
-        rP: game.coordinates.rightPlayer
-      };
-      game.sendMsg('gameLoop', JSON.stringify(gameLoopData));
-    }, 1000 / game.fps);
+        const gameLoopData = {
+          b: game.coordinates.ball,
+          lP: game.coordinates.leftPlayer,
+          rP: game.coordinates.rightPlayer
+        };
+        game.sendMsg('gameLoop', JSON.stringify(gameLoopData));
+      }, 1000 / game.fps);
   }
 
   @SubscribeMessage('keyDown')

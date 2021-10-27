@@ -18,6 +18,8 @@ const App = () => {
 	const enemyRef = React.useRef<UpdateUser | null>(null);
 	const gameSettingsRef = React.useRef<GameSettings | null>(null);
 	const eventSourceRef = React.useRef<EventSource | null>(null);
+	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
+	const mainEventSourceInitializedRef = React.useRef(false);
 	const [currentUser, setCurrentUser] =  React.useState(new User());
 	// const user = new User();
 	// user.username = 'admin';
@@ -73,6 +75,8 @@ const App = () => {
 						currentUser={currentUser}
 						gameSettingsRef={gameSettingsRef}
 						eventSourceRef={eventSourceRef}
+						gameRef={gameRef}
+						setStatus={setStatus}
 					/>
 				</Route>
 
@@ -84,6 +88,7 @@ const App = () => {
 						enemyRef={enemyRef}
 						gameSettingsRef={gameSettingsRef}
 						eventSourceRef={eventSourceRef}
+						mainEventSourceInitializedRef={mainEventSourceInitializedRef}
 					/>
 				</Route>
 

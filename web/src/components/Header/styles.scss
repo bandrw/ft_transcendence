@@ -24,7 +24,7 @@ header {
 			color: #42b983;
 			display: flex;
 			align-items: center;
-			width: 30%;
+			width: 160px;
 		}
 
 		.links {
@@ -44,6 +44,7 @@ header {
 		.header-buttons {
 			display: flex;
 			align-items: center;
+			width: 160px;
 
 			& > button {
 				cursor: pointer;
@@ -73,6 +74,44 @@ header {
 			background-position: center;
 			background-size: 80%;
 			position: relative;
+		}
+	}
+
+	.header-center {
+		.header-center-exit-btn {
+			display: flex;
+			justify-content: space-between;
+			padding: 7px 21px;
+			align-items: center;
+			height: 65px;
+			background: none;
+			outline: none;
+			border: none;
+			cursor: pointer;
+			border-radius: 18px;
+			transition: all 0.1s ease-out;
+			background: #21232b;
+
+			& > svg {
+				color: #e30000;
+				font-size: 2.5em;
+			}
+
+			& > span {
+				margin-left: 21px;
+				letter-spacing: 2px;
+				font-weight: 300;
+				color: #bbb;
+				font-size: 1.3em;
+			}
+
+			&:hover {
+				background: #21242f;
+			}
+
+			&:active {
+				background: #24273a;
+			}
 		}
 	}
 }

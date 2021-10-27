@@ -1,0 +1,74 @@
+.confirmation-window-wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.confirmation-window {
+	width: 500px;
+	height: 250px;
+	background: #1a1b1f;
+	border-radius: 25px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	padding: 25px;
+
+	p {
+		font-size: 1.5em;
+		font-weight: 500;
+	}
+
+	.confirmation-window-buttons {
+		margin-top: 20px;
+		width: 350px;
+		display: flex;
+		justify-content: space-between;
+
+		button {
+			cursor: pointer;
+			width: 150px;
+			font-size: 1.2em;
+			padding: 15px 20px;
+			border: none;
+			outline: none;
+			border-radius: 18px;
+			transition: all 0.1s ease-out;
+		}
+
+		.confirmation-window-ok-btn {
+			background: #29aa44;
+			color: white;
+
+			&:hover {
+				background: #20b740;
+			}
+
+			&:active {
+				background: #1f7e33;
+			}
+		}
+
+		.confirmation-window-cancel-btn {
+			background: #21232b;
+			color: white;
+
+			&:hover {
+				background: #222533;
+			}
+
+			&:active {
+				background: #1f212a;
+			}
+		}
+	}
+}
