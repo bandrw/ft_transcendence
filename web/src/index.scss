@@ -27,6 +27,10 @@ body {
 	-webkit-border-radius: 1ex;
 }
 
+::-webkit-scrollbar-corner {
+	display: none;
+}
+
 :-webkit-autofill::first-line,
 :-webkit-autofill,
 :-webkit-autofill:hover,

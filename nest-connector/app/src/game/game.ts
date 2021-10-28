@@ -96,7 +96,8 @@ export class Game {
     // Ball bouncing (walls)
     const bounceOffTheNorthWall = this.coordinates.ball.y + this.gameSettings.ballSize >= this.gameSettings.canvasHeight;
     const bounceOffTheSouthWall = this.coordinates.ball.y <= 0;
-    if (bounceOffTheNorthWall || bounceOffTheSouthWall)
+    if ((bounceOffTheNorthWall && Math.sin(this.gameSettings.ballAngle) > 0) ||
+        (bounceOffTheSouthWall && Math.sin(this.gameSettings.ballAngle) < 0))
     {
       this.gameSettings.ballAngle = -this.gameSettings.ballAngle;
       this.sendMsg('playSound', 'pong-sound-1');

@@ -13,13 +13,14 @@ import { useHistory } from "react-router-dom";
 interface GameProps {
 	enemyInfo: UpdateUser | null,
 	currentUser: User,
+	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	gameSettingsRef: React.MutableRefObject<GameSettings | null>,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
 	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>
 }
 
-const Game = ({ enemyInfo, currentUser, gameSettingsRef, eventSourceRef, gameRef, setStatus }: GameProps) => {
+const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSourceRef, gameRef, setStatus }: GameProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
@@ -38,6 +39,7 @@ const Game = ({ enemyInfo, currentUser, gameSettingsRef, eventSourceRef, gameRef
 		<div>
 			<Header
 				currentUser={currentUser}
+				setCurrentUser={setCurrentUser}
 				status={UserStatus.InGame}
 				centerBlock={
 					<div className='header-center'>

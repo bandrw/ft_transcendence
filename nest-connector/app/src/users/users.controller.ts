@@ -118,7 +118,7 @@ export class UsersController {
       .indexOf(login);
     if (index === -1) this.UsersService.onlineUsers.push(newUser);
     else this.UsersService.onlineUsers[index] = newUser;
-    this.UsersService.userEvent('login', newUser);
+    this.UsersService.userEvent('updateUser', newUser);
   }
 
   @Post('login')

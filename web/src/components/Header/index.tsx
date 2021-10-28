@@ -6,13 +6,18 @@ import { UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 
+import UserMenu from "./UserMenu";
+
 interface HeaderProps {
 	currentUser: User,
+	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: UserStatus,
 	centerBlock?: JSX.Element
 }
 
-const Header = ({ currentUser, status, centerBlock }: HeaderProps) => {
+const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProps) => {
+	const [userMenuShown, setUserMenuShown] = React.useState(false);
+
 	return (
 		<header>
 			<div className='header-container'>
@@ -29,8 +34,16 @@ const Header = ({ currentUser, status, centerBlock }: HeaderProps) => {
 					<button
 						style={{ backgroundImage: `url(${currentUser.urlAvatar})` }}
 						className='user-btn'
+						onClick={() => setUserMenuShown(prev => !prev)}
 					>
 						<div className='user-status' style={{ backgroundColor: status }}/>
+						{
+							userMenuShown &&
+							<UserMenu
+								currentUser={currentUser}
+								setCurrentUser={setCurrentUser}
+							/>
+						}
 					</button>
 				</div>
 			</div>

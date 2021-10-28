@@ -9,6 +9,7 @@ header {
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
 	background: rgba(#1a1b1f, 0.8);
+	z-index: 10;
 	//border-bottom: 1px solid #42b983;
 
 	.header-container {

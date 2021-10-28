@@ -19,11 +19,8 @@ const App = () => {
 	const gameSettingsRef = React.useRef<GameSettings | null>(null);
 	const eventSourceRef = React.useRef<EventSource | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
-	const mainEventSourceInitializedRef = React.useRef(false);
-	const [currentUser, setCurrentUser] =  React.useState(new User());
-	// const user = new User();
-	// user.username = 'admin';
-	// const [currentUser, setCurrentUser] =  React.useState(user);
+	const mainEventSourceInitializedRef = React.useRef<boolean>(false);
+	const [currentUser, setCurrentUser] =  React.useState<User>(new User());
 
 	React.useEffect(() => {
 		if (!currentUser.isAuthorized())
@@ -73,6 +70,7 @@ const App = () => {
 					<Game
 						enemyInfo={enemyRef.current}
 						currentUser={currentUser}
+						setCurrentUser={setCurrentUser}
 						gameSettingsRef={gameSettingsRef}
 						eventSourceRef={eventSourceRef}
 						gameRef={gameRef}
@@ -83,6 +81,7 @@ const App = () => {
 				<Route exact path='/'>
 					<Main
 						currentUser={currentUser}
+						setCurrentUser={setCurrentUser}
 						status={status}
 						setStatus={setStatus}
 						enemyRef={enemyRef}

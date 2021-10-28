@@ -14,6 +14,7 @@ import { useHistory } from "react-router-dom";
 
 interface MainProps {
 	currentUser: User,
+	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: UserStatus,
 	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
 	enemyRef: React.MutableRefObject<UpdateUser | null>,
@@ -24,6 +25,7 @@ interface MainProps {
 
 const Main: React.FC<MainProps> = ({
 																		 currentUser,
+																		 setCurrentUser,
 																		 status,
 																		 setStatus,
 																		 enemyRef,
@@ -34,9 +36,11 @@ const Main: React.FC<MainProps> = ({
 	const history = useHistory();
 
 	React.useEffect(() => {
-		if (!currentUser.isAuthorized())
+		if (!currentUser.isAuthorized()) {
+			mainEventSourceInitializedRef.current = false;
 			history.push('/login');
-	}, [history, currentUser]);
+		}
+	}, [history, currentUser, mainEventSourceInitializedRef]);
 
 	React.useEffect(() => {
 		if (status === UserStatus.InGame)
@@ -90,6 +94,11 @@ const Main: React.FC<MainProps> = ({
 		if (!eventSource)
 			return ;
 
+		const logoutHandler = (e: any) => {
+			const data: UpdateUser = JSON.parse(e.data);
+			setUsers(usersRef.current.filter(usr => usr.login !== data.login));
+		};
+
 		const gameSettingsHandler = (e: any) => {
 			const gameSettings: GameSettings = JSON.parse(e.data);
 			gameSettingsRef.current = gameSettings;
@@ -104,12 +113,16 @@ const Main: React.FC<MainProps> = ({
 			const data: UpdateUser = JSON.parse(e.data);
 
 			const newUsers: UpdateUser[] = [];
+			// Edit user
 			for (let i = 0; i < usersRef.current.length; ++i) {
 				if (usersRef.current[i].login === data.login)
 					newUsers.push(data);
 				else
 					newUsers.push(usersRef.current[i]);
 			}
+			// Add new user
+			if (usersRef.current.map((usr) => usr.login).indexOf(data.login) === -1)
+				newUsers.push(data);
 			setUsers(newUsers);
 
 			if (!enemyRef.current && status !== UserStatus.Regular) {
@@ -130,6 +143,7 @@ const Main: React.FC<MainProps> = ({
 			setStatus(UserStatus.InGame);
 		};
 
+		eventSource.addEventListener('logout_SSE', logoutHandler);
 		eventSource.addEventListener('updateUser', updateUserHandler);
 		eventSource.addEventListener('enemy', enemyHandler);
 		eventSource.addEventListener('gameIsReady', gameIsReadyHandler);
@@ -139,6 +153,7 @@ const Main: React.FC<MainProps> = ({
 		console.log('[Main] eventSource listeners added');
 
 		// return () => {
+		// 	eventSource.removeEventListener('logout_SSE', logoutHandler);
 		// 	eventSource.removeEventListener('updateUser', updateUserHandler);
 		// 	eventSource.removeEventListener('enemy', enemyHandler);
 		// 	eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
@@ -161,6 +176,7 @@ const Main: React.FC<MainProps> = ({
 			<div className='main-container'>
 				<Header
 					currentUser={currentUser}
+					setCurrentUser={setCurrentUser}
 					status={status}
 				/>
 				<div className='main-center'>

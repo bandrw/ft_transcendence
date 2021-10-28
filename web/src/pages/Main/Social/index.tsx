@@ -51,7 +51,7 @@ const Social = ({ users }: SocialProps) => {
 			damping={0.4}
 			// style={{ animationFillMode: 'backwards' }}
 		>
-			<div className='main-block-title'>
+			<div className='main-block-title social-title'>
 				<span>People</span>
 				<button>
 					<FontAwesomeIcon icon={faArrowRight}/>
@@ -83,6 +83,16 @@ const Social = ({ users }: SocialProps) => {
 							return <SocialBlockUser key={i} user={user}/>;
 						})
 					}
+					{/*{*/}
+					{/*	users.map((user, i) => {*/}
+					{/*		return <SocialBlockUser key={i} user={user}/>;*/}
+					{/*	})*/}
+					{/*}*/}
+					{/*{*/}
+					{/*	users.map((user, i) => {*/}
+					{/*		return <SocialBlockUser key={i} user={user}/>;*/}
+					{/*	})*/}
+					{/*}*/}
 				</ul>
 			</div>
 		</Fade>
