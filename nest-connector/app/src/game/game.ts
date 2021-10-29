@@ -16,6 +16,7 @@ export class Game {
     },
   };
   public readonly fps = 60;
+  public readonly pointsToWin = 11;
   private gameSettings = {
     id: this.id,
     canvasWidth: 1024,
@@ -31,7 +32,7 @@ export class Game {
     leftPlayerUsername: this.playerOne.user.login,
     rightPlayerUsername: this.playerTwo.user.login
   };
-  private score = {
+  public readonly score = {
     leftPlayer: 0,
     rightPlayer: 0
   }

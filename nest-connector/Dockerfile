@@ -1,3 +1,4 @@
+# Dev
 FROM debian:buster
 WORKDIR /
 RUN apt-get update -y && apt-get install -y curl procps
@@ -10,8 +11,6 @@ RUN npm i -g @nestjs/cli
 #RUN npm install --save @nestjs/typeorm typeorm postgres pg
 EXPOSE 3000
 WORKDIR /transcendence
-
-# Dev
 CMD npm install && npm run start:dev
 
 ## Prod

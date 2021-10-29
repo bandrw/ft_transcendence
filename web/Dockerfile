@@ -1,10 +1,12 @@
-FROM node:14-alpine
+FROM node:16.13-alpine
 
 WORKDIR /app
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+RUN npm install -g serve
+
+CMD ["serve", "-s", "build", "-l", "3000"]
 
 COPY package.json ./
 COPY tsconfig.json ./
@@ -13,4 +15,6 @@ RUN npm install
 
 COPY ./public ./public
 COPY ./src ./src
-#COPY ./.env ./
+COPY ./.env ./
+
+RUN npm run build

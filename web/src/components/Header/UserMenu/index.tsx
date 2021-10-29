@@ -27,6 +27,7 @@ const UserMenu = ({ currentUser, setCurrentUser } : UserMenuProps) => {
 	return (
 		<Fade
 			duration={250}
+			className='user-menu-wrapper'
 		>
 			<div className='user-menu'>
 				<div className='user-menu-btn'>

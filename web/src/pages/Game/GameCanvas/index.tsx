@@ -1,11 +1,13 @@
 import './styles.scss';
 
 import { SocketContext } from "context/socket";
-import { GameLoop, GameSettings, UpdateUser } from "models/apiTypes";
+import { GameLoop, GameSettings, UpdateUser, UserStatus } from "models/apiTypes";
 import GameBall from "models/GameBall";
 import Player from "models/Player";
 import { User } from "models/User";
+import GameResults from "pages/Game/GameResults";
 import React, { useEffect } from "react";
+import { Fade } from "react-awesome-reveal";
 import { setInterval } from "timers";
 
 interface GameCanvasProps {
@@ -13,10 +15,11 @@ interface GameCanvasProps {
 	currentUser: User,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	gameSettingsRef: React.MutableRefObject<GameSettings | null>,
-	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>
+	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
+	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>
 }
 
-const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, gameRef }: GameCanvasProps) => {
+const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, gameRef, setStatus }: GameCanvasProps) => {
 	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const leftPlayer = new Player();
@@ -25,6 +28,7 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 
 	const score = { leftPlayer: 0, rightPlayer: 0 };
 
+	const [gameResults, setGameResults] = React.useState<{ winner: string } | null>(null);
 	const [leftPlayerImg, setLeftPlayerImg]  = React.useState('');
 	const [rightPlayerImg, setRightPlayerImg]  = React.useState('');
 
@@ -35,6 +39,11 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 		const eventSource = eventSourceRef.current;
 		if (!eventSource)
 			return ;
+
+		const gameResultsHandler = (e: any) => {
+			const data: { winner: string } = JSON.parse(e.data);
+			setGameResults(data);
+		};
 
 		const gameLoopHandler = (e: any) => {
 			const gameSettings = gameSettingsRef.current;
@@ -77,6 +86,7 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 			}
 		};
 
+		eventSource.addEventListener('gameResults', gameResultsHandler);
 		eventSource.addEventListener('gameLoop', gameLoopHandler);
 		eventSource.addEventListener('gameScore', gameScoreHandler);
 		eventSource.addEventListener('playSound', playSoundHandler);
@@ -86,6 +96,7 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 		// 	// if (gameCpy.runs)
 		// 	// 	return ;
 		//
+		// 	eventSource.removeEventListener('gameResults', gameResultsHandler);
 		// 	eventSource.removeEventListener('gameLoop', gameLoopHandler);
 		// 	eventSource.removeEventListener('gameScore', gameScoreHandler);
 		// 	eventSource.removeEventListener('playSound', playSoundHandler);
@@ -314,7 +325,6 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 					/>
 					<div className='info-board-user-name'>{gameSettingsRef.current?.leftPlayerUsername}</div>
 				</div>
-				{/*{infoBoardContent}*/}
 				<div className='info-board-user info-board-right-user'>
 					<div className='info-board-user-name'>{gameSettingsRef.current?.rightPlayerUsername}</div>
 					<div
@@ -329,6 +339,24 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 				height="600px"
 				ref={canvasRef}
 			/>
+			{
+				gameResults &&
+					<Fade
+						className='game-results-wrapper'
+						duration={500}
+					>
+						<GameResults
+							winner={gameResults.winner}
+							loser={
+								(gameResults.winner === gameSettingsRef.current?.leftPlayerUsername
+								? gameSettingsRef.current?.rightPlayerUsername
+								: gameSettingsRef.current?.leftPlayerUsername) || ''
+							}
+							gameRef={gameRef}
+							setStatus={setStatus}
+						/>
+					</Fade>
+			}
 		</div>
 	);
 };

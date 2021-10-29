@@ -3,7 +3,7 @@ import './styles.scss';
 import axios from "axios";
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { GameSettings, GetAll, UpdateUser, UserStatus } from "models/apiTypes";
+import { FetchedUsers, GameSettings, GetAll, UpdateUser, UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import RecentGames from "pages/Main/RecentGames";
@@ -48,8 +48,8 @@ const Main: React.FC<MainProps> = ({
 	}, [history, status]);
 
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
-	const [users, setUsers] = React.useState<UpdateUser[]>([]);
-	const usersRef = React.useRef<UpdateUser[]>([]);
+	const [users, setUsers] = React.useState<FetchedUsers[]>([]);
+	const usersRef = React.useRef<FetchedUsers[]>([]);
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -66,7 +66,9 @@ const Main: React.FC<MainProps> = ({
 					return {
 						login: usr.login,
 						url_avatar: usr.url_avatar,
-						status: UserStatus.Regular
+						status: UserStatus.Regular,
+						games: usr.games,
+						wins: usr.wins
 					};
 				});
 				setUsers(fetchedUsers);
@@ -112,7 +114,7 @@ const Main: React.FC<MainProps> = ({
 		const updateUserHandler = (e: any) => {
 			const data: UpdateUser = JSON.parse(e.data);
 
-			const newUsers: UpdateUser[] = [];
+			const newUsers: FetchedUsers[] = [];
 			// Edit user
 			for (let i = 0; i < usersRef.current.length; ++i) {
 				if (usersRef.current[i].login === data.login)
@@ -123,6 +125,7 @@ const Main: React.FC<MainProps> = ({
 			// Add new user
 			if (usersRef.current.map((usr) => usr.login).indexOf(data.login) === -1)
 				newUsers.push(data);
+
 			setUsers(newUsers);
 
 			if (!enemyRef.current && status !== UserStatus.Regular) {
@@ -152,17 +155,20 @@ const Main: React.FC<MainProps> = ({
 
 		console.log('[Main] eventSource listeners added');
 
-		// return () => {
-		// 	eventSource.removeEventListener('logout_SSE', logoutHandler);
-		// 	eventSource.removeEventListener('updateUser', updateUserHandler);
-		// 	eventSource.removeEventListener('enemy', enemyHandler);
-		// 	eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
-		// 	eventSource.removeEventListener('gameSettings', gameSettingsHandler);
-		// 	eventSourceInitializedRef.current = false;
-		//
-		// 	// eventSource.close();
-		// 	console.log('[Main] eventSource listeners removed');
-		// };
+		return () => {
+			// if (mainEventSourceInitializedRef.current)
+			// 	return ;
+			//
+			// eventSource.removeEventListener('logout_SSE', logoutHandler);
+			// eventSource.removeEventListener('updateUser', updateUserHandler);
+			// eventSource.removeEventListener('enemy', enemyHandler);
+			// eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
+			// eventSource.removeEventListener('gameSettings', gameSettingsHandler);
+			// mainEventSourceInitializedRef.current = false;
+			//
+			// // eventSource.close();
+			// console.log('[Main] eventSource listeners removed');
+		};
 	});
 
 	const filteredUsers: UpdateUser[] = [];

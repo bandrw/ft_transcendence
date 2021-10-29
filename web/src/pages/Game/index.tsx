@@ -73,6 +73,7 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSo
 				eventSourceRef={eventSourceRef}
 				gameSettingsRef={gameSettingsRef}
 				gameRef={gameRef}
+				setStatus={setStatus}
 			/>
 		</div>
 	);

@@ -1,9 +1,15 @@
-.user-menu {
+.user-menu-wrapper {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 170px;
+	height: calc(100% + 15px);
+}
 
+.user-menu {
 	cursor: auto;
 	position: absolute;
-	//bottom: calc(-100% - 40px);
-	top: calc(100% + 15px);
+	top: 100%;
 	right: 0;
 	background: #21232b;
 	box-shadow: 0 0 20px #1a1b1f;

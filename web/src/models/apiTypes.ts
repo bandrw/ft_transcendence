@@ -25,7 +25,9 @@ type UserCheckExist = {
 type UpdateUser = {
 	login: string,
 	status: string,
-	url_avatar: string
+	url_avatar: string,
+	games: number,
+	wins: number
 }
 
 type GameSettings = {
@@ -57,17 +59,21 @@ type GameLoop = {
 	}
 }
 
-type GetOnline = {
-	games: number,
+type FetchedUsers = {
 	login: string,
 	status: string,
 	url_avatar: string,
+	games: number,
 	wins: number
 }
 
 type GetAll = {
+	id: number,
 	login: string,
-	url_avatar: string
+	password: string,
+	url_avatar: string,
+	games: number,
+	wins: number
 }
 
 export enum UserStatus {
@@ -81,10 +87,10 @@ export enum UserStatus {
 }
 
 export type {
+	FetchedUsers,
 	GameLoop,
 	GameSettings,
 	GetAll,
-	GetOnline,
 	GetUser,
 	UpdateUser,
 	UserCheckExist,

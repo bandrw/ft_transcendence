@@ -101,7 +101,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					{
 						isLoading ?
 							<CircleLoading bgColor='#fff' width='35px' height='35px'/> :
-							<span>Log in</span>
+							'Log in'
 					}
 				</button>
 			</form>

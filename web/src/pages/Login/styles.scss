@@ -59,6 +59,10 @@
 		align-items: center;
 		transition: all 0.05s ease-in;
 
+		&::selection {
+			background: #2c3e50;
+		}
+
 		@media (hover: hover) {
 			&:hover {
 				background: #21b941;
@@ -73,6 +77,10 @@
 		margin-bottom: 15px;
 		color: red;
 		text-align: center;
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 
 	.register-link {
@@ -85,10 +93,19 @@
 		&:hover {
 			text-decoration: underline;
 		}
+
+		&::selection {
+			background: #29aa44;
+			color: white;
+		}
 	}
 
 	.separator {
 		margin-top: 30px;
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 
 	.login-services {

@@ -23,20 +23,20 @@ export class UsersController {
     for (let i = 0; i < req.body.login.length; i++) {
       for (let k = 0; k < bad.length; k++) {
         if (req.body.login[i] === bad[k]) {
-          // res.send(bad[k]);
           res.send({ ok: false, msg: `Bad character ('${bad[k]}') in login` });
           return;
         }
       }
     }
-    // res.send(true);
     res.send({ ok: true, msg: 'User created' });
     await this.UsersService.create(req.body.login, req.body.pass);
   }
+
   @Get('getAll')
-  getUsers(@Res() res: Response) {
-    this.UsersService.findAll(res);
+  async getUsers(@Res() res: Response) {
+    await this.UsersService.findAll(res);
   }
+
   @Get('getOnline')
   getOnline(@Res() response: Response) {
     response.send(

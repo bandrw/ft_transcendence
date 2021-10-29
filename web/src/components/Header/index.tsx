@@ -2,11 +2,10 @@ import './styles.scss';
 
 import { faBell } from "@fortawesome/free-solid-svg-icons/faBell";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import UserMenu from "components/Header/UserMenu";
 import { UserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
-
-import UserMenu from "./UserMenu";
 
 interface HeaderProps {
 	currentUser: User,
@@ -25,7 +24,7 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 					FT
 				</h1>
 
-				{centerBlock && centerBlock}
+				{ centerBlock ? centerBlock : null }
 
 				<div className='header-buttons'>
 					<button className='notifications-btn'>
@@ -35,6 +34,8 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 						style={{ backgroundImage: `url(${currentUser.urlAvatar})` }}
 						className='user-btn'
 						onClick={() => setUserMenuShown(prev => !prev)}
+						onMouseOver={() => setUserMenuShown(true)}
+						onMouseLeave={() => setUserMenuShown(false)}
 					>
 						<div className='user-status' style={{ backgroundColor: status }}/>
 						{

@@ -38,6 +38,23 @@ export class Events
       game.gameInterval = setInterval(() => {
         game.updatePositions();
 
+        // Score check
+        if (game.score.leftPlayer >= 11) {
+          const data = {
+            winner: game.playerOne.user.login
+          };
+          game.sendMsg('gameResults', JSON.stringify(data));
+          this.gameService.updateStatistics(game.playerOne.user.login, game.playerTwo.user.login).then();
+          clearInterval(game.gameInterval);
+        } else if (game.score.rightPlayer >= 11) {
+          const data = {
+            winner: game.playerTwo.user.login
+          };
+          game.sendMsg('gameResults', JSON.stringify(data));
+          this.gameService.updateStatistics(game.playerTwo.user.login, game.playerOne.user.login).then();
+          clearInterval(game.gameInterval);
+        }
+
         const gameLoopData = {
           b: game.coordinates.ball,
           lP: game.coordinates.leftPlayer,
@@ -99,11 +116,11 @@ export class Events
     }
   }
 
-  @SubscribeMessage('gameScore')
-  async gameScore(@MessageBody() user: string) {
-    const u = JSON.parse(user);
-    await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
-  }
+  // @SubscribeMessage('gameScore')
+  // async gameScore(@MessageBody() user: string) {
+  //   const u = JSON.parse(user);
+  //   await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
+  // }
 
   @SubscribeMessage('newPersonalMessage')
   newPersonalMessage(@MessageBody() data: string) {

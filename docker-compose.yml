@@ -23,15 +23,13 @@ services:
     networks:
       transcendence:
         ipv4_address: 172.20.0.5
-#  web:
-#    container_name: web
-#    build: ./web
-#    environment:
-#      - REACT_APP_API_URL=http://localhost:3000
-#    ports:
-#      - "8080:3000"
-#    networks:
-#      - transcendence
+  web:
+    container_name: web
+    build: ./web
+    ports:
+      - "8080:3000"
+    networks:
+      - transcendence
 networks:
   transcendence:
     driver: bridge

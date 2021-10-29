@@ -136,7 +136,7 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 					{
 						isLoading ?
 							<CircleLoading bgColor='#fff' width='35px' height='35px'/> :
-							<span>Register</span>
+							'Register'
 					}
 				</button>
 			</form>

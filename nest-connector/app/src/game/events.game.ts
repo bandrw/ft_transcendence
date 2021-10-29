@@ -58,11 +58,11 @@ export class EventsGame
     }
   }
 
-  @SubscribeMessage('gameScore')
-  async gameScore(@MessageBody() user: string) {
-    const u = JSON.parse(user);
-    await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
-  }
+  // @SubscribeMessage('gameScore')
+  // async gameScore(@MessageBody() user: string) {
+  //   const u = JSON.parse(user);
+  //   await this.gameService.chooseUser(this.gameService.gamers[u.id], u.login);
+  // }
 
   @SubscribeMessage('newMessage')
   newMessage(@MessageBody() data: string) {

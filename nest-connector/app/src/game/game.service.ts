@@ -10,25 +10,25 @@ export class GameService {
   startGame(Game: G) {
     this.gamers.push(Game);
   }
-  async chooseUser(game: G, login: string) {
-    if (game.playerTwo.user.login === login) {
-      game.playerTwo.gamePoints += 1;
-      if (game.playerTwo.gamePoints == game.pointsForWin) {
-        await this.updateStatistics(
-          game.playerTwo.user.login,
-          game.playerOne.user.login,
-        );
-      }
-    } else {
-      game.playerOne.gamePoints += 1;
-      if (game.playerOne.gamePoints == game.pointsForWin) {
-        await this.updateStatistics(
-          game.playerOne.user.login,
-          game.playerTwo.user.login,
-        );
-      }
-    }
-  }
+  // async chooseUser(game: G, login: string) {
+  //   if (game.playerTwo.user.login === login) {
+  //     game.playerTwo.gamePoints += 1;
+  //     if (game.playerTwo.gamePoints == game.pointsForWin) {
+  //       await this.updateStatistics(
+  //         game.playerTwo.user.login,
+  //         game.playerOne.user.login,
+  //       );
+  //     }
+  //   } else {
+  //     game.playerOne.gamePoints += 1;
+  //     if (game.playerOne.gamePoints == game.pointsForWin) {
+  //       await this.updateStatistics(
+  //         game.playerOne.user.login,
+  //         game.playerTwo.user.login,
+  //       );
+  //     }
+  //   }
+  // }
   async updateStatistics(loginWin, loginLose) {
     const user = await this.userService.usersRepository.findOne({
       where: { login: loginWin },

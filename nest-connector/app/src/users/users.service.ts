@@ -16,7 +16,7 @@ export class UsersService {
 
   async findAll(@Res() response: Response) {
     response.send(
-      await this.usersRepository.find({ select: ['login', 'url_avatar'] }),
+      await this.usersRepository.find(),
     );
   }
 
