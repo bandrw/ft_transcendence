@@ -10,7 +10,21 @@ export class GameService {
   startGame(Game: G) {
     this.games.push(Game);
   }
-  async chooseUser(game: G, login: string) {
+  async leaveGame(game: G, login: string, id) {
+    this.games[id] = null;
+    if (game.playerTwo.user.login === login) {
+      await this.updateStatistics(
+        game.playerTwo.user.login,
+        game.playerOne.user.login,
+      );
+    } else {
+      await this.updateStatistics(
+        game.playerOne.user.login,
+        game.playerTwo.user.login,
+      );
+    }
+  }
+  async addScore(game: G, login: string) {
     if (game.playerTwo.user.login === login) {
       game.playerTwo.gamePoints += 1;
       if (game.playerTwo.gamePoints == game.pointsForWin) {
@@ -30,20 +44,20 @@ export class GameService {
     }
   }
   async updateStatistics(loginWin, loginLose) {
-    const user = await this.userService.usersRepository.findOne({
+    const winner = await this.userService.usersRepository.findOne({
       where: { login: loginWin },
     });
-    user.games += 1;
-    user.wins += 1;
-    await this.userService.usersRepository.manager.save(user);
-    const enemy = await this.userService.usersRepository.findOne({
+    winner.games += 1;
+    winner.wins += 1;
+    await this.userService.usersRepository.manager.save(winner);
+    const looser = await this.userService.usersRepository.findOne({
       where: { login: loginLose },
     });
-    enemy.games += 1;
-    await this.userService.usersRepository.manager.save(enemy);
+    looser.games += 1;
+    await this.userService.usersRepository.manager.save(looser);
     this.userService.userStatsEvent({
-      winner: user.login,
-      looser: enemy.login,
+      winner: winner.login,
+      looser: looser.login,
     });
   }
 }

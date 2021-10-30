@@ -116,6 +116,7 @@ export default {
           } else if (this.enemy && !this.gameInProgress) {
             this.$refs.Ladder.cancelAccept(event);
           } else if (this.enemy && this.gameInProgress) {
+            this.$socket.emit("leaveGame", this.user);
             this.SET_GAME_IN_PROGRESS(false);
             this.$refs.Ladder.clearData("blue");
           }
