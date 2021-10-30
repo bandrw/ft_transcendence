@@ -58,6 +58,7 @@ export class UsersController {
   }
   @Post('logout')
   userLogout(@Req() req: Request) {
+    console.log('logout');
     const index = this.UsersService.onlineUsers
       .map(function (e) {
         return e.login;
@@ -113,14 +114,14 @@ export class UsersController {
   }
   @Post('login')
   async authentification(@Req() req: Request, @Res() response: Response) {
-    let i = 0;
-    while (i < this.UsersService.onlineUsers.length) {
-      if (this.UsersService.onlineUsers[i].login === req.body.login) {
-        response.send('doubleLogin');
-        return;
-      }
-      ++i;
-    }
+    // let i = 0;
+    // while (i < this.UsersService.onlineUsers.length) {
+    //   if (this.UsersService.onlineUsers[i].login === req.body.login) {
+    //     response.send('doubleLogin');
+    //     return;
+    //   }
+    //   ++i;
+    // }
     response.send(await this.UsersService.login(response, req.body.login));
   }
 }

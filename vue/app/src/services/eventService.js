@@ -34,4 +34,7 @@ export default {
   async updateAvatar(login) {
     return await apiClient.get(`/users/avatar?login=${login}`);
   },
+  async logout(user) {
+    return await apiClient.post("/users/logout", { user: user });
+  },
 };

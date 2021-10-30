@@ -35,9 +35,11 @@
       class="chat_user_info"
       :style="{ left: infoStyle.left, top: infoStyle.top }"
     >
-      {{ user.login }}
+      {{ user_in_chat.login }}
       <span :style="{ color: pinColor(user_in_chat.winP) }"
-        ><p>{{ winPercent(user_in_chat.wins, user_in_chat.games, user_in_chat) }}%</p></span
+        ><p>
+          {{ winPercent(user_in_chat.wins, user_in_chat.games, user_in_chat) }}%
+        </p></span
       >
       <img :src="user_in_chat.url_avatar" class="user_profile_avatar" alt="" />
       <div class="chat_user_profile_close_button" v-on:click="SET_INFO(false)">

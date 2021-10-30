@@ -6,13 +6,13 @@ export const state = {
     posX: 50,
     width: 10,
     speed: 1,
-    interval: null,
+    leftInterval: null,
+    rightInterval: null,
   },
   enemy: {
     posX: 50,
     width: 10,
     speed: 1,
-    interval: null,
   },
   ball: {
     posX: 0,
@@ -76,19 +76,19 @@ export const mutations = {
   SET_ENEMY_POS_X(state, pos) {
     state.enemy.posX = pos;
   },
-  SET_YOU_INTERVAL(state, interval) {
-    state.you.interval = interval;
+  SET_LEFT_INTERVAL(state, interval) {
+    state.you.leftInterval = interval;
   },
-  CLEAR_YOU_INTERVAL(state) {
-    clearInterval(state.you.interval);
-    state.you.interval = false;
+  CLEAR_LEFT_INTERVAL(state) {
+    clearInterval(state.you.leftInterval);
+    state.you.leftInterval = false;
   },
-  SET_ENEMY_INTERVAL(state, interval) {
-    state.enemy.interval = interval;
+  SET_RIGHT_INTERVAL(state, interval) {
+    state.you.rightInterval = interval;
   },
-  CLEAR_ENEMY_INTERVAL(state) {
-    clearInterval(state.enemy.interval);
-    state.enemy.interval = false;
+  CLEAR_RIGHT_INTERVAL(state) {
+    clearInterval(state.you.rightInterval);
+    state.you.rightInterval = false;
   },
   ADD_YOU_POS_X(state, pos) {
     state.you.posX += pos;

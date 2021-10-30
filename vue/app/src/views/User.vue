@@ -9,7 +9,7 @@
       </div>
       <router-view />
     </div>
-    <div v-else class="user_authorized">
+    <div v-if="authorized && !gameInProgress" class="user_authorized">
       <div class="user_logout_button" v-on:click="logout">logout</div>
       <div class="user_profile_button" v-on:click="showProfile">
         {{ user.login }}
@@ -45,12 +45,17 @@ export default {
       const winP = (this.user.wins / this.user.games).toFixed(2) * 100;
       return winP ? winP : 0;
     },
+    ...mapState("ladder", ["ladder", "game"]),
     ...mapState(["authorized", "user"]),
     ...mapState("profile", ["profile"]),
-    ...mapState("game", ["gameInProgress", "gameInProgress", "enemy"]),
+    ...mapState("game", ["gameInProgress", "enemy"]),
   },
   methods: {
-    ...mapMutations("game", ["CLEAR_YOU_INTERVAL", "CLEAR_ENEMY_INTERVAL"]),
+    ...mapMutations("game", [
+      "CLEAR_RIGHT_INTERVAL",
+      "CLEAR_LEFT_INTERVAL",
+      "SET_GAME_IN_PROGRESS",
+    ]),
     ...mapMutations("profile", ["SET_PROFILE"]),
     ...mapMutations("ladder", ["CLEAR_FIND_INTERVAL", "CLEAR_ACCEPT_INTERVAL"]),
     ...mapMutations([
@@ -64,13 +69,14 @@ export default {
     async logout() {
       if (this.gameInProgress) {
         this.$refs.Ladder.clearData();
-        this.CLOSE_EVENT_SOURCE();
-        this.SET_ENEMY(null);
-        this.SET_AUTHORIZE(false);
-        this.SET_PROFILE(false);
-        this.SET_USERS(null);
-        this.CLEAR_USER();
       }
+      this.CLOSE_EVENT_SOURCE();
+      await eventService.logout(this.user);
+      this.SET_ENEMY(null);
+      this.SET_AUTHORIZE(false);
+      this.SET_PROFILE(false);
+      this.SET_USERS(null);
+      // this.CLEAR_USER();
     },
     showProfile() {
       this.SET_PROFILE(!this.profile);
@@ -84,29 +90,43 @@ export default {
         .then(this.getData);
       this.SET_NEW_USER_AVATAR(avatar);
     },
-  },
-  logoutIfAuthorized() {
-    if (this.authorized) {
-      this.logout();
-    }
-  },
-  stopPlatform(event) {
-    if (event.key === "ArrowRight") {
-      this.CLEAR_YOU_INTERVAL();
-    } else if (event.key === "ArrowLeft") {
-      this.CLEAR_ENEMY_INTERVAL();
-    }
-  },
-  keyEvents(event) {
-    if (event.key === "ArrowRight" && this.gameInProgress) {
-      this.$refs.game.movePlatformRight();
-    } else if (event.key === "ArrowLeft" && this.gameInProgress) {
-      this.$refs.game.movePlatformLeft();
-    }
+    async logoutIfAuthorized() {
+      if (this.authorized) {
+        await this.logout();
+      }
+    },
+    stopPlatform(event) {
+      if (event.key === "ArrowRight") {
+        this.CLEAR_RIGHT_INTERVAL();
+      } else if (event.key === "ArrowLeft") {
+        this.CLEAR_LEFT_INTERVAL();
+      }
+    },
+    keyEvents(event) {
+      if (event.key === "ArrowRight" && this.gameInProgress) {
+        this.$refs.game.movePlatformRight();
+      } else if (event.key === "ArrowLeft" && this.gameInProgress) {
+        this.$refs.game.movePlatformLeft();
+      } else if (event.key === "Escape") {
+        if (this.ladder && this.authorized && !this.game && !this.enemy) {
+          this.logout();
+        } else if (this.ladder && this.authorized && this.game) {
+          if (!this.enemy) {
+            this.$refs.Ladder.cancelFind(event);
+          } else if (this.enemy && !this.gameInProgress) {
+            this.$refs.Ladder.cancelAccept(event);
+          } else if (this.enemy && this.gameInProgress) {
+            this.SET_GAME_IN_PROGRESS(false);
+            this.$refs.Ladder.clearData("blue");
+          }
+        }
+      }
+    },
   },
   mounted() {
     window.onbeforeunload = this.logoutIfAuthorized;
     document.addEventListener("keyup", this.stopPlatform);
+    document.addEventListener("keydown", this.keyEvents);
   },
 };
 </script>

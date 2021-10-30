@@ -43,9 +43,9 @@ export default {
       "SET_ID",
       "SET_BALL_POS_X",
       "SET_BALL_POS_Y",
-      "SET_YOU_INTERVAL",
+      "SET_LEFT_INTERVAL",
       "ADD_YOU_POS_X",
-      "SET_ENEMY_INTERVAL",
+      "SET_RIGHT_INTERVAL",
     ]),
     platformEvent() {
       const data = JSON.stringify({
@@ -62,19 +62,19 @@ export default {
       }
     },
     moveLeft() {
-      if (this.youPosX + 1 + this.youWidth / 2 < 100) {
+      if (this.you.posX + 1 + this.you.width / 2 < 100) {
         this.ADD_YOU_POS_X(1);
         this.platformEvent();
       }
     },
     movePlatformRight() {
-      if (!this.you.interval) {
-        this.SET_YOU_INTERVAL(setInterval(this.moveRight, 15));
+      if (!this.you.rightInterval) {
+        this.SET_RIGHT_INTERVAL(setInterval(this.moveRight, 15));
       }
     },
     movePlatformLeft() {
-      if (!this.enemy.interval) {
-        this.SET_ENEMY_INTERVAL(setInterval(this.moveLeft, 15));
+      if (!this.you.leftInterval) {
+        this.SET_LEFT_INTERVAL(setInterval(this.moveLeft, 15));
       }
     },
   },
