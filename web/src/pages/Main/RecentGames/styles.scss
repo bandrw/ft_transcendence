@@ -14,6 +14,11 @@
 		position: relative;
 		z-index: 1;
 
+		.recent-game-enemy {
+			display: flex;
+			align-items: center;
+		}
+
 		.recent-game-img {
 			position: relative;
 			width: 50px;
@@ -25,12 +30,23 @@
 			border-radius: 18px;
 		}
 
+		.user-login {
+			margin-left: 40px;
+			max-width: 150px;
+		}
+
 		.recent-game-win {
+			width: 50px;
 			color: #3cb768;
 		}
 
 		.recent-game-lose {
+			width: 50px;
 			color: #e30000;
+		}
+
+		.recent-game-score {
+			width: 60px;
 		}
 	}
 }

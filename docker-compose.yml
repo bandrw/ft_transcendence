@@ -1,35 +1,40 @@
 version: "3.3"
 services:
-  sql:
-    container_name: sql
-    build:
-      context: PostgreSQL
+  db:
+    container_name: db
+    image: postgres:11.13
+    environment:
+      - POSTGRES_USER=pfile
+      - POSTGRES_PASSWORD=pfile
+      - POSTGRES_DB=pfile
+      - TZ=Europe/Moscow
+      - PGTZ=Europe/Moscow
     ports:
-      - "5432:5432"
-    # volumes:
-    # - ./PostgreSQL/data:/var/lib/postgresql/11/main
-    networks:
-      - transcendence
-    # command: /start.sh
-  nest:
-    container_name: nest-connector
-    command: bash -c "npm install && npm run start:dev"
-    build:
-      context: nest-connector
-    ports:
-      - "3000:3000"
+      - "5432:5432" # tmp
     volumes:
-      - ./nest-connector/app:/transcendence
-    networks:
-      transcendence:
-        ipv4_address: 172.20.0.5
-  web:
-    container_name: web
-    build: ./web
-    ports:
-      - "8080:3000"
+      - ./db/data:/var/lib/postgresql/data
+      - ./db/scripts:/docker-entrypoint-initdb.d
     networks:
       - transcendence
+#  nest:
+#    container_name: nest-connector
+#    command: bash -c "npm install && npm run start:dev"
+#    build:
+#      context: nest-connector
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - ./nest-connector/app:/transcendence
+#    networks:
+#      transcendence:
+#        ipv4_address: 172.20.0.5
+#  web:
+#    container_name: web
+#    build: ./web
+#    ports:
+#      - "8080:3000"
+#    networks:
+#      - transcendence
 networks:
   transcendence:
     driver: bridge

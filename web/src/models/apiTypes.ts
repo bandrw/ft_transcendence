@@ -9,7 +9,6 @@ type GetUser = {
 	login: string,
 	password: string,
 	url_avatar: string,
-	wins: number
 }
 
 type UserLogin = {
@@ -26,8 +25,6 @@ type UpdateUser = {
 	login: string,
 	status: string,
 	url_avatar: string,
-	games: number,
-	wins: number
 }
 
 type GameSettings = {
@@ -63,8 +60,6 @@ type FetchedUsers = {
 	login: string,
 	status: string,
 	url_avatar: string,
-	games: number,
-	wins: number
 }
 
 type GetAll = {
@@ -72,8 +67,6 @@ type GetAll = {
 	login: string,
 	password: string,
 	url_avatar: string,
-	games: number,
-	wins: number
 }
 
 export enum UserStatus {

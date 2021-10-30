@@ -57,7 +57,7 @@ const Main: React.FC<MainProps> = ({
 		if (!currentUser.isAuthorized())
 			return ;
 
-		axios.get<GetAll[]>('/users/getAll')
+		axios.get<GetAll[]>('/users/')
 			.then(res => {
 				if (!isMounted)
 					return ;
@@ -67,8 +67,6 @@ const Main: React.FC<MainProps> = ({
 						login: usr.login,
 						url_avatar: usr.url_avatar,
 						status: UserStatus.Regular,
-						games: usr.games,
-						wins: usr.wins
 					};
 				});
 				setUsers(fetchedUsers);
@@ -203,7 +201,9 @@ const Main: React.FC<MainProps> = ({
 						triggerOnce={true}
 						style={{ position: 'relative', zIndex: 8 }}
 					>
-						<RecentGames/>
+						<RecentGames
+							currentUser={currentUser}
+						/>
 					</Fade>
 				</div>
 				<div className='main-right'>

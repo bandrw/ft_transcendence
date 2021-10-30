@@ -68,22 +68,22 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 		};
 
 		const playSoundHandler = (e: any) => {
-			let a: HTMLAudioElement | null = null;
-			if (e.data === 'pong-sound-1') {
-				a = new Audio('/audio/pong-sound-1.wav');
-				a.volume = 0.17;
-			} else if (e.data === 'pong-sound-2') {
-				a = new Audio('/audio/pong-sound-2.wav');
-				a.volume = 0.17;
-			} else if (e.data === 'pong-sound-3') {
-				a = new Audio('/audio/pong-sound-3.wav');
-				a.volume = 0.1;
-			}
-			if (a) {
-				a.play()
-					.then()
-					.catch(() => console.log('audio play error'));
-			}
+			// let a: HTMLAudioElement | null = null;
+			// if (e.data === 'pong-sound-1') {
+			// 	a = new Audio('/audio/pong-sound-1.wav');
+			// 	a.volume = 0.17;
+			// } else if (e.data === 'pong-sound-2') {
+			// 	a = new Audio('/audio/pong-sound-2.wav');
+			// 	a.volume = 0.17;
+			// } else if (e.data === 'pong-sound-3') {
+			// 	a = new Audio('/audio/pong-sound-3.wav');
+			// 	a.volume = 0.1;
+			// }
+			// if (a) {
+			// 	a.play()
+			// 		.then()
+			// 		.catch(() => console.log('audio play error'));
+			// }
 		};
 
 		eventSource.addEventListener('gameResults', gameResultsHandler);
@@ -104,9 +104,12 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 		// };
 	});
 
-	const playerWidth = 15;
-	const playerMargin = 15;
-	const playerHeight = 150;
+	// const playerWidth = 15;
+	// const playerMargin = 15;
+	// const playerHeight = 150;
+	const playerWidth = gameSettingsRef.current?.playerWidth || 15;
+	const playerMargin = gameSettingsRef.current?.playerMargin || 15;
+	const playerHeight = gameSettingsRef.current?.playerHeight || 100;
 
 	useEffect(() => {
 		const keyDownHandler = (e: KeyboardEvent) => {

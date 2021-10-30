@@ -1,4 +1,4 @@
-import { Gamer as G } from './gamer.interface';
+import { Gamer as G } from './game.interface';
 
 export class Game {
   public pointsForWin: number;
@@ -23,8 +23,8 @@ export class Game {
     canvasHeight: 600,
     playerWidth: 15,
     playerMargin: 15,
-    playerHeight: 150,
-    playerStep: 6,
+    playerHeight: 100,
+    playerStep: 8,
     ballSize: 15,
     ballAngle: 0,
     ballSpeed: 8,

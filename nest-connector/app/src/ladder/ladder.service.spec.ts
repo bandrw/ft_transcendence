@@ -3,14 +3,14 @@ import { LadderService } from './ladder.service';
 import { UsersModule } from '../users/users.module';
 import { GameModule } from '../game/game.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User_table } from '../users/user.entity';
+import { User } from '../users/user.entity';
 import { INestApplication } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
 describe('LadderService', () => {
   let service: LadderService;
   let app: INestApplication;
-  let repository: Repository<User_table>;
+  let repository: Repository<User>;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -24,7 +24,7 @@ describe('LadderService', () => {
           password: 'pfile',
           database: 'test',
           synchronize: false,
-          entities: [User_table],
+          entities: [User],
         }),
       ],
       providers: [LadderService],

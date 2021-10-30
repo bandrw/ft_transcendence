@@ -1,17 +1,17 @@
+import { Inject, Logger } from '@nestjs/common';
 import { WebSocketGateway } from '@nestjs/websockets';
 import {
-  SubscribeMessage,
   MessageBody,
-  WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  SubscribeMessage,
+  WebSocketServer,
 } from '@nestjs/websockets';
+import { ChatService } from 'chat/chat.service';
+import { GameService } from 'game/game.service';
 import { Server, Socket } from 'socket.io';
-import { Inject, Logger } from '@nestjs/common';
-import { GameService } from './game/game.service';
-import { UsersService } from './users/users.service';
-import { ChatService } from './chat/chat.service';
+import { UsersService } from 'users/users.service';
 
 @WebSocketGateway({ cors: true })
 export class Events
@@ -34,7 +34,7 @@ export class Events
     const user = JSON.parse(data);
     const game = this.gameService.gamers[user.id];
 
-    if (!game.gameInterval) // мини костыль, т.к. start отсылают два клиента и запускалось 2 интервала
+    if (!game.gameInterval) // чтобы не запускалось 2 интервала, т.к. start отсылают два клиента
       game.gameInterval = setInterval(() => {
         game.updatePositions();
 
@@ -44,14 +44,18 @@ export class Events
             winner: game.playerOne.user.login
           };
           game.sendMsg('gameResults', JSON.stringify(data));
-          this.gameService.updateStatistics(game.playerOne.user.login, game.playerTwo.user.login).then();
+          this.gameService.updateStatistics(game.playerOne.user.login, game.playerTwo.user.login, game.score)
+            .then()
+            .catch(() => console.log('[updateStatistics] error'));
           clearInterval(game.gameInterval);
         } else if (game.score.rightPlayer >= 11) {
           const data = {
             winner: game.playerTwo.user.login
           };
           game.sendMsg('gameResults', JSON.stringify(data));
-          this.gameService.updateStatistics(game.playerTwo.user.login, game.playerOne.user.login).then();
+          this.gameService.updateStatistics(game.playerTwo.user.login, game.playerOne.user.login, game.score)
+            .then()
+            .catch(() => console.log('[updateStatistics] error'));
           clearInterval(game.gameInterval);
         }
 

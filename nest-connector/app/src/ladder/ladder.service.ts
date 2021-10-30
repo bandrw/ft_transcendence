@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { Ladder } from './ladder.interface';
-import { OnlineUser } from '../users/users.interface';
-import { Game } from '../game/game';
-import { Gamer } from '../game/gamer.interface';
-import { GameService } from '../game/game.service';
+import { Game } from 'game/game';
+import { Gamer } from 'game/game.interface';
+import { GameService } from 'game/game.service';
+import { Ladder } from 'ladder/ladder.interface';
+import { OnlineUser } from 'users/users.interface';
+import { UsersService } from 'users/users.service';
 
 @Injectable()
 export class LadderService {
