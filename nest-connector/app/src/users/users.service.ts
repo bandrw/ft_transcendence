@@ -1,7 +1,7 @@
 import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User_table } from './user.entity';
+import { User } from './user.entity';
 import { Response } from 'express';
 import { AvatarGenerator } from 'random-avatar-generator';
 import { OnlineUser } from './users.interface';
@@ -10,8 +10,8 @@ import { OnlineUser } from './users.interface';
 export class UsersService {
   onlineUsers: OnlineUser[] = [];
   constructor(
-    @InjectRepository(User_table)
-    public usersRepository: Repository<User_table>,
+    @InjectRepository(User)
+    public usersRepository: Repository<User>,
   ) {}
 
   async findAll(@Res() response: Response) {
@@ -20,7 +20,7 @@ export class UsersService {
     );
   }
 
-  async login(@Res() res: Response, login: string): Promise<User_table> {
+  async login(@Res() res: Response, login: string): Promise<User> {
     return await this.usersRepository.findOne({
       where: { login: login },
     });

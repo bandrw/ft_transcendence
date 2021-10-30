@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CssController } from './css/css.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User_table } from 'src/users/user.entity';
+import { User } from 'src/users/user.entity';
 import { UsersModule } from './users/users.module';
 import { JsController } from './js/js.controller';
 import { LadderModule } from './ladder/ladder.module';
@@ -11,6 +11,7 @@ import { GameModule } from './game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChatModule } from './chat/chat.module';
 import { Events } from './events';
+import { GameHistory } from "./game/game.entity";
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { Events } from './events';
       password: 'pfile',
       database: 'pfile',
       synchronize: true,
-      entities: [User_table],
+      entities: [User, GameHistory],
     }),
     UsersModule,
     LadderModule,

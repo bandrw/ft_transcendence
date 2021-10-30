@@ -1,17 +1,26 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Game as G } from './game';
 import { UsersService } from '../users/users.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { GameHistory } from './game.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GameService {
+  private id: number;
   public games: G[] = [];
   @Inject(UsersService)
   userService: UsersService;
+  constructor(
+    @InjectRepository(GameHistory)
+    public GameHistory: Repository<GameHistory>,
+  ) {
+    this.id = 0;
+  }
   startGame(Game: G) {
     this.games.push(Game);
   }
   async leaveGame(game: G, login: string, id) {
-    this.games[id] = null;
     if (game.playerTwo.user.login === login) {
       await this.updateStatistics(
         game.playerTwo.user.login,
@@ -23,6 +32,7 @@ export class GameService {
         game.playerTwo.user.login,
       );
     }
+    this.games[id] = null;
   }
   async addScore(game: G, login: string) {
     if (game.playerTwo.user.login === login) {
@@ -43,6 +53,14 @@ export class GameService {
       }
     }
   }
+  async createHistory(winner, looser) {
+    const new_game = this.GameHistory.create();
+    new_game.id = ++this.id;
+    new_game.user_one_id = winner;
+    new_game.user_two_id = looser;
+    new_game.winner_id = winner.id;
+    await this.GameHistory.manager.save(new_game);
+  }
   async updateStatistics(loginWin, loginLose) {
     const winner = await this.userService.usersRepository.findOne({
       where: { login: loginWin },
@@ -59,5 +77,6 @@ export class GameService {
       winner: winner.login,
       looser: looser.login,
     });
+    await this.createHistory(winner, looser);
   }
 }

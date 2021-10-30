@@ -112,7 +112,6 @@ export default {
       this.CLEAR_FIND_INTERVAL();
       this.CLEAR_ACCEPT_INTERVAL();
       this.SET_GAME_IN_PROGRESS(true);
-      //fadeOut
     },
     gameSettings(event) {
       const gameSettings = JSON.parse(event.data);

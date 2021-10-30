@@ -48,7 +48,7 @@ export default {
     ...mapState("ladder", ["ladder", "game"]),
     ...mapState(["authorized", "user"]),
     ...mapState("profile", ["profile"]),
-    ...mapState("game", ["gameInProgress", "enemy"]),
+    ...mapState("game", ["gameInProgress", "enemy", "id"]),
   },
   methods: {
     ...mapMutations("game", [
@@ -116,7 +116,10 @@ export default {
           } else if (this.enemy && !this.gameInProgress) {
             this.$refs.Ladder.cancelAccept(event);
           } else if (this.enemy && this.gameInProgress) {
-            this.$socket.emit("leaveGame", this.user);
+            this.$socket.emit("leaveGame", {
+              login: this.user.login,
+              id: this.id,
+            });
             this.SET_GAME_IN_PROGRESS(false);
             this.$refs.Ladder.clearData("blue");
           }

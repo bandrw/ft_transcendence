@@ -58,7 +58,6 @@ export class UsersController {
   }
   @Post('logout')
   userLogout(@Req() req: Request) {
-    console.log('logout');
     const index = this.UsersService.onlineUsers
       .map(function (e) {
         return e.login;
