@@ -1,7 +1,7 @@
 .social {
 	padding: 30px 0;
-	height: calc(100% - 61px);
-	max-height: 613px;
+	height: calc(100% - 61px + 25px);
+	max-height: 638px;
 
 	.social-title {
 		padding: 0 40px;
@@ -34,6 +34,7 @@
 			font-weight: 450;
 			letter-spacing: 1px;
 			color: #bbb;
+			text-transform: uppercase;
 		}
 
 		ul {

@@ -14,18 +14,22 @@ export class UsersService {
 		public usersRepository: Repository<User>,
 	) {}
 
-	findAll(): Promise<User[]> {
-		return this.usersRepository.find({ relations: ['wonGames', 'lostGames'] });
+	findAll(expand = false): Promise<User[]> {
+		if (expand)
+			return this.usersRepository.find({ relations: ['wonGames', 'lostGames'] });
+		return this.usersRepository.find();
 	}
 
-	findOne(login: string): Promise<User> {
+	findOneByLogin(login: string, expand = false) {
+		if (expand)
+			return this.usersRepository.findOne({ where: { login: login }, relations: ['wonGames', 'lostGames'] });
 		return this.usersRepository.findOne({ where: { login: login } });
 	}
 
-	async login(login: string): Promise<User> {
-		return await this.usersRepository.findOne({
-			where: { login: login },
-		});
+	findOneById(id: number, expand = false): Promise<User> {
+		if (expand)
+			return this.usersRepository.findOne({ where: { id: id }, relations: ['wonGames', 'lostGames'] });
+		return this.usersRepository.findOne({ where: { id: id } });
 	}
 
 	async remove(id: string): Promise<void> {
@@ -54,6 +58,7 @@ export class UsersService {
 		let i = 0;
 		while (i < this.onlineUsers.length) {
 			if (this.onlineUsers[i].login == user.login) {
+				this.onlineUsers[i].id = user.id;
 				this.onlineUsers[i].url_avatar = ret;
 				this.userEvent('updateUser', this.onlineUsers[i]);
 			}
@@ -71,6 +76,7 @@ export class UsersService {
 					event +
 					'\ndata: ' +
 					JSON.stringify({
+						id: user.id,
 						login: user.login,
 						url_avatar: user.url_avatar,
 						status: user.status,

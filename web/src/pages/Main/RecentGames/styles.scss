@@ -3,6 +3,36 @@
 	padding: 30px 40px;
 	position: relative;
 	z-index: 1;
+	height: 295px;
+
+	.recent-games-legend {
+		width: calc(100% - 30px);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 15px;
+		height: 25px;
+
+		div {
+			color: #bbb;
+			font-weight: 300;
+			text-transform: uppercase;
+			font-size: 12px;
+		}
+
+		.recent-games-legend-enemy {
+			width: 200px;
+		}
+		.recent-games-legend-result {
+			width: 50px;
+		}
+		.recent-games-legend-score {
+			width: 60px;
+		}
+		.recent-games-legend-date {
+			width: 150px;
+		}
+	}
 
 	.recent-game {
 		font-size: 1.1em;
@@ -15,6 +45,7 @@
 		z-index: 1;
 
 		.recent-game-enemy {
+			width: 200px;
 			display: flex;
 			align-items: center;
 		}
@@ -32,7 +63,7 @@
 
 		.user-login {
 			margin-left: 40px;
-			max-width: 150px;
+			//max-width: 150px;
 		}
 
 		.recent-game-win {
@@ -47,6 +78,10 @@
 
 		.recent-game-score {
 			width: 60px;
+		}
+
+		.recent-game-date {
+			width: 150px;
 		}
 	}
 }

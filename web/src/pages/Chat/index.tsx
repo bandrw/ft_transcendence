@@ -5,12 +5,12 @@ import { User } from "models/User";
 import React from 'react';
 import { useHistory } from "react-router-dom";
 
-import { UserStatus } from "../../models/apiTypes";
+import { ApiUserStatus } from "../../models/apiTypes";
 
 interface ChatProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
-	status: UserStatus
+	status: ApiUserStatus
 }
 
 const Chat = ({ currentUser, setCurrentUser, status }: ChatProps) => {

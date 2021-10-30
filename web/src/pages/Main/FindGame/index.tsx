@@ -3,7 +3,7 @@ import './styles.scss';
 import { faCheck, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from "axios";
-import { UpdateUser, UserStatus } from "models/apiTypes";
+import { ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 import { Fade } from "react-awesome-reveal";
@@ -11,9 +11,9 @@ import { clearInterval, setInterval } from "timers";
 
 interface AcceptWindowProps {
 	currentUser: User,
-	status: UserStatus,
-	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
-	enemy: UpdateUser | null,
+	status: ApiUserStatus,
+	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
+	enemy: ApiUpdateUser | null,
 	enemyIsReady: boolean
 }
 
@@ -24,14 +24,14 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 	const acceptGame = () => {
 		if (timerIntervalRef.current)
 			clearInterval(timerIntervalRef.current);
-		setStatus(UserStatus.Accepted);
+		setStatus(ApiUserStatus.Accepted);
 
 	};
 
 	const declineGame = () => {
 		if (timerIntervalRef.current)
 			clearInterval(timerIntervalRef.current);
-		setStatus(UserStatus.Declined);
+		setStatus(ApiUserStatus.Declined);
 	};
 
 	React.useEffect(() => {
@@ -62,7 +62,7 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 						<div
 							style={{
 								backgroundImage: `url(${currentUser.urlAvatar})`,
-								borderColor: status === UserStatus.Accepted ? '#29aa44' : 'transparent'
+								borderColor: status === ApiUserStatus.Accepted ? '#29aa44' : 'transparent'
 							}}
 							className='accept-window-info-img'
 						/>
@@ -81,7 +81,7 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 				</div>
 				<div className='accept-window-accept'>
 					{
-						status === UserStatus.Accepted
+						status === ApiUserStatus.Accepted
 							? <div className='accept-btn accept-btn-accepted'>
 									<FontAwesomeIcon icon={faCheck}/>
 								</div>
@@ -99,9 +99,9 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 
 interface FindGameProps {
 	currentUser: User,
-	status: UserStatus,
-	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
-	enemyRef: React.MutableRefObject<UpdateUser | null>,
+	status: ApiUserStatus,
+	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
+	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
 	enemyIsReady: boolean
 }
 
@@ -114,10 +114,10 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 
 		if (!currentUser.isAuthorized())
 			return ;
-		if (status === UserStatus.InGame)
+		if (status === ApiUserStatus.InGame)
 			return ;
 
-		if (status === UserStatus.FoundEnemy) {
+		if (status === ApiUserStatus.FoundEnemy) {
 			if (timerIntervalRef.current)
 				clearInterval(timerIntervalRef.current);
 			setPassedTime(0);
@@ -133,13 +133,13 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 				return ;
 
 			switch (status) {
-				case UserStatus.Regular: {
+				case ApiUserStatus.Regular: {
 					if (timerIntervalRef.current)
 						clearInterval(timerIntervalRef.current);
 					setPassedTime(0);
 					break;
 				}
-				case UserStatus.Searching: {
+				case ApiUserStatus.Searching: {
 					timerIntervalRef.current = setInterval(() => setPassedTime(prev => prev + 1), 1000);
 					break;
 				}
@@ -151,7 +151,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 		};
 	}, [status, currentUser, currentUser.username]);
 
-	if (status === UserStatus.Searching)
+	if (status === ApiUserStatus.Searching)
 		return (
 			<div className='find-game main-block'>
 				<div className='find-game-img'/>
@@ -161,7 +161,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 						<span className='find-game-searching-time'>{`${passedTime} s`}</span>
 					</div>
 					<button
-						onClick={() => setStatus(UserStatus.Regular)}
+						onClick={() => setStatus(ApiUserStatus.Regular)}
 						className='find-game-cancel'
 					>
 						<FontAwesomeIcon icon={faTimesCircle}/>
@@ -170,7 +170,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 			</div>
 		);
 
-	if (status === UserStatus.FoundEnemy || status === UserStatus.Accepted)
+	if (status === ApiUserStatus.FoundEnemy || status === ApiUserStatus.Accepted)
 		return (
 			<div className='find-game main-block'>
 				<div className='find-game-img'/>
@@ -180,7 +180,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 						<span className='find-game-searching-time'>{`${passedTime} s`}</span>
 					</div>
 					<button
-						onClick={() => setStatus(UserStatus.Regular)}
+						onClick={() => setStatus(ApiUserStatus.Regular)}
 						className='find-game-cancel'
 					>
 						<FontAwesomeIcon icon={faTimesCircle}/>
@@ -208,7 +208,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 			<div className='find-game-back'>
 				<span>Find game</span>
 				<button
-					onClick={() => setStatus(UserStatus.Searching)}
+					onClick={() => setStatus(ApiUserStatus.Searching)}
 					className='find-game-btn'
 				>
 					<FontAwesomeIcon icon={faPlay}/>

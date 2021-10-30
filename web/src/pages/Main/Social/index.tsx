@@ -2,21 +2,21 @@ import './styles.scss';
 
 import { faArrowRight, faCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { UpdateUser, UserStatus } from "models/apiTypes";
+import { ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import React from 'react';
 import { Fade } from "react-awesome-reveal";
 
 interface SocialBlockUserProps {
-	user: UpdateUser
+	user: ApiUpdateUser
 }
 
 const SocialBlockUser = ({ user }: SocialBlockUserProps) => {
 	let statusDescription = '';
-	if (user.status === UserStatus.Regular)
+	if (user.status === ApiUserStatus.Regular)
 		statusDescription = 'In main menu';
-	else if (user.status === UserStatus.InGame)
+	else if (user.status === ApiUserStatus.InGame)
 		statusDescription = 'In game';
-	else if (user.status === UserStatus.Offline)
+	else if (user.status === ApiUserStatus.Offline)
 		statusDescription = 'Offline';
 	else
 		statusDescription = 'Searching game';
@@ -40,7 +40,7 @@ const SocialBlockUser = ({ user }: SocialBlockUserProps) => {
 };
 
 interface SocialProps {
-	users: UpdateUser[]
+	users: ApiUpdateUser[]
 }
 
 const Social = ({ users }: SocialProps) => {
@@ -59,7 +59,7 @@ const Social = ({ users }: SocialProps) => {
 			</div>
 			<div className='social-block'>
 				<div className='social-block-title'>
-					<span>FRIENDS</span>
+					<span>friends</span>
 					<FontAwesomeIcon icon={faCircle}/>
 					<span>{0}</span>
 				</div>
@@ -73,7 +73,7 @@ const Social = ({ users }: SocialProps) => {
 			</div>
 			<div className='social-block'>
 				<div className='social-block-title'>
-					<span>ONLINE</span>
+					<span>online</span>
 					<FontAwesomeIcon icon={faCircle}/>
 					<span>{users.length}</span>
 				</div>

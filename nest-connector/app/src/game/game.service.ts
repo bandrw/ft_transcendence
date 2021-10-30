@@ -56,10 +56,10 @@ export class GameService {
 	// }
 
 	async updateStatistics(winnerLogin: string, loserLogin: string, score: { leftPlayer: number, rightPlayer: number }) {
-		const winner = await this.userService.findOne(winnerLogin);
+		const winner = await this.userService.findOneByLogin(winnerLogin);
 		if (!winner)
 			throw new HttpException('Cannot update statistics', HttpStatus.INTERNAL_SERVER_ERROR);
-		const loser = await this.userService.findOne(loserLogin);
+		const loser = await this.userService.findOneByLogin(loserLogin);
 		if (!loser)
 			throw new HttpException('Cannot update statistics', HttpStatus.INTERNAL_SERVER_ERROR);
 

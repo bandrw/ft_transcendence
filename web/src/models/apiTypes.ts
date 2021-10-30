@@ -1,33 +1,55 @@
-type UserCreate = {
+type ApiUserCreate = {
 	ok: boolean,
 	msg: string
 }
+type ApiGame = {
+	id: number,
+	winnerId?: number,
+	loserId?: number,
+	winner?: {
+		id: number,
+		login: string,
+		password: string,
+		url_avatar: string
+	},
+	loser?: {
+		id: number,
+		login: string,
+		password: string,
+		url_avatar: string
+	},
+	leftScore: number,
+	rightScore: number,
+	date: string
+}
 
-type GetUser = {
-	games: number,
+type ApiUser = {
 	id: number,
 	login: string,
 	password: string,
 	url_avatar: string,
+	wonGames?: ApiGame[],
+	lostGames?: ApiGame[]
 }
 
-type UserLogin = {
+type ApiUserLogin = {
 	ok: boolean,
-	msg: GetUser
+	msg: ApiUser
 }
 
-type UserCheckExist = {
+type ApiUserCheckExist = {
 	ok: boolean,
-	msg: string | GetUser
+	msg: string | ApiUser
 }
 
-type UpdateUser = {
+type ApiUpdateUser = {
+	id: number,
 	login: string,
 	status: string,
 	url_avatar: string,
 }
 
-type GameSettings = {
+type ApiGameSettings = {
 	id: number,
 	canvasWidth: number,
 	canvasHeight: number,
@@ -43,7 +65,7 @@ type GameSettings = {
 	rightPlayerUsername: string
 }
 
-type GameLoop = {
+type ApiGameLoop = {
 	b: {
 		x: number,
 		y: number
@@ -56,20 +78,14 @@ type GameLoop = {
 	}
 }
 
-type FetchedUsers = {
+type ApiFetchedUser = {
+	id: number,
 	login: string,
 	status: string,
 	url_avatar: string,
 }
 
-type GetAll = {
-	id: number,
-	login: string,
-	password: string,
-	url_avatar: string,
-}
-
-export enum UserStatus {
+export enum ApiUserStatus {
 	Regular = 'green',
 	Searching = 'yellow',
 	FoundEnemy = 'orange',
@@ -80,13 +96,13 @@ export enum UserStatus {
 }
 
 export type {
-	FetchedUsers,
-	GameLoop,
-	GameSettings,
-	GetAll,
-	GetUser,
-	UpdateUser,
-	UserCheckExist,
-	UserCreate,
-	UserLogin
+	ApiFetchedUser,
+	ApiGame,
+	ApiGameLoop,
+	ApiGameSettings,
+	ApiUpdateUser,
+	ApiUser,
+	ApiUserCheckExist,
+	ApiUserCreate,
+	ApiUserLogin
 };

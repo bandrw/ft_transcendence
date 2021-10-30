@@ -4,20 +4,20 @@ import { faDoorOpen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmationWindow from "components/ConfirmationWindow";
 import Header from "components/Header";
-import { GameSettings, UpdateUser, UserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import GameCanvas from "pages/Game/GameCanvas";
 import React from 'react';
 import { useHistory } from "react-router-dom";
 
 interface GameProps {
-	enemyInfo: UpdateUser | null,
+	enemyInfo: ApiUpdateUser | null,
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
-	gameSettingsRef: React.MutableRefObject<GameSettings | null>,
+	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
-	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>
+	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
 const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSourceRef, gameRef, setStatus }: GameProps) => {
@@ -28,7 +28,7 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSo
 			if (gameRef.current.runs && gameRef.current.interval)
 				clearInterval(gameRef.current.interval);
 			gameRef.current.runs = false;
-			setStatus(UserStatus.Regular);
+			setStatus(ApiUserStatus.Regular);
 			history.push('/');
 		}
 	}, [history, enemyInfo, gameRef, setStatus]);
@@ -40,7 +40,7 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSo
 			<Header
 				currentUser={currentUser}
 				setCurrentUser={setCurrentUser}
-				status={UserStatus.InGame}
+				status={ApiUserStatus.InGame}
 				centerBlock={
 					<div className='header-center'>
 						<button
@@ -58,7 +58,7 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSo
 									if (gameRef.current.runs && gameRef.current.interval)
 										clearInterval(gameRef.current.interval);
 									gameRef.current.runs = false;
-									setStatus(UserStatus.Regular);
+									setStatus(ApiUserStatus.Regular);
 									history.push('/');
 								}}
 								cancelHandler={() => setExitWindowShown(false)}

@@ -3,40 +3,40 @@ import './styles.scss';
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from "axios";
-import { GetAll } from "models/apiTypes";
+import { ApiGame, ApiUpdateUser, ApiUser } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 
-type RecentGame = {
-	id: number,
-	winner: GetAll,
-	loser: GetAll,
-	leftScore: number,
-	rightScore: number,
-	date: string
-}
-
 interface RecentGamesProps {
-	currentUser: User
+	currentUser: User,
+	users: ApiUpdateUser[]
 }
 
-const RecentGames = ({ currentUser }: RecentGamesProps) => {
-	const [gamesHistory, setGamesHistory] = React.useState<RecentGame[]>([]);
+const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
+	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
+
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<RecentGame[]>('/games')
+		axios.get<ApiUser>('/users', { params: { login: currentUser.username, expand: true } })
 			.then(res => {
 				if (!isMounted)
 					return ;
 
-				setGamesHistory(res.data.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
+				if (!res.data.wonGames || !res.data.lostGames)
+					return ;
+				const games: ApiGame[] = [];
+				for (let i in res.data.wonGames)
+					games.push(res.data.wonGames[i]);
+				for (let i in res.data.lostGames)
+					games.push(res.data.lostGames[i]);
+				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
 			});
 
 		return () => {
 			isMounted = false;
 		};
-	}, []);
+	}, [currentUser.username]);
 
 	return (
 		<div className='main-block recent-games'>
@@ -46,35 +46,42 @@ const RecentGames = ({ currentUser }: RecentGamesProps) => {
 					<FontAwesomeIcon icon={faArrowRight}/>
 				</button>
 			</div>
+			<div className='recent-games-legend'>
+				<div className='recent-games-legend-enemy'>enemy</div>
+				<div className='recent-games-legend-result'>result</div>
+				<div className='recent-games-legend-score'>score</div>
+				<div className='recent-games-legend-date'>date</div>
+			</div>
 			{
-				gamesHistory.map((game, i) => {
-					const enemyColor = 'blue';
-					const enemy = game.winner.login === currentUser.username ? game.loser : game.winner;
+				gamesHistory.slice(0, 3).map((game, i) => {
+					const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
+					const enemy = users.find(user => user.id === enemyId);
+					const enemyColor = enemy ? enemy.status : 'transparent';
 
 					return (
 						<div className='recent-game' key={i}>
 							<div className='recent-game-enemy'>
 								<div
-									style={{ backgroundImage: `url(${enemy.url_avatar})` }}
+									style={{ backgroundImage: `url(${enemy?.url_avatar})` }}
 									className='recent-game-img'
 								>
 									<div className='user-status' style={{ backgroundColor: enemyColor }}/>
 								</div>
-								<div className='user-login'>{enemy.login}</div>
+								<div className='user-login'>{enemy?.login}</div>
 							</div>
 							{
-								game.winner.login === currentUser.username
+								game.winnerId === currentUser.id
 									? <div className='recent-game-win'>Win</div>
 									: <div className='recent-game-lose'>Lose</div>
 							}
 							<div className='recent-game-score'>
 								{`${game.leftScore} : ${game.rightScore}`}
 							</div>
-							<div>
+							<div className='recent-game-date'>
 								{
 									new Date(Date.parse(game.date)).toLocaleString('en-US', {
 										year: 'numeric', month: 'numeric', day: 'numeric', minute: '2-digit', hour: '2-digit', hour12: false, timeZone: 'Europe/Moscow'
-									})
+									}).replaceAll('/', '.')
 								}
 							</div>
 						</div>

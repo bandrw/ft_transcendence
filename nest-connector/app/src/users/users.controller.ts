@@ -3,7 +3,7 @@ import {
 	Controller,
 	Get,
 	Header,
-	HttpCode, HttpException, HttpStatus,
+	HttpCode, HttpException, HttpStatus, Param,
 	Post,
 	Query,
 	Req,
@@ -38,9 +38,18 @@ export class UsersController {
 		return { ok: true, msg: `User ${r.login} created` };
 	}
 
-	@Get('/')
-	async getUsers() {
-		return await this.UsersService.findAll();
+	@Get()
+	async getUsers(
+		@Query('login') login: string,
+		@Query('expand') expand: string
+	) {
+		if (login) {
+			const user = await this.UsersService.findOneByLogin(login, expand === 'true');
+			if (!user)
+				throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+			return user;
+		}
+		return await this.UsersService.findAll(expand === 'true');
 	}
 
 	@Get('online')
@@ -108,12 +117,13 @@ export class UsersController {
 		if (!login)
 			throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
 
-		const user = await this.UsersService.findOne(login);
+		const user = await this.UsersService.findOneByLogin(login);
 		if (!user)
 			throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 
 		req.socket.setTimeout(1000 * 60 * 60 * 60);
 		const newUser: OnlineUser = {
+			id: user.id,
 			login: login,
 			resp: response,
 			url_avatar: user.url_avatar,
@@ -131,7 +141,7 @@ export class UsersController {
 		if (!req.body.login)
 			throw new HttpException('Invalid body (login)', HttpStatus.BAD_REQUEST);
 
-		const r = await this.UsersService.login(req.body.login);
+		const r = await this.UsersService.findOneByLogin(req.body.login);
 		if (r) {
 			await this.emitter(req, req.body.login, response);
 			response.send({ ok: true, msg: r });

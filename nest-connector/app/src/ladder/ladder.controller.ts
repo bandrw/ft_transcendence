@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { LadderService } from './ladder.service';
+import { LadderService } from 'ladder/ladder.service';
+
 
 @Controller('ladder')
 export class LadderController {

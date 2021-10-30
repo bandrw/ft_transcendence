@@ -1,6 +1,6 @@
 import './App.scss';
 
-import { GameSettings, UpdateUser, UserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Chat";
 import Game from "pages/Game";
@@ -14,9 +14,9 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 const App = () => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
-	const [status, setStatus] = React.useState<UserStatus>(UserStatus.Regular);
-	const enemyRef = React.useRef<UpdateUser | null>(null);
-	const gameSettingsRef = React.useRef<GameSettings | null>(null);
+	const [status, setStatus] = React.useState<ApiUserStatus>(ApiUserStatus.Regular);
+	const enemyRef = React.useRef<ApiUpdateUser | null>(null);
+	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const eventSourceRef = React.useRef<EventSource | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const mainEventSourceInitializedRef = React.useRef<boolean>(false);

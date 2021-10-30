@@ -1,7 +1,7 @@
 import './styles.scss';
 
 import { SocketContext } from "context/socket";
-import { GameLoop, GameSettings, UpdateUser, UserStatus } from "models/apiTypes";
+import { ApiGameLoop, ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import GameBall from "models/GameBall";
 import Player from "models/Player";
 import { User } from "models/User";
@@ -11,12 +11,12 @@ import { Fade } from "react-awesome-reveal";
 import { setInterval } from "timers";
 
 interface GameCanvasProps {
-	enemyInfo: UpdateUser | null,
+	enemyInfo: ApiUpdateUser | null,
 	currentUser: User,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
-	gameSettingsRef: React.MutableRefObject<GameSettings | null>,
+	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
-	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>
+	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
 const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, gameRef, setStatus }: GameCanvasProps) => {
@@ -50,7 +50,7 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 			if (!gameSettings)
 				return ;
 
-			const data: GameLoop = JSON.parse(e.data);
+			const data: ApiGameLoop = JSON.parse(e.data);
 			if (data.b) {
 				ball.xPosition = data.b.x;
 				ball.yPosition = data.b.y;

@@ -3,7 +3,7 @@ import './styles.scss';
 import axios from "axios";
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { FetchedUsers, GameSettings, GetAll, UpdateUser, UserStatus } from "models/apiTypes";
+import { ApiFetchedUser, ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import RecentGames from "pages/Main/RecentGames";
@@ -15,10 +15,10 @@ import { useHistory } from "react-router-dom";
 interface MainProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
-	status: UserStatus,
-	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>,
-	enemyRef: React.MutableRefObject<UpdateUser | null>,
-	gameSettingsRef: React.MutableRefObject<GameSettings | null>,
+	status: ApiUserStatus,
+	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
+	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
+	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	mainEventSourceInitializedRef: React.MutableRefObject<boolean>
 }
@@ -43,13 +43,13 @@ const Main: React.FC<MainProps> = ({
 	}, [history, currentUser, mainEventSourceInitializedRef]);
 
 	React.useEffect(() => {
-		if (status === UserStatus.InGame)
+		if (status === ApiUserStatus.InGame)
 			history.push('/game');
 	}, [history, status]);
 
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
-	const [users, setUsers] = React.useState<FetchedUsers[]>([]);
-	const usersRef = React.useRef<FetchedUsers[]>([]);
+	const [users, setUsers] = React.useState<ApiFetchedUser[]>([]);
+	const usersRef = React.useRef<ApiFetchedUser[]>([]);
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -57,16 +57,17 @@ const Main: React.FC<MainProps> = ({
 		if (!currentUser.isAuthorized())
 			return ;
 
-		axios.get<GetAll[]>('/users/')
+		axios.get<ApiUser[]>('/users/')
 			.then(res => {
 				if (!isMounted)
 					return ;
 
-				const fetchedUsers = res.data.map((usr: GetAll) => {
+				const fetchedUsers = res.data.map((usr: ApiUser) => {
 					return {
+						id: usr.id,
 						login: usr.login,
 						url_avatar: usr.url_avatar,
-						status: UserStatus.Regular,
+						status: ApiUserStatus.Regular,
 					};
 				});
 				setUsers(fetchedUsers);
@@ -95,12 +96,12 @@ const Main: React.FC<MainProps> = ({
 			return ;
 
 		const logoutHandler = (e: any) => {
-			const data: UpdateUser = JSON.parse(e.data);
+			const data: ApiUpdateUser = JSON.parse(e.data);
 			setUsers(usersRef.current.filter(usr => usr.login !== data.login));
 		};
 
 		const gameSettingsHandler = (e: any) => {
-			const gameSettings: GameSettings = JSON.parse(e.data);
+			const gameSettings: ApiGameSettings = JSON.parse(e.data);
 			gameSettingsRef.current = gameSettings;
 			const data = {
 				login: currentUser.username,
@@ -110,9 +111,9 @@ const Main: React.FC<MainProps> = ({
 		};
 
 		const updateUserHandler = (e: any) => {
-			const data: UpdateUser = JSON.parse(e.data);
+			const data: ApiUpdateUser = JSON.parse(e.data);
 
-			const newUsers: FetchedUsers[] = [];
+			const newUsers: ApiFetchedUser[] = [];
 			// Edit user
 			for (let i = 0; i < usersRef.current.length; ++i) {
 				if (usersRef.current[i].login === data.login)
@@ -126,22 +127,22 @@ const Main: React.FC<MainProps> = ({
 
 			setUsers(newUsers);
 
-			if (!enemyRef.current && status !== UserStatus.Regular) {
-				setStatus(UserStatus.Regular);
-			} else if (enemyRef.current && data.login === enemyRef.current.login && (data.status === UserStatus.Declined || data.status === UserStatus.Regular)) {
-				setStatus(UserStatus.Regular);
-			} else if (enemyRef.current && data.login === enemyRef.current.login && data.status === UserStatus.Accepted) {
+			if (!enemyRef.current && status !== ApiUserStatus.Regular) {
+				setStatus(ApiUserStatus.Regular);
+			} else if (enemyRef.current && data.login === enemyRef.current.login && (data.status === ApiUserStatus.Declined || data.status === ApiUserStatus.Regular)) {
+				setStatus(ApiUserStatus.Regular);
+			} else if (enemyRef.current && data.login === enemyRef.current.login && data.status === ApiUserStatus.Accepted) {
 				setEnemyIsReady(true);
 			}
 		};
 
 		const enemyHandler = (e: any) => {
 			enemyRef.current = JSON.parse(e.data);
-			setStatus(UserStatus.FoundEnemy);
+			setStatus(ApiUserStatus.FoundEnemy);
 		};
 
 		const gameIsReadyHandler = () => {
-			setStatus(UserStatus.InGame);
+			setStatus(ApiUserStatus.InGame);
 		};
 
 		eventSource.addEventListener('logout_SSE', logoutHandler);
@@ -169,7 +170,7 @@ const Main: React.FC<MainProps> = ({
 		};
 	});
 
-	const filteredUsers: UpdateUser[] = [];
+	const filteredUsers: ApiUpdateUser[] = [];
 	for (let i in users) {
 		if (users[i].login !== currentUser.username)
 			filteredUsers.push(users[i]);
@@ -203,6 +204,7 @@ const Main: React.FC<MainProps> = ({
 					>
 						<RecentGames
 							currentUser={currentUser}
+							users={users}
 						/>
 					</Fade>
 				</div>

@@ -3,14 +3,14 @@ import './styles.scss';
 import { faBell } from "@fortawesome/free-solid-svg-icons/faBell";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import UserMenu from "components/Header/UserMenu";
-import { UserStatus } from "models/apiTypes";
+import { ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 
 interface HeaderProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
-	status: UserStatus,
+	status: ApiUserStatus,
 	centerBlock?: JSX.Element
 }
 

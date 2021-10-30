@@ -3,7 +3,7 @@ import './styles.scss';
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
-import { UserLogin } from "models/apiTypes";
+import { ApiUserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 import { Link, useHistory } from "react-router-dom";
@@ -19,12 +19,13 @@ export const signIn = async (
 	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
 	setErrors: React.Dispatch<React.SetStateAction<string> >
 ) => {
-	const r = await axios.post<any, AxiosResponse<UserLogin> >('/users/login', {
+	const r = await axios.post<any, AxiosResponse<ApiUserLogin> >('/users/login', {
 		login
 	})
 		.then(res => {
 			if (res.data.ok && bcryptjs.compareSync(password, res.data.msg.password)) {
 				const usr = new User();
+				usr.id = res.data.msg.id;
 				usr.username = res.data.msg.login;
 				usr.urlAvatar = res.data.msg.url_avatar;
 				usr.loginDate = Date.now();

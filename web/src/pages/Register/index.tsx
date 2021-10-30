@@ -3,7 +3,7 @@ import './styles.scss';
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
-import { UserCheckExist, UserCreate } from "models/apiTypes";
+import { ApiUserCheckExist, ApiUserCreate } from "models/apiTypes";
 import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
@@ -75,7 +75,7 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 
 		setIsLoading(true);
 		setErrors('');
-		const checkExistResponse: UserCheckExist = await axios.get<UserCheckExist>('/users/checkExist', {
+		const checkExistResponse: ApiUserCheckExist = await axios.get<ApiUserCheckExist>('/users/checkExist', {
 			params: { login: login }
 		})
 			.then(res => res.data);
@@ -86,7 +86,7 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 		}
 
 		const hashedPassword = await bcryptjs.hash(password, 10);
-		const usersCreateResponse = await axios.post<any, AxiosResponse<UserCreate> >(
+		const usersCreateResponse = await axios.post<any, AxiosResponse<ApiUserCreate> >(
 			'/users/create', {
 			login: login,
 			pass: hashedPassword

@@ -2,7 +2,7 @@ import './styles.scss';
 
 import { faChevronLeft, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { UserStatus } from "models/apiTypes";
+import { ApiUserStatus } from "models/apiTypes";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
@@ -10,7 +10,7 @@ interface GameResultsProps {
 	winner: string,
 	loser: string,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
-	setStatus: React.Dispatch<React.SetStateAction<UserStatus>>
+	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
 const GameResults = ({ winner, loser, gameRef, setStatus }: GameResultsProps) => {
@@ -36,7 +36,7 @@ const GameResults = ({ winner, loser, gameRef, setStatus }: GameResultsProps) =>
 				<button
 					className='game-results-back-btn'
 					onClick={() => {
-						setStatus(UserStatus.Regular);
+						setStatus(ApiUserStatus.Regular);
 						gameRef.current.runs = false;
 						history.push('/');
 					}}
