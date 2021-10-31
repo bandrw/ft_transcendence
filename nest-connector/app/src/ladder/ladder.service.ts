@@ -62,7 +62,7 @@ export class LadderService {
   }
 
   gameStart(userIndex, login) {
-    this.userPersonalEvent(
+    this.users.userPersonalEvent(
       'enemyIsReady',
       this.users.onlineUsers[userIndex],
       login,
@@ -77,8 +77,16 @@ export class LadderService {
         this.lobby[k].first.status === 'red' &&
         this.lobby[k].second.status === 'red'
       ) {
-        this.userPersonalEvent('gameIsReady', null, this.lobby[k].first.login);
-        this.userPersonalEvent('gameIsReady', null, this.lobby[k].second.login);
+        this.users.userPersonalEvent(
+          'gameIsReady',
+          null,
+          this.lobby[k].first.login,
+        );
+        this.users.userPersonalEvent(
+          'gameIsReady',
+          null,
+          this.lobby[k].second.login,
+        );
         this.games.startGame(
           this.buildGame(this.lobby[k].first, this.lobby[k].second),
         );
@@ -132,38 +140,16 @@ export class LadderService {
     this.lobby[i].second.status = 'orange';
     this.users.userEvent('updateUser', this.lobby[i].first);
     this.users.userEvent('updateUser', this.lobby[i].second);
-    this.userPersonalEvent(
+    this.users.userPersonalEvent(
       'enemy',
       this.lobby[i].first,
       this.lobby[i].second.login,
     );
-    this.userPersonalEvent(
+    this.users.userPersonalEvent(
       'enemy',
       this.lobby[i].second,
       this.lobby[i].first.login,
     );
-  }
-
-  userPersonalEvent(event: string, user: OnlineUser, login: string) {
-    let i = 0;
-    while (i < this.users.onlineUsers.length) {
-      if (this.users.onlineUsers[i].login === login) {
-        let data;
-        if (user) {
-          data = JSON.stringify({
-            login: user.login,
-            url_avatar: user.url_avatar,
-            status: user.status,
-          });
-        } else {
-          data = false;
-        }
-        this.users.onlineUsers[i].resp.write(
-          `event: ${event}\ndata: ${data}\n\n`,
-        );
-      }
-      ++i;
-    }
   }
 
   removeFromLadder(user: OnlineUser, func) {
@@ -202,7 +188,11 @@ export class LadderService {
   sendSingleEvents(userIndex: number) {
     this.lobby[userIndex].first.status = 'yellow';
     this.users.userEvent('updateUser', this.lobby[userIndex].first);
-    this.userPersonalEvent('enemy', null, this.lobby[userIndex].first.login);
+    this.users.userPersonalEvent(
+      'enemy',
+      null,
+      this.lobby[userIndex].first.login,
+    );
   }
 
   findAnotherLobby(userIndex: number): boolean {

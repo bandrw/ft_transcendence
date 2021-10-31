@@ -95,4 +95,23 @@ export class UsersService {
       ++i;
     }
   }
+  userPersonalEvent(event: string, user: OnlineUser, login: string) {
+    let i = 0;
+    while (i < this.onlineUsers.length) {
+      if (this.onlineUsers[i].login === login) {
+        let data;
+        if (user) {
+          data = JSON.stringify({
+            login: user.login,
+            url_avatar: user.url_avatar,
+            status: user.status,
+          });
+        } else {
+          data = false;
+        }
+        this.onlineUsers[i].resp.write(`event: ${event}\ndata: ${data}\n\n`);
+      }
+      ++i;
+    }
+  }
 }

@@ -3,6 +3,7 @@
 </template>
 <script>
 import { mapState, mapMutations } from "vuex";
+import eventService from "../services/eventService";
 
 export default {
   computed: {
@@ -24,6 +25,7 @@ export default {
       "CLEAR_ACCEPT_INTERVAL",
       "CLEAR_FIND_INTERVAL",
       "SET_ENEMY_READY_STATUS",
+      "CLEAR_LADDER",
     ]),
     ...mapMutations("game", [
       "CLEAR_BALL_INTERVAL",
@@ -59,9 +61,14 @@ export default {
     updateUserStats(event) {
       const stats = JSON.parse(event.data);
       let i = 0;
-      this.INCREMENT_USER_GAMES();
-      if (this.user.login === stats.winner) {
-        this.INCREMENT_USER_WINS();
+      if (
+        this.user.login === stats.winner ||
+        this.user.login === stats.looser
+      ) {
+        this.INCREMENT_USER_GAMES();
+        if (this.user.login === stats.winner) {
+          this.INCREMENT_USER_WINS();
+        }
       }
       while (i < this.users.length) {
         if (this.users[i].login === stats.winner) {
@@ -163,6 +170,13 @@ export default {
     enemyPosition(event) {
       this.SET_ENEMY_POS_X(event.data);
     },
+    enemyHasLeaveGame() {
+      console.log("enemyHasLeaveGame");
+      this.SET_GAME_IN_PROGRESS(false);
+      eventService.setStatus(this.user.login, "blue");
+      this.CLEAR_LADDER();
+      this.SET_ENEMY(null);
+    },
     listenEvents() {
       this.CREATE_EVENT_SOURCE(this.user.login);
       this.eventSource.addEventListener("login", this.addUser);
@@ -178,6 +192,10 @@ export default {
       this.eventSource.addEventListener("gameSettings", this.gameSettings);
       this.eventSource.addEventListener("ballLaunch", this.ballLaunch);
       this.eventSource.addEventListener("enemyPosition", this.enemyPosition);
+      this.eventSource.addEventListener(
+        "enemyHasLeaveGame",
+        this.enemyHasLeaveGame
+      );
       // this.eventSource.addEventListener("getMessage")
     },
   },

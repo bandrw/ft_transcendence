@@ -26,9 +26,21 @@ export class GameService {
         game.playerTwo.user.login,
         game.playerOne.user.login,
       );
+      console.log('enemyHasLeaveGame');
+      this.userService.userPersonalEvent(
+        'enemyHasLeaveGame',
+        null,
+        game.playerOne.user.login,
+      );
     } else {
       await this.updateStatistics(
         game.playerOne.user.login,
+        game.playerTwo.user.login,
+      );
+      console.log('enemyHasLeaveGame');
+      this.userService.userPersonalEvent(
+        'enemyHasLeaveGame',
+        null,
         game.playerTwo.user.login,
       );
     }
