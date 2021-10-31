@@ -57,7 +57,11 @@ export default {
       "SET_GAME_IN_PROGRESS",
     ]),
     ...mapMutations("profile", ["SET_PROFILE"]),
-    ...mapMutations("ladder", ["CLEAR_FIND_INTERVAL", "CLEAR_ACCEPT_INTERVAL"]),
+    ...mapMutations("ladder", [
+      "CLEAR_FIND_INTERVAL",
+      "CLEAR_ACCEPT_INTERVAL",
+      "CLEAR_LADDER",
+    ]),
     ...mapMutations([
       "CLOSE_EVENT_SOURCE",
       "SET_ENEMY",
@@ -121,7 +125,9 @@ export default {
               id: this.id,
             });
             this.SET_GAME_IN_PROGRESS(false);
-            this.$refs.Ladder.clearData("blue");
+            eventService.setStatus(this.user.login, "blue");
+            this.CLEAR_LADDER();
+            this.SET_ENEMY(null);
           }
         }
       }
