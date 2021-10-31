@@ -5,12 +5,27 @@
 	z-index: 1;
 	height: 295px;
 
+	.recent-games-link {
+		font-size: 1.5em;
+
+		svg {
+			transition: all 0.15s ease-in-out;
+			color: #aaa;
+		}
+
+		&:hover {
+			svg {
+				color: white;
+			}
+		}
+	}
+
 	.recent-games-legend {
 		width: calc(100% - 30px);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0 15px;
+		padding: 15px 15px 0;
 		height: 25px;
 
 		div {
@@ -38,11 +53,14 @@
 		font-size: 1.1em;
 		width: calc(100% - 30px);
 		display: flex;
-		padding: 10px 15px;
+		padding: 5px 15px;
+		margin: 10px 0;
 		align-items: center;
 		justify-content: space-between;
 		position: relative;
 		z-index: 1;
+		transition: all 0.1s ease-in-out;
+		border-radius: 15px;
 
 		.recent-game-enemy {
 			width: 200px;
@@ -82,6 +100,18 @@
 
 		.recent-game-date {
 			width: 150px;
+		}
+
+		&:hover {
+			background: #2c2f3a;
+
+			.recent-game-img {
+				background-color: #21232b;
+			}
+		}
+
+		&:last-child {
+			margin-bottom: 0;
 		}
 	}
 }

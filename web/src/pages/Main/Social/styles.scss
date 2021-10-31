@@ -38,7 +38,7 @@
 		}
 
 		ul {
-			padding: 0 40px;
+			padding: 0 25px;
 			list-style-type: none;
 			overflow: auto;
 
@@ -53,6 +53,9 @@
 			justify-content: space-between;
 			margin: 15px 0;
 			align-items: center;
+			transition: all 0.1s ease-in-out;
+			border-radius: 15px;
+			padding: 5px 25px;
 
 			.social-block-user-img {
 				position: relative;
@@ -74,6 +77,14 @@
 				text-align: right;
 				width: 150px;
 				color: #bbb;
+			}
+
+			&:hover {
+				background: #2c2f3a;
+
+				.social-block-user-img {
+					background-color: #21232b;
+				}
 			}
 		}
 	}

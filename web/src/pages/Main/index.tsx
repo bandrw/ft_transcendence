@@ -1,9 +1,8 @@
 import './styles.scss';
 
-import axios from "axios";
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { ApiFetchedUser, ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiFetchedUser, ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import RecentGames from "pages/Main/RecentGames";
@@ -20,7 +19,10 @@ interface MainProps {
 	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
-	mainEventSourceInitializedRef: React.MutableRefObject<boolean>
+	mainEventSourceInitializedRef: React.MutableRefObject<boolean>,
+	users: ApiFetchedUser[],
+	setUsers: React.Dispatch<React.SetStateAction<ApiFetchedUser[]>>,
+	usersRef: React.MutableRefObject<ApiFetchedUser[]>,
 }
 
 const Main: React.FC<MainProps> = ({
@@ -31,7 +33,10 @@ const Main: React.FC<MainProps> = ({
 																		 enemyRef,
 																		 gameSettingsRef,
 																		 eventSourceRef,
-																		 mainEventSourceInitializedRef
+																		 mainEventSourceInitializedRef,
+																		 users,
+																		 setUsers,
+																		 usersRef
 	}) => {
 	const history = useHistory();
 
@@ -48,39 +53,6 @@ const Main: React.FC<MainProps> = ({
 	}, [history, status]);
 
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
-	const [users, setUsers] = React.useState<ApiFetchedUser[]>([]);
-	const usersRef = React.useRef<ApiFetchedUser[]>([]);
-
-	React.useEffect(() => {
-		let isMounted = true;
-
-		if (!currentUser.isAuthorized())
-			return ;
-
-		axios.get<ApiUser[]>('/users/')
-			.then(res => {
-				if (!isMounted)
-					return ;
-
-				const fetchedUsers = res.data.map((usr: ApiUser) => {
-					return {
-						id: usr.id,
-						login: usr.login,
-						url_avatar: usr.url_avatar,
-						status: ApiUserStatus.Regular,
-					};
-				});
-				setUsers(fetchedUsers);
-			});
-
-		return () => {
-			isMounted = false;
-		};
-	}, [currentUser]);
-
-	React.useEffect(() => {
-		usersRef.current = users;
-	}, [users]);
 
 	const socket = React.useContext(SocketContext);
 

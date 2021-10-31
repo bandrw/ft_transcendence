@@ -114,5 +114,21 @@ header {
 				background: #24273a;
 			}
 		}
+
+		.games-history-header {
+			.home-link {
+				font-size: 26px;
+				color: #ccc;
+				transition: all 0.15s ease-in-out;
+
+				svg {
+					margin-right: 10px;
+				}
+
+				&:hover {
+					color: white;
+				}
+			}
+		}
 	}
 }

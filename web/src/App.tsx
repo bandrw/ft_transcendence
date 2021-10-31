@@ -1,6 +1,7 @@
 import './App.scss';
 
-import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import axios from "axios";
+import { ApiFetchedUser, ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Chat";
 import Game from "pages/Game";
@@ -10,6 +11,8 @@ import Register from "pages/Register";
 import React from 'react';
 import { useMediaQuery } from "react-responsive";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
+import GamesHistory from "./pages/GamesHistory";
 
 const App = () => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
@@ -21,6 +24,39 @@ const App = () => {
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const mainEventSourceInitializedRef = React.useRef<boolean>(false);
 	const [currentUser, setCurrentUser] =  React.useState<User>(new User());
+	const [users, setUsers] = React.useState<ApiFetchedUser[]>([]);
+	const usersRef = React.useRef<ApiFetchedUser[]>([]);
+
+	React.useEffect(() => {
+		usersRef.current = users;
+	}, [users, usersRef]);
+
+	React.useEffect(() => {
+		let isMounted = true;
+
+		if (!currentUser.isAuthorized())
+			return ;
+
+		axios.get<ApiUser[]>('/users/')
+			.then(res => {
+				if (!isMounted)
+					return ;
+
+				const fetchedUsers = res.data.map((usr: ApiUser) => {
+					return {
+						id: usr.id,
+						login: usr.login,
+						url_avatar: usr.url_avatar,
+						status: ApiUserStatus.Regular,
+					};
+				});
+				setUsers(fetchedUsers);
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [currentUser, setUsers]);
 
 	React.useEffect(() => {
 		if (!currentUser.isAuthorized())
@@ -78,6 +114,15 @@ const App = () => {
 					/>
 				</Route>
 
+				<Route path='/games/:login'>
+					<GamesHistory
+						currentUser={currentUser}
+						setCurrentUser={setCurrentUser}
+						status={status}
+						users={users}
+					/>
+				</Route>
+
 				<Route exact path='/'>
 					<Main
 						currentUser={currentUser}
@@ -88,6 +133,9 @@ const App = () => {
 						gameSettingsRef={gameSettingsRef}
 						eventSourceRef={eventSourceRef}
 						mainEventSourceInitializedRef={mainEventSourceInitializedRef}
+						users={users}
+						setUsers={setUsers}
+						usersRef={usersRef}
 					/>
 				</Route>
 

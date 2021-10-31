@@ -5,7 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from "axios";
 import { ApiGame, ApiUpdateUser, ApiUser } from "models/apiTypes";
 import { User } from "models/User";
+import { GameTime } from "pages/GamesHistory";
 import React from 'react';
+import { Link } from "react-router-dom";
 
 interface RecentGamesProps {
 	currentUser: User,
@@ -42,9 +44,9 @@ const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
 		<div className='main-block recent-games'>
 			<div className='main-block-title'>
 				<span>Recent games</span>
-				<button>
+				<Link className='recent-games-link' to={`/games/${currentUser.username}`}>
 					<FontAwesomeIcon icon={faArrowRight}/>
-				</button>
+				</Link>
 			</div>
 			<div className='recent-games-legend'>
 				<div className='recent-games-legend-enemy'>enemy</div>
@@ -78,11 +80,7 @@ const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
 								{`${game.leftScore} : ${game.rightScore}`}
 							</div>
 							<div className='recent-game-date'>
-								{
-									new Date(Date.parse(game.date)).toLocaleString('en-US', {
-										year: 'numeric', month: 'numeric', day: 'numeric', minute: '2-digit', hour: '2-digit', hour12: false, timeZone: 'Europe/Moscow'
-									}).replaceAll('/', '.')
-								}
+								<GameTime date={ Date.parse(game.date) }/>
 							</div>
 						</div>
 					);

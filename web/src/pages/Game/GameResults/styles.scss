@@ -48,7 +48,7 @@
 		.game-results-winner {
 			font-size: 28px;
 			margin-bottom: 10px;
-			margin-top: 40px;
+			margin-top: 60px;
 
 			div {
 				svg {
@@ -58,11 +58,12 @@
 		}
 
 		.game-results-loser {
+			margin-top: 20px;
 			font-size: 24px;
 		}
 
 		.game-results-buttons {
-			margin-top: 40px;
+			margin-top: 80px;
 			display: flex;
 			justify-content: center;
 
@@ -78,11 +79,19 @@
 				font-weight: 500;
 				display: flex;
 				align-items: center;
+				transition: 0.1s ease-in-out;
 
 				svg {
 					color: white;
 					font-size: 1em;
 					margin-right: 10px;
+				}
+
+				&:hover {
+					background: #21b941;
+				}
+				&:active {
+					opacity: 0.8;
 				}
 			}
 		}
