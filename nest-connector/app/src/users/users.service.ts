@@ -20,12 +20,6 @@ export class UsersService {
     );
   }
 
-  async login(@Res() res: Response, login: string): Promise<User> {
-    return await this.usersRepository.findOne({
-      where: { login: login },
-    });
-  }
-
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
   }

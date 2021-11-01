@@ -34,6 +34,7 @@ export default new Vuex.Store({
       ++state.user.games;
     },
     INCREMENT_USER_WINS(state) {
+      console.log("wins: " + state.user.wins);
       ++state.user.wins;
     },
     INCREMENT_USERS_GAMES(state, index) {

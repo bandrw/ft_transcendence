@@ -6,6 +6,7 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
@@ -59,6 +60,21 @@ export class Events
     const u = JSON.parse(user);
     await this.gameService.addScore(this.gameService.games[u.id], u.login);
   }
+  @SubscribeMessage('login')
+  async login(@ConnectedSocket() client: Socket, @MessageBody() login: string) {
+    const user = await this.userService.usersRepository.findOne({
+      where: { login: login },
+    });
+    let i = 0;
+    while (i < this.userService.onlineUsers.length) {
+      if (this.userService.onlineUsers[i].login === login) {
+        client.emit('userEntity', 'doubleLogin');
+        return;
+      }
+      ++i;
+    }
+    client.emit('userEntity', user);
+  }
   @SubscribeMessage('leaveGame')
   async leaveGame(@MessageBody() data: any) {
     await this.gameService.leaveGame(
@@ -81,7 +97,7 @@ export class Events
   }
 
   handleConnection(client: Socket, ...args: any[]): any {
-    this.logger.log('client connected: ' + client + args);
+    this.logger.log('client connected: ' + client.id + args);
   }
 
   handleDisconnect(client: Socket): any {

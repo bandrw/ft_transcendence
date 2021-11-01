@@ -59,9 +59,11 @@ export default {
         this.error = "please enter password";
         return;
       }
-      const user = await eventService.login(this.login).then((response) => {
-        return response.data;
-      });
+      this.$socket.emit("login", this.login);
+    },
+  },
+  sockets: {
+    async userEntity(user) {
       if (user === "doubleLogin") {
         this.error = "user with the same login already in game";
         return;

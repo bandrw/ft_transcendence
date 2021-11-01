@@ -80,7 +80,6 @@ export default {
       this.SET_AUTHORIZE(false);
       this.SET_PROFILE(false);
       this.SET_USERS(null);
-      // this.CLEAR_USER();
     },
     showProfile() {
       this.SET_PROFILE(!this.profile);

@@ -65,8 +65,10 @@ export default {
         this.user.login === stats.winner ||
         this.user.login === stats.looser
       ) {
+        console.log(this.user);
         this.INCREMENT_USER_GAMES();
         if (this.user.login === stats.winner) {
+          console.log("wins0: " + this.user.wins);
           this.INCREMENT_USER_WINS();
         }
       }
@@ -171,7 +173,6 @@ export default {
       this.SET_ENEMY_POS_X(event.data);
     },
     enemyHasLeaveGame() {
-      console.log("enemyHasLeaveGame");
       this.SET_GAME_IN_PROGRESS(false);
       eventService.setStatus(this.user.login, "blue");
       this.CLEAR_LADDER();

@@ -8,7 +8,6 @@ import {
   Header,
   HttpCode,
 } from '@nestjs/common';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UsersService } from './users.service';
 import { Response, Request } from 'express';
 import { OnlineUser } from './users.interface';
@@ -31,8 +30,8 @@ export class UsersController {
     await this.UsersService.create(req.body.login, req.body.pass);
   }
   @Get('getAll')
-  getUsers(@Res() res: Response) {
-    this.UsersService.findAll(res);
+  async getUsers(@Res() res: Response) {
+    return await this.UsersService.findAll(res);
   }
   @Get('getOnline')
   getOnline(@Res() response: Response) {
@@ -49,8 +48,8 @@ export class UsersController {
     );
   }
   @Get('del')
-  delUser(@Query('id') id) {
-    this.UsersService.remove(id);
+  async delUser(@Query('id') id) {
+    await this.UsersService.remove(id);
   }
   @Get('avatar')
   async updateAvatar(@Query('login') login): Promise<string> {
@@ -58,25 +57,18 @@ export class UsersController {
   }
   @Post('logout')
   userLogout(@Req() req: Request) {
-    const index = this.UsersService.onlineUsers
-      .map(function (e) {
-        return e.login;
-      })
-      .indexOf(req.body.user.login);
-    if (index != -1) {
-      this.UsersService.userEvent(
-        'logout_SSE',
-        this.UsersService.onlineUsers[index],
-      );
-      this.UsersService.onlineUsers[index].resp.end();
-      this.UsersService.onlineUsers.splice(index, 1);
-      this.UsersService.onlineUsers = this.UsersService.onlineUsers.filter(
-        function (val) {
-          if (val) {
-            return val;
-          }
-        },
-      );
+    let index = 0;
+    while (index < this.UsersService.onlineUsers.length) {
+      if (this.UsersService.onlineUsers[index].login === req.body.login) {
+        this.UsersService.userEvent(
+          'logout_SSE',
+          this.UsersService.onlineUsers[index],
+        );
+        this.UsersService.onlineUsers[index].resp.end();
+        this.UsersService.onlineUsers[index] = null;
+        return;
+      }
+      ++index;
     }
   }
 
@@ -110,17 +102,5 @@ export class UsersController {
     };
     this.UsersService.onlineUsers.push(newUser);
     this.UsersService.userEvent('login', newUser);
-  }
-  @Post('login')
-  async authentification(@Req() req: Request, @Res() response: Response) {
-    // let i = 0;
-    // while (i < this.UsersService.onlineUsers.length) {
-    //   if (this.UsersService.onlineUsers[i].login === req.body.login) {
-    //     response.send('doubleLogin');
-    //     return;
-    //   }
-    //   ++i;
-    // }
-    response.send(await this.UsersService.login(response, req.body.login));
   }
 }
