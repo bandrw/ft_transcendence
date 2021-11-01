@@ -20,6 +20,20 @@ export class UsersService {
     );
   }
 
+  logout(login: string) {
+    let index = 0;
+    while (index < this.onlineUsers.length) {
+      if (this.onlineUsers[index] && this.onlineUsers[index].login === login) {
+        this.userEvent('logout_SSE', this.onlineUsers[index]);
+        this.onlineUsers[index].resp.end();
+        this.onlineUsers[index] = null;
+        this.onlineUsers = this.onlineUsers.filter((user) => user);
+        return;
+      }
+      ++index;
+    }
+  }
+
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
   }

@@ -5,4 +5,5 @@ export interface OnlineUser {
   status: string;
   games: number;
   wins: number;
+  socketId: string;
 }

@@ -179,7 +179,10 @@ export default {
       this.SET_ENEMY(null);
     },
     listenEvents() {
-      this.CREATE_EVENT_SOURCE(this.user.login);
+      this.CREATE_EVENT_SOURCE({
+        login: this.user.login,
+        socketId: this.user.socketId,
+      });
       this.eventSource.addEventListener("login", this.addUser);
       this.eventSource.addEventListener(
         "updateUsersStats",

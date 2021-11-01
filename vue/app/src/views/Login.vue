@@ -63,19 +63,20 @@ export default {
     },
   },
   sockets: {
-    async userEntity(user) {
-      if (user === "doubleLogin") {
+    async userEntity(data) {
+      if (data === "doubleLogin") {
         this.error = "user with the same login already in game";
         return;
       }
-      if (user) {
-        if (cryptService.comparePassword(this.password, user.password)) {
+      if (data.user) {
+        if (cryptService.comparePassword(this.password, data.user.password)) {
           const onlineUsers = await eventService
             .onlineUsers()
             .then(function (response) {
               return response.data ? response.data : [];
             });
-          this.setUsers({ users: onlineUsers, user: user });
+          data.user.socketId = data.socketId;
+          this.setUsers({ users: onlineUsers, user: data.user });
           this.error = null;
           this.$refs.eventSource.listenEvents();
         } else {

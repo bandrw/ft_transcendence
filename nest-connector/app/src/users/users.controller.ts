@@ -37,13 +37,17 @@ export class UsersController {
   getOnline(@Res() response: Response) {
     response.send(
       this.UsersService.onlineUsers.map(function (e) {
-        return {
-          login: e.login,
-          url_avatar: e.url_avatar,
-          status: e.status,
-          games: e.games,
-          wins: e.wins,
-        };
+        if (e) {
+          return {
+            login: e.login,
+            url_avatar: e.url_avatar,
+            status: e.status,
+            games: e.games,
+            wins: e.wins,
+          };
+        } else {
+          return null;
+        }
       }),
     );
   }
@@ -57,19 +61,7 @@ export class UsersController {
   }
   @Post('logout')
   userLogout(@Req() req: Request) {
-    let index = 0;
-    while (index < this.UsersService.onlineUsers.length) {
-      if (this.UsersService.onlineUsers[index].login === req.body.login) {
-        this.UsersService.userEvent(
-          'logout_SSE',
-          this.UsersService.onlineUsers[index],
-        );
-        this.UsersService.onlineUsers[index].resp.end();
-        this.UsersService.onlineUsers[index] = null;
-        return;
-      }
-      ++index;
-    }
+    this.UsersService.logout(req.body.login);
   }
 
   @Get('checkExist')
@@ -86,6 +78,7 @@ export class UsersController {
   async emitter(
     @Req() req: Request,
     @Query('login') login,
+    @Query('socketId') socketId,
     @Res() response: Response,
   ) {
     const user = await this.UsersService.usersRepository.findOne({
@@ -99,6 +92,7 @@ export class UsersController {
       status: 'green',
       games: user.games,
       wins: user.wins,
+      socketId: socketId,
     };
     this.UsersService.onlineUsers.push(newUser);
     this.UsersService.userEvent('login', newUser);

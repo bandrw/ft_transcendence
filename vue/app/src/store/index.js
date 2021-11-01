@@ -16,9 +16,9 @@ export default new Vuex.Store({
     eventSource: false,
   },
   mutations: {
-    CREATE_EVENT_SOURCE(state, login) {
+    CREATE_EVENT_SOURCE(state, data) {
       state.eventSource = new EventSource(
-        `http://localhost:3000/users/login?login=${login}`
+        `http://localhost:3000/users/login?login=${data.login}&socketId=${data.socketId}`
       );
     },
     CLOSE_EVENT_SOURCE(state) {

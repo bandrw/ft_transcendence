@@ -67,13 +67,16 @@ export class Events
     });
     let i = 0;
     while (i < this.userService.onlineUsers.length) {
-      if (this.userService.onlineUsers[i].login === login) {
+      if (
+        this.userService.onlineUsers[i] &&
+        this.userService.onlineUsers[i].login === login
+      ) {
         client.emit('userEntity', 'doubleLogin');
         return;
       }
       ++i;
     }
-    client.emit('userEntity', user);
+    client.emit('userEntity', { user: user, socketId: client.id });
   }
   @SubscribeMessage('leaveGame')
   async leaveGame(@MessageBody() data: any) {
@@ -102,5 +105,13 @@ export class Events
 
   handleDisconnect(client: Socket): any {
     this.logger.log(`Client disconnected : ${client.id}`);
+    let i = 0;
+    while (i < this.userService.onlineUsers.length) {
+      if (this.userService.onlineUsers[i].socketId === client.id) {
+        this.userService.logout(this.userService.onlineUsers[i].login);
+        return;
+      }
+      ++i;
+    }
   }
 }
