@@ -20,6 +20,10 @@ export default {
       "INCREMENT_USER_GAMES",
       "DEL_USER",
       "SET_ENEMY",
+      "SET_USERS_STATUS",
+      "SET_USERS_URL_AVATAR",
+      "SET_ENEMY_STATUS",
+      "SET_ENEMY_URL_AVATAR",
     ]),
     ...mapMutations("ladder", [
       "CLEAR_ACCEPT_INTERVAL",
@@ -96,24 +100,30 @@ export default {
       let index = 0;
       while (index < this.users.length) {
         if (this.users[index].login === user.login) {
-          this.users[index].status = user.status;
-          this.users[index].url_avatar = user.url_avatar;
+          this.SET_USERS_STATUS({
+            index: index,
+            status: user.status,
+          });
+          this.SET_USERS_URL_AVATAR({
+            index: index,
+            url_avatar: user.url_avatar,
+          });
           break;
         }
         ++index;
       }
       if (this.enemy && this.enemy.login === user.login) {
-        this.enemy.status = user.status;
-        this.enemy.url_avatar = user.url_avatar;
+        this.SET_ENEMY_URL_AVATAR(user.url_avatar);
+        this.SET_ENEMY_STATUS(user.status);
       }
     },
     setEnemy(event) {
       const enemy = JSON.parse(event.data);
       this.SET_ENEMY(enemy);
-      this.SET_ENEMY_READY_STATUS("yellow");
+      this.SET_ENEMY_READY_STATUS("gameNotAccepted");
     },
     enemyIsReady() {
-      this.SET_ENEMY_READY_STATUS("green");
+      this.SET_ENEMY_READY_STATUS("gameAccepted");
     },
     gameIsReady() {
       this.CLEAR_FIND_INTERVAL();

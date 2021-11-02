@@ -2,7 +2,7 @@
   <div v-on:click="findGame" :id="idGame" class="Jquery_bundle">
     <div v-if="enemy">
       <div
-        v-show="readyStatus === 'yellow'"
+        v-show="readyStatus === 'gameNotAccepted'"
         id="accept_button"
         @click="gameAccept"
       >
@@ -13,13 +13,10 @@
       <div id="ladder_you">
         <img :src="user.url_avatar" width="100%" height="100%" alt="" />
       </div>
-      <div
-        id="ladder_ready_you"
-        :style="{ backgroundColor: readyStatus }"
-      ></div>
+      <div id="ladder_ready_you" :style="{ backgroundColor: readyColor }"></div>
       <div
         id="ladder_ready_enemy"
-        :style="{ backgroundColor: enemyReadyStatus }"
+        :style="{ backgroundColor: enemyReadyColor }"
       ></div>
       <div id="ladder_enemy">
         <img :src="enemy.url_avatar" width="100%" height="100%" alt="" />
@@ -58,6 +55,20 @@ export default {
     idGame: function () {
       return this.enemy ? "game_accept" : "search_ladder";
     },
+    readyColor: function () {
+      if (this.readyStatus === "gameNotAccepted") {
+        return "yellow";
+      } else {
+        return "green";
+      }
+    },
+    enemyReadyColor: function () {
+      if (this.enemyReadyStatus === "gameNotAccepted") {
+        return "yellow";
+      } else {
+        return "green";
+      }
+    },
   },
   methods: {
     ...mapMutations("ladder", [
@@ -75,7 +86,7 @@ export default {
     ]),
     ...mapMutations(["SET_ENEMY"]),
     gameAccept() {
-      this.SET_READY_STATUS("green");
+      this.SET_READY_STATUS("gameAccepted");
       eventService.setStatus(this.enemy.login, "red");
     },
     clearIntervals: function () {
@@ -105,7 +116,7 @@ export default {
         this.FIND_TICK();
         if (this.enemy && !this.breaker) {
           this.SET_BREAKER(true);
-          this.SET_READY_STATUS("yellow");
+          this.SET_READY_STATUS("gameNotAccepted");
           this.waiting();
         }
       } else {
@@ -136,10 +147,10 @@ export default {
       if (this.authorized && this.timerAccept > 0.1) {
         this.ACCEPT_TICK();
       } else {
-        this.clearIntervals();
-        if (this.readyStatus === "yellow") {
+        // this.clearIntervals();
+        if (this.readyStatus === "gameNotAccepted") {
           this.clearData("blue");
-        } else if (this.readyStatus === "green") {
+        } else if (this.readyStatus === "gameAccepted") {
           this.SET_ENEMY(false);
           this.backToSearch();
         }

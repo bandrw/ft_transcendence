@@ -10,8 +10,8 @@ export const state = {
   ladder: "play",
   game: false,
   breaker: false,
-  readyStatus: "yellow",
-  enemyReadyStatus: "yellow",
+  readyStatus: "gameNotAccepted",
+  enemyReadyStatus: "gameNotAccepted",
 };
 
 export const mutations = {
