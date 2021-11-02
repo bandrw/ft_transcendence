@@ -1,79 +1,20 @@
-.games-history-wrapper {
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
+.list-section {
+	width: calc(100% - 50px);
+	border: 3px solid #1a1b1f;
+	padding: 25px;
+	border-radius: 18px;
 
-.games-history {
-	padding-top: 20px;
-	margin-top: 80px;
-	margin-bottom: 80px;
-	width: calc(100% - 80px);
-	max-width: calc(2560px - 80px);
-	height: fit-content;
-	display: flex;
-	flex-direction: column;
-
-	h1 {
-		text-align: left;
-		font-size: 3em;
-		font-weight: 300;
+	.list-section-title {
+		display: flex;
+		margin-bottom: 25px;
 	}
 
-	.games-history-games {
-		width: calc(100% - 50px);
-		padding: 25px;
-		margin-top: 20px;
-
-		.games-history-legend {
-			width: calc(100% - 50px);
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0 25px;
-			height: 25px;
-
-			div {
-				color: #bbb;
-				font-weight: 300;
-				text-transform: uppercase;
-				font-size: 12px;
-			}
-
-			.games-history-legend-enemy {
-				width: 220px;
-			}
-			.games-history-legend-result {
-				width: 50px;
-			}
-			.games-history-legend-score {
-				width: 60px;
-			}
-			.games-history-legend-date {
-				width: 160px;
-			}
-		}
-
-		.recent-games-empty {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			font-size: 24px;
-			padding: 25px;
-			margin-top: 25px;
-
-			svg {
-				margin-left: 15px;
-				color: #29aa44;
-			}
-		}
-
+	.list-section-list {
 		.games-history-game {
 			display: flex;
 			padding: 5px 25px;
 			margin: 10px 0;
-			font-size: 1.1em;
+			font-size: 0.8em;
 			width: calc(100% - 50px);
 			align-items: center;
 			justify-content: space-between;

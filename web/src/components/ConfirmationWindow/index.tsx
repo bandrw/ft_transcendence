@@ -16,13 +16,13 @@ const ConfirmationWindow = ({ title, okHandler, cancelHandler }: ConfirmationWin
 				<div className='confirmation-window-buttons'>
 					<button
 						className='confirmation-window-ok-btn'
-						onClick={okHandler}
+						onClick={ okHandler }
 					>
 						Yes
 					</button>
 					<button
 						className='confirmation-window-cancel-btn'
-						onClick={cancelHandler}
+						onClick={ cancelHandler }
 					>
 						Cancel
 					</button>

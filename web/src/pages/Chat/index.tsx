@@ -24,9 +24,9 @@ const Chat = ({ currentUser, setCurrentUser, status }: ChatProps) => {
 	return (
 		<div className='chat-container'>
 			<Header
-				currentUser={currentUser}
-				setCurrentUser={setCurrentUser}
-				status={status}
+				currentUser={ currentUser }
+				setCurrentUser={ setCurrentUser }
+				status={ status }
 			/>
 			Chat view
 		</div>

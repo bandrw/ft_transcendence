@@ -41,6 +41,10 @@
 		&:active {
 			background: #323646;
 		}
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 
 	.user-menu-sign-out {

@@ -16,10 +16,10 @@ const CircleLoading = ({ bgColor = '#000', width = '50px', height = '50px' }: Ci
 	return (
 		<div
 			className='lds-spinner'
-			style={{ width: width, height: height }}
+			style={ { width: width, height: height } }
 		>
 			{
-				divArray.map((item, i) => <div key={i} style={{ backgroundColor: bgColor }}/>)
+				divArray.map((item, i) => <div key={ i } style={ { backgroundColor: bgColor } }/>)
 			}
 		</div>
 	);

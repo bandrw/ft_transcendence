@@ -5,6 +5,13 @@
 
 	.social-title {
 		padding: 0 40px;
+		height: 50px;
+
+		span {
+			&::selection {
+				background: #29aa44;
+			}
+		}
 	}
 
 	.social-block {
@@ -35,6 +42,10 @@
 			letter-spacing: 1px;
 			color: #bbb;
 			text-transform: uppercase;
+
+			&::selection {
+				background: #29aa44;
+			}
 		}
 
 		ul {
@@ -70,13 +81,48 @@
 			}
 
 			.social-block-user-username {
+				color: white;
 				font-size: 1.2em;
+				transition: all 0.1s ease-in-out;
+
+				&::selection {
+					background: #29aa44;
+				}
+
+				&:hover {
+					color: #29aa44;
+				}
 			}
 
 			.social-block-user-status-description {
 				text-align: right;
 				width: 150px;
 				color: #bbb;
+
+				&::selection {
+					background: #29aa44;
+				}
+
+				.social-block-user-watch-btn {
+					height: 40px;
+					width: 40px;
+					background: #29aa44;
+					color: white;
+					outline: none;
+					border: none;
+					border-radius: 8px;
+					margin-left: 15px;
+					cursor: pointer;
+					transition: all 0.1s ease-in-out;
+					font-size: 1.1em;
+
+					&:hover {
+						background: #21b941;
+					}
+					&:active {
+						opacity: 0.8;
+					}
+				}
 			}
 
 			&:hover {

@@ -1,10 +1,10 @@
 import './styles.scss';
 
-import { faHome } from "@fortawesome/free-solid-svg-icons";
+import { faGamepad, faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import Header from "components/Header";
-import { ApiFetchedUser, ApiGame, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiOnlineUser, ApiUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import moment from "moment";
 import React from "react";
@@ -20,16 +20,16 @@ export const GameTime = ({ date }: { date: number }) => {
 
 	if (gameDateDay === now)
 		return (
-			<div>{`Today, ${gameDateTime}`}</div>
+			<div>{ `Today, ${gameDateTime}` }</div>
 		);
 	if (gameDateDay === yesterdayDay)
 		return (
-			<div>{`Yesterday, ${gameDateTime}`}</div>
+			<div>{ `Yesterday, ${gameDateTime}` }</div>
 		);
 	return (
 		<Moment
 			format='MM.DD.YYYY, HH:mm'
-			date={date}
+			date={ date }
 		/>
 	);
 };
@@ -38,7 +38,7 @@ interface GamesHistoryProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	users: ApiFetchedUser[]
+	users: ApiOnlineUser[]
 }
 
 const GamesHistory = ({ currentUser, setCurrentUser, status, users }: GamesHistoryProps) => {
@@ -84,14 +84,14 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, users }: GamesHisto
 	return (
 		<div>
 			<Header
-				currentUser={currentUser}
-				setCurrentUser={setCurrentUser}
-				status={status}
+				currentUser={ currentUser }
+				setCurrentUser={ setCurrentUser }
+				status={ status }
 				centerBlock={
 					<div className='header-center'>
 						<div className='games-history-header'>
 							<Link className='home-link' to='/'>
-								<FontAwesomeIcon icon={faHome}/>
+								<FontAwesomeIcon icon={ faHome }/>
 								Go home
 							</Link>
 						</div>
@@ -101,7 +101,7 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, users }: GamesHisto
 			<div className='games-history-wrapper'>
 				<Fade className='games-history'>
 					<div>
-						<h1>{`Games history with ${params.login}`}</h1>
+						<h1>{ `Games history with ${params.login}` }</h1>
 						<div className='games-history-games main-block'>
 							<div className='games-history-legend'>
 								<div className='games-history-legend-enemy'>enemy</div>
@@ -110,36 +110,41 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, users }: GamesHisto
 								<div className='games-history-legend-date'>date</div>
 							</div>
 							{
-								gamesHistory.map((game, i) => {
-									const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
-									const enemy = users.find(user => user.id === enemyId);
-									const enemyColor = enemy ? enemy.status : 'transparent';
-
-									return (
-										<div className='games-history-game' key={i}>
-											<div className='games-history-enemy'>
-												<div
-													style={{ backgroundImage: `url(${enemy?.url_avatar})` }}
-													className='games-history-game-img'
-												>
-													<div className='games-history-user-status' style={{ backgroundColor: enemyColor }}/>
-												</div>
-												<div className='games-history-user-login'>{enemy?.login}</div>
-											</div>
-											{
-												game.winnerId === currentUser.id
-													? <div className='games-history-win'>Win</div>
-													: <div className='games-history-lose'>Lose</div>
-											}
-											<div className='games-history-game-score'>
-												{`${game.leftScore} : ${game.rightScore}`}
-											</div>
-											<div className='games-history-game-date'>
-												<GameTime date={Date.parse(game.date)} />
-											</div>
+								gamesHistory.length === 0
+									? <div className='recent-games-empty'>
+											You have no games yet
+											<FontAwesomeIcon icon={ faGamepad }/>
 										</div>
-									);
-								})
+									: gamesHistory.map((game, i) => {
+											const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
+											const enemy = users.find(user => user.id === enemyId);
+											const enemyColor = enemy ? enemy.status : 'transparent';
+
+											return (
+												<div className='games-history-game' key={ i }>
+													<div className='games-history-enemy'>
+														<div
+															style={ { backgroundImage: `url(${enemy?.url_avatar})` } }
+															className='games-history-game-img'
+														>
+															<div className='games-history-user-status' style={ { backgroundColor: enemyColor } }/>
+														</div>
+														<Link to={ `/users/${enemy?.login}` } className='games-history-user-login'>{ enemy?.login }</Link>
+													</div>
+													{
+														game.winnerId === currentUser.id
+															? <div className='games-history-win'>Win</div>
+															: <div className='games-history-lose'>Lose</div>
+													}
+													<div className='games-history-game-score'>
+														{ `${game.leftScore} : ${game.rightScore}` }
+													</div>
+													<div className='games-history-game-date'>
+														<GameTime date={ Date.parse(game.date) } />
+													</div>
+												</div>
+											);
+										})
 							}
 						</div>
 					</div>

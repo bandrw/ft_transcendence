@@ -1,16 +1,17 @@
+import { Inject, Logger } from '@nestjs/common';
 import { WebSocketGateway } from '@nestjs/websockets';
 import {
-  SubscribeMessage,
   MessageBody,
-  WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  SubscribeMessage,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Inject, Logger } from '@nestjs/common';
-import { GameService } from './game.service';
+
 import { UsersService } from '../users/users.service';
+import { GameService } from './game.service';
 
 @WebSocketGateway({ cors: true })
 export class EventsGame
@@ -28,7 +29,7 @@ export class EventsGame
   @SubscribeMessage('start')
   launchBall(@MessageBody() user: string) {
     console.log('events.game start', user);
-    console.log(this.gameService.gamers);
+    console.log(this.gameService.games);
     // console.log('[launchBall]', user);
     // const u = JSON.parse(user);
     // if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
@@ -45,14 +46,14 @@ export class EventsGame
   @SubscribeMessage('platformPosition')
   platformPosition(@MessageBody() user: string) {
     const u = JSON.parse(user);
-    if (this.gameService.gamers[u.id].playerTwo.user.login === u.login) {
-      this.gameService.gamers[u.id].playerOne.position = u.enemyPlatformX;
-      this.gameService.gamers[u.id].playerOne.user.resp.write(
+    if (this.gameService.games[u.id].rightPlayer.user.login === u.login) {
+      this.gameService.games[u.id].leftPlayer.position = u.enemyPlatformX;
+      this.gameService.games[u.id].leftPlayer.user.resp.write(
         `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
       );
     } else {
-      this.gameService.gamers[u.id].playerTwo.position = u.enemyPlatformX;
-      this.gameService.gamers[u.id].playerTwo.user.resp.write(
+      this.gameService.games[u.id].rightPlayer.position = u.enemyPlatformX;
+      this.gameService.games[u.id].rightPlayer.user.resp.write(
         `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
       );
     }

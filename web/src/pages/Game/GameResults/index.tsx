@@ -21,27 +21,27 @@ const GameResults = ({ winner, loser, gameRef, setStatus }: GameResultsProps) =>
 			<p>Game over</p>
 			<div className='game-results-winner'>
 				<div>
-					<FontAwesomeIcon icon={faTrophy}/>
+					<FontAwesomeIcon icon={ faTrophy }/>
 					Winner:
 				</div>
-				<span>{winner}</span>
+				<span>{ winner }</span>
 			</div>
 			<div className='game-results-loser'>
 				<div>
 					Loser:
 				</div>
-				<span>{loser}</span>
+				<span>{ loser }</span>
 			</div>
 			<div className='game-results-buttons'>
 				<button
 					className='game-results-back-btn'
-					onClick={() => {
+					onClick={ () => {
 						setStatus(ApiUserStatus.Regular);
 						gameRef.current.runs = false;
 						history.push('/');
-					}}
+					} }
 				>
-					<FontAwesomeIcon icon={faChevronLeft}/>
+					<FontAwesomeIcon icon={ faChevronLeft }/>
 					Main menu
 				</button>
 			</div>

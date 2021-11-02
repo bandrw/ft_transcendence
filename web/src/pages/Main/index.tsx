@@ -2,7 +2,7 @@ import './styles.scss';
 
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { ApiFetchedUser, ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiOnlineUser, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import RecentGames from "pages/Main/RecentGames";
@@ -20,9 +20,9 @@ interface MainProps {
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	mainEventSourceInitializedRef: React.MutableRefObject<boolean>,
-	users: ApiFetchedUser[],
-	setUsers: React.Dispatch<React.SetStateAction<ApiFetchedUser[]>>,
-	usersRef: React.MutableRefObject<ApiFetchedUser[]>,
+	users: ApiOnlineUser[],
+	setUsers: React.Dispatch<React.SetStateAction<ApiOnlineUser[]>>,
+	usersRef: React.MutableRefObject<ApiOnlineUser[]>,
 }
 
 const Main: React.FC<MainProps> = ({
@@ -75,6 +75,10 @@ const Main: React.FC<MainProps> = ({
 		const gameSettingsHandler = (e: any) => {
 			const gameSettings: ApiGameSettings = JSON.parse(e.data);
 			gameSettingsRef.current = gameSettings;
+
+			if (gameSettings.leftPlayer.login !== currentUser.username && gameSettings.rightPlayer.login !== currentUser.username)
+				return ;
+
 			const data = {
 				login: currentUser.username,
 				id: gameSettings.id
@@ -85,7 +89,7 @@ const Main: React.FC<MainProps> = ({
 		const updateUserHandler = (e: any) => {
 			const data: ApiUpdateUser = JSON.parse(e.data);
 
-			const newUsers: ApiFetchedUser[] = [];
+			const newUsers: ApiOnlineUser[] = [];
 			// Edit user
 			for (let i = 0; i < usersRef.current.length; ++i) {
 				if (usersRef.current[i].login === data.login)
@@ -152,42 +156,43 @@ const Main: React.FC<MainProps> = ({
 		<div className='main'>
 			<div className='main-container'>
 				<Header
-					currentUser={currentUser}
-					setCurrentUser={setCurrentUser}
-					status={status}
+					currentUser={ currentUser }
+					setCurrentUser={ setCurrentUser }
+					status={ status }
 				/>
 				<div className='main-center'>
 					<Fade
-						triggerOnce={true}
-						style={{ position: 'relative', zIndex: 9 }}
+						triggerOnce={ true }
+						style={ { position: 'relative', zIndex: 9 } }
 					>
 						<FindGame
-							currentUser={currentUser}
-							status={status}
-							setStatus={setStatus}
-							enemyRef={enemyRef}
-							enemyIsReady={enemyIsReady}
+							currentUser={ currentUser }
+							status={ status }
+							setStatus={ setStatus }
+							enemyRef={ enemyRef }
+							enemyIsReady={ enemyIsReady }
 						/>
 					</Fade>
 					<Fade
-						delay={100}
-						triggerOnce={true}
-						style={{ position: 'relative', zIndex: 8 }}
+						delay={ 100 }
+						triggerOnce={ true }
+						style={ { position: 'relative', zIndex: 8 } }
 					>
 						<RecentGames
-							currentUser={currentUser}
-							users={users}
+							currentUser={ currentUser }
+							users={ users }
 						/>
 					</Fade>
 				</div>
 				<div className='main-right'>
 					<Fade
-						delay={100}
-						triggerOnce={true}
+						delay={ 100 }
+						triggerOnce={ true }
 						className='main-block social'
 					>
 						<Social
-							users={filteredUsers}
+							users={ filteredUsers }
+							currentUser={ currentUser }
 						/>
 					</Fade>
 				</div>

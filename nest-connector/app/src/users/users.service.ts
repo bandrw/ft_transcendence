@@ -83,7 +83,6 @@ export class UsersService {
 					}) +
 					'\n\n',
 				);
-				console.log(`[userEvent] Event ${event} sent to ${user.login}`);
 			}
 			++i;
 		}

@@ -3,7 +3,7 @@ import {
 	Controller,
 	Get,
 	Header,
-	HttpCode, HttpException, HttpStatus, Param,
+	HttpCode, HttpException, HttpStatus,
 	Post,
 	Query,
 	Req,
@@ -56,6 +56,7 @@ export class UsersController {
 	getOnline() {
 		return this.UsersService.onlineUsers.map(usr => {
 				return {
+					id: usr.id,
 					login: usr.login,
 					url_avatar: usr.url_avatar,
 					status: usr.status

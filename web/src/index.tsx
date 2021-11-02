@@ -11,7 +11,7 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 ReactDOM.render(
 		<React.StrictMode>
-			<SocketContext.Provider value={socket}>
+			<SocketContext.Provider value={ socket }>
 				<App/>
 			</SocketContext.Provider>
 		</React.StrictMode>,

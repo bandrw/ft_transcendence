@@ -25,7 +25,6 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 		if (timerIntervalRef.current)
 			clearInterval(timerIntervalRef.current);
 		setStatus(ApiUserStatus.Accepted);
-
 	};
 
 	const declineGame = () => {
@@ -60,37 +59,37 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 				<div className='accept-window-info'>
 					<div className='accept-window-info-player'>
 						<div
-							style={{
+							style={ {
 								backgroundImage: `url(${currentUser.urlAvatar})`,
 								borderColor: status === ApiUserStatus.Accepted ? '#29aa44' : 'transparent'
-							}}
+							} }
 							className='accept-window-info-img'
 						/>
-						<div className='accept-window-info-username'>{currentUser.username}</div>
+						<div className='accept-window-info-username'>{ currentUser.username }</div>
 					</div>
 					<div className='accept-window-info-player'>
 						<div
-							style={{
+							style={ {
 								backgroundImage: `url(${enemy.url_avatar})`,
 								borderColor: enemyIsReady ? '#29aa44' : 'transparent'
-							}}
+							} }
 							className='accept-window-info-img'
 						/>
-						<div className='accept-window-info-username'>{enemy ? enemy.login : '[Unknown]'}</div>
+						<div className='accept-window-info-username'>{ enemy ? enemy.login : '[Unknown]' }</div>
 					</div>
 				</div>
 				<div className='accept-window-accept'>
 					{
 						status === ApiUserStatus.Accepted
 							? <div className='accept-btn accept-btn-accepted'>
-									<FontAwesomeIcon icon={faCheck}/>
+									<FontAwesomeIcon icon={ faCheck }/>
 								</div>
-							: <button className='accept-btn' onClick={acceptGame}>
+							: <button className='accept-btn' onClick={ acceptGame }>
 									Accept
 								</button>
 					}
-					<button className='decline-btn' onClick={declineGame}>Decline</button>
-					<span>{`${timeLeft} s`}</span>
+					<button className='decline-btn' onClick={ declineGame }>Decline</button>
+					<span>{ `${timeLeft} s` }</span>
 				</div>
 			</div>
 		</div>
@@ -114,8 +113,8 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 
 		if (!currentUser.isAuthorized())
 			return ;
-		if (status === ApiUserStatus.InGame)
-			return ;
+		// if (status === ApiUserStatus.InGame)
+		// 	return ;
 
 		if (status === ApiUserStatus.FoundEnemy) {
 			if (timerIntervalRef.current)
@@ -158,13 +157,13 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 				<div className='find-game-back'>
 					<div className='find-game-searching'>
 						<span>Searching</span>
-						<span className='find-game-searching-time'>{`${passedTime} s`}</span>
+						<span className='find-game-searching-time'>{ `${passedTime} s` }</span>
 					</div>
 					<button
-						onClick={() => setStatus(ApiUserStatus.Regular)}
+						onClick={ () => setStatus(ApiUserStatus.Regular) }
 						className='find-game-cancel'
 					>
-						<FontAwesomeIcon icon={faTimesCircle}/>
+						<FontAwesomeIcon icon={ faTimesCircle }/>
 					</button>
 				</div>
 			</div>
@@ -177,26 +176,26 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 				<div className='find-game-back'>
 					<div className='find-game-searching'>
 						<span>Searching</span>
-						<span className='find-game-searching-time'>{`${passedTime} s`}</span>
+						<span className='find-game-searching-time'>{ `${passedTime} s` }</span>
 					</div>
 					<button
-						onClick={() => setStatus(ApiUserStatus.Regular)}
+						onClick={ () => setStatus(ApiUserStatus.Regular) }
 						className='find-game-cancel'
 					>
-						<FontAwesomeIcon icon={faTimesCircle}/>
+						<FontAwesomeIcon icon={ faTimesCircle }/>
 					</button>
 				</div>
 				<Fade
-					duration={500}
-					triggerOnce={true}
-					style={{ position: 'fixed' }}
+					duration={ 500 }
+					triggerOnce={ true }
+					style={ { position: 'fixed' } }
 				>
 					<AcceptWindow
-						currentUser={currentUser}
-						status={status}
-						setStatus={setStatus}
-						enemy={enemyRef.current}
-						enemyIsReady={enemyIsReady}
+						currentUser={ currentUser }
+						status={ status }
+						setStatus={ setStatus }
+						enemy={ enemyRef.current }
+						enemyIsReady={ enemyIsReady }
 					/>
 				</Fade>
 			</div>
@@ -208,10 +207,10 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 			<div className='find-game-back'>
 				<span>Find game</span>
 				<button
-					onClick={() => setStatus(ApiUserStatus.Searching)}
+					onClick={ () => setStatus(ApiUserStatus.Searching) }
 					className='find-game-btn'
 				>
-					<FontAwesomeIcon icon={faPlay}/>
+					<FontAwesomeIcon icon={ faPlay }/>
 				</button>
 			</div>
 		</div>

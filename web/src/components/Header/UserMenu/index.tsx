@@ -6,7 +6,7 @@ import axios from "axios";
 import { User } from "models/User";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
-import { useHistory } from "react-router-dom";
+import { Link,useHistory } from "react-router-dom";
 
 interface UserMenuProps {
 	currentUser: User,
@@ -26,16 +26,16 @@ const UserMenu = ({ currentUser, setCurrentUser } : UserMenuProps) => {
 
 	return (
 		<Fade
-			duration={250}
+			duration={ 250 }
 			className='user-menu-wrapper'
 		>
 			<div className='user-menu'>
-				<div className='user-menu-btn'>
+				<Link to={ `/users/${currentUser.username}` } className='user-menu-btn'>
 					Profile
-				</div>
-				<div className='user-menu-btn user-menu-sign-out' onClick={logOut}>
+				</Link>
+				<div className='user-menu-btn user-menu-sign-out' onClick={ logOut }>
 					Log out
-					<FontAwesomeIcon icon={faSignOutAlt}/>
+					<FontAwesomeIcon icon={ faSignOutAlt }/>
 				</div>
 			</div>
 		</Fade>

@@ -57,7 +57,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 		<div className='login-container'>
 			<h1>Login page</h1>
 
-			<form onSubmit={(e) => {
+			<form onSubmit={ (e) => {
 				e.preventDefault();
 
 				setIsLoading(true);
@@ -74,13 +74,13 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 						setIsLoading(false);
 						setLoginErrors('Wrong login or password');
 					});
-			}}
+			} }
 			>
 				<input
 					name='login'
 					type='text'
 					placeholder='Login'
-					ref={loginRef}
+					ref={ loginRef }
 					defaultValue='admin'
 					autoComplete='username'
 				/>
@@ -88,12 +88,12 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					name='password'
 					type='password'
 					placeholder='Password'
-					ref={passwordRef}
+					ref={ passwordRef }
 					defaultValue='123123'
 					autoComplete='current-password'
 				/>
 				<span className='login-errors'>
-					{loginErrors}
+					{ loginErrors }
 				</span>
 				<button
 					type='submit'
@@ -121,7 +121,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 			<div className='login-services'>
 				<button
 					className='login-service'
-					onClick={() => alert('not working yet')}
+					onClick={ () => alert('not working yet') }
 				>
 					Sign in with
 					<div className='login-service-icon'/>

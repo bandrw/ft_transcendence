@@ -41,7 +41,9 @@
 		.info-board-user {
 			display: flex;
 			align-items: center;
-			width: 200px;
+			padding: 5px 25px;
+			border-radius: 18px;
+			transition: all 0.15s ease-in-out;
 
 			.info-board-user-img {
 				width: 42px;
@@ -52,8 +54,18 @@
 			}
 
 			.info-board-user-name {
+				color: white;
+				transition: all 0.3s ease-in-out;
+
 				&::selection {
 					background: #29aa44;
+				}
+			}
+
+			&:hover {
+				background: #21242f;
+				.info-board-user-name {
+					color: #29aa44;
 				}
 			}
 		}

@@ -1,17 +1,18 @@
 import './styles.scss';
 
 import { SocketContext } from "context/socket";
-import { ApiGameLoop, ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGameLoop, ApiGameSettings, ApiUserStatus } from "models/apiTypes";
 import GameBall from "models/GameBall";
 import Player from "models/Player";
 import { User } from "models/User";
 import GameResults from "pages/Game/GameResults";
 import React, { useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
+import { Link } from 'react-router-dom';
 import { setInterval } from "timers";
 
 interface GameCanvasProps {
-	enemyInfo: ApiUpdateUser | null,
+	watchMode: boolean,
 	currentUser: User,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
@@ -19,7 +20,7 @@ interface GameCanvasProps {
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
-const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, gameRef, setStatus }: GameCanvasProps) => {
+const GameCanvas = ({ watchMode, currentUser, eventSourceRef, gameSettingsRef, gameRef, setStatus }: GameCanvasProps) => {
 	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const leftPlayer = new Player();
@@ -29,8 +30,6 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 	const score = { leftPlayer: 0, rightPlayer: 0 };
 
 	const [gameResults, setGameResults] = React.useState<{ winner: string } | null>(null);
-	const [leftPlayerImg, setLeftPlayerImg]  = React.useState('');
-	const [rightPlayerImg, setRightPlayerImg]  = React.useState('');
 
 	React.useEffect(() => {
 		if (gameRef.current.runs)
@@ -68,22 +67,22 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 		};
 
 		const playSoundHandler = (e: any) => {
-			// let a: HTMLAudioElement | null = null;
-			// if (e.data === 'pong-sound-1') {
-			// 	a = new Audio('/audio/pong-sound-1.wav');
-			// 	a.volume = 0.17;
-			// } else if (e.data === 'pong-sound-2') {
-			// 	a = new Audio('/audio/pong-sound-2.wav');
-			// 	a.volume = 0.17;
-			// } else if (e.data === 'pong-sound-3') {
-			// 	a = new Audio('/audio/pong-sound-3.wav');
-			// 	a.volume = 0.1;
-			// }
-			// if (a) {
-			// 	a.play()
-			// 		.then()
-			// 		.catch(() => console.log('audio play error'));
-			// }
+			let a: HTMLAudioElement | null = null;
+			if (e.data === 'pong-sound-1') {
+				a = new Audio('/audio/pong-sound-1.wav');
+				a.volume = 0.17;
+			} else if (e.data === 'pong-sound-2') {
+				a = new Audio('/audio/pong-sound-2.wav');
+				a.volume = 0.17;
+			} else if (e.data === 'pong-sound-3') {
+				a = new Audio('/audio/pong-sound-3.wav');
+				a.volume = 0.1;
+			}
+			if (a) {
+				a.play()
+					.then()
+					.catch(() => console.log('audio play error'));
+			}
 		};
 
 		eventSource.addEventListener('gameResults', gameResultsHandler);
@@ -112,6 +111,9 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 	const playerHeight = gameSettingsRef.current?.playerHeight || 100;
 
 	useEffect(() => {
+		if (watchMode)
+			return ;
+
 		const keyDownHandler = (e: KeyboardEvent) => {
 			const gameSettings = gameSettingsRef.current;
 			if (!gameSettings)
@@ -198,11 +200,8 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 			ctx.closePath();
 		};
 
-		const drawUserRectangle = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-			if (leftPlayer.username === currentUser.username)
-				ctx.rect(playerMargin, leftPlayer.yPosition, playerWidth, playerHeight);
-			else if (rightPlayer.username === currentUser.username)
-				ctx.rect(canvas.width - playerWidth - playerMargin, rightPlayer.yPosition, playerWidth, playerHeight);
+		const drawLeftRectangle = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+			ctx.rect(playerMargin, leftPlayer.yPosition, playerWidth, playerHeight);
 			ctx.fill();
 		};
 
@@ -217,11 +216,8 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 			ctx.closePath();
 		};
 
-		const drawEnemyRectangle = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-			if (leftPlayer.username === currentUser.username)
-				ctx.rect(canvas.width - playerWidth - playerMargin, rightPlayer.yPosition, playerWidth, playerHeight);
-			else if (rightPlayer.username === currentUser.username)
-				ctx.rect(playerMargin, leftPlayer.yPosition, playerWidth, playerHeight);
+		const drawRightRectangle = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+			ctx.rect(canvas.width - playerWidth - playerMargin, rightPlayer.yPosition, playerWidth, playerHeight);
 			ctx.fill();
 		};
 
@@ -245,8 +241,8 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 
 			ctx.beginPath();
 			ctx.fillStyle = '#29aa44';
-			drawUserRectangle(canvas, ctx);
-			drawEnemyRectangle(canvas, ctx);
+			drawLeftRectangle(canvas, ctx);
+			drawRightRectangle(canvas, ctx);
 			ctx.closePath();
 
 			ctx.beginPath();
@@ -277,23 +273,22 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 			ball.yPosition = 0;
 			leftPlayer.yPosition = Math.round((canvas.height - playerHeight) / 2);
 			rightPlayer.yPosition = Math.round((canvas.height - playerHeight) / 2);
-			leftPlayer.username = gameSettings.leftPlayerUsername;
-			rightPlayer.username = gameSettings.rightPlayerUsername;
+			leftPlayer.username = gameSettings.leftPlayer.login;
+			rightPlayer.username = gameSettings.rightPlayer.login;
 
-			if (leftPlayer.username === enemyInfo?.login) {
-				setLeftPlayerImg(enemyInfo?.url_avatar);
-				setRightPlayerImg(currentUser.urlAvatar);
-			} else {
-				setLeftPlayerImg(currentUser.urlAvatar);
-				setRightPlayerImg(enemyInfo?.url_avatar || '');
-			}
+			// if (leftPlayer.username === enemyInfo?.login) {
+			// 	setLeftPlayerImg(enemyInfo?.url_avatar);
+			// 	setRightPlayerImg(currentUser.urlAvatar);
+			// } else {
+			// 	setLeftPlayerImg(currentUser.urlAvatar);
+			// 	setRightPlayerImg(enemyInfo?.url_avatar || '');
+			// }
 
 			render();
 		};
 
 		prepareGame();
 
-		let timeUntilStart = 3;
 		// setInfoBoardContent(<div className='info-board-timer'>{timeUntilStart}</div>);
 		// const interval = setInterval(() => {
 		// 	--timeUntilStart;
@@ -307,7 +302,7 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 		// }, 1000);
 
 		if (!gameRef.current.runs)
-			setTimeout(runGame, timeUntilStart * 1000);
+			runGame();
 
 		// return () => {
 		// 	if (gameRef.current.runs && gameRef.current.interval) {
@@ -321,42 +316,42 @@ const GameCanvas = ({ enemyInfo, currentUser, eventSourceRef, gameSettingsRef, g
 	return (
 		<div className='game-container'>
 			<div className='info-board'>
-				<div className='info-board-user info-board-left-user'>
+				<Link to={ `/users/${gameSettingsRef.current?.leftPlayer.login}` } className='info-board-user info-board-left-user'>
 					<div
 						className='info-board-user-img'
-						style={{ backgroundImage: `url(${leftPlayerImg})` }}
+						style={ { backgroundImage: `url(${ gameSettingsRef.current?.leftPlayer.url_avatar })` } }
 					/>
-					<div className='info-board-user-name'>{gameSettingsRef.current?.leftPlayerUsername}</div>
-				</div>
-				<div className='info-board-user info-board-right-user'>
-					<div className='info-board-user-name'>{gameSettingsRef.current?.rightPlayerUsername}</div>
+					<div className='info-board-user-name'>{ gameSettingsRef.current?.leftPlayer.login }</div>
+				</Link>
+				<Link to={ `/users/${gameSettingsRef.current?.rightPlayer.login}` } className='info-board-user info-board-right-user'>
+					<div className='info-board-user-name'>{ gameSettingsRef.current?.rightPlayer.login }</div>
 					<div
 						className='info-board-user-img'
-						style={{ backgroundImage: `url(${rightPlayerImg})` }}
+						style={ { backgroundImage: `url(${ gameSettingsRef.current?.rightPlayer.url_avatar })` } }
 					/>
-				</div>
+				</Link>
 			</div>
 			<canvas
 				id="game-canvas"
 				width="1024px"
 				height="600px"
-				ref={canvasRef}
+				ref={ canvasRef }
 			/>
 			{
 				gameResults &&
 					<Fade
 						className='game-results-wrapper'
-						duration={500}
+						duration={ 500 }
 					>
 						<GameResults
-							winner={gameResults.winner}
+							winner={ gameResults.winner }
 							loser={
-								(gameResults.winner === gameSettingsRef.current?.leftPlayerUsername
-								? gameSettingsRef.current?.rightPlayerUsername
-								: gameSettingsRef.current?.leftPlayerUsername) || ''
+								(gameResults.winner === gameSettingsRef.current?.leftPlayer.login
+								? gameSettingsRef.current?.rightPlayer.login
+								: gameSettingsRef.current?.leftPlayer.login) || ''
 							}
-							gameRef={gameRef}
-							setStatus={setStatus}
+							gameRef={ gameRef }
+							setStatus={ setStatus }
 						/>
 					</Fade>
 			}

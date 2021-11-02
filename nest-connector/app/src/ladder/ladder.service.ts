@@ -12,9 +12,9 @@ export class LadderService {
   public lobbyId = 0;
   constructor(
     @Inject(UsersService)
-    private users: UsersService,
+    private usersService: UsersService,
     @Inject(GameService)
-    private games: GameService,
+    private gameService: GameService,
   ) {}
 
   traceLadder(login: string) {
@@ -34,57 +34,46 @@ export class LadderService {
   }
 
   updateStatus(login: string, status: string) {
-    console.log(`[updateStatus] ${login} to ${status}`);
     let i = 0;
-    while (this.users.onlineUsers[i].login != login) {
+    while (this.usersService.onlineUsers[i].login != login) {
       ++i;
     }
     if (status === 'blue') {
-      this.users.onlineUsers[i].status = 'green';
+      this.usersService.onlineUsers[i].status = 'green';
     } else {
-      this.users.onlineUsers[i].status = status;
+      this.usersService.onlineUsers[i].status = status;
     }
-    this.users.userEvent('updateUser', this.users.onlineUsers[i]);
+    this.usersService.userEvent('updateUser', this.usersService.onlineUsers[i]);
     if (status === 'yellow') {
-      this.addToLadder(this.users.onlineUsers[i]);
+      this.addToLadder(this.usersService.onlineUsers[i]);
     } else if (status === 'green') {
       this.removeFromLadder(
-        this.users.onlineUsers[i],
+        this.usersService.onlineUsers[i],
         this.sendSingleEvents.bind(this),
       );
     } else if (status === 'blue') {
       this.removeFromLadder(
-        this.users.onlineUsers[i],
+        this.usersService.onlineUsers[i],
         this.awayFromKeyboard.bind(this),
       );
     } else if (status === 'red') {
       this.gameStart(i, login);
     }
-    console.log('lobby:');
-    console.log(this.lobby);
   }
 
   gameStart(userIndex, login) {
-    this.userPersonalEvent(
-      'enemyIsReady',
-      this.users.onlineUsers[userIndex],
-      login,
-    );
+    this.userPersonalEvent('enemyIsReady', this.usersService.onlineUsers[userIndex], login);
     let k = 0;
     while (k < this.lobby.length) {
-      if (
-        this.lobby[k].first &&
-        this.lobby[k].second &&
-        (this.lobby[k].first.login === login ||
-          this.lobby[k].second.login === login) &&
-        this.lobby[k].first.status === 'red' &&
-        this.lobby[k].second.status === 'red'
+      if (this.lobby[k].first && this.lobby[k].second &&
+        (this.lobby[k].first.login === login || this.lobby[k].second.login === login) &&
+        this.lobby[k].first.status === 'red' && this.lobby[k].second.status === 'red'
       ) {
+        this.updateStatus(this.lobby[k].first.login, 'inGame');
+        this.updateStatus(this.lobby[k].second.login, 'inGame');
         this.userPersonalEvent('gameIsReady', null, this.lobby[k].first.login);
         this.userPersonalEvent('gameIsReady', null, this.lobby[k].second.login);
-        this.games.startGame(
-          this.buildGame(this.lobby[k].first, this.lobby[k].second),
-        );
+        this.gameService.startGame(this.buildGame(this.lobby[k].first, this.lobby[k].second));
       }
       ++k;
     }
@@ -114,12 +103,12 @@ export class LadderService {
       },
     };
     ++this.lobbyId;
-    return new Game(gamer1, gamer2, this.games.gamers.length);
+    return new Game(gamer1, gamer2);
   }
 
   awayFromKeyboard(userIndex) {
     this.lobby[userIndex].first.status = 'yellow';
-    this.users.userEvent('updateUser', this.lobby[userIndex].first);
+    this.usersService.userEvent('updateUser', this.lobby[userIndex].first);
   }
 
   addToLadder(user: OnlineUser) {
@@ -141,8 +130,8 @@ export class LadderService {
   sendEvents(i: number) {
     this.lobby[i].first.status = 'orange';
     this.lobby[i].second.status = 'orange';
-    this.users.userEvent('updateUser', this.lobby[i].first);
-    this.users.userEvent('updateUser', this.lobby[i].second);
+    this.usersService.userEvent('updateUser', this.lobby[i].first);
+    this.usersService.userEvent('updateUser', this.lobby[i].second);
     this.userPersonalEvent(
       'enemy',
       this.lobby[i].first,
@@ -153,13 +142,12 @@ export class LadderService {
       this.lobby[i].second,
       this.lobby[i].first.login,
     );
-    console.log('[sendEvents] Events sent');
   }
 
   userPersonalEvent(event: string, user: OnlineUser, login: string) {
     let i = 0;
-    while (i < this.users.onlineUsers.length) {
-      if (this.users.onlineUsers[i].login === login) {
+    while (i < this.usersService.onlineUsers.length) {
+      if (this.usersService.onlineUsers[i].login === login) {
         let data;
         if (user) {
           data = JSON.stringify({
@@ -170,29 +158,26 @@ export class LadderService {
         } else {
           data = false;
         }
-        this.users.onlineUsers[i].resp.write(
+        this.usersService.onlineUsers[i].resp.write(
           `event: ${event}\ndata: ${data}\n\n`,
         );
-        if (user)
-          console.log(
-            `[userPersonalEvent] Event ${event} sent to ${user.login}`,
-          );
       }
       ++i;
     }
   }
 
-  private gameStop() {
-    for (let j = 0; j < this.lobby.length; ++j) {
-      for (let k = 0; k < this.games.gamers.length; ++k) {
-        const game = this.games.gamers[k];
-        if (game.playerOne.user.login === this.lobby[j].first?.login || game.playerOne.user.login === this.lobby[j].second?.login ||
-            game.playerTwo.user.login === this.lobby[j].first?.login || game.playerTwo.user.login === this.lobby[j].second?.login) {
-          clearInterval(game.gameInterval);
-        }
-      }
-    }
-  }
+  // private gameStop() {
+  //   console.log('[gameStop]');
+  //   for (let j = 0; j < this.lobby.length; ++j) {
+  //     for (let k = 0; k < this.gameService.games.length; ++k) {
+  //       const game = this.gameService.games[k];
+  //       if (game.leftPlayer.user.login === this.lobby[j].first?.login || game.leftPlayer.user.login === this.lobby[j].second?.login ||
+  //           game.rightPlayer.user.login === this.lobby[j].first?.login || game.rightPlayer.user.login === this.lobby[j].second?.login) {
+  //         clearInterval(game.gameInterval);
+  //       }
+  //     }
+  //   }
+  // }
 
   removeFromLadder(user: OnlineUser, func) {
     let i = 0;
@@ -203,9 +188,9 @@ export class LadderService {
           this.lobby[i].first = this.lobby[i].second;
           this.lobby[i].second = null;
           func(i);
-          this.gameStop();
+          // this.gameStop();
         } else {
-          this.gameStop();
+          // this.gameStop();
           this.lobby = this.lobby.filter(function (val) {
             return val.first !== null || val.second !== null;
           });
@@ -217,19 +202,19 @@ export class LadderService {
       ) {
         this.lobby[i].second = null;
         if (this.lobby[i].first) {
-          this.gameStop();
+          // this.gameStop();
           func(i);
         } else {
-          this.gameStop();
+          // this.gameStop();
           this.lobby = this.lobby.filter(function (val) {
             return val.first !== null || val.second !== null;
           });
         }
         // Game Stop
         for (let j = 0; j < this.lobby.length; ++j) {
-          for (let k = 0; k < this.games.gamers.length; ++k) {
-            const game = this.games.gamers[k];
-            if (game.playerOne.user.login === this.lobby[j].first?.login || game.playerTwo.user.login === this.lobby[j].second?.login)
+          for (let k = 0; k < this.gameService.games.length; ++k) {
+            const game = this.gameService.games[k];
+            if (game.leftPlayer.user.login === this.lobby[j].first?.login || game.rightPlayer.user.login === this.lobby[j].second?.login)
               clearInterval(game.gameInterval);
           }
         }
@@ -241,7 +226,7 @@ export class LadderService {
 
   sendSingleEvents(userIndex: number) {
     this.lobby[userIndex].first.status = 'yellow';
-    this.users.userEvent('updateUser', this.lobby[userIndex].first);
+    this.usersService.userEvent('updateUser', this.lobby[userIndex].first);
     this.userPersonalEvent('enemy', null, this.lobby[userIndex].first.login);
   }
 

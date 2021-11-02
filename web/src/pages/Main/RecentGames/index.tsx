@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from "axios";
 import { ApiGame, ApiUpdateUser, ApiUser } from "models/apiTypes";
@@ -40,12 +40,28 @@ const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
 		};
 	}, [currentUser.username]);
 
+	if (gamesHistory.length === 0)
+		return (
+			<div className='main-block recent-games'>
+				<div className='main-block-title'>
+					<span>Recent games</span>
+					<Link className='recent-games-link' to={ `/games/${currentUser.username}` }>
+						<FontAwesomeIcon icon={ faArrowRight }/>
+					</Link>
+				</div>
+				<div className='recent-games-empty'>
+					You have no games yet
+					<FontAwesomeIcon icon={ faGamepad }/>
+				</div>
+			</div>
+		);
+
 	return (
 		<div className='main-block recent-games'>
 			<div className='main-block-title'>
 				<span>Recent games</span>
-				<Link className='recent-games-link' to={`/games/${currentUser.username}`}>
-					<FontAwesomeIcon icon={faArrowRight}/>
+				<Link className='recent-games-link' to={ `/games/${currentUser.username}` }>
+					<FontAwesomeIcon icon={ faArrowRight }/>
 				</Link>
 			</div>
 			<div className='recent-games-legend'>
@@ -61,15 +77,15 @@ const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
 					const enemyColor = enemy ? enemy.status : 'transparent';
 
 					return (
-						<div className='recent-game' key={i}>
+						<div className='recent-game' key={ i }>
 							<div className='recent-game-enemy'>
 								<div
-									style={{ backgroundImage: `url(${enemy?.url_avatar})` }}
+									style={ { backgroundImage: `url(${enemy?.url_avatar})` } }
 									className='recent-game-img'
 								>
-									<div className='user-status' style={{ backgroundColor: enemyColor }}/>
+									<div className='user-status' style={ { backgroundColor: enemyColor } }/>
 								</div>
-								<div className='user-login'>{enemy?.login}</div>
+								<Link to={ `/users/${enemy?.login}` } className='user-login'>{ enemy?.login }</Link>
 							</div>
 							{
 								game.winnerId === currentUser.id
@@ -77,7 +93,7 @@ const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
 									: <div className='recent-game-lose'>Lose</div>
 							}
 							<div className='recent-game-score'>
-								{`${game.leftScore} : ${game.rightScore}`}
+								{ `${game.leftScore} : ${game.rightScore}` }
 							</div>
 							<div className='recent-game-date'>
 								<GameTime date={ Date.parse(game.date) }/>

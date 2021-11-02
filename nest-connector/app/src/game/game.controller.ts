@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { GameService } from "game/game.service";
 
 @Controller('games')
@@ -8,6 +8,12 @@ export class GameController {
 	@Get('/')
 	async getGames() {
 		return await this.GameService.getGames();
+	}
+
+	@Get('/watchGame')
+	addWatcher(@Query('login') login: string, @Query('gamerLogin') gamerLogin: string) {
+		this.GameService.addWatcher(login, gamerLogin);
+		return { ok: true };
 	}
 
 	// @Post('/')

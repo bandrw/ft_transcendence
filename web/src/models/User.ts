@@ -5,6 +5,7 @@ export class User {
 		this.username = '';
 		this.urlAvatar = '';
 		this.loginDate = 0;
+		this.intraLogin = null;
 	}
 
 	isAuthorized() {
@@ -15,5 +16,6 @@ export class User {
 	username: string;
 	loginDate: number;
 	urlAvatar: string;
+	intraLogin: string | null
 
 }

@@ -106,31 +106,31 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 			<h1>Registration</h1>
 
 			<form
-				onSubmit={register}
+				onSubmit={ register }
 			>
 				<input
 					name='login'
 					type='text'
 					placeholder='Login'
-					ref={loginRef}
+					ref={ loginRef }
 					autoComplete='username'
 				/>
 				<input
 					name='password'
 					type='password'
 					placeholder='Password'
-					ref={passwordRef}
+					ref={ passwordRef }
 					autoComplete='new-password'
 				/>
 				<input
 					name='password-confirm'
 					type='password'
 					placeholder='Confirm password'
-					ref={passwordConfirmRef}
+					ref={ passwordConfirmRef }
 					autoComplete='new-password'
 				/>
 				<span className='errors'>
-					{errors}
+					{ errors }
 				</span>
 				<button type='submit' className='register-btn'>
 					{

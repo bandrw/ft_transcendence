@@ -1,3 +1,13 @@
+export enum ApiUserStatus {
+	Regular = 'green',
+	Searching = 'yellow',
+	FoundEnemy = 'orange',
+	Accepted = 'red',
+	InGame = 'inGame',
+	Declined = 'blue',
+	Offline = 'offline'
+}
+
 type ApiUserCreate = {
 	ok: boolean,
 	msg: string
@@ -28,8 +38,16 @@ type ApiUser = {
 	login: string,
 	password: string,
 	url_avatar: string,
+	intraLogin?: string,
 	wonGames?: ApiGame[],
 	lostGames?: ApiGame[]
+}
+
+type ApiOnlineUser = {
+	id: number,
+	login: string,
+	url_avatar: string,
+	status: ApiUserStatus
 }
 
 type ApiUserLogin = {
@@ -45,12 +63,12 @@ type ApiUserCheckExist = {
 type ApiUpdateUser = {
 	id: number,
 	login: string,
-	status: string,
 	url_avatar: string,
+	status: ApiUserStatus,
 }
 
 type ApiGameSettings = {
-	id: number,
+	id: string,
 	canvasWidth: number,
 	canvasHeight: number,
 	playerWidth: number,
@@ -61,8 +79,18 @@ type ApiGameSettings = {
 	ballAngle: number,
 	ballSpeed: number,
 	fps: number,
-	leftPlayerUsername: string,
-	rightPlayerUsername: string
+	leftPlayer: {
+		id: number,
+		login: string,
+		url_avatar: string,
+		status: string
+	},
+	rightPlayer: {
+		id: number,
+		login: string,
+		url_avatar: string,
+		status: string
+	}
 }
 
 type ApiGameLoop = {
@@ -85,21 +113,12 @@ type ApiFetchedUser = {
 	url_avatar: string,
 }
 
-export enum ApiUserStatus {
-	Regular = 'green',
-	Searching = 'yellow',
-	FoundEnemy = 'orange',
-	Accepted = 'red',
-	InGame = 'inGame',
-	Declined = 'blue',
-	Offline = 'offline'
-}
-
 export type {
 	ApiFetchedUser,
 	ApiGame,
 	ApiGameLoop,
 	ApiGameSettings,
+	ApiOnlineUser,
 	ApiUpdateUser,
 	ApiUser,
 	ApiUserCheckExist,
