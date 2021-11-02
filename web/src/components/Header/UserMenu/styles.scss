@@ -17,6 +17,20 @@
 	padding: 5px 10px;
 	border-radius: 10px;
 
+	.user-menu-username {
+		color: #aaa;
+		transition: all 0.1s ease-out;
+		margin: 5px 0;
+		width: 150px;
+		height: 45px;
+		font-size: 18px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		text-transform: uppercase;
+	}
+
 	.user-menu-btn {
 		transition: all 0.1s ease-out;
 		margin: 5px 0;

@@ -30,6 +30,9 @@ const UserMenu = ({ currentUser, setCurrentUser } : UserMenuProps) => {
 			className='user-menu-wrapper'
 		>
 			<div className='user-menu'>
+				<div className='user-menu-username'>
+					{ currentUser.username }
+				</div>
 				<Link to={ `/users/${currentUser.username}` } className='user-menu-btn'>
 					Profile
 				</Link>

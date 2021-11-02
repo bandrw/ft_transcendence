@@ -7,7 +7,7 @@ import UserMenu from "components/Header/UserMenu";
 import { ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
-import { useHistory } from "react-router-dom";
+import { Link,useHistory } from "react-router-dom";
 
 interface HeaderProps {
 	currentUser: User,
@@ -31,9 +31,11 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 					{
 						centerBlock
 						? centerBlock
-						: <h1 style={ { width: 'auto' } }>
-								FT
-							</h1>
+						: <Link to='/'>
+								<h1 style={ { letterSpacing: '2px' } }>
+									FT
+								</h1>
+							</Link>
 					}
 
 					<div className='header-buttons'>
@@ -64,9 +66,11 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 	return (
 		<header>
 			<div className='header-container'>
-				<h1 style={ { letterSpacing: '2px' } }>
-					FT
-				</h1>
+				<Link to='/'>
+					<h1 style={ { letterSpacing: '2px' } }>
+						FT
+					</h1>
+				</Link>
 
 				{ centerBlock ? centerBlock : null }
 
@@ -77,7 +81,7 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 					<button
 						style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }
 						className='user-btn'
-						onClick={ () => setUserMenuShown(prev => !prev) }
+						// onClick={ () => setUserMenuShown(prev => !prev) }
 						onMouseOver={ () => setUserMenuShown(true) }
 						onMouseLeave={ () => setUserMenuShown(false) }
 					>

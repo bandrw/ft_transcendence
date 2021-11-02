@@ -66,9 +66,9 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 	const register = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		const login = loginRef.current?.value || '';
-		const password = passwordRef.current?.value || '';
-		const passwordConfirm = passwordConfirmRef.current?.value || '';
+		const login = loginRef.current?.value.trim().toLowerCase() || '';
+		const password = passwordRef.current?.value.trim().toLowerCase() || '';
+		const passwordConfirm = passwordConfirmRef.current?.value.trim().toLowerCase() || '';
 
 		if (!validateInput(login, password, passwordConfirm, setErrors))
 			return;

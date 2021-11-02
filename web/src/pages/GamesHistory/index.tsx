@@ -1,10 +1,10 @@
 import './styles.scss';
 
-import { faGamepad, faHome } from "@fortawesome/free-solid-svg-icons";
+import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import Header from "components/Header";
-import { ApiGame, ApiOnlineUser, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import moment from "moment";
 import React from "react";
@@ -38,10 +38,10 @@ interface GamesHistoryProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	users: ApiOnlineUser[]
+	allUsers: ApiUser[]
 }
 
-const GamesHistory = ({ currentUser, setCurrentUser, status, users }: GamesHistoryProps) => {
+const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHistoryProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
@@ -87,16 +87,6 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, users }: GamesHisto
 				currentUser={ currentUser }
 				setCurrentUser={ setCurrentUser }
 				status={ status }
-				centerBlock={
-					<div className='header-center'>
-						<div className='games-history-header'>
-							<Link className='home-link' to='/'>
-								<FontAwesomeIcon icon={ faHome }/>
-								Go home
-							</Link>
-						</div>
-					</div>
-				}
 			/>
 			<div className='games-history-wrapper'>
 				<Fade className='games-history'>
@@ -112,39 +102,42 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, users }: GamesHisto
 							{
 								gamesHistory.length === 0
 									? <div className='recent-games-empty'>
-											You have no games yet
+											No games yet
 											<FontAwesomeIcon icon={ faGamepad }/>
 										</div>
 									: gamesHistory.map((game, i) => {
-											const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
-											const enemy = users.find(user => user.id === enemyId);
-											const enemyColor = enemy ? enemy.status : 'transparent';
+										const loser = allUsers.find(usr => usr.id === game.loserId);
+										const winner = allUsers.find(usr => usr.id === game.winnerId);
+										const enemy = loser?.login === params.login ? winner : loser;
+										const user = winner?.login === params.login ? winner : loser;
 
-											return (
-												<div className='games-history-game' key={ i }>
-													<div className='games-history-enemy'>
-														<div
-															style={ { backgroundImage: `url(${enemy?.url_avatar})` } }
-															className='games-history-game-img'
-														>
-															<div className='games-history-user-status' style={ { backgroundColor: enemyColor } }/>
-														</div>
-														<Link to={ `/users/${enemy?.login}` } className='games-history-user-login'>{ enemy?.login }</Link>
+										const enemyColor = 'pink';
+
+										return (
+											<div className='games-history-game' key={ i }>
+												<div className='games-history-enemy'>
+													<div
+														style={ { backgroundImage: `url(${enemy?.url_avatar})` } }
+														className='games-history-game-img'
+													>
+														<div className='games-history-user-status' style={ { backgroundColor: enemyColor } }/>
 													</div>
-													{
-														game.winnerId === currentUser.id
-															? <div className='games-history-win'>Win</div>
-															: <div className='games-history-lose'>Lose</div>
-													}
-													<div className='games-history-game-score'>
-														{ `${game.leftScore} : ${game.rightScore}` }
-													</div>
-													<div className='games-history-game-date'>
-														<GameTime date={ Date.parse(game.date) } />
-													</div>
+													<Link to={ `/users/${enemy?.login}` } className='games-history-user-login'>{ enemy?.login }</Link>
 												</div>
-											);
-										})
+												{
+													game.winnerId === user?.id
+														? <div className='games-history-win'>Win</div>
+														: <div className='games-history-lose'>Lose</div>
+												}
+												<div className='games-history-game-score'>
+													{ `${game.leftScore} : ${game.rightScore}` }
+												</div>
+												<div className='games-history-game-date'>
+													<GameTime date={ Date.parse(game.date) } />
+												</div>
+											</div>
+										);
+									})
 							}
 						</div>
 					</div>

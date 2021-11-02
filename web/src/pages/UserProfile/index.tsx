@@ -1,10 +1,10 @@
 import './styles.scss';
 
-import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { faExternalLinkAlt, faGamepad, faUserFriends } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import Header from "components/Header";
-import { ApiFetchedUser, ApiGame, ApiOnlineUser, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
 import ListSection from "pages/UserProfile/ListSection";
@@ -12,13 +12,14 @@ import React from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
 
 interface GameItemProps {
-	enemy?: ApiFetchedUser,
+	enemy?: ApiUser,
 	game: ApiGame,
-	currentUser: User
+	user?: ApiUser
 }
 
-const GameItem = ({ enemy, game, currentUser }: GameItemProps) => {
-	const enemyColor = enemy ? enemy.status : 'transparent';
+const GameItem = ({ enemy, game, user }: GameItemProps) => {
+	// const statusColor = enemy ? enemy.status : 'transparent';
+	const statusColor = 'pink';
 
 	return (
 		<div className='games-history-game'>
@@ -27,12 +28,12 @@ const GameItem = ({ enemy, game, currentUser }: GameItemProps) => {
 					style={ { backgroundImage: `url(${ enemy?.url_avatar })` } }
 					className='games-history-game-img'
 				>
-					<div className='games-history-user-status' style={ { backgroundColor: enemyColor } }/>
+					<div className='games-history-user-status' style={ { backgroundColor: statusColor } }/>
 				</div>
 				<Link to={ `/users/${enemy?.login}` } className='games-history-user-login'>{ enemy?.login }</Link>
 			</div>
 			{
-				game.winnerId === currentUser.id
+				game.winnerId === user?.id
 					? <div className='games-history-win'>Win</div>
 					: <div className='games-history-lose'>Lose</div>
 			}
@@ -50,10 +51,10 @@ interface UserProfileProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	users: ApiOnlineUser[]
+	allUsers: ApiUser[]
 }
 
-const UserProfile = ({ currentUser, setCurrentUser, status, users }: UserProfileProps) => {
+const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProfileProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
@@ -148,18 +149,34 @@ const UserProfile = ({ currentUser, setCurrentUser, status, users }: UserProfile
 					<div className='user-profile-content'>
 						<ListSection
 							title='Latest games'
+							linkTo={ `/games/${user?.login}` }
 							list={
-								gamesHistory.map(game => {
-								const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
-								const enemy = users.find(user => user.id === enemyId);
+								gamesHistory.slice(0, 3).map(game => {
+									const loser = allUsers.find(usr => usr.id === game.loserId);
+									const winner = allUsers.find(usr => usr.id === game.winnerId);
+									const enemy = loser?.login === params.login ? winner : loser;
+									const user = winner?.login === params.login ? winner : loser;
 
-								return <GameItem game={ game } currentUser={ currentUser } enemy={ enemy }/>;
-							}) }
+									return <GameItem game={ game } user={ user } enemy={ enemy }/>;
+								})
+							}
+							emptyListSubstitute={
+								<div className='list-section-empty'>
+									No games yet
+									<FontAwesomeIcon icon={ faGamepad }/>
+								</div>
+							}
 						/>
 						<div style={ { height: '50px' } }/>
 						<ListSection
 							title='Friends'
 							list={ [] }
+							emptyListSubstitute={
+								<div className='list-section-empty'>
+									No friends yet
+									<FontAwesomeIcon icon={ faUserFriends }/>
+								</div>
+							}
 						/>
 					</div>
 				</div>

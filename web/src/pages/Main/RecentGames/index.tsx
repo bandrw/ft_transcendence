@@ -3,7 +3,7 @@ import './styles.scss';
 import { faArrowRight, faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from "axios";
-import { ApiGame, ApiUpdateUser, ApiUser } from "models/apiTypes";
+import { ApiGame, ApiUser } from "models/apiTypes";
 import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
 import React from 'react';
@@ -11,10 +11,10 @@ import { Link } from "react-router-dom";
 
 interface RecentGamesProps {
 	currentUser: User,
-	users: ApiUpdateUser[]
+	allUsers: ApiUser[]
 }
 
-const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
+const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 
 	React.useEffect(() => {
@@ -72,9 +72,10 @@ const RecentGames = ({ currentUser, users }: RecentGamesProps) => {
 			</div>
 			{
 				gamesHistory.slice(0, 3).map((game, i) => {
-					const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
-					const enemy = users.find(user => user.id === enemyId);
-					const enemyColor = enemy ? enemy.status : 'transparent';
+					const enemyId = (game.winnerId === currentUser.id ? game.loserId : game.winnerId);
+					const enemy = allUsers.find(user => (user.id === enemyId));
+					// const enemyColor = enemy ? enemy.status : 'transparent';
+					const enemyColor = 'pink';
 
 					return (
 						<div className='recent-game' key={ i }>

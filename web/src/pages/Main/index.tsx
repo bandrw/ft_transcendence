@@ -2,7 +2,7 @@ import './styles.scss';
 
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { ApiGameSettings, ApiOnlineUser, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiOnlineUser, ApiUpdateUser, ApiUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import RecentGames from "pages/Main/RecentGames";
@@ -20,7 +20,8 @@ interface MainProps {
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	mainEventSourceInitializedRef: React.MutableRefObject<boolean>,
-	users: ApiOnlineUser[],
+	allUsers: ApiUser[],
+	onlineUsers: ApiOnlineUser[],
 	setUsers: React.Dispatch<React.SetStateAction<ApiOnlineUser[]>>,
 	usersRef: React.MutableRefObject<ApiOnlineUser[]>,
 }
@@ -34,7 +35,8 @@ const Main: React.FC<MainProps> = ({
 																		 gameSettingsRef,
 																		 eventSourceRef,
 																		 mainEventSourceInitializedRef,
-																		 users,
+																		 allUsers,
+																		 onlineUsers,
 																		 setUsers,
 																		 usersRef
 	}) => {
@@ -147,9 +149,9 @@ const Main: React.FC<MainProps> = ({
 	});
 
 	const filteredUsers: ApiUpdateUser[] = [];
-	for (let i in users) {
-		if (users[i].login !== currentUser.username)
-			filteredUsers.push(users[i]);
+	for (let i in onlineUsers) {
+		if (onlineUsers[i].login !== currentUser.username)
+			filteredUsers.push(onlineUsers[i]);
 	}
 
 	return (
@@ -180,7 +182,7 @@ const Main: React.FC<MainProps> = ({
 					>
 						<RecentGames
 							currentUser={ currentUser }
-							users={ users }
+							allUsers={ allUsers }
 						/>
 					</Fade>
 				</div>

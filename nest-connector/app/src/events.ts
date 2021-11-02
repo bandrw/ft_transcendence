@@ -42,12 +42,12 @@ export class Events
 
 				// Score check
 				if (game.score.leftPlayer >= 11 || game.score.rightPlayer >= 11) {
-					const data = {
-						winner: game.leftPlayer.user.login
-					};
-					game.sendMsg('gameResults', JSON.stringify(data));
 					const winnerLogin = game.score.leftPlayer >= 11 ? game.leftPlayer.user.login : game.rightPlayer.user.login;
 					const loserLogin = game.score.rightPlayer >= 11 ? game.leftPlayer.user.login : game.rightPlayer.user.login;
+					const data = {
+						winner: winnerLogin
+					};
+					game.sendMsg('gameResults', JSON.stringify(data));
 					this.gameService.updateStatistics(winnerLogin, loserLogin, game.score)
 						.then()
 						.catch(() => console.log('[updateStatistics] error'));

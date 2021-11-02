@@ -10,7 +10,6 @@ header {
 	-webkit-backdrop-filter: blur(10px);
 	background: rgba(#1a1b1f, 0.8);
 	z-index: 10;
-	//border-bottom: 1px solid #42b983;
 
 	.header-container {
 		display: flex;
@@ -46,9 +45,6 @@ header {
 
 		h1 {
 			color: #29aa44;
-			display: flex;
-			align-items: center;
-			width: 160px;
 			letter-spacing: 2px;
 
 			&::selection {

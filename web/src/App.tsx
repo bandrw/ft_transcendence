@@ -1,7 +1,7 @@
 import './App.scss';
 
 import axios from "axios";
-import { ApiGameSettings, ApiOnlineUser, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiOnlineUser, ApiUpdateUser, ApiUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Chat";
 import Game from "pages/Game";
@@ -24,12 +24,13 @@ const App = () => {
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const mainEventSourceInitializedRef = React.useRef<boolean>(false);
 	const [currentUser, setCurrentUser] =  React.useState<User>(new User());
-	const [users, setUsers] = React.useState<ApiOnlineUser[]>([]);
-	const usersRef = React.useRef<ApiOnlineUser[]>([]);
+	const [onlineUsers, setOnlineUsers] = React.useState<ApiOnlineUser[]>([]);
+	const onlineUsersRef = React.useRef<ApiOnlineUser[]>([]);
+	const [allUsers, setAllUsers] = React.useState<ApiUser[]>([]);
 
 	React.useEffect(() => {
-		usersRef.current = users;
-	}, [users, usersRef]);
+		onlineUsersRef.current = onlineUsers;
+	}, [onlineUsers, onlineUsersRef]);
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -42,13 +43,32 @@ const App = () => {
 				if (!isMounted)
 					return ;
 
-				setUsers(res.data);
+				setOnlineUsers(res.data);
 			});
 
 		return () => {
 			isMounted = false;
 		};
-	}, [currentUser, setUsers]);
+	}, [currentUser, setOnlineUsers]);
+
+	React.useEffect(() => {
+		let isMounted = true;
+
+		if (!currentUser.isAuthorized())
+			return ;
+
+		axios.get<ApiUser[]>('/users')
+			.then(res => {
+				if (!isMounted)
+					return ;
+
+				setAllUsers(res.data);
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [currentUser]);
 
 	React.useEffect(() => {
 		if (!currentUser.isAuthorized())
@@ -112,7 +132,7 @@ const App = () => {
 						currentUser={ currentUser }
 						setCurrentUser={ setCurrentUser }
 						status={ status }
-						users={ users }
+						allUsers={ allUsers }
 					/>
 				</Route>
 
@@ -121,7 +141,7 @@ const App = () => {
 						currentUser={ currentUser }
 						setCurrentUser={ setCurrentUser }
 						status={ status }
-						users={ users }
+						allUsers={ allUsers }
 					/>
 				</Route>
 
@@ -135,9 +155,10 @@ const App = () => {
 						gameSettingsRef={ gameSettingsRef }
 						eventSourceRef={ eventSourceRef }
 						mainEventSourceInitializedRef={ mainEventSourceInitializedRef }
-						users={ users }
-						setUsers={ setUsers }
-						usersRef={ usersRef }
+						allUsers={ allUsers }
+						onlineUsers={ onlineUsers }
+						setUsers={ setOnlineUsers }
+						usersRef={ onlineUsersRef }
 					/>
 				</Route>
 

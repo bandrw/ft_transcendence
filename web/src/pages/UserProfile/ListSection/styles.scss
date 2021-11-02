@@ -6,10 +6,37 @@
 
 	.list-section-title {
 		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		margin-bottom: 25px;
+
+		svg {
+			cursor: pointer;
+			transition: all 0.15s ease-in-out;
+			color: #aaa;
+
+			&:hover {
+				color: white;
+			}
+		}
 	}
 
 	.list-section-list {
+
+		.list-section-empty {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 24px;
+			padding: 25px;
+			margin-top: 25px;
+
+			svg {
+				margin-left: 15px;
+				color: #29aa44;
+			}
+		}
+
 		.games-history-game {
 			display: flex;
 			padding: 5px 25px;
@@ -60,21 +87,22 @@
 			}
 
 			.games-history-lose {
-				width: 50px;
+				width: 70px;
 				color: #e30000;
 			}
 
 			.games-history-win {
-				width: 50px;
+				width: 70px;
 				color: #3cb768;
 			}
 
 			.games-history-game-score {
-				width: 60px;
+				width: 80px;
+				white-space: nowrap;
 			}
 
 			.games-history-game-date {
-				width: 160px;
+				min-width: 200px;
 			}
 
 			&:hover {

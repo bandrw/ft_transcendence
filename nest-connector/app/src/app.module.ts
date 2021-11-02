@@ -18,7 +18,7 @@ import { Events } from './events';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'db', // todo [change host to 'db']
       port: 5432,
       username: 'pfile',
       password: 'pfile',
