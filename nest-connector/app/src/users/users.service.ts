@@ -69,19 +69,19 @@ export class UsersService {
   userEvent(event: string, user: OnlineUser) {
     let i = 0;
     while (i < this.onlineUsers.length) {
-      if (this.onlineUsers[i].login != user.login) {
-        this.onlineUsers[i].resp.write(
-          'event: ' +
-            event +
-            '\ndata: ' +
-            JSON.stringify({
-              login: user.login,
-              url_avatar: user.url_avatar,
-              status: user.status,
-            }) +
-            '\n\n',
-        );
-      }
+      // if (this.onlineUsers[i].login != user.login) {
+      this.onlineUsers[i].resp.write(
+        'event: ' +
+          event +
+          '\ndata: ' +
+          JSON.stringify({
+            login: user.login,
+            url_avatar: user.url_avatar,
+            status: user.status,
+          }) +
+          '\n\n',
+      );
+      // }
       ++i;
     }
   }

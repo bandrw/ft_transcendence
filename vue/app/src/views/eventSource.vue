@@ -24,6 +24,8 @@ export default {
       "SET_USERS_URL_AVATAR",
       "SET_ENEMY_STATUS",
       "SET_ENEMY_URL_AVATAR",
+      "SET_USER_STATUS",
+      "SET_USER_URL_AVATAR",
     ]),
     ...mapMutations("ladder", [
       "CLEAR_ACCEPT_INTERVAL",
@@ -111,6 +113,10 @@ export default {
           break;
         }
         ++index;
+      }
+      if (this.user.login === user.login) {
+        this.SET_USER_URL_AVATAR(user.url_avatar);
+        this.SET_USER_STATUS(user.status);
       }
       if (this.enemy && this.enemy.login === user.login) {
         this.SET_ENEMY_URL_AVATAR(user.url_avatar);

@@ -61,7 +61,7 @@ export class UsersController {
   }
   @Post('logout')
   userLogout(@Req() req: Request) {
-    this.UsersService.logout(req.body.login);
+    this.UsersService.logout(req.body.user.login);
   }
 
   @Get('checkExist')

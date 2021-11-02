@@ -42,13 +42,15 @@ import eventService from "../services/eventService";
 export default {
   computed: {
     winPercent() {
-      const winP = (this.user.wins / this.user.games).toFixed(2) * 100;
+      const winP = (
+        (this.user.wins / this.user.games).toFixed(2) * 100
+      ).toFixed(0);
       return winP ? winP : 0;
     },
     ...mapState("ladder", ["ladder", "game"]),
-    ...mapState(["authorized", "user"]),
+    ...mapState(["authorized", "user", "enemy"]),
     ...mapState("profile", ["profile"]),
-    ...mapState("game", ["gameInProgress", "enemy", "id"]),
+    ...mapState("game", ["gameInProgress", "id"]),
   },
   methods: {
     ...mapMutations("game", [
@@ -93,16 +95,31 @@ export default {
         .then(this.getData);
       this.SET_NEW_USER_AVATAR(avatar);
     },
-    // async logoutIfAuthorized() {
-    //   if (this.authorized) {
-    //     await this.logout();
-    //   }
-    // },
     stopPlatform(event) {
       if (event.key === "ArrowRight") {
         this.CLEAR_RIGHT_INTERVAL();
       } else if (event.key === "ArrowLeft") {
         this.CLEAR_LEFT_INTERVAL();
+      }
+    },
+    escapeEvents(event) {
+      if (this.authorized && !this.game && !this.enemy) {
+        this.logout();
+      } else if (this.authorized && this.game) {
+        if (!this.enemy) {
+          this.$refs.Ladder.cancelFind(event);
+        } else if (this.enemy && !this.gameInProgress) {
+          this.$refs.Ladder.cancelAccept(event);
+        } else if (this.enemy && this.gameInProgress) {
+          this.$socket.emit("leaveGame", {
+            login: this.user.login,
+            id: this.id,
+          });
+          this.SET_GAME_IN_PROGRESS(false);
+          eventService.setStatus(this.user.login, "blue");
+          this.CLEAR_LADDER();
+          this.SET_ENEMY(null);
+        }
       }
     },
     keyEvents(event) {
@@ -111,29 +128,11 @@ export default {
       } else if (event.key === "ArrowLeft" && this.gameInProgress) {
         this.$refs.game.movePlatformLeft();
       } else if (event.key === "Escape") {
-        if (this.ladder && this.authorized && !this.game && !this.enemy) {
-          this.logout();
-        } else if (this.ladder && this.authorized && this.game) {
-          if (!this.enemy) {
-            this.$refs.Ladder.cancelFind(event);
-          } else if (this.enemy && !this.gameInProgress) {
-            this.$refs.Ladder.cancelAccept(event);
-          } else if (this.enemy && this.gameInProgress) {
-            this.$socket.emit("leaveGame", {
-              login: this.user.login,
-              id: this.id,
-            });
-            this.SET_GAME_IN_PROGRESS(false);
-            eventService.setStatus(this.user.login, "blue");
-            this.CLEAR_LADDER();
-            this.SET_ENEMY(null);
-          }
-        }
+        this.escapeEvents(event);
       }
     },
   },
   mounted() {
-    // window.onbeforeunload = this.logoutIfAuthorized;
     document.addEventListener("keyup", this.stopPlatform);
     document.addEventListener("keydown", this.keyEvents);
   },

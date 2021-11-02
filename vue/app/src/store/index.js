@@ -73,6 +73,12 @@ export default new Vuex.Store({
     SET_ENEMY_URL_AVATAR(state, url_avatar) {
       state.enemy.url_avatar = url_avatar;
     },
+    SET_USER_STATUS(state, status) {
+      state.user.status = status;
+    },
+    SET_USER_URL_AVATAR(state, url_avatar) {
+      state.user.url_avatar = url_avatar;
+    },
   },
   actions: {
     setUsers({ commit }, data) {
