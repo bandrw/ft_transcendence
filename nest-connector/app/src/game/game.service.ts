@@ -21,7 +21,7 @@ export class GameService {
     this.games.push(Game);
   }
   async leaveGame(game: G, login: string, id) {
-    if (game.playerTwo.user.login === login) {
+    if (game.playerOne.user.login === login) {
       await this.updateStatistics(
         game.playerTwo.user.login,
         game.playerOne.user.login,
@@ -29,7 +29,7 @@ export class GameService {
       this.userService.userPersonalEvent(
         'enemyHasLeaveGame',
         null,
-        game.playerOne.user.login,
+        game.playerTwo.user.login,
       );
     } else {
       await this.updateStatistics(
@@ -39,7 +39,7 @@ export class GameService {
       this.userService.userPersonalEvent(
         'enemyHasLeaveGame',
         null,
-        game.playerTwo.user.login,
+        game.playerOne.user.login,
       );
     }
     this.games[id] = null;

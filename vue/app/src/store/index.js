@@ -34,14 +34,13 @@ export default new Vuex.Store({
       ++state.user.games;
     },
     INCREMENT_USER_WINS(state) {
-      console.log("wins: " + state.user.wins);
       ++state.user.wins;
     },
     INCREMENT_USERS_GAMES(state, index) {
       ++state.users[index].games;
     },
     INCREMENT_USERS_WINS(state, index) {
-      ++state.user[index].wins;
+      ++state.users[index].wins;
     },
     SET_AUTHORIZE(state, status) {
       state.authorized = status;

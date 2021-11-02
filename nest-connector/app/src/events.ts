@@ -3,21 +3,17 @@ import {
   SubscribeMessage,
   MessageBody,
   WebSocketServer,
-  OnGatewayConnection,
   OnGatewayDisconnect,
-  OnGatewayInit,
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { GameService } from './game/game.service';
 import { UsersService } from './users/users.service';
 import { ChatService } from './chat/chat.service';
 
 @WebSocketGateway()
-export class Events
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class Events implements OnGatewayDisconnect {
   constructor(
     @Inject(GameService)
     private gameService: GameService,
@@ -27,7 +23,6 @@ export class Events
     private chatService: ChatService,
   ) {}
   @WebSocketServer() server: Server;
-  private logger: Logger = new Logger('AppGateway');
   @SubscribeMessage('start')
   launchBall(@MessageBody() user: string) {
     const u = JSON.parse(user);
@@ -95,19 +90,14 @@ export class Events
       messageInfo.message,
     );
   }
-  afterInit(server: Server): any {
-    this.logger.log(server);
-  }
-
-  handleConnection(client: Socket, ...args: any[]): any {
-    this.logger.log('client connected: ' + client.id + args);
-  }
 
   handleDisconnect(client: Socket): any {
-    this.logger.log(`Client disconnected : ${client.id}`);
     let i = 0;
     while (i < this.userService.onlineUsers.length) {
-      if (this.userService.onlineUsers[i].socketId === client.id) {
+      if (
+        this.userService.onlineUsers[i] &&
+        this.userService.onlineUsers[i].socketId === client.id
+      ) {
         this.userService.logout(this.userService.onlineUsers[i].login);
         return;
       }

@@ -93,11 +93,11 @@ export default {
         .then(this.getData);
       this.SET_NEW_USER_AVATAR(avatar);
     },
-    async logoutIfAuthorized() {
-      if (this.authorized) {
-        await this.logout();
-      }
-    },
+    // async logoutIfAuthorized() {
+    //   if (this.authorized) {
+    //     await this.logout();
+    //   }
+    // },
     stopPlatform(event) {
       if (event.key === "ArrowRight") {
         this.CLEAR_RIGHT_INTERVAL();
@@ -133,7 +133,7 @@ export default {
     },
   },
   mounted() {
-    window.onbeforeunload = this.logoutIfAuthorized;
+    // window.onbeforeunload = this.logoutIfAuthorized;
     document.addEventListener("keyup", this.stopPlatform);
     document.addEventListener("keydown", this.keyEvents);
   },
