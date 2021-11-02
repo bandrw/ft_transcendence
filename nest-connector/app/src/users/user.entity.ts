@@ -1,22 +1,23 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { GameEntity } from "game/game.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class User_table {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Entity({ name: 'users' })
+export class User {
+	@PrimaryGeneratedColumn()
+	id: number;
 
-  @Column()
-  login: string;
+	@Column()
+	login: string;
 
-  @Column()
-  password: string;
+	@Column()
+	password: string;
 
-  @Column()
-  url_avatar: string;
+	@Column()
+	url_avatar: string;
 
-  @Column({ default: 0 })
-  games: number;
+	@OneToMany(() => GameEntity, game => game.winner)
+	wonGames: GameEntity[];
 
-  @Column({ default: 0 })
-  wins: number;
+	@OneToMany(() => GameEntity, game => game.loser)
+	lostGames: GameEntity[];
 }

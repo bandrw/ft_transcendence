@@ -4,21 +4,52 @@ header {
 	left: 0;
 	right: 0;
 	display: flex;
-	height: 50px;
+	height: 80px;
 	justify-content: center;
-	border-bottom: 1px solid #42b983;
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	background: rgba(#1a1b1f, 0.8);
+	z-index: 10;
 
 	.header-container {
 		display: flex;
 		align-items: center;
-		width: 1024px;
+		justify-content: space-between;
+		width: calc(100% - 80px);
+		max-width: calc(2560px - 80px);
 		height: 100%;
+		padding: 0 40px;
+
+		.header-back-btn {
+			width: 160px;
+			border: 2px solid #21232b;
+			background: none;
+			outline: none;
+			color: #29aa44;
+			height: 60px;
+			font-size: 26px;
+			border-radius: 18px;
+			cursor: pointer;
+			background: #21232b;
+			transition: all 0.05s ease-in;
+
+			&:hover {
+				background: #2c2f3a;
+				border-color: #2c2f3a;
+			}
+
+			&:active {
+				opacity: 0.7;
+			}
+		}
 
 		h1 {
-			color: #42b983;
-			display: flex;
-			align-items: center;
-			width: 30%;
+			color: #29aa44;
+			letter-spacing: 2px;
+
+			&::selection {
+				background: #2c2f3a;
+			}
 		}
 
 		.links {
@@ -31,42 +62,96 @@ header {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				color: #2c3e50;
+				color: white;
 			}
 		}
 
-		.user {
-			width: calc(20% - 20px);
-			padding: 0 10px;
+		.header-buttons {
 			display: flex;
-			justify-content: space-between;
 			align-items: center;
-			border: 1px solid #2c3e50;
-			border-radius: 5px;
-			height: 80%;
+			width: 160px;
 
-			.user-img {
-				width: 30px;
-				height: 30px;
-				border: 1px solid #ccc;
-				border-radius: 50%;
-			}
-
-			.user-username {
-				width: 60%;
-				height: 35px;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-
-			.user-btn {
-				width: 30px;
-				height: 30px;
-				background: #ccc;
+			& > button {
+				cursor: pointer;
+				width: 60px;
+				height: 60px;
+				border-radius: 18px;
 				border: none;
 				outline: none;
-				cursor: pointer;
+				font-size: 1.5em;
+				margin-right: 40px;
+				background-color: #21232b;
+
+				&:last-child {
+					margin-right: 0;
+				}
+			}
+		}
+
+		.notifications-btn {
+			& > svg {
+				color: white;
+			}
+		}
+
+		.user-btn {
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: 80%;
+			position: relative;
+		}
+	}
+
+	.header-center {
+		.header-center-exit-btn {
+			display: flex;
+			justify-content: space-between;
+			padding: 7px 21px;
+			align-items: center;
+			height: 65px;
+			background: none;
+			outline: none;
+			border: none;
+			cursor: pointer;
+			border-radius: 18px;
+			transition: all 0.1s ease-out;
+			background: #21232b;
+
+			& > svg {
+				color: #e30000;
+				font-size: 2.5em;
+			}
+
+			& > span {
+				margin-left: 21px;
+				letter-spacing: 2px;
+				font-weight: 300;
+				color: #bbb;
+				font-size: 1.3em;
+			}
+
+			&:hover {
+				background: #21242f;
+			}
+
+			&:active {
+				background: #24273a;
+			}
+		}
+
+		.games-history-header {
+			.home-link {
+				font-size: 26px;
+				color: #ccc;
+				transition: all 0.15s ease-in-out;
+
+				svg {
+					margin-right: 10px;
+				}
+
+				&:hover {
+					color: white;
+				}
 			}
 		}
 	}

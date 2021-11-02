@@ -171,14 +171,14 @@ Vue.component('user', {
       });
       this.eventSource.addEventListener('gameIsReady', () => {
         this.$refs.ladder.gameReady();
-        $('.Jquery_bundle').fadeOut(1000);
+        // $('.Jquery_bundle').fadeOut(1000);
         this.gameR = true;
       });
       this.eventSource.addEventListener('gameSettings', (event) => {
         const gameSettings = JSON.parse(event.data);
         this.$refs.game.setSettings(gameSettings);
       });
-      this.eventSource.addEventListener('bellLaunch', () => {
+      this.eventSource.addEventListener('ballLaunch', () => {
         this.$refs.game.ballInAction();
       });
       this.eventSource.addEventListener('enemyPosition', (event) => {
@@ -262,7 +262,7 @@ Vue.component('user', {
             } else if (this.enemy && !this.gameR) {
               this.$refs.ladder.cancelAccept(event);
             } else if (this.enemy && this.gameR) {
-              $('.Jquery_bundle').fadeIn(1000);
+              // $('.Jquery_bundle').fadeIn(1000);
               this.gameR = false;
               this.$refs.ladder.clearData('blue');
             }

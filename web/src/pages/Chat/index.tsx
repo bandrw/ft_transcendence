@@ -1,33 +1,36 @@
-import './styles.scss'
+import './styles.scss';
 
+import Header from "components/Header";
+import { User } from "models/User";
 import React from 'react';
 import { useHistory } from "react-router-dom";
 
-import { User } from "../../classes/User";
-import Header from "../../components/Header";
+import { ApiUserStatus } from "../../models/apiTypes";
 
 interface ChatProps {
 	currentUser: User,
-	setCurrentUser: (arg0: User) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
+	status: ApiUserStatus
 }
 
-const Chat = (props: ChatProps) => {
+const Chat = ({ currentUser, setCurrentUser, status }: ChatProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
-		if (!props.currentUser.isAuthorized())
-			history.push('/login')
-	}, [history, props.currentUser])
+		if (!currentUser.isAuthorized())
+			history.push('/login');
+	}, [history, currentUser]);
 
 	return (
 		<div className='chat-container'>
 			<Header
-				currentUser={props.currentUser}
-				setCurrentUser={props.setCurrentUser}
+				currentUser={ currentUser }
+				setCurrentUser={ setCurrentUser }
+				status={ status }
 			/>
 			Chat view
 		</div>
-	)
-}
+	);
+};
 
 export default Chat;

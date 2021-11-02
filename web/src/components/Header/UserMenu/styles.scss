@@ -1,0 +1,73 @@
+.user-menu-wrapper {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 170px;
+	height: calc(100% + 15px);
+}
+
+.user-menu {
+	cursor: auto;
+	position: absolute;
+	top: 100%;
+	right: 0;
+	background: #21232b;
+	box-shadow: 0 0 20px #1a1b1f;
+	z-index: 10;
+	padding: 5px 10px;
+	border-radius: 10px;
+
+	.user-menu-username {
+		color: #aaa;
+		transition: all 0.1s ease-out;
+		margin: 5px 0;
+		width: 150px;
+		height: 45px;
+		font-size: 18px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		text-transform: uppercase;
+	}
+
+	.user-menu-btn {
+		transition: all 0.1s ease-out;
+		margin: 5px 0;
+		cursor: pointer;
+		width: 150px;
+		height: 45px;
+		font-size: 16px;
+		background: #21232b;
+		border: none;
+		outline: none;
+		border-radius: 10px;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+
+		&:hover {
+			background: #2c2f3a;
+		}
+
+		&:active {
+			background: #323646;
+		}
+
+		&::selection {
+			background: #29aa44;
+		}
+	}
+
+	.user-menu-sign-out {
+		& > svg {
+			font-size: 1.2em;
+			position: absolute;
+			right: 15px;
+			bottom: 12px;
+			color: #e30000;
+		}
+	}
+}

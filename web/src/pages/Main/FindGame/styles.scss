@@ -1,0 +1,213 @@
+.find-game {
+	margin: 0 auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-direction: column;
+	width: calc(100% - 80px);
+	height: 240px;
+	padding: 30px 40px;
+	position: relative;
+	z-index: 9;
+
+	.find-game-img {
+		margin-top: 5px;
+		width: 100%;
+		height: 75px;
+		background-image: url("../../../img/play-pong.png");
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+
+	.find-game-title {
+		font-size: 2em;
+	}
+
+	.find-game-back {
+		margin-bottom: 5px;
+		width: 370px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10px;
+		border-radius: 25px;
+		background: #2c2f3a;
+
+		& > span {
+			width: 200px;
+			margin: 0 auto;
+			font-size: 1.4em;
+
+			&::selection {
+				background: #29aa44;
+			}
+		}
+	}
+
+	.find-game-btn {
+		background: #29aa44;
+		color: white;
+		font-size: 26px;
+		font-weight: bold;
+		border: none;
+		outline: none;
+		padding: 0 20px;
+		height: 60px;
+		width: 100px;
+		border-radius: 20px;
+		cursor: pointer;
+		transition: all 0.1s ease-out;
+
+		@media (hover: hover) {
+			&:hover {
+				background: #21b941;
+			}
+		}
+		&:active {
+			opacity: 0.8;
+		}
+	}
+
+	.find-game-searching {
+		margin: 0 auto;
+		width: 200px;
+		height: 60px;
+		font-size: 1.4em;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		color: white;
+		border-radius: 10px;
+
+		.find-game-searching-time {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			font-size: 0.95em;
+			height: 30px;
+		}
+	}
+
+	.find-game-cancel {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100px;
+		height: 60px;
+		border: none;
+		outline: none;
+		font-size: 26px;
+		background: #e30000;
+		cursor: pointer;
+		color: white;
+		border-radius: 20px;
+	}
+}
+
+.accept-window-wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	z-index: 9999;
+
+	.accept-window {
+		width: 700px;
+		border-radius: 25px;
+		background: #1a1b1f;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: center;
+
+		& > p {
+			font-size: 2em;
+			font-weight: bold;
+			margin-top: 50px;
+		}
+
+		.accept-window-info {
+			margin: 40px 0;
+			width: 50%;
+			display: flex;
+			justify-content: space-between;
+
+			.accept-window-info-img {
+				padding: 5px;
+				width: 65px;
+				height: 70px;
+				background-size: 90%;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-color: #21232b;
+				border-radius: 18px;
+				margin: 0 auto;
+				border: 2px solid transparent;
+			}
+
+			.accept-window-info-username {
+				margin: 15px 0 10px;
+			}
+		}
+
+		.accept-window-accept {
+			margin-bottom: 50px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+
+			& > button {
+				background: none;
+				border: none;
+				outline: none;
+				cursor: pointer;
+				transition: all 0.1s ease-in;
+			}
+
+			.accept-btn {
+				width: 300px;
+				height: 80px;
+				background: #29aa44;
+				font-size: 1.5em;
+				color: white;
+				border-radius: 10px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.accept-btn-accepted {
+				background: transparent;
+				border: 2px solid #29aa44;
+				font-size: 2em;
+
+				& > svg {
+					color: #29aa44;
+				}
+			}
+
+			.decline-btn {
+				font-size: 1em;
+				color: red;
+				margin-top: 25px;
+				width: fit-content;
+
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+
+			& > span {
+				margin-top: 25px;
+			}
+		}
+	}
+}

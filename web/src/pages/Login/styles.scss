@@ -9,25 +9,36 @@
 
 	h1 {
 		margin-bottom: 30px;
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 
 	form {
 		display: flex;
 		flex-direction: column;
+		font-size: 1.2em;
 	}
 
 	input {
 		border-radius: 15px;
-		width: calc(400px - 40px);
+		width: calc(400px - 52px);
 		border: 1px solid #2c3e50;
 		outline: none;
-		font-size: 1em;
-		padding: 12px 20px;
+		font-size: 20px;
+		padding: 16px 26px;
 		margin-bottom: 15px;
 		transition: all 0.1s ease-in;
+		background: transparent;
+		color: white;
+
+		&::selection {
+			background: #29aa44;
+		}
 
 		&:focus {
-			border-color: #42b983;
+			border-color: #29aa44;
 		}
 	}
 
@@ -36,10 +47,10 @@
 		cursor: pointer;
 		width: 400px;
 		height: 50px;
-		font-size: 1.2em;
+		font-size: 20px;
 		font-weight: bold;
 		padding: 10px 12px;
-		background: #42b983;
+		background: #29aa44;
 		border: none;
 		outline: none;
 		color: white;
@@ -48,13 +59,17 @@
 		align-items: center;
 		transition: all 0.05s ease-in;
 
+		&::selection {
+			background: #2c3e50;
+		}
+
 		@media (hover: hover) {
 			&:hover {
-				background: #3dc083;
+				background: #21b941;
 			}
 		}
 		&:active {
-			background: #42a979;
+			opacity: 0.8;
 		}
 	}
 
@@ -62,10 +77,14 @@
 		margin-bottom: 15px;
 		color: red;
 		text-align: center;
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 
 	.register-link {
-		color: #42b983;
+		color: #21b941;
 		font-size: 1.2em;
 		width: fit-content;
 		padding: 0;
@@ -74,10 +93,19 @@
 		&:hover {
 			text-decoration: underline;
 		}
+
+		&::selection {
+			background: #29aa44;
+			color: white;
+		}
 	}
 
 	.separator {
 		margin-top: 30px;
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 
 	.login-services {

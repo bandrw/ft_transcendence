@@ -1,94 +1,99 @@
-import './styles.scss'
+import './styles.scss';
 
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
+import CircleLoading from "components/CircleLoading";
+import { ApiUserLogin } from "models/apiTypes";
+import { User } from "models/User";
 import React from 'react';
 import { Link, useHistory } from "react-router-dom";
 
-import { UserLogin } from "../../apiTypes/apiTypes";
-import { User } from "../../classes/User";
-import CircleLoading from "../../components/CircleLoading";
-
 interface LoginProps {
 	currentUser: User,
-	setCurrentUser: (arg0: User) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
 }
 
 export const signIn = async (
 	login: string,
 	password: string,
-	setCurrentUser: (user: User) => void,
-	setErrors: (errors: string) => void
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
+	setErrors: React.Dispatch<React.SetStateAction<string> >
 ) => {
-	const r = await axios.post<any, AxiosResponse<UserLogin> >('/users/login', {
+	const r = await axios.post<any, AxiosResponse<ApiUserLogin> >('/users/login', {
 		login
 	})
 		.then(res => {
 			if (res.data.ok && bcryptjs.compareSync(password, res.data.msg.password)) {
-				const usr = new User()
-				usr.username = res.data.msg.login
-				usr.loginDate = Date.now()
-				setCurrentUser(usr)
-				return true
+				const usr = new User();
+				usr.id = res.data.msg.id;
+				usr.username = res.data.msg.login;
+				usr.urlAvatar = res.data.msg.url_avatar;
+				usr.loginDate = Date.now();
+				setCurrentUser(usr);
+				return true;
 			}
-			setErrors('Wrong username or password')
-			return false
-		})
+			setErrors('Wrong username or password');
+			return false;
+		});
 	if (!r)
-		throw Error()
-}
+		throw Error();
+};
 
-const Login = (props: LoginProps) => {
+const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 	const history = useHistory();
 
 	React.useEffect(() => {
-		if (props.currentUser.isAuthorized())
-			history.push('/')
-	}, [history, props.currentUser])
+		if (currentUser.isAuthorized())
+			history.push('/');
+	}, [history, currentUser]);
 
-	const loginRef = React.createRef<HTMLInputElement>()
-	const passwordRef = React.createRef<HTMLInputElement>()
+	const loginRef = React.createRef<HTMLInputElement>();
+	const passwordRef = React.createRef<HTMLInputElement>();
 
 	const [loginErrors, setLoginErrors] = React.useState<string>('');
-	const [isLoading, setIsLoading] = React.useState<boolean>(false)
+	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
 	return (
 		<div className='login-container'>
 			<h1>Login page</h1>
 
-			<form onSubmit={(e) => {
-				e.preventDefault()
+			<form onSubmit={ (e) => {
+				e.preventDefault();
 
-				setIsLoading(true)
+				setIsLoading(true);
 
 				const login = loginRef.current?.value || '';
-				const password = passwordRef.current?.value || ''
+				const password = passwordRef.current?.value || '';
 
-				signIn(login, password, props.setCurrentUser, setLoginErrors)
+				signIn(login, password, setCurrentUser, setLoginErrors)
 					.then(() => {
-						setIsLoading(false)
-						history.push('/')
+						setIsLoading(false);
+						history.push('/');
 					})
 					.catch(() => {
-						setIsLoading(false)
-						setLoginErrors('Wrong login or password')
-					})
-			}}
+						setIsLoading(false);
+						setLoginErrors('Wrong login or password');
+					});
+			} }
 			>
 				<input
 					name='login'
 					type='text'
 					placeholder='Login'
-					ref={loginRef}
+					ref={ loginRef }
+					defaultValue='admin'
+					autoComplete='username'
 				/>
 				<input
 					name='password'
 					type='password'
 					placeholder='Password'
-					ref={passwordRef}
+					ref={ passwordRef }
+					defaultValue='123123'
+					autoComplete='current-password'
 				/>
 				<span className='login-errors'>
-					{loginErrors}
+					{ loginErrors }
 				</span>
 				<button
 					type='submit'
@@ -97,7 +102,7 @@ const Login = (props: LoginProps) => {
 					{
 						isLoading ?
 							<CircleLoading bgColor='#fff' width='35px' height='35px'/> :
-							<span>Log in</span>
+							'Log in'
 					}
 				</button>
 			</form>
@@ -116,14 +121,14 @@ const Login = (props: LoginProps) => {
 			<div className='login-services'>
 				<button
 					className='login-service'
-					onClick={() => alert('not working yet')}
+					onClick={ () => alert('not working yet') }
 				>
 					Sign in with
 					<div className='login-service-icon'/>
 				</button>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
 export default Login;

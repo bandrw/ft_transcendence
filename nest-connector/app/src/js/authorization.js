@@ -206,23 +206,24 @@ Vue.component('wall', {
         .then(function (res) {
           return res.data;
         });
-      if (this.im) {
-        if (bcrypt.compareSync(password, this.im.password)) {
-          this.im.password = null;
+      if (this.im.ok) {
+        if (bcrypt.compareSync(password, this.im.msg.password)) {
+          this.im.msg.password = null;
           this.error = null;
           this.users = await axios
             .get('/users/getOnline')
             .then(function (response) {
               return response.data;
             });
-          this.$emit('authSuccess', this.im, this.users);
+          this.$emit('authSuccess', this.im.msg, this.users);
           this.users = null;
-          this.im = null;
+          this.im.msg = null;
         } else {
           this.error = 'Wrong password';
         }
       } else {
-        this.error = "User with login '" + login + "' not found";
+        // this.error = "User with login '" + login + "' not found";
+        this.error = this.im.msg;
       }
     },
     thankYou(login) {
