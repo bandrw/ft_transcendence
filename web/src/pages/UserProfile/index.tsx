@@ -41,7 +41,7 @@ const GameItem = ({ enemy, game, user }: GameItemProps) => {
 				{ `${game.leftScore} : ${game.rightScore}` }
 			</div>
 			<div className='games-history-game-date'>
-				<GameTime date={ Date.parse(game.date) } />
+				<GameTime date={ game.date } />
 			</div>
 		</div>
 	);

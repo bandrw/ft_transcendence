@@ -12,7 +12,7 @@ import { Fade } from "react-awesome-reveal";
 import Moment from "react-moment";
 import { Link, useHistory, useParams } from "react-router-dom";
 
-export const GameTime = ({ date }: { date: number }) => {
+export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');
 	const gameDateDay = moment(date).format('DD.MM.YYYY');
 	const yesterdayDay = moment().subtract(1, 'days').format('DD.MM.YYYY');
@@ -133,7 +133,7 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 													{ `${game.leftScore} : ${game.rightScore}` }
 												</div>
 												<div className='games-history-game-date'>
-													<GameTime date={ Date.parse(game.date) } />
+													<GameTime date={ game.date } />
 												</div>
 											</div>
 										);

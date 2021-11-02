@@ -97,7 +97,7 @@ const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
 								{ `${game.leftScore} : ${game.rightScore}` }
 							</div>
 							<div className='recent-game-date'>
-								<GameTime date={ Date.parse(game.date) }/>
+								<GameTime date={ game.date }/>
 							</div>
 						</div>
 					);
