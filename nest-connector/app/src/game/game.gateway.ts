@@ -18,14 +18,15 @@ export class GameGateway {
 				game.updatePositions();
 
 				// Score check
-				if (game.score.leftPlayer >= game.pointsToWin || game.score.rightPlayer >= game.pointsToWin) {
-					const winnerLogin = game.score.leftPlayer >= game.pointsToWin ? game.leftPlayer.user.login : game.rightPlayer.user.login;
-					const loserLogin = game.score.rightPlayer >= game.pointsToWin ? game.leftPlayer.user.login : game.rightPlayer.user.login;
+				const score = game.gameSettings.score;
+				if (score.leftPlayer >= game.pointsToWin || score.rightPlayer >= game.pointsToWin) {
+					const winnerLogin = score.leftPlayer >= game.pointsToWin ? game.leftPlayer.user.login : game.rightPlayer.user.login;
+					const loserLogin = score.rightPlayer >= game.pointsToWin ? game.leftPlayer.user.login : game.rightPlayer.user.login;
 					const data = {
 						winner: winnerLogin
 					};
 					game.sendMsg('gameResults', JSON.stringify(data));
-					this.gameService.updateStatistics(winnerLogin, loserLogin, game.score)
+					this.gameService.updateStatistics(winnerLogin, loserLogin, score)
 						.then()
 						.catch(() => console.log('[updateStatistics] error'));
 					clearInterval(game.gameInterval);

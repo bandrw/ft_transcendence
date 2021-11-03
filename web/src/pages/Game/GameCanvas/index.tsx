@@ -13,19 +13,22 @@ import { Link } from 'react-router-dom';
 interface GameCanvasProps {
 	watchMode: boolean,
 	currentUser: User,
-	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
+	gameSettings: ApiGameSettings,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
-const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatus }: GameCanvasProps) => {
+const GameCanvas = ({ watchMode, currentUser, gameSettings, gameRef, setStatus }: GameCanvasProps) => {
 	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const leftPlayer = useMemo(() => new Player(), []);
 	const rightPlayer = useMemo(() => new Player(), []);
 	const ball = useMemo(() => new GameBall(), []);
 
-	const score = useMemo(() => ({ leftPlayer: 0, rightPlayer: 0 }), []);
+	const score = useMemo(() => ({
+		leftPlayer: gameSettings.score.leftPlayer,
+		rightPlayer: gameSettings.score.rightPlayer
+	}), [gameSettings.score.leftPlayer, gameSettings.score.rightPlayer]);
 
 	const [gameResults, setGameResults] = React.useState<{ winner: string } | null>(null);
 
@@ -81,19 +84,15 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 
 	}, [ball, leftPlayer, rightPlayer, score, socket]);
 
-	const playerWidth = gameSettingsRef.current?.playerWidth || 15;
-	const playerMargin = gameSettingsRef.current?.playerMargin || 15;
-	const playerHeight = gameSettingsRef.current?.playerHeight || 100;
+	const playerWidth = gameSettings.playerWidth;
+	const playerMargin = gameSettings.playerMargin;
+	const playerHeight = gameSettings.playerHeight;
 
 	useEffect(() => {
 		if (watchMode)
 			return ;
 
 		const keyDownHandler = (e: KeyboardEvent) => {
-			const gameSettings = gameSettingsRef.current;
-			if (!gameSettings)
-				return ;
-
 			let currentPlayer;
 			if (currentUser.username === leftPlayer.username)
 				currentPlayer = leftPlayer;
@@ -109,7 +108,7 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 					return ;
 				const data = {
 					login: currentUser.username,
-					gameId: gameSettingsRef.current?.id,
+					gameId: gameSettings.id,
 					key: e.key
 				};
 				socket.emit('keyDown', JSON.stringify(data));
@@ -121,10 +120,6 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 		};
 
 		const keyUpHandler = (e: KeyboardEvent) => {
-			const gameSettings = gameSettingsRef.current;
-			if (!gameSettings)
-				return ;
-
 			let currentPlayer;
 			if (currentUser.username === leftPlayer.username)
 				currentPlayer = leftPlayer;
@@ -136,7 +131,7 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 			if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
 				const data = {
 					login: currentUser.username,
-					gameId: gameSettingsRef.current?.id,
+					gameId: gameSettings.id,
 					key: e.key
 				};
 				socket.emit('keyUp', JSON.stringify(data));
@@ -153,7 +148,7 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 			document.removeEventListener('keydown', keyDownHandler);
 			document.removeEventListener('keyup', keyUpHandler);
 		};
-	}, []);
+	}, [currentUser.username, gameSettings, leftPlayer, rightPlayer, socket, watchMode]);
 
 	useEffect(() => {
 		let gameRuns = true;
@@ -260,10 +255,6 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 			if (!canvas)
 				return ;
 
-			const gameSettings = gameSettingsRef.current;
-			if (!gameSettings)
-				return ;
-
 			ball.angle = 0;
 			ball.speed = gameSettings.ballSpeed;
 			ball.size = gameSettings.ballSize;
@@ -284,25 +275,24 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 
 		return () => {
 			gameRuns = false;
-			console.log('[GameCanvas] cleanup');
 		};
-	}, []);
+	}, [ball, gameSettings, leftPlayer, playerHeight, playerMargin, playerWidth, rightPlayer, score.leftPlayer, score.rightPlayer]);
 
 	return (
 		<div className='game-container'>
 			<div className='info-board'>
-				<Link to={ `/users/${gameSettingsRef.current?.leftPlayer.login}` } className='info-board-user info-board-left-user'>
+				<Link to={ `/users/${gameSettings.leftPlayer.login}` } className='info-board-user info-board-left-user'>
 					<div
 						className='info-board-user-img'
-						style={ { backgroundImage: `url(${ gameSettingsRef.current?.leftPlayer.url_avatar })` } }
+						style={ { backgroundImage: `url(${ gameSettings.leftPlayer.url_avatar })` } }
 					/>
-					<div className='info-board-user-name'>{ gameSettingsRef.current?.leftPlayer.login }</div>
+					<div className='info-board-user-name'>{ gameSettings.leftPlayer.login }</div>
 				</Link>
-				<Link to={ `/users/${gameSettingsRef.current?.rightPlayer.login}` } className='info-board-user info-board-right-user'>
-					<div className='info-board-user-name'>{ gameSettingsRef.current?.rightPlayer.login }</div>
+				<Link to={ `/users/${gameSettings.rightPlayer.login}` } className='info-board-user info-board-right-user'>
+					<div className='info-board-user-name'>{ gameSettings.rightPlayer.login }</div>
 					<div
 						className='info-board-user-img'
-						style={ { backgroundImage: `url(${ gameSettingsRef.current?.rightPlayer.url_avatar })` } }
+						style={ { backgroundImage: `url(${ gameSettings.rightPlayer.url_avatar })` } }
 					/>
 				</Link>
 			</div>
@@ -321,9 +311,9 @@ const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatu
 						<GameResults
 							winner={ gameResults.winner }
 							loser={
-								(gameResults.winner === gameSettingsRef.current?.leftPlayer.login
-								? gameSettingsRef.current?.rightPlayer.login
-								: gameSettingsRef.current?.leftPlayer.login) || ''
+								(gameResults.winner === gameSettings.leftPlayer.login
+								? gameSettings.rightPlayer.login
+								: gameSettings.leftPlayer.login) || ''
 							}
 							gameRef={ gameRef }
 							setStatus={ setStatus }

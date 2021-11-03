@@ -44,12 +44,12 @@ export class Game {
 			login: this.rightPlayer.user.login,
 			url_avatar: this.rightPlayer.user.url_avatar,
 			status: this.rightPlayer.user.status
+		},
+		score: {
+			leftPlayer: 0,
+			rightPlayer: 0
 		}
 	};
-	public readonly score = {
-		leftPlayer: 0,
-		rightPlayer: 0
-	}
 	public watchers: OnlineUser[] = [];
 
 	constructor(
@@ -88,14 +88,14 @@ export class Game {
 	updatePositions() {
 		// Score
 		if (this.coordinates.ball.x < 0 - this.gameSettings.ballSize) {
-			++this.score.rightPlayer;
-			this.sendMsg('gameScore', JSON.stringify(this.score));
+			++this.gameSettings.score.rightPlayer;
+			this.sendMsg('gameScore', JSON.stringify(this.gameSettings.score));
 			this.resetPositions();
 			this.sendMsg('playSound', 'pong-sound-3');
 		}
 		if (this.coordinates.ball.x > this.gameSettings.canvasWidth) {
-			++this.score.leftPlayer;
-			this.sendMsg('gameScore', JSON.stringify(this.score));
+			++this.gameSettings.score.leftPlayer;
+			this.sendMsg('gameScore', JSON.stringify(this.gameSettings.score));
 			this.resetPositions();
 			this.sendMsg('playSound', 'pong-sound-3');
 		}

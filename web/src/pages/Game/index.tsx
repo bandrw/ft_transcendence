@@ -33,8 +33,6 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef
 			return ;
 
 		if (!enemyInfo) {
-			// if (gameRef.current.runs && gameRef.current.interval)
-			// 	clearInterval(gameRef.current.interval);
 			gameRef.current.runs = false;
 			setStatus(ApiUserStatus.Regular);
 			history.push('/');
@@ -76,14 +74,16 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef
 					</div>
 				}
 			/>
-			<GameCanvas
-				watchMode={ watchMode }
-				currentUser={ currentUser }
-				// eventSourceRef={ eventSourceRef }
-				gameSettingsRef={ gameSettingsRef }
-				gameRef={ gameRef }
-				setStatus={ setStatus }
-			/>
+			{
+				gameSettingsRef.current &&
+				<GameCanvas
+					watchMode={ watchMode }
+					currentUser={ currentUser }
+					gameSettings={ gameSettingsRef.current }
+					gameRef={ gameRef }
+					setStatus={ setStatus }
+				/>
+			}
 		</div>
 	);
 };

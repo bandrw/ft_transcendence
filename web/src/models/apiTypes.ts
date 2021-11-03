@@ -90,6 +90,10 @@ type ApiGameSettings = {
 		login: string,
 		url_avatar: string,
 		status: string
+	},
+	score: {
+		leftPlayer: number,
+		rightPlayer: number
 	}
 }
 

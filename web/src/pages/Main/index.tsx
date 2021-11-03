@@ -50,6 +50,7 @@ const Main: React.FC<MainProps> = ({
 	}, [history, status]);
 
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
+	const statusRef = React.useRef(status);
 
 	const socket = React.useContext(SocketContext);
 
@@ -66,6 +67,7 @@ const Main: React.FC<MainProps> = ({
 			const gameSettings: ApiGameSettings = JSON.parse(e);
 			gameSettingsRef.current = gameSettings;
 
+			// If watch mode, don't send start
 			if (gameSettings.leftPlayer.login !== currentUser.username && gameSettings.rightPlayer.login !== currentUser.username)
 				return ;
 
@@ -93,7 +95,7 @@ const Main: React.FC<MainProps> = ({
 
 			setUsers(newUsers);
 
-			if (!enemyRef.current && status !== ApiUserStatus.Regular) {
+			if (!enemyRef.current && statusRef.current !== ApiUserStatus.Regular) {
 				setStatus(ApiUserStatus.Regular);
 			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && (updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular)) {
 				setStatus(ApiUserStatus.Regular);
@@ -122,7 +124,7 @@ const Main: React.FC<MainProps> = ({
 		return () => {
 			// console.log('[Main] eventSource listeners removed');
 		};
-	}, []);
+	}, [currentUser, setStatus, setUsers, socket, enemyRef, gameSettingsRef, usersRef]);
 
 	const filteredUsers: ApiUpdateUser[] = [];
 	for (let i in onlineUsers) {
