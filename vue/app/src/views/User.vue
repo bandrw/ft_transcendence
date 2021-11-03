@@ -1,15 +1,6 @@
 <template>
   <div>
-    <div v-if="!authorized" id="user_unauthorized">
-      <div>
-        <router-link :to="{ name: 'login' }" class="tab">Login</router-link> |
-        <router-link :to="{ name: 'register' }" class="tab"
-          >Register</router-link
-        >
-      </div>
-      <router-view />
-    </div>
-    <div v-if="authorized && !gameInProgress" class="user_authorized">
+    <div v-if="!gameInProgress && authorized" class="user_authorized">
       <div class="user_logout_button" v-on:click="logout">logout</div>
       <div class="user_profile_button" v-on:click="showProfile">
         {{ user.login }}
@@ -82,6 +73,7 @@ export default {
       this.SET_AUTHORIZE(false);
       this.SET_PROFILE(false);
       this.SET_USERS(null);
+      await this.$router.push("login");
     },
     showProfile() {
       this.SET_PROFILE(!this.profile);
@@ -103,6 +95,7 @@ export default {
       }
     },
     escapeEvents(event) {
+      console.log(this.game);
       if (this.authorized && !this.game && !this.enemy) {
         this.logout();
       } else if (this.authorized && this.game) {
@@ -127,14 +120,21 @@ export default {
         this.$refs.game.movePlatformRight();
       } else if (event.key === "ArrowLeft" && this.gameInProgress) {
         this.$refs.game.movePlatformLeft();
-      } else if (event.key === "Escape") {
+      }
+    },
+    keyPressEvents(event) {
+      if (event.key === "Escape") {
         this.escapeEvents(event);
       }
     },
   },
   mounted() {
+    if (!this.authorized) {
+      this.$router.push("Login");
+    }
     document.addEventListener("keyup", this.stopPlatform);
     document.addEventListener("keydown", this.keyEvents);
+    document.addEventListener("keydown", this.keyPressEvents);
   },
 };
 </script>

@@ -1,16 +1,18 @@
 <template>
   <div>
-    <div id="user_register_login">
-      login: <input v-model="login" type="text" />
+    <div v-if="!message">
+      <div id="user_register_login">
+        login: <input v-model="login" type="text" />
+      </div>
+      <div id="user_register_pass1">
+        pass: <input v-model="password1" type="password" />
+      </div>
+      <div id="user_register_pass2">
+        repeat: <input v-model="password2" type="password" />
+      </div>
+      <p v-if="error" id="user_register_error_message">error: {{ error }}</p>
+      <div id="user_login_button" v-on:click="createAccount">login</div>
     </div>
-    <div id="user_register_pass1">
-      pass: <input v-model="password1" type="password" />
-    </div>
-    <div id="user_register_pass2">
-      repeat: <input v-model="password2" type="password" />
-    </div>
-    <p v-if="error" id="user_register_error_message">error: {{ error }}</p>
-    <div id="user_login_button" v-on:click="createAccount">login</div>
     <div v-show="message" id="thank_you">
       <h4>{{ message }}</h4>
     </div>
@@ -39,8 +41,9 @@ export default {
         this.password2 = null;
       }
     },
-    clearMessage() {
+    redirectToLogin() {
       this.message = null;
+      this.$router.push("login");
     },
     checkBadSymbols(res) {
       const bad = " /|;<>&?:{}[]()";
@@ -54,7 +57,7 @@ export default {
       } else {
         this.error = null;
         this.message = "Hello " + this.login + "! Thank you for registration";
-        setTimeout(this.clearMessage, 3000);
+        setTimeout(this.redirectToLogin, 3000);
       }
     },
     creating(err, hash) {

@@ -8,7 +8,12 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/user",
+    name: "user",
+    component: User,
+  },
+  {
+    path: "/login",
     name: "login",
     component: Login,
   },
@@ -19,15 +24,15 @@ const routes = [
     alias: "/registration",
   },
   {
-    path: "/authorization",
-    redirect: { name: "login" },
+    path: "/",
+    redirect: { name: "user" },
   },
-  {
-    path: "/user/:username",
-    name: "user",
-    component: User,
-    props: true,
-  },
+  // {
+  //   path: "/user/:username",
+  //   name: "user",
+  //   component: User,
+  //   props: true,
+  // },
 ];
 
 const router = new VueRouter({
