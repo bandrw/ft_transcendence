@@ -2,9 +2,10 @@ import { Gamer } from 'game/game.interface';
 import { OnlineUser } from "users/users.interface";
 import { v4 as uuidv4 } from 'uuid';
 
+import { UsersGateway } from "../users/users.gateway";
+
 export class Game {
 	public id = uuidv4();
-	public pointsForWin: number;
 	public gameInterval: NodeJS.Timer | null = null;
 	public readonly coordinates = {
 		leftPlayer: {
@@ -74,11 +75,14 @@ export class Game {
 	}
 
 	public sendMsg(event: string, data: string) {
-		const msg = `event: ${event}\ndata: ${data}\n\n`;
-		this.leftPlayer.user.resp.write(msg);
-		this.rightPlayer.user.resp.write(msg);
+		// removing disconnected watchers
 		for (let i = 0; i < this.watchers.length; ++i)
-			this.watchers[i].resp.write(msg);
+			this.watchers = this.watchers.filter(watcher => UsersGateway.users.get(watcher.socket.id));
+
+		this.leftPlayer.user.socket.emit(event, data);
+		this.rightPlayer.user.socket.emit(event, data);
+		for (let i = 0; i < this.watchers.length; ++i)
+			this.watchers[i].socket.emit(event, data);
 	}
 
 	updatePositions() {
@@ -152,5 +156,10 @@ export class Game {
 		// Ball moving
 		this.coordinates.ball.x += Math.cos(this.gameSettings.ballAngle) * this.gameSettings.ballSpeed;
 		this.coordinates.ball.y += Math.sin(this.gameSettings.ballAngle) * this.gameSettings.ballSpeed;
+
+		this.coordinates.ball.x = Math.round(this.coordinates.ball.x);
+		this.coordinates.ball.y = Math.round(this.coordinates.ball.y);
+		this.coordinates.leftPlayer.y = Math.round(this.coordinates.leftPlayer.y);
+		this.coordinates.rightPlayer.y = Math.round(this.coordinates.rightPlayer.y);
 	}
 }

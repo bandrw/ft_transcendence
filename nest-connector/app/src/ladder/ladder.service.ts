@@ -158,9 +158,10 @@ export class LadderService {
         } else {
           data = false;
         }
-        this.usersService.onlineUsers[i].resp.write(
-          `event: ${event}\ndata: ${data}\n\n`,
-        );
+        // this.usersService.onlineUsers[i].resp.write(
+        //   `event: ${event}\ndata: ${data}\n\n`,
+        // );
+        this.usersService.onlineUsers[i].socket.emit(event, data);
       }
       ++i;
     }

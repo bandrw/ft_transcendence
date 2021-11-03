@@ -3,10 +3,12 @@ import './styles.scss';
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
+import { SocketContext } from "context/socket";
 import { ApiUserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
 import { Link, useHistory } from "react-router-dom";
+import { Socket } from "socket.io-client";
 
 interface LoginProps {
 	currentUser: User,
@@ -17,10 +19,12 @@ export const signIn = async (
 	login: string,
 	password: string,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
-	setErrors: React.Dispatch<React.SetStateAction<string> >
+	setErrors: React.Dispatch<React.SetStateAction<string> >,
+	socket: Socket
 ) => {
 	const r = await axios.post<any, AxiosResponse<ApiUserLogin> >('/users/login', {
-		login
+		login,
+		socketId: socket.id
 	})
 		.then(res => {
 			if (res.data.ok && bcryptjs.compareSync(password, res.data.msg.password)) {
@@ -41,6 +45,7 @@ export const signIn = async (
 
 const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 	const history = useHistory();
+	const socket = React.useContext(SocketContext);
 
 	React.useEffect(() => {
 		if (currentUser.isAuthorized())
@@ -65,7 +70,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 				const login = loginRef.current?.value || '';
 				const password = passwordRef.current?.value || '';
 
-				signIn(login, password, setCurrentUser, setLoginErrors)
+				signIn(login, password, setCurrentUser, setLoginErrors, socket)
 					.then(() => {
 						setIsLoading(false);
 						history.push('/');

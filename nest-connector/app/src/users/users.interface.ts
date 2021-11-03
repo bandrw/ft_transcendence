@@ -1,9 +1,9 @@
-import { Response } from 'express';
+import { Socket } from "socket.io";
 
 export interface OnlineUser {
 	id: number;
 	login: string;
 	url_avatar: string;
-	resp: Response;
+	socket: Socket
 	status: string;
 }

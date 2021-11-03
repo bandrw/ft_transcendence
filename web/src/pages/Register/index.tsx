@@ -9,6 +9,8 @@ import { signIn } from "pages/Login";
 import React from 'react';
 import { Link, useHistory } from "react-router-dom";
 
+import { SocketContext } from "../../context/socket";
+
 const validateInput = (
 	login: string,
 	password: string,
@@ -50,6 +52,7 @@ interface RegisterProps {
 
 const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 	const history = useHistory();
+	const socket = React.useContext(SocketContext);
 
 	React.useEffect(() => {
 		if (currentUser.isAuthorized())
@@ -93,7 +96,7 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 		})
 			.then(res => res.data);
 		if (usersCreateResponse.ok) {
-			await signIn(login, password, setCurrentUser, setErrors)
+			await signIn(login, password, setCurrentUser, setErrors, socket)
 				.catch(err => setErrors(err.toString()));
 		} else {
 			setErrors(usersCreateResponse.msg);

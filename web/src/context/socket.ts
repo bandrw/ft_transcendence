@@ -1,10 +1,7 @@
 import React from 'react';
 import { io, Socket } from "socket.io-client";
 
-if (!process.env.REACT_APP_API_URL)
-	throw Error('REACT_APP_API_URL is empty');
-
-export const socket = io(process.env.REACT_APP_API_URL);
+export const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:3000');
 
 socket.on("disconnect", (reason) => {
 	if (reason === "io server disconnect")
@@ -15,9 +12,9 @@ socket.on("disconnect", (reason) => {
 // 	console.log('connect_error', error);
 // });
 
-socket.onAny((event) => {
-	console.log(`[socket context] got ${event}`);
-});
+// socket.onAny((event, data) => {
+// 	console.log(`[socket context] got ${event}`);
+// });
 
 // console.log('Listeners added');
 

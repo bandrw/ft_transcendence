@@ -20,9 +20,7 @@ const App = () => {
 	const [status, setStatus] = React.useState<ApiUserStatus>(ApiUserStatus.Regular);
 	const enemyRef = React.useRef<ApiUpdateUser | null>(null);
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
-	const eventSourceRef = React.useRef<EventSource | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
-	const mainEventSourceInitializedRef = React.useRef<boolean>(false);
 	const [currentUser, setCurrentUser] =  React.useState<User>(new User());
 	const [onlineUsers, setOnlineUsers] = React.useState<ApiOnlineUser[]>([]);
 	const onlineUsersRef = React.useRef<ApiOnlineUser[]>([]);
@@ -70,17 +68,6 @@ const App = () => {
 		};
 	}, [currentUser]);
 
-	React.useEffect(() => {
-		if (!currentUser.isAuthorized())
-			return ;
-
-		eventSourceRef.current = new EventSource(`${process.env.REACT_APP_API_URL}/users/login?login=${currentUser.username}`);
-
-		return () => {
-			eventSourceRef.current?.close();
-		};
-	}, [currentUser]);
-
 	if (!isDesktop)
 		return (
 			<div style={ { fontSize: '2em', marginTop: '100px' } }>
@@ -120,7 +107,7 @@ const App = () => {
 						currentUser={ currentUser }
 						setCurrentUser={ setCurrentUser }
 						gameSettingsRef={ gameSettingsRef }
-						eventSourceRef={ eventSourceRef }
+						// eventSourceRef={ eventSourceRef }
 						gameRef={ gameRef }
 						status={ status }
 						setStatus={ setStatus }
@@ -153,8 +140,6 @@ const App = () => {
 						setStatus={ setStatus }
 						enemyRef={ enemyRef }
 						gameSettingsRef={ gameSettingsRef }
-						eventSourceRef={ eventSourceRef }
-						mainEventSourceInitializedRef={ mainEventSourceInitializedRef }
 						allUsers={ allUsers }
 						onlineUsers={ onlineUsers }
 						setUsers={ setOnlineUsers }

@@ -7,7 +7,7 @@ import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import RecentGames from "pages/Main/RecentGames";
 import Social from "pages/Main/Social";
-import React, { useEffect } from 'react';
+import React  from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { useHistory } from "react-router-dom";
 
@@ -18,8 +18,6 @@ interface MainProps {
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
 	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
-	eventSourceRef: React.MutableRefObject<EventSource | null>,
-	mainEventSourceInitializedRef: React.MutableRefObject<boolean>,
 	allUsers: ApiUser[],
 	onlineUsers: ApiOnlineUser[],
 	setUsers: React.Dispatch<React.SetStateAction<ApiOnlineUser[]>>,
@@ -33,8 +31,6 @@ const Main: React.FC<MainProps> = ({
 																		 setStatus,
 																		 enemyRef,
 																		 gameSettingsRef,
-																		 eventSourceRef,
-																		 mainEventSourceInitializedRef,
 																		 allUsers,
 																		 onlineUsers,
 																		 setUsers,
@@ -44,10 +40,9 @@ const Main: React.FC<MainProps> = ({
 
 	React.useEffect(() => {
 		if (!currentUser.isAuthorized()) {
-			mainEventSourceInitializedRef.current = false;
 			history.push('/login');
 		}
-	}, [history, currentUser, mainEventSourceInitializedRef]);
+	}, [history, currentUser]);
 
 	React.useEffect(() => {
 		if (status === ApiUserStatus.InGame)
@@ -58,24 +53,17 @@ const Main: React.FC<MainProps> = ({
 
 	const socket = React.useContext(SocketContext);
 
-	useEffect(() => {
-		if (mainEventSourceInitializedRef.current)
-			return ;
-
+	React.useEffect(() => {
 		if (!currentUser.isAuthorized())
 			return;
 
-		const eventSource = eventSourceRef.current;
-		if (!eventSource)
-			return ;
-
-		const logoutHandler = (e: any) => {
-			const data: ApiUpdateUser = JSON.parse(e.data);
-			setUsers(usersRef.current.filter(usr => usr.login !== data.login));
+		const logoutHandler = (data: string) => {
+			const logoutData: ApiUpdateUser = JSON.parse(data);
+			setUsers(usersRef.current.filter(usr => usr.login !== logoutData.login));
 		};
 
-		const gameSettingsHandler = (e: any) => {
-			const gameSettings: ApiGameSettings = JSON.parse(e.data);
+		const gameSettingsHandler = (e: string) => {
+			const gameSettings: ApiGameSettings = JSON.parse(e);
 			gameSettingsRef.current = gameSettings;
 
 			if (gameSettings.leftPlayer.login !== currentUser.username && gameSettings.rightPlayer.login !== currentUser.username)
@@ -88,34 +76,34 @@ const Main: React.FC<MainProps> = ({
 			setTimeout(() => socket.emit('start', JSON.stringify(data)), 3000);
 		};
 
-		const updateUserHandler = (e: any) => {
-			const data: ApiUpdateUser = JSON.parse(e.data);
+		const updateUserHandler = (data: string) => {
+			const updateUserData: ApiUpdateUser = JSON.parse(data);
 
 			const newUsers: ApiOnlineUser[] = [];
 			// Edit user
 			for (let i = 0; i < usersRef.current.length; ++i) {
-				if (usersRef.current[i].login === data.login)
-					newUsers.push(data);
+				if (usersRef.current[i].login === updateUserData.login)
+					newUsers.push(updateUserData);
 				else
 					newUsers.push(usersRef.current[i]);
 			}
 			// Add new user
-			if (usersRef.current.map((usr) => usr.login).indexOf(data.login) === -1)
-				newUsers.push(data);
+			if (usersRef.current.map((usr) => usr.login).indexOf(updateUserData.login) === -1)
+				newUsers.push(updateUserData);
 
 			setUsers(newUsers);
 
 			if (!enemyRef.current && status !== ApiUserStatus.Regular) {
 				setStatus(ApiUserStatus.Regular);
-			} else if (enemyRef.current && data.login === enemyRef.current.login && (data.status === ApiUserStatus.Declined || data.status === ApiUserStatus.Regular)) {
+			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && (updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular)) {
 				setStatus(ApiUserStatus.Regular);
-			} else if (enemyRef.current && data.login === enemyRef.current.login && data.status === ApiUserStatus.Accepted) {
+			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && updateUserData.status === ApiUserStatus.Accepted) {
 				setEnemyIsReady(true);
 			}
 		};
 
-		const enemyHandler = (e: any) => {
-			enemyRef.current = JSON.parse(e.data);
+		const enemyHandler = (e: string) => {
+			enemyRef.current = JSON.parse(e);
 			setStatus(ApiUserStatus.FoundEnemy);
 		};
 
@@ -123,30 +111,18 @@ const Main: React.FC<MainProps> = ({
 			setStatus(ApiUserStatus.InGame);
 		};
 
-		eventSource.addEventListener('logout_SSE', logoutHandler);
-		eventSource.addEventListener('updateUser', updateUserHandler);
-		eventSource.addEventListener('enemy', enemyHandler);
-		eventSource.addEventListener('gameIsReady', gameIsReadyHandler);
-		eventSource.addEventListener('gameSettings', gameSettingsHandler);
-		mainEventSourceInitializedRef.current = true;
+		socket.on('logout_SSE', data => logoutHandler(data));
+		socket.on('updateUser', data => updateUserHandler(data));
+		socket.on('enemy', data => enemyHandler(data));
+		socket.on('gameIsReady', () => gameIsReadyHandler());
+		socket.on('gameSettings', data => gameSettingsHandler(data));
 
-		console.log('[Main] eventSource listeners added');
+		console.log('[Main] listeners added');
 
 		return () => {
-			// if (mainEventSourceInitializedRef.current)
-			// 	return ;
-			//
-			// eventSource.removeEventListener('logout_SSE', logoutHandler);
-			// eventSource.removeEventListener('updateUser', updateUserHandler);
-			// eventSource.removeEventListener('enemy', enemyHandler);
-			// eventSource.removeEventListener('gameIsReady', gameIsReadyHandler);
-			// eventSource.removeEventListener('gameSettings', gameSettingsHandler);
-			// mainEventSourceInitializedRef.current = false;
-			//
-			// // eventSource.close();
 			// console.log('[Main] eventSource listeners removed');
 		};
-	});
+	}, []);
 
 	const filteredUsers: ApiUpdateUser[] = [];
 	for (let i in onlineUsers) {

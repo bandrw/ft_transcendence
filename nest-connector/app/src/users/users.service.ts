@@ -68,43 +68,28 @@ export class UsersService {
 	}
 
 	userEvent(event: string, user: OnlineUser) {
-		let i = 0;
-		while (i < this.onlineUsers.length) {
+		for (let i = 0; i < this.onlineUsers.length; ++i) {
 			if (this.onlineUsers[i].login != user.login) {
-				this.onlineUsers[i].resp.write(
-					'event: ' +
-					event +
-					'\ndata: ' +
-					JSON.stringify({
-						id: user.id,
-						login: user.login,
-						url_avatar: user.url_avatar,
-						status: user.status,
-					}) +
-					'\n\n',
-				);
+				const data = JSON.stringify({
+					id: user.id,
+					login: user.login,
+					url_avatar: user.url_avatar,
+					status: user.status,
+				});
+				this.onlineUsers[i].socket.emit(event, data);
 			}
-			++i;
 		}
 	}
 
 	userStatsEvent(stats) {
-		let i = 0;
-		while (i < this.onlineUsers.length) {
-			this.onlineUsers[i].resp.write(
-				'event: updateUsersStats\ndata: ' + JSON.stringify(stats) + '\n\n',
-			);
-			++i;
+		for (let i = 0; i < this.onlineUsers.length; ++i) {
+			this.onlineUsers[i].socket.emit('updateUsersStats', JSON.stringify(stats));
 		}
 	}
 
-	broadcastEventData(event, data) {
-		let i = 0;
-		while (i < this.onlineUsers.length) {
-			this.onlineUsers[i].resp.write(
-				`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`,
-			);
-			++i;
+	broadcastEventData(event: string, data: string) {
+		for (let i = 0; i < this.onlineUsers.length; ++i) {
+			this.onlineUsers[i].socket.emit(event, JSON.stringify(data));
 		}
 	}
 }

@@ -15,13 +15,13 @@ interface GameProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
-	eventSourceRef: React.MutableRefObject<EventSource | null>,
+	// eventSourceRef: React.MutableRefObject<EventSource | null>,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
 	status: ApiUserStatus,
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
-const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSourceRef, gameRef, status, setStatus }: GameProps) => {
+const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef, status, setStatus }: GameProps) => {
 	const watchMode = (status !== ApiUserStatus.InGame);
 	const history = useHistory();
 
@@ -33,8 +33,8 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSo
 			return ;
 
 		if (!enemyInfo) {
-			if (gameRef.current.runs && gameRef.current.interval)
-				clearInterval(gameRef.current.interval);
+			// if (gameRef.current.runs && gameRef.current.interval)
+			// 	clearInterval(gameRef.current.interval);
 			gameRef.current.runs = false;
 			setStatus(ApiUserStatus.Regular);
 			history.push('/');
@@ -64,8 +64,8 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSo
 							<ConfirmationWindow
 								title='Are you sure you want to exit the game?'
 								okHandler={ () => {
-									if (gameRef.current.runs && gameRef.current.interval)
-										clearInterval(gameRef.current.interval);
+									// if (gameRef.current.runs && gameRef.current.interval)
+									// 	clearInterval(gameRef.current.interval);
 									gameRef.current.runs = false;
 									setStatus(ApiUserStatus.Regular);
 									history.push('/');
@@ -79,7 +79,7 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, eventSo
 			<GameCanvas
 				watchMode={ watchMode }
 				currentUser={ currentUser }
-				eventSourceRef={ eventSourceRef }
+				// eventSourceRef={ eventSourceRef }
 				gameSettingsRef={ gameSettingsRef }
 				gameRef={ gameRef }
 				setStatus={ setStatus }

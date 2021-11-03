@@ -43,21 +43,21 @@ export class EventsGame
     // }
   }
 
-  @SubscribeMessage('platformPosition')
-  platformPosition(@MessageBody() user: string) {
-    const u = JSON.parse(user);
-    if (this.gameService.games[u.id].rightPlayer.user.login === u.login) {
-      this.gameService.games[u.id].leftPlayer.position = u.enemyPlatformX;
-      this.gameService.games[u.id].leftPlayer.user.resp.write(
-        `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
-      );
-    } else {
-      this.gameService.games[u.id].rightPlayer.position = u.enemyPlatformX;
-      this.gameService.games[u.id].rightPlayer.user.resp.write(
-        `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
-      );
-    }
-  }
+  // @SubscribeMessage('platformPosition')
+  // platformPosition(@MessageBody() user: string) {
+  //   const u = JSON.parse(user);
+  //   if (this.gameService.games[u.id].rightPlayer.user.login === u.login) {
+  //     this.gameService.games[u.id].leftPlayer.position = u.enemyPlatformX;
+  //     this.gameService.games[u.id].leftPlayer.user.resp.write(
+  //       `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
+  //     );
+  //   } else {
+  //     this.gameService.games[u.id].rightPlayer.position = u.enemyPlatformX;
+  //     this.gameService.games[u.id].rightPlayer.user.resp.write(
+  //       `event: enemyPosition\ndata: ${u.enemyPlatformX}\n\n`,
+  //     );
+  //   }
+  // }
 
   // @SubscribeMessage('gameScore')
   // async gameScore(@MessageBody() user: string) {

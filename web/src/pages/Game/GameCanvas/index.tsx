@@ -6,50 +6,38 @@ import GameBall from "models/GameBall";
 import Player from "models/Player";
 import { User } from "models/User";
 import GameResults from "pages/Game/GameResults";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Fade } from "react-awesome-reveal";
 import { Link } from 'react-router-dom';
-import { setInterval } from "timers";
 
 interface GameCanvasProps {
 	watchMode: boolean,
 	currentUser: User,
-	eventSourceRef: React.MutableRefObject<EventSource | null>,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
-const GameCanvas = ({ watchMode, currentUser, eventSourceRef, gameSettingsRef, gameRef, setStatus }: GameCanvasProps) => {
+const GameCanvas = ({ watchMode, currentUser, gameSettingsRef, gameRef, setStatus }: GameCanvasProps) => {
 	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
-	const leftPlayer = new Player();
-	const rightPlayer = new Player();
-	const ball = new GameBall();
+	const leftPlayer = useMemo(() => new Player(), []);
+	const rightPlayer = useMemo(() => new Player(), []);
+	const ball = useMemo(() => new GameBall(), []);
 
-	const score = { leftPlayer: 0, rightPlayer: 0 };
+	const score = useMemo(() => ({ leftPlayer: 0, rightPlayer: 0 }), []);
 
 	const [gameResults, setGameResults] = React.useState<{ winner: string } | null>(null);
 
-	React.useEffect(() => {
-		if (gameRef.current.runs)
-			return ;
-
-		const eventSource = eventSourceRef.current;
-		if (!eventSource)
-			return ;
-
-		const gameResultsHandler = (e: any) => {
-			const data: { winner: string } = JSON.parse(e.data);
+	useEffect(() => {
+		const gameResultsHandler = (e: string) => {
+			const data: { winner: string } = JSON.parse(e);
 			setGameResults(data);
 		};
 
-		const gameLoopHandler = (e: any) => {
-			const gameSettings = gameSettingsRef.current;
-			if (!gameSettings)
-				return ;
+		const gameLoopHandler = (e: string) => {
+			const data: ApiGameLoop = JSON.parse(e);
 
-			const data: ApiGameLoop = JSON.parse(e.data);
 			if (data.b) {
 				ball.xPosition = data.b.x;
 				ball.yPosition = data.b.y;
@@ -60,52 +48,39 @@ const GameCanvas = ({ watchMode, currentUser, eventSourceRef, gameSettingsRef, g
 				rightPlayer.yPosition = data.rP.y;
 		};
 
-		const gameScoreHandler = (e: any) => {
-			const data = JSON.parse(e.data);
+		const gameScoreHandler = (e: string) => {
+			const data = JSON.parse(e);
 			score.leftPlayer = data.leftPlayer;
 			score.rightPlayer = data.rightPlayer;
 		};
 
-		const playSoundHandler = (e: any) => {
+		const playSoundHandler = (e: string) => {
 			let a: HTMLAudioElement | null = null;
-			if (e.data === 'pong-sound-1') {
+			if (e === 'pong-sound-1') {
 				a = new Audio('/audio/pong-sound-1.wav');
 				a.volume = 0.17;
-			} else if (e.data === 'pong-sound-2') {
+			} else if (e === 'pong-sound-2') {
 				a = new Audio('/audio/pong-sound-2.wav');
 				a.volume = 0.17;
-			} else if (e.data === 'pong-sound-3') {
+			} else if (e === 'pong-sound-3') {
 				a = new Audio('/audio/pong-sound-3.wav');
 				a.volume = 0.1;
 			}
 			if (a) {
 				a.play()
 					.then()
-					.catch(() => console.log('audio play error'));
+					.catch(() => {});
 			}
 		};
 
-		eventSource.addEventListener('gameResults', gameResultsHandler);
-		eventSource.addEventListener('gameLoop', gameLoopHandler);
-		eventSource.addEventListener('gameScore', gameScoreHandler);
-		eventSource.addEventListener('playSound', playSoundHandler);
-		console.log('[Game] eventSource listeners added');
+		socket.on('gameResults', data => gameResultsHandler(data));
+		socket.on('gameLoop', data => gameLoopHandler(data));
+		socket.on('gameScore', data => gameScoreHandler(data));
+		socket.on('playSound', data => playSoundHandler(data));
+		console.log('[GameCanvas] socket listeners added');
 
-		// return () => {
-		// 	// if (gameCpy.runs)
-		// 	// 	return ;
-		//
-		// 	eventSource.removeEventListener('gameResults', gameResultsHandler);
-		// 	eventSource.removeEventListener('gameLoop', gameLoopHandler);
-		// 	eventSource.removeEventListener('gameScore', gameScoreHandler);
-		// 	eventSource.removeEventListener('playSound', playSoundHandler);
-		// 	console.log('[Game] eventSource listeners removed');
-		// };
-	});
+	}, [ball, leftPlayer, rightPlayer, score, socket]);
 
-	// const playerWidth = 15;
-	// const playerMargin = 15;
-	// const playerHeight = 150;
 	const playerWidth = gameSettingsRef.current?.playerWidth || 15;
 	const playerMargin = gameSettingsRef.current?.playerMargin || 15;
 	const playerHeight = gameSettingsRef.current?.playerHeight || 100;
@@ -178,9 +153,11 @@ const GameCanvas = ({ watchMode, currentUser, eventSourceRef, gameSettingsRef, g
 			document.removeEventListener('keydown', keyDownHandler);
 			document.removeEventListener('keyup', keyUpHandler);
 		};
-	});
+	}, []);
 
 	useEffect(() => {
+		let gameRuns = true;
+
 		const drawBackground = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
 			ctx.beginPath();
 			ctx.fillStyle = '#111';
@@ -228,11 +205,15 @@ const GameCanvas = ({ watchMode, currentUser, eventSourceRef, gameSettingsRef, g
 
 		const render = () => {
 			const canvas = canvasRef.current;
-			if (!canvas)
+			if (!canvas) {
+				console.log('[render] cannot get canvas');
 				return ;
+			}
 			const ctx = canvas.getContext('2d');
-			if (!ctx)
+			if (!ctx) {
+				console.log('[render] cannot get ctx');
 				return ;
+			}
 
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -252,9 +233,26 @@ const GameCanvas = ({ watchMode, currentUser, eventSourceRef, gameSettingsRef, g
 		};
 
 		const runGame = () => {
+			console.log('!!! [runGame] !!!');
+			let fpsInterval: number, now: number, then: number, elapsed: number;
 			const fps = 60;
-			gameRef.current.interval = setInterval(render, 1000 / fps);
-			gameRef.current.runs = true;
+
+			const animate = () => {
+				if (!gameRuns)
+					return ;
+
+				requestAnimationFrame(animate);
+				now = Date.now();
+				elapsed = now - then;
+				if (elapsed > fpsInterval) {
+					then = now - (elapsed % fpsInterval);
+					render();
+				}
+			};
+
+			fpsInterval = 1000 / fps;
+			then = Date.now();
+			animate();
 		};
 
 		const prepareGame = () => {
@@ -276,42 +274,19 @@ const GameCanvas = ({ watchMode, currentUser, eventSourceRef, gameSettingsRef, g
 			leftPlayer.username = gameSettings.leftPlayer.login;
 			rightPlayer.username = gameSettings.rightPlayer.login;
 
-			// if (leftPlayer.username === enemyInfo?.login) {
-			// 	setLeftPlayerImg(enemyInfo?.url_avatar);
-			// 	setRightPlayerImg(currentUser.urlAvatar);
-			// } else {
-			// 	setLeftPlayerImg(currentUser.urlAvatar);
-			// 	setRightPlayerImg(enemyInfo?.url_avatar || '');
-			// }
-
 			render();
 		};
 
 		prepareGame();
 
-		// setInfoBoardContent(<div className='info-board-timer'>{timeUntilStart}</div>);
-		// const interval = setInterval(() => {
-		// 	--timeUntilStart;
-		// 	if (timeUntilStart === 0 && enemyInfo) {
-		// 		setInfoBoardContent(<div/>);
-		// 		runGame();
-		// 		clearInterval(interval);
-		// 	} else {
-		// 		setInfoBoardContent(<div>{timeUntilStart}</div>);
-		// 	}
-		// }, 1000);
-
-		if (!gameRef.current.runs)
+		// if (!gameRef.current.runs)
 			runGame();
 
-		// return () => {
-		// 	if (gameRef.current.runs && gameRef.current.interval) {
-		// 		clearInterval(gameRef.current.interval);
-		// 		gameRef.current.runs = false;
-		// 		console.log('[GameCanvas] interval cleared');
-		// 	}
-		// };
-	});
+		return () => {
+			gameRuns = false;
+			console.log('[GameCanvas] cleanup');
+		};
+	}, []);
 
 	return (
 		<div className='game-container'>

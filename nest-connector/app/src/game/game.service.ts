@@ -42,7 +42,7 @@ export class GameService {
 
 		const game = this.games.find(g => g.leftPlayer.user.login === gamerLogin || g.rightPlayer.user.login === gamerLogin);
 		if (game) {
-			watcher.resp.write(`event: gameSettings\ndata: ${ JSON.stringify(game.gameSettings) }\n\n`);
+			watcher.socket.emit('gameSettings', JSON.stringify(game.gameSettings));
 			game.watchers.push(watcher);
 		}
 	}

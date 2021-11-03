@@ -12,13 +12,11 @@ import { LadderModule } from 'ladder/ladder.module';
 import { User } from 'users/user.entity';
 import { UsersModule } from 'users/users.module';
 
-import { Events } from './events';
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'db', // todo [change host to 'db']
+      host: 'localhost', // todo [change host to 'db']
       port: 5432,
       username: 'pfile',
       password: 'pfile',
@@ -32,6 +30,6 @@ import { Events } from './events';
     EventEmitterModule.forRoot(),
   ],
   controllers: [AppController, CssController, JsController],
-  providers: [AppService, Events],
+  providers: [AppService],
 })
 export class AppModule {}

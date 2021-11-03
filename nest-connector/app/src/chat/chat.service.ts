@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { UsersService } from '../users/users.service';
 import { PersonalChat } from './personal-chat';
 
@@ -28,28 +29,28 @@ export class ChatService {
       ++i;
     }
     if (i === this.usersService.onlineUsers.length) {
-      this.personalChats.push(
-        new PersonalChat(fromUser, toUser, this.personalChats.length),
-      );
-      this.usersService.onlineUsers[fromUserIndex].resp.write(
-        `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[toUserIndex].login}}`,
-      );
-      this.usersService.onlineUsers[toUserIndex].resp.write(
-        `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[fromUserIndex].login}}`,
-      );
+      // this.personalChats.push(
+      //   new PersonalChat(fromUser, toUser, this.personalChats.length),
+      // );
+      // this.usersService.onlineUsers[fromUserIndex].resp.write(
+      //   `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[toUserIndex].login}}`,
+      // );
+      // this.usersService.onlineUsers[toUserIndex].resp.write(
+      //   `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[fromUserIndex].login}}`,
+      // );
     }
   }
 
   transferPersonalMessage(id: number, to: string, message: string) {
-    if (this.personalChats[id].userOne.login === to) {
-      this.personalChats[id].userOne.resp.write(
-        `event: personalMessage\ndata: ${message}`,
-      );
-    } else {
-      this.personalChats[id].userTwo.resp.write(
-        `event: personalMessage\ndata: ${message}`,
-      );
-    }
+    // if (this.personalChats[id].userOne.login === to) {
+    //   this.personalChats[id].userOne.resp.write(
+    //     `event: personalMessage\ndata: ${message}`,
+    //   );
+    // } else {
+    //   this.personalChats[id].userTwo.resp.write(
+    //     `event: personalMessage\ndata: ${message}`,
+    //   );
+    // }
   }
 
   // removePersonalChat(personalChat: PersonalChat) {

@@ -51,7 +51,13 @@
       "semi": "error",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      "react/jsx-curly-spacing": ["error", { "when": "always", "children": true }]
+      "react/jsx-curly-spacing": [
+        "error",
+        {
+          "when": "always",
+          "children": true
+        }
+      ]
     },
     "parserOptions": {
       "ecmaVersion": 6,
