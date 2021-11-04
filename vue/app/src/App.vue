@@ -1,26 +1,52 @@
 <template>
-  <div :id="userAuthorizationStatus">
-    <div v-if="!authorized">
-      <router-link :to="{ name: 'login' }" class="tab">Login</router-link> |
-      <router-link :to="{ name: 'register' }" class="tab">Register</router-link>
+  <div>
+    <div :id="userAuthorizationStatus" v-if="screenSize">
+      <div v-if="!authorized">
+        <router-link :to="{ name: 'login' }" class="tab">Login</router-link> |
+        <router-link :to="{ name: 'register' }" class="tab"
+          >Register</router-link
+        >
+      </div>
+      <router-view />
     </div>
-    <router-view />
+    <div v-else>
+      <h1>Sorry you screen to small</h1>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 export default {
   computed: {
-    ...mapState(["authorized"]),
+    ...mapState(["authorized", "innerHeight", "innerWidth"]),
     userAuthorizationStatus() {
       return !this.authorized ? "user_unauthorized" : "empty";
     },
+    screenSize() {
+      return this.innerHeight > 350 && this.innerWidth > 830;
+    },
+  },
+  methods: {
+    ...mapMutations(["SET_INNER_HEIGHT", "SET_INNER_WIDTH"]),
+    updateScreenSize() {
+      this.SET_INNER_WIDTH(window.innerWidth);
+      this.SET_INNER_HEIGHT(window.innerHeight);
+    },
+  },
+  mounted() {
+    this.SET_INNER_WIDTH(window.innerWidth);
+    this.SET_INNER_HEIGHT(window.innerHeight);
+    window.addEventListener("resize", this.updateScreenSize);
   },
 };
 </script>
 
 <style>
+h1 {
+  text-align: center;
+}
+
 #user_unauthorized {
   width: 50%;
   height: 27%;

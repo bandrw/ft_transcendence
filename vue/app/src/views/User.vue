@@ -21,7 +21,7 @@
       <div class="user_profile_close_button" v-on:click="showProfile">x</div>
     </div>
     <game ref="game" v-if="gameInProgress && authorized" />
-    <Ladder ref="Ladder" v-if="!gameInProgress && authorized" />
+    <Ladder ref="Ladder" v-show="!gameInProgress && authorized" />
     <chat v-if="!gameInProgress && authorized" />
   </div>
 </template>
@@ -33,10 +33,11 @@ import eventService from "../services/eventService";
 export default {
   computed: {
     winPercent() {
-      const winP = (
-        (this.user.wins / this.user.games).toFixed(2) * 100
-      ).toFixed(0);
-      return winP ? winP : 0;
+      if (isNaN(this.user.wins / this.user.games)) {
+        return 0;
+      } else {
+        return ((this.user.wins / this.user.games).toFixed(2) * 100).toFixed(0);
+      }
     },
     ...mapState("ladder", ["ladder", "game"]),
     ...mapState(["authorized", "user", "enemy"]),
@@ -95,7 +96,7 @@ export default {
       }
     },
     escapeEvents(event) {
-      console.log(this.game);
+      console.log("escapeEvents");
       if (this.authorized && !this.game && !this.enemy) {
         this.logout();
       } else if (this.authorized && this.game) {
@@ -134,7 +135,7 @@ export default {
     }
     document.addEventListener("keyup", this.stopPlatform);
     document.addEventListener("keydown", this.keyEvents);
-    document.addEventListener("keydown", this.keyPressEvents);
+    document.addEventListener("keypress", this.keyPressEvents);
   },
 };
 </script>

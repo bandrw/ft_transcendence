@@ -10,6 +10,17 @@ import io from "socket.io/client-dist/socket.io";
 import VueSocketIO from "vue-socket.io";
 import chat from "./views/chat";
 
+Vue.directive("scroll", {
+  inserted: function (el, binding) {
+    let f = function (evt) {
+      if (binding.value(evt, el)) {
+        window.removeEventListener("scroll", f);
+      }
+    };
+    window.addEventListener("scroll", f);
+  },
+});
+
 Vue.config.productionTip = false;
 Vue.use(
   new VueSocketIO({

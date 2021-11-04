@@ -4,7 +4,11 @@
       <div class="chat_performance">
         {{ type }}
       </div>
-      <div v-show="show_chat && usersExceptByName" class="chat_users_side">
+      <div
+        v-show="show_chat && usersExceptByName"
+        v-scroll="handleScroll"
+        class="chat_users_side"
+      >
         <div
           class="user_in_chat"
           v-for="user in usersExceptByName"
@@ -18,7 +22,7 @@
           ></span>
         </div>
       </div>
-      <div v-show="show_chat" id="chat_messages">
+      <div v-show="this.show_chat" id="chat_messages">
         <div v-for="message in messages" :key="message">
           <span>{{ message }}</span>
         </div>
@@ -83,6 +87,16 @@ export default {
       "SET_INFO_TOP",
       "SET_USER_IN_CHAT",
     ]),
+    handleScroll: function (evt, el) {
+      console.log("scrolling");
+      if (window.scrollY > 50) {
+        el.setAttribute(
+          "style",
+          "opacity: 1; transform: translate3d(0, -10px, 0)"
+        );
+      }
+      return window.scrollY > 100;
+    },
     showChat() {
       if (this.show_chat) {
         this.SET_SHOW_CHAT(false);

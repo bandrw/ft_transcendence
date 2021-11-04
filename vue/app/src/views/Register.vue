@@ -60,8 +60,8 @@ export default {
         setTimeout(this.redirectToLogin, 3000);
       }
     },
-    creating(err, hash) {
-      eventService
+    async creating(err, hash) {
+      await eventService
         .createUser({ pass: hash, login: this.login })
         .then(this.checkBadSymbols);
       this.clear();

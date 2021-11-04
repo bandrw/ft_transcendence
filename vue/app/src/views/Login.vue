@@ -79,7 +79,7 @@ export default {
           this.setUsers({ users: onlineUsers, user: data.user });
           this.error = null;
           this.$refs.eventSource.listenEvents();
-          await this.$router.push("user");
+          await this.$router.push("main");
         } else {
           this.error = "Wrong password";
         }

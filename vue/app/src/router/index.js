@@ -8,7 +8,7 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/user",
+    path: "/",
     name: "user",
     component: User,
   },
@@ -24,7 +24,7 @@ const routes = [
     alias: "/registration",
   },
   {
-    path: "/",
+    path: "/main",
     redirect: { name: "user" },
   },
   // {

@@ -14,8 +14,16 @@ export default new Vuex.Store({
     users: [],
     enemy: false,
     eventSource: false,
+    innerHeight: null,
+    innerWidth: null,
   },
   mutations: {
+    SET_INNER_HEIGHT(state, height) {
+      state.innerHeight = height;
+    },
+    SET_INNER_WIDTH(state, width) {
+      state.innerWidth = width;
+    },
     CREATE_EVENT_SOURCE(state, data) {
       state.eventSource = new EventSource(
         `http://localhost:3000/users/login?login=${data.login}&socketId=${data.socketId}`
