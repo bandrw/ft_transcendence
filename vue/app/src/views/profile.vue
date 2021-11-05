@@ -1,12 +1,13 @@
 <template>
   <div>
+    <router-link :to="{ name: 'main' }">back</router-link>
     <div id="user_authorized">
       <div id="user_logout_button" v-on:click="logout">logout</div>
       <div id="user_profile_button" v-on:click="showProfile">
         {{ user.login }}
       </div>
     </div>
-    <div v-show="profile" id="user_profile">
+    <div v-show="this.profile" id="user_profile">
       <img :src="user.url_avatar" id="user_profile_avatar" alt="" />
       <div id="user_update_avatar" v-on:click="updateAvatar"></div>
       <div id="game_stats_count">

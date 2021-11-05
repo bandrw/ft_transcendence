@@ -1,10 +1,10 @@
 <template>
   <div v-show="this.authorized">
-    <div v-show="!gameInProgress">
+    <div v-show="!this.gameInProgress">
       <Ladder ref="Ladder" />
       <chat />
       <div>
-        <router-link :to="{ name: profile, params: { username: user.login } }"
+        <router-link :to="{ name: 'profile', params: { username: user.login } }"
           >profile</router-link
         >
       </div>

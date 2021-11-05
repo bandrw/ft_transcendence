@@ -11,7 +11,9 @@
         repeat: <input v-model="password2" type="password" />
       </div>
       <p v-if="error" id="user_register_error_message">error: {{ error }}</p>
-      <div id="user_login_button" v-on:click="createAccount">login</div>
+      <div id="user_login_button" v-on:click="createAccount">
+        <p>register</p>
+      </div>
     </div>
     <div v-show="message" id="thank_you">
       <h4>{{ message }}</h4>
@@ -43,7 +45,9 @@ export default {
     },
     redirectToLogin() {
       this.message = null;
-      this.$router.push("login");
+      if (this.$route.name !== "login") {
+        this.$router.push("login");
+      }
     },
     checkBadSymbols(res) {
       const bad = " /|;<>&?:{}[]()";
