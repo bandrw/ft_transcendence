@@ -24,6 +24,10 @@ services:
       - "3000:3000"
     environment:
       - TZ=Europe/Moscow
+      - DB_HOST=db
+      - POSTGRES_USER=pfile
+      - POSTGRES_PASSWORD=pfile
+      - POSTGRES_DB=pfile
     networks:
       transcendence:
         ipv4_address: 172.20.0.5
