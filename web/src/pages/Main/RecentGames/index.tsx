@@ -3,7 +3,7 @@ import './styles.scss';
 import { faArrowRight, faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from "axios";
-import { ApiGame, ApiUser } from "models/apiTypes";
+import { ApiGame, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
 import React from 'react';
@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 interface RecentGamesProps {
 	currentUser: User,
-	allUsers: ApiUser[]
+	allUsers: ApiUserExpand[]
 }
 
 const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
@@ -20,7 +20,7 @@ const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiUser>('/users', { params: { login: currentUser.username, expand: true } })
+		axios.get<ApiUserExpand>('/users', { params: { login: currentUser.username, expand: true } })
 			.then(res => {
 				if (!isMounted)
 					return ;

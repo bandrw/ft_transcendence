@@ -122,28 +122,25 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 			setPassedTime(0);
 			return ;
 		}
-		axios.get('/ladder/gameStatus', {
-			params: {
-				login: currentUser.username,
-				status: status
-			}
-		}).then(() => {
-			if (!isMounted)
-				return ;
+		axios.get('/ladder/gameStatus', { params: { login: currentUser.username, status: status } })
+			.then(() => {
+				if (!isMounted)
+					return ;
 
-			switch (status) {
-				case ApiUserStatus.Regular: {
-					if (timerIntervalRef.current)
-						clearInterval(timerIntervalRef.current);
-					setPassedTime(0);
-					break;
+				switch (status) {
+					case ApiUserStatus.Regular: {
+						if (timerIntervalRef.current)
+							clearInterval(timerIntervalRef.current);
+						setPassedTime(0);
+						break;
+					}
+					case ApiUserStatus.Searching: {
+						timerIntervalRef.current = setInterval(() => setPassedTime(prev => prev + 1), 1000);
+						break;
+					}
 				}
-				case ApiUserStatus.Searching: {
-					timerIntervalRef.current = setInterval(() => setPassedTime(prev => prev + 1), 1000);
-					break;
-				}
-			}
-		});
+			})
+			.catch(() => {});
 
 		return () => {
 			isMounted = false;

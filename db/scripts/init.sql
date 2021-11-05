@@ -24,4 +24,21 @@ CREATE TABLE "games_history"
 		FOREIGN KEY("loserId")
 		REFERENCES "users"("id")
 		ON DELETE SET NULL
-)
+);
+
+CREATE TABLE "user_subscriptions"
+(
+	"id" serial PRIMARY KEY,
+	"userId" INTEGER,
+	"targetId" INTEGER,
+
+	CONSTRAINT "fk_user"
+		FOREIGN KEY("userId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL,
+
+	CONSTRAINT "fk_target"
+		FOREIGN KEY("targetId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL
+);

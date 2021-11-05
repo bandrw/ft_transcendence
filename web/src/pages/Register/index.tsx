@@ -3,7 +3,7 @@ import './styles.scss';
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
-import { ApiUserCheckExist, ApiUserCreate } from "models/apiTypes";
+import { ApiUser, ApiUserCreate } from "models/apiTypes";
 import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
@@ -78,11 +78,10 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 
 		setIsLoading(true);
 		setErrors('');
-		const checkExistResponse: ApiUserCheckExist = await axios.get<ApiUserCheckExist>('/users/checkExist', {
+		const user = await axios.get<ApiUser>('/users', {
 			params: { login: login }
-		})
-			.then(res => res.data);
-		if (checkExistResponse.ok) {
+		}).then(res => res).catch(err => err.response);
+		if (user.status === 200) {
 			setErrors('User with this login already exists');
 			setIsLoading(false);
 			return;

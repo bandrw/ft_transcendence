@@ -9,7 +9,8 @@ import { GameEntity } from "game/game.entity";
 import { GameModule } from 'game/game.module';
 import { JsController } from 'js/js.controller';
 import { LadderModule } from 'ladder/ladder.module';
-import { User } from 'users/user.entity';
+import { UserSubscription } from "users/entities/subscription.entity";
+import { User } from 'users/entities/user.entity';
 import { UsersModule } from 'users/users.module';
 
 @Module({
@@ -21,7 +22,7 @@ import { UsersModule } from 'users/users.module';
       username: 'pfile',
       password: 'pfile',
       database: 'pfile',
-      entities: [User, GameEntity],
+      entities: [User, GameEntity, UserSubscription],
     }),
     UsersModule,
     LadderModule,

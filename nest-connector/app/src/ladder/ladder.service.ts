@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Game } from 'game/game';
 import { Gamer } from 'game/game.interface';
 import { GameService } from 'game/game.service';
@@ -34,35 +34,28 @@ export class LadderService {
   }
 
   updateStatus(login: string, status: string) {
-    let i = 0;
-    while (this.usersService.onlineUsers[i].login != login) {
-      ++i;
-    }
-    if (status === 'blue') {
-      this.usersService.onlineUsers[i].status = 'green';
-    } else {
-      this.usersService.onlineUsers[i].status = status;
-    }
-    this.usersService.userEvent('updateUser', this.usersService.onlineUsers[i]);
+    const user = this.usersService.onlineUsers.find(usr => usr.login === login);
+    if (!user)
+      throw new HttpException('Cannot find user', HttpStatus.BAD_REQUEST);
+
+    if (status === 'blue')
+      user.status = 'green';
+    else
+      user.status = status;
+    this.usersService.userEvent('updateUser', user);
     if (status === 'yellow') {
-      this.addToLadder(this.usersService.onlineUsers[i]);
+      this.addToLadder(user);
     } else if (status === 'green') {
-      this.removeFromLadder(
-        this.usersService.onlineUsers[i],
-        this.sendSingleEvents.bind(this),
-      );
+      this.removeFromLadder(user, this.sendSingleEvents.bind(this));
     } else if (status === 'blue') {
-      this.removeFromLadder(
-        this.usersService.onlineUsers[i],
-        this.awayFromKeyboard.bind(this),
-      );
+      this.removeFromLadder(user, this.awayFromKeyboard.bind(this));
     } else if (status === 'red') {
-      this.gameStart(i, login);
+      this.gameStart(user, login);
     }
   }
 
-  gameStart(userIndex, login) {
-    this.userPersonalEvent('enemyIsReady', this.usersService.onlineUsers[userIndex], login);
+  gameStart(user: OnlineUser, login: string) {
+    this.userPersonalEvent('enemyIsReady', user, login);
     let k = 0;
     while (k < this.lobby.length) {
       if (this.lobby[k].first && this.lobby[k].second &&
@@ -151,16 +144,16 @@ export class LadderService {
         let data;
         if (user) {
           data = JSON.stringify({
+            id: user.id,
             login: user.login,
             url_avatar: user.url_avatar,
             status: user.status,
+            subscriptions: user.subscriptions,
+            subscribers: user.subscribers
           });
         } else {
           data = false;
         }
-        // this.usersService.onlineUsers[i].resp.write(
-        //   `event: ${event}\ndata: ${data}\n\n`,
-        // );
         this.usersService.onlineUsers[i].socket.emit(event, data);
       }
       ++i;

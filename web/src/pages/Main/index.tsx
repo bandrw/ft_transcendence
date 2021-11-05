@@ -2,7 +2,7 @@ import './styles.scss';
 
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { ApiGameSettings, ApiOnlineUser, ApiUpdateUser, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
 import RecentGames from "pages/Main/RecentGames";
@@ -18,10 +18,10 @@ interface MainProps {
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
 	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
-	allUsers: ApiUser[],
-	onlineUsers: ApiOnlineUser[],
-	setUsers: React.Dispatch<React.SetStateAction<ApiOnlineUser[]>>,
-	usersRef: React.MutableRefObject<ApiOnlineUser[]>,
+	allUsers: ApiUserExpand[],
+	onlineUsers: ApiUpdateUser[],
+	setOnlineUsers: React.Dispatch<React.SetStateAction<ApiUpdateUser[]>>,
+	usersRef: React.MutableRefObject<ApiUpdateUser[]>,
 }
 
 const Main: React.FC<MainProps> = ({
@@ -33,7 +33,7 @@ const Main: React.FC<MainProps> = ({
 																		 gameSettingsRef,
 																		 allUsers,
 																		 onlineUsers,
-																		 setUsers,
+																		 setOnlineUsers,
 																		 usersRef
 	}) => {
 	const history = useHistory();
@@ -60,14 +60,14 @@ const Main: React.FC<MainProps> = ({
 
 		const logoutHandler = (data: string) => {
 			const logoutData: ApiUpdateUser = JSON.parse(data);
-			setUsers(usersRef.current.filter(usr => usr.login !== logoutData.login));
+			setOnlineUsers(usersRef.current.filter(usr => usr.login !== logoutData.login));
 		};
 
 		const gameSettingsHandler = (e: string) => {
 			const gameSettings: ApiGameSettings = JSON.parse(e);
 			gameSettingsRef.current = gameSettings;
 
-			// If watch mode, don't send start
+			// If watch mode is on, don't send start
 			if (gameSettings.leftPlayer.login !== currentUser.username && gameSettings.rightPlayer.login !== currentUser.username)
 				return ;
 
@@ -81,7 +81,7 @@ const Main: React.FC<MainProps> = ({
 		const updateUserHandler = (data: string) => {
 			const updateUserData: ApiUpdateUser = JSON.parse(data);
 
-			const newUsers: ApiOnlineUser[] = [];
+			const newUsers: ApiUpdateUser[] = [];
 			// Edit user
 			for (let i = 0; i < usersRef.current.length; ++i) {
 				if (usersRef.current[i].login === updateUserData.login)
@@ -93,7 +93,7 @@ const Main: React.FC<MainProps> = ({
 			if (usersRef.current.map((usr) => usr.login).indexOf(updateUserData.login) === -1)
 				newUsers.push(updateUserData);
 
-			setUsers(newUsers);
+			setOnlineUsers(newUsers);
 
 			if (!enemyRef.current && statusRef.current !== ApiUserStatus.Regular) {
 				setStatus(ApiUserStatus.Regular);
@@ -118,19 +118,9 @@ const Main: React.FC<MainProps> = ({
 		socket.on('enemy', data => enemyHandler(data));
 		socket.on('gameIsReady', () => gameIsReadyHandler());
 		socket.on('gameSettings', data => gameSettingsHandler(data));
+		// console.log('[Main] listeners added');
 
-		console.log('[Main] listeners added');
-
-		return () => {
-			// console.log('[Main] eventSource listeners removed');
-		};
-	}, [currentUser, setStatus, setUsers, socket, enemyRef, gameSettingsRef, usersRef]);
-
-	const filteredUsers: ApiUpdateUser[] = [];
-	for (let i in onlineUsers) {
-		if (onlineUsers[i].login !== currentUser.username)
-			filteredUsers.push(onlineUsers[i]);
-	}
+	}, [currentUser, setStatus, setOnlineUsers, socket, enemyRef, gameSettingsRef, usersRef]);
 
 	return (
 		<div className='main'>
@@ -171,8 +161,9 @@ const Main: React.FC<MainProps> = ({
 						className='main-block social'
 					>
 						<Social
-							users={ filteredUsers }
+							onlineUsers={ onlineUsers.filter(usr => usr.login !== currentUser.username) }
 							currentUser={ currentUser }
+							allUsers={ allUsers }
 						/>
 					</Fade>
 				</div>

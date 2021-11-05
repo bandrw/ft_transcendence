@@ -30,17 +30,83 @@
 			background-size: 80%;
 		}
 
-		.user-profile-header-username {
-			font-size: 32px;
-			height: 100px;
-			display: flex;
-			align-items: center;
+		.user-profile-header-top {
 			position: absolute;
+			height: 100px;
 			top: -100px;
 			left: 260px;
-			padding: 0 75px;
-			text-transform: uppercase;
-			font-weight: 500;
+			display: flex;
+			align-items: center;
+
+			.user-profile-header-username {
+				padding: 0 75px;
+				font-size: 32px;
+				display: flex;
+				align-items: center;
+				text-transform: uppercase;
+				font-weight: 500;
+			}
+
+			.user-profile-header-subscribe-btn {
+				width: 200px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-size: 24px;
+				height: 50px;
+				color: white;
+				background: #29aa44;
+				outline: none;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				transition: all 0.1s ease-in-out;
+
+				svg {
+					font-size: 0.8em;
+					margin-left: 10px;
+				}
+
+				&:hover {
+					background: #21b941;
+				}
+
+				&:active {
+					opacity: 0.8;
+				}
+			}
+
+			.user-profile-header-subscribe-btn-accept {
+				border: 1px solid #29aa44;
+				background: #29aa44;
+				color: white;
+
+				&:hover {
+					color: white;
+				}
+			}
+			.user-profile-header-subscribe-btn-subscribed {
+				border: 1px solid #29aa44;
+				background: #29aa44;
+				color: white;
+
+				&:hover {
+					color: white;
+				}
+
+				&:hover {
+					color: white;
+				}
+			}
+			.user-profile-header-subscribe-btn-friends {
+				border: 1px solid #29aa44;
+				background: transparent;
+				color: #29aa44;
+
+				&:hover {
+					color: white;
+				}
+			}
 		}
 
 		.user-profile-header {

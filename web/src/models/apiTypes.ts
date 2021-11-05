@@ -12,52 +12,49 @@ type ApiUserCreate = {
 	ok: boolean,
 	msg: string
 }
-type ApiGame = {
-	id: number,
-	winnerId?: number,
-	loserId?: number,
-	winner?: {
-		id: number,
-		login: string,
-		password: string,
-		url_avatar: string
-	},
-	loser?: {
-		id: number,
-		login: string,
-		password: string,
-		url_avatar: string
-	},
-	leftScore: number,
-	rightScore: number,
-	date: string
-}
 
 type ApiUser = {
 	id: number,
 	login: string,
 	password: string,
-	url_avatar: string,
-	intraLogin?: string,
-	wonGames?: ApiGame[],
-	lostGames?: ApiGame[]
+	url_avatar: string
 }
 
-type ApiOnlineUser = {
+type ApiGame = {
+	id: number,
+	winnerId?: number,
+	loserId?: number,
+	winner?: ApiUser,
+	loser?: ApiUser,
+	leftScore: number,
+	rightScore: number,
+	date: string
+}
+
+type ApiUserExpand = {
 	id: number,
 	login: string,
+	password: string,
 	url_avatar: string,
-	status: ApiUserStatus
+	intraLogin?: string,
+	wonGames: ApiGame[],
+	lostGames: ApiGame[],
+	subscriptions: ApiUser[],
+	subscribers: ApiUser[]
 }
+
+// type ApiOnlineUser = {
+// 	id: number,
+// 	login: string,
+// 	url_avatar: string,
+// 	status: ApiUserStatus,
+// 	subscriptions: ApiUser[],
+// 	subscribers: ApiUser[]
+// }
 
 type ApiUserLogin = {
 	ok: boolean,
 	msg: ApiUser
-}
-
-type ApiUserCheckExist = {
-	ok: boolean,
-	msg: string | ApiUser
 }
 
 type ApiUpdateUser = {
@@ -65,6 +62,8 @@ type ApiUpdateUser = {
 	login: string,
 	url_avatar: string,
 	status: ApiUserStatus,
+	subscriptions: ApiUser[],
+	subscribers: ApiUser[]
 }
 
 type ApiGameSettings = {
@@ -122,10 +121,10 @@ export type {
 	ApiGame,
 	ApiGameLoop,
 	ApiGameSettings,
-	ApiOnlineUser,
+	// ApiOnlineUser,
 	ApiUpdateUser,
 	ApiUser,
-	ApiUserCheckExist,
 	ApiUserCreate,
-	ApiUserLogin
+	ApiUserExpand,
+	ApiUserLogin,
 };

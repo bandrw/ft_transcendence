@@ -4,7 +4,7 @@ import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import Header from "components/Header";
-import { ApiGame, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import moment from "moment";
 import React from "react";
@@ -38,7 +38,7 @@ interface GamesHistoryProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	allUsers: ApiUser[]
+	allUsers: ApiUserExpand[]
 }
 
 const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHistoryProps) => {
@@ -61,7 +61,7 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiUser>('/users', { params: { login: params.login, expand: true } })
+		axios.get<ApiUserExpand>('/users', { params: { login: params.login, expand: true } })
 			.then(res => {
 				if (!isMounted)
 					return;

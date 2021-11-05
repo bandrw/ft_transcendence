@@ -13,15 +13,11 @@ export class ChatService {
     let fromUser;
     let toUser;
     let i = 0;
-    let fromUserIndex;
-    let toUserIndex;
     while (i < this.usersService.onlineUsers.length) {
       if (this.usersService.onlineUsers[i].login === from) {
         fromUser = this.usersService.onlineUsers[i];
-        fromUserIndex = i;
       } else if (this.usersService.onlineUsers[i].login === to) {
         toUser = this.usersService.onlineUsers[i];
-        toUserIndex = i;
       }
       if (fromUser && toUser) {
         break;

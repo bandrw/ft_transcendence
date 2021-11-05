@@ -1,7 +1,7 @@
 import './App.scss';
 
 import axios from "axios";
-import { ApiGameSettings, ApiOnlineUser, ApiUpdateUser, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Chat";
 import Game from "pages/Game";
@@ -22,30 +22,49 @@ const App = () => {
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const [currentUser, setCurrentUser] =  React.useState<User>(new User());
-	const [onlineUsers, setOnlineUsers] = React.useState<ApiOnlineUser[]>([]);
-	const onlineUsersRef = React.useRef<ApiOnlineUser[]>([]);
-	const [allUsers, setAllUsers] = React.useState<ApiUser[]>([]);
+	const [onlineUsers, setOnlineUsers] = React.useState<ApiUpdateUser[]>([]);
+	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
+	const [allUsers, setAllUsers] = React.useState<ApiUserExpand[]>([]);
 
 	React.useEffect(() => {
 		onlineUsersRef.current = onlineUsers;
 	}, [onlineUsers, onlineUsersRef]);
 
 	React.useEffect(() => {
-		let isMounted = true;
+		setAllUsers(prev => prev.map(allUser => {
+			const onlineUsr = onlineUsers.find(usr => allUser.id === usr.id);
+			if (!onlineUsr)
+				return allUser;
+
+			return {
+				id: allUser.id,
+				login: allUser.login,
+				password: allUser.password,
+				url_avatar: allUser.url_avatar,
+				intraLogin: allUser.intraLogin,
+				wonGames: allUser.wonGames,
+				lostGames: allUser.lostGames,
+				subscriptions: onlineUsr.subscriptions,
+				subscribers: onlineUsr.subscribers,
+			};
+		}));
+	}, [onlineUsers]);
+
+	React.useEffect(() => {
+		// let isMounted = true;
 
 		if (!currentUser.isAuthorized())
 			return ;
 
-		axios.get<ApiOnlineUser[]>('/users/online')
+		axios.get<ApiUpdateUser[]>('/users/online')
 			.then(res => {
-				if (!isMounted)
-					return ;
-
+				// if (!isMounted)
+				// 	return ;
 				setOnlineUsers(res.data);
 			});
 
 		return () => {
-			isMounted = false;
+			// isMounted = false;
 		};
 	}, [currentUser, setOnlineUsers]);
 
@@ -55,7 +74,7 @@ const App = () => {
 		if (!currentUser.isAuthorized())
 			return ;
 
-		axios.get<ApiUser[]>('/users')
+		axios.get<ApiUserExpand[]>('/users', { params: { expand: true } })
 			.then(res => {
 				if (!isMounted)
 					return ;
@@ -142,7 +161,7 @@ const App = () => {
 						gameSettingsRef={ gameSettingsRef }
 						allUsers={ allUsers }
 						onlineUsers={ onlineUsers }
-						setUsers={ setOnlineUsers }
+						setOnlineUsers={ setOnlineUsers }
 						usersRef={ onlineUsersRef }
 					/>
 				</Route>

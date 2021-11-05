@@ -1,5 +1,6 @@
 import { GameEntity } from "game/game.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserSubscription } from "users/entities/subscription.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -20,4 +21,10 @@ export class User {
 
 	@OneToMany(() => GameEntity, game => game.loser)
 	lostGames: GameEntity[];
+
+	@OneToMany(() => UserSubscription, subscription => subscription.user)
+	subscriptions: UserSubscription[];
+
+	@OneToMany(() => UserSubscription, subscription => subscription.target)
+	subscribers: UserSubscription[];
 }

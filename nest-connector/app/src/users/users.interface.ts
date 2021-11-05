@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import { User } from "users/entities/user.entity";
 
 export interface OnlineUser {
 	id: number;
@@ -6,4 +7,6 @@ export interface OnlineUser {
 	url_avatar: string;
 	socket: Socket
 	status: string;
+	subscriptions: User[];
+	subscribers: User[];
 }
