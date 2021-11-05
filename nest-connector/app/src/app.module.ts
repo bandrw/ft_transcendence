@@ -23,6 +23,8 @@ import { UsersModule } from 'users/users.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       entities: [User, GameEntity, UserSubscription],
+      retryAttempts: 50,
+      retryDelay: 5000
     }),
     UsersModule,
     LadderModule,

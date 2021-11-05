@@ -98,7 +98,7 @@ export class UsersController {
 	userLogout(@Req() req: Request) {
 		const index = this.usersService.onlineUsers.map(usr => usr.login).indexOf(req.body.user.login);
 		if (index != -1) {
-			this.usersService.userEvent('logout_SSE', this.usersService.onlineUsers[index]);
+			this.usersService.userEvent('logout', this.usersService.onlineUsers[index]);
 			this.usersService.onlineUsers.splice(index, 1);
 			this.usersService.onlineUsers = this.usersService.onlineUsers.filter(val => {
 				if (val) {

@@ -113,7 +113,7 @@ const Main: React.FC<MainProps> = ({
 			setStatus(ApiUserStatus.InGame);
 		};
 
-		socket.on('logout_SSE', data => logoutHandler(data));
+		socket.on('logout', data => logoutHandler(data));
 		socket.on('updateUser', data => updateUserHandler(data));
 		socket.on('enemy', data => enemyHandler(data));
 		socket.on('gameIsReady', () => gameIsReadyHandler());
