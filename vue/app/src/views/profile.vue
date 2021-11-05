@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div v-if="!gameInProgress && authorized" id="user_authorized">
+    <div id="user_authorized">
       <div id="user_logout_button" v-on:click="logout">logout</div>
       <div id="user_profile_button" v-on:click="showProfile">
         {{ user.login }}
       </div>
     </div>
-    <div v-show="profile && authorized && !gameInProgress" id="user_profile">
+    <div v-show="profile" id="user_profile">
       <img :src="user.url_avatar" id="user_profile_avatar" alt="" />
       <div id="user_update_avatar" v-on:click="updateAvatar"></div>
       <div id="game_stats_count">
@@ -28,6 +28,7 @@ import eventService from "../services/eventService";
 import { mapMutations, mapState } from "vuex";
 
 export default {
+  // props: ["username"],
   computed: {
     ...mapState("game", ["gameInProgress"]),
     ...mapState(["user", "authorized"]),

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div :id="userAuthorizationStatus" v-if="screenSize">
-      <div v-if="!authorized">
+      <div v-if="!this.authorized">
         <router-link :to="{ name: 'login' }" class="tab">Login</router-link> |
         <router-link :to="{ name: 'register' }" class="tab"
           >Register</router-link

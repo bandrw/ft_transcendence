@@ -1,9 +1,15 @@
 <template>
-  <div v-show="authorized">
+  <div v-show="this.authorized">
     <div v-show="!gameInProgress">
       <Ladder ref="Ladder" />
       <chat />
-      <profile ref="profile" v-on:clearLadder="clearLadder" />
+      <div>
+        <router-link :to="{ name: profile, params: { username: user.login } }"
+          >profile</router-link
+        >
+      </div>
+      <router-view />
+      <!--      <profile ref="profile" v-on:clearLadder="clearLadder" />-->
     </div>
     <game ref="game" v-show="gameInProgress" />
   </div>
