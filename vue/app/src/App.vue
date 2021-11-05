@@ -16,7 +16,8 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
+
 export default {
   computed: {
     ...mapState(["authorized", "innerHeight", "innerWidth"]),
@@ -45,6 +46,15 @@ export default {
 <style>
 h1 {
   text-align: center;
+}
+
+.tab {
+  text-align: left;
+  width: 20%;
+  background-color: beige;
+  font-size: larger;
+  margin: 1%;
+  top: 5%;
 }
 
 #user_unauthorized {

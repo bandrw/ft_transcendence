@@ -40,11 +40,9 @@
       :style="{ left: infoStyle.left, top: infoStyle.top }"
     >
       {{ user_in_chat.login }}
-      <span :style="{ color: pinColor(user_in_chat.winP) }"
-        ><p>
-          {{ winPercent(user_in_chat.wins, user_in_chat.games, user_in_chat) }}%
-        </p></span
-      >
+      <span :style="{ color: pinColor(user_in_chat.winP) }">
+        {{ winPercent(user_in_chat.wins, user_in_chat.games, user_in_chat) }}%
+      </span>
       <img :src="user_in_chat.url_avatar" class="user_profile_avatar" alt="" />
       <div class="chat_user_profile_close_button" v-on:click="SET_INFO(false)">
         x
@@ -54,7 +52,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 
 export default {
   data() {

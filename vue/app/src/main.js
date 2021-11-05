@@ -2,13 +2,14 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import User from "./views/User";
+import main from "./views/main";
 import Ladder from "./views/Ladder";
 import eventSource from "./views/eventSource";
 import game from "./views/game";
 import io from "socket.io/client-dist/socket.io";
 import VueSocketIO from "vue-socket.io";
 import chat from "./views/chat";
+import profle from "./views/profile";
 
 Vue.directive("scroll", {
   inserted: function (el, binding) {
@@ -27,11 +28,12 @@ Vue.use(
     connection: io("http://localhost:3000", { transports: ["websocket"] }),
   })
 );
-Vue.component("User", User);
+Vue.component("Main", main);
 Vue.component("Ladder", Ladder);
 Vue.component("eventSource", eventSource);
 Vue.component("game", game);
 Vue.component("chat", chat);
+Vue.component("profile", profle);
 
 new Vue({
   router,

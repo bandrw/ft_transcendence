@@ -2,15 +2,16 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Login from "../views/Login.vue";
 import Register from "../views/Register";
-import User from "../views/User";
+import main from "../views/main";
+import profile from "../views/profile";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "user",
-    component: User,
+    name: "main",
+    component: main,
   },
   {
     path: "/login",
@@ -25,14 +26,14 @@ const routes = [
   },
   {
     path: "/main",
-    redirect: { name: "user" },
+    redirect: { name: "main" },
   },
-  // {
-  //   path: "/user/:username",
-  //   name: "user",
-  //   component: User,
-  //   props: true,
-  // },
+  {
+    path: "/profile/:username",
+    name: "profile",
+    component: profile,
+    props: true,
+  },
 ];
 
 const router = new VueRouter({
