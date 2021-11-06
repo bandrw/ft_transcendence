@@ -2,7 +2,13 @@
   <div id="user_profile">
     <div>
       <img :src="user.url_avatar" id="user_profile_avatar" alt="" />
-      <div id="user_update_avatar" v-on:click="updateAvatar"></div>
+      <b-icon-arrow-clockwise
+        scale="3.25"
+        shift-v="3.25"
+        aria-hidden="true"
+        id="user_update_avatar"
+        v-on:click="updateAvatar"
+      ></b-icon-arrow-clockwise>
       <div id="game_stats_count">
         <p>games: {{ user.games }}</p>
       </div>
@@ -12,7 +18,11 @@
       <div id="game_stats_winPercent">
         <p>win percent: {{ winPercent }}%</p>
       </div>
-      <div id="user_profile_close_button" v-on:click="closeProfile">x</div>
+      <b-icon-x-circle
+        id="user_profile_close_button"
+        v-on:click="closeProfile"
+        aria-hidden="true"
+      ></b-icon-x-circle>
     </div>
   </div>
 </template>
@@ -86,7 +96,7 @@ export default {
 #user_profile {
   width: 100%;
   height: 100%;
-  background-color: darkviolet;
+  background-color: beige;
   position: absolute;
 }
 
@@ -94,10 +104,8 @@ export default {
   position: absolute;
   top: 1%;
   right: 1%;
-  width: 5%;
-  height: 12%;
-  text-align: center;
-  background-color: aqua;
+  width: 10%;
+  height: 10%;
 }
 
 #user_profile_avatar {
@@ -105,16 +113,12 @@ export default {
   left: 1%;
   top: 1%;
   width: 25%;
-  height: 50%;
+  height: 25%;
 }
 
 #user_update_avatar {
+  left: 5%;
+  top: 27%;
   position: absolute;
-  top: 1%;
-  left: 1%;
-  width: 5%;
-  height: 12%;
-  text-align: center;
-  background-color: beige;
 }
 </style>

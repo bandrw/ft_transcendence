@@ -130,8 +130,8 @@ export default {
 
 <style>
 #mouse_outer {
-  height: 23%;
-  width: 15%;
+  height: 27%;
+  width: 18%;
   position: absolute;
   top: 0;
   right: 0;
@@ -160,17 +160,18 @@ export default {
 #user_authorized {
   min-width: 100px;
   min-height: 50px;
-  width: 100%;
+  width: 90%;
   height: 25%;
   position: absolute;
-  bottom: 0;
+  bottom: 10%;
+  left: 10%;
 }
 
 #profile_image {
   min-width: 50px;
   min-height: 50px;
-  width: 65%;
-  height: 65%;
+  width: 61%;
+  height: 61%;
   position: absolute;
   right: 15%;
   top: 0;
