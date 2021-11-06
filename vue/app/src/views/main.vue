@@ -3,15 +3,23 @@
     <div v-show="!this.gameInProgress">
       <Ladder ref="Ladder" />
       <chat />
-      <div>
-        <router-link :to="{ name: 'profile', params: { username: user.login } }"
-          >profile</router-link
-        >
+      <div id="mouse_outer" @mouseleave.stop="hideUserDropdown">
+        <img
+          :src="this.user.url_avatar"
+          alt=""
+          id="profile_image"
+          @mouseover="showUserDropdown"
+        />
+        <div id="user_authorized" v-show="profile">
+          <div id="user_logout_button" v-on:click="logout"><p>logout</p></div>
+          <div id="user_profile_button" v-on:click="goToProfile">
+            <p>profile</p>
+          </div>
+        </div>
       </div>
       <router-view />
-      <!--      <profile ref="profile" v-on:clearLadder="clearLadder" />-->
     </div>
-    <game ref="game" v-show="gameInProgress" />
+    <game ref="game" v-show="this.gameInProgress" />
   </div>
 </template>
 
@@ -46,8 +54,29 @@ export default {
       "CLEAR_USER",
       "SET_NEW_USER_AVATAR",
     ]),
-    clearLadder() {
-      this.$refs.Ladder.clearLadder();
+    showUserDropdown() {
+      this.SET_PROFILE(true);
+    },
+    hideUserDropdown() {
+      this.SET_PROFILE(false);
+    },
+    goToProfile() {
+      this.$router.push({
+        name: "profile",
+        params: { username: this.user.login },
+      });
+    },
+    async logout() {
+      if (this.gameInProgress) {
+        this.$refs.Ladder.clearLadder();
+      }
+      this.CLOSE_EVENT_SOURCE();
+      await eventService.logout(this.user);
+      this.SET_ENEMY(null);
+      this.SET_AUTHORIZE(false);
+      this.SET_PROFILE(false);
+      this.SET_USERS(null);
+      await this.$router.push({ name: "login" });
     },
     getData(res) {
       return res.data;
@@ -91,7 +120,7 @@ export default {
   },
   mounted() {
     if (!this.authorized) {
-      this.$router.push("Login");
+      this.$router.push("login");
     }
     document.addEventListener("keyup", this.stopPlatform);
     document.addEventListener("keydown", this.keyEvents);
@@ -100,8 +129,51 @@ export default {
 </script>
 
 <style>
-body {
-  background-color: #79e7af;
+#mouse_outer {
+  height: 23%;
+  width: 15%;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#user_logout_button {
+  width: 30%;
+  height: 74%;
+  background-color: chocolate;
+  position: absolute;
+  top: 25%;
+  right: 1%;
+  border-radius: 10%;
+}
+
+#user_profile_button {
+  width: 67%;
+  height: 74%;
+  background-color: green;
+  position: absolute;
+  top: 25%;
+  left: 1%;
+  border-radius: 8%;
+}
+
+#user_authorized {
+  min-width: 100px;
+  min-height: 50px;
+  width: 100%;
+  height: 25%;
+  position: absolute;
+  bottom: 0;
+}
+
+#profile_image {
+  min-width: 50px;
+  min-height: 50px;
+  width: 65%;
+  height: 65%;
+  position: absolute;
+  right: 15%;
+  top: 0;
 }
 
 #user_login_button > p {
@@ -111,6 +183,7 @@ body {
 
 p {
   font-family: Serif, fantasy, sans-serif;
+  text-align: center;
 }
 
 input {

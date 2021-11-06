@@ -16,7 +16,7 @@
       </div>
     </div>
     <div v-show="message" id="thank_you">
-      <h4>{{ message }}</h4>
+      <h4 id="error_message">{{ message }}</h4>
     </div>
   </div>
 </template>
@@ -123,8 +123,9 @@ export default {
 
 #user_register_error_message {
   position: absolute;
-  top: 10%;
+  top: 5%;
   right: 5%;
+  color: red;
 }
 
 #thank_you {

@@ -12,6 +12,14 @@ const routes = [
     path: "/",
     name: "main",
     component: main,
+    children: [
+      {
+        path: "/profile/:username",
+        name: "profile",
+        component: profile,
+        // props: true,
+      },
+    ],
   },
   {
     path: "/login",
@@ -27,12 +35,6 @@ const routes = [
   {
     path: "/main",
     redirect: { name: "main" },
-  },
-  {
-    path: "/profile/:username",
-    name: "profile",
-    component: profile,
-    // props: true,
   },
 ];
 

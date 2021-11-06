@@ -1,13 +1,6 @@
 <template>
-  <div>
-    <router-link :to="{ name: 'main' }">back</router-link>
-    <div id="user_authorized">
-      <div id="user_logout_button" v-on:click="logout">logout</div>
-      <div id="user_profile_button" v-on:click="showProfile">
-        {{ user.login }}
-      </div>
-    </div>
-    <div v-show="this.profile" id="user_profile">
+  <div id="user_profile">
+    <div>
       <img :src="user.url_avatar" id="user_profile_avatar" alt="" />
       <div id="user_update_avatar" v-on:click="updateAvatar"></div>
       <div id="game_stats_count">
@@ -17,9 +10,9 @@
         <p>wins: {{ user.wins }}</p>
       </div>
       <div id="game_stats_winPercent">
-        <p>wins: {{ winPercent }}%</p>
+        <p>win percent: {{ winPercent }}%</p>
       </div>
-      <div id="user_profile_close_button" v-on:click="showProfile">x</div>
+      <div id="user_profile_close_button" v-on:click="closeProfile">x</div>
     </div>
   </div>
 </template>
@@ -29,7 +22,7 @@ import eventService from "../services/eventService";
 import { mapMutations, mapState } from "vuex";
 
 export default {
-  // props: ["username"],
+  props: ["username"],
   computed: {
     ...mapState("game", ["gameInProgress"]),
     ...mapState(["user", "authorized"]),
@@ -51,20 +44,9 @@ export default {
       "SET_USERS",
     ]),
     ...mapMutations("profile", ["SET_PROFILE"]),
-    async logout() {
-      if (this.gameInProgress) {
-        this.$emit("clearLadder");
-      }
-      this.CLOSE_EVENT_SOURCE();
-      await eventService.logout(this.user);
-      this.SET_ENEMY(null);
-      this.SET_AUTHORIZE(false);
-      this.SET_PROFILE(false);
-      this.SET_USERS(null);
-      await this.$router.push("login");
-    },
-    showProfile() {
+    closeProfile() {
       this.SET_PROFILE(!this.profile);
+      this.$router.push({ name: "main" });
     },
     async updateAvatar() {
       const avatar = eventService
@@ -77,35 +59,6 @@ export default {
 </script>
 
 <style scoped>
-#user_authorized {
-  min-width: 100px;
-  min-height: 50px;
-  width: 20%;
-  height: 10%;
-  background-color: crimson;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-#user_logout_button {
-  width: 30%;
-  height: 74%;
-  background-color: chocolate;
-  position: absolute;
-  top: 25%;
-  right: 1%;
-}
-
-#user_profile_button {
-  width: 67%;
-  height: 74%;
-  background-color: green;
-  position: absolute;
-  top: 25%;
-  left: 1%;
-}
-
 #game_stats_count {
   width: 12%;
   height: 5%;
@@ -131,12 +84,10 @@ export default {
 }
 
 #user_profile {
-  width: 40%;
-  height: 30%;
+  width: 100%;
+  height: 100%;
   background-color: darkviolet;
   position: absolute;
-  top: 1%;
-  right: 21%;
 }
 
 #user_profile_close_button {

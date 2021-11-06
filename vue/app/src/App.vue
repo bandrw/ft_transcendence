@@ -2,10 +2,14 @@
   <div>
     <div :id="userAuthorizationStatus" v-if="screenSize">
       <div v-if="!this.authorized">
-        <router-link :to="{ name: 'login' }" class="tab">Login</router-link> |
-        <router-link :to="{ name: 'register' }" class="tab"
-          >Register</router-link
-        >
+        <b-nav tabs>
+          <b-nav-item :active="active1" @click="switchToLogin"
+            >Login</b-nav-item
+          >
+          <b-nav-item :active="active2" @click="switchToRegister"
+            >Register</b-nav-item
+          >
+        </b-nav>
       </div>
       <router-view />
     </div>
@@ -19,6 +23,12 @@
 import { mapMutations, mapState } from "vuex";
 
 export default {
+  data() {
+    return {
+      active1: true,
+      active2: false,
+    };
+  },
   computed: {
     ...mapState(["authorized", "innerHeight", "innerWidth"]),
     userAuthorizationStatus() {
@@ -30,6 +40,20 @@ export default {
   },
   methods: {
     ...mapMutations(["SET_INNER_HEIGHT", "SET_INNER_WIDTH"]),
+    switchToLogin() {
+      if (!this.active1) {
+        this.active1 = true;
+        this.active2 = false;
+        this.$router.push("login");
+      }
+    },
+    switchToRegister() {
+      if (!this.active2) {
+        this.active2 = true;
+        this.active1 = false;
+        this.$router.push("register");
+      }
+    },
     updateScreenSize() {
       this.SET_INNER_WIDTH(window.innerWidth);
       this.SET_INNER_HEIGHT(window.innerHeight);
@@ -44,6 +68,10 @@ export default {
 </script>
 
 <style>
+body {
+  background-color: #79e7af;
+}
+
 h1 {
   text-align: center;
 }
