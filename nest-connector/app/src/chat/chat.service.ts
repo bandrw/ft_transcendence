@@ -28,14 +28,21 @@ export class ChatService {
 		}
 	}
 
-	async getChats(userId: number): Promise<ChatEntity[]> {
+	async getChats(userId: number, expand: boolean): Promise<ChatEntity[]> {
 		const chats: ChatEntity[] = [];
+		let r1: ChatEntity[];
+		let r2: ChatEntity[];
 
-		const r1 = await this.chatRepository.find({ where: { userOneId: userId } });
+		if (expand) {
+			r1 = await this.chatRepository.find({ where: { userOneId: userId }, relations: ['userOne', 'userTwo'] });
+			r2 = await this.chatRepository.find({ where: { userTwoId: userId }, relations: ['userOne', 'userTwo'] });
+		} else {
+			r1 = await this.chatRepository.find({ where: { userOneId: userId } });
+			r2 = await this.chatRepository.find({ where: { userTwoId: userId } });
+		}
+
 		for (let i = 0; i < r1.length; ++i)
 			chats.push(r1[i]);
-
-		const r2 = await this.chatRepository.find({ where: { userTwoId: userId } });
 		for (let i = 0; i < r2.length; ++i)
 			chats.push(r2[i]);
 

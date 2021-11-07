@@ -1,0 +1,45 @@
+.messenger-contact-selected {
+	background: #2c2f3a;
+}
+
+.messenger-contact {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	height: 50px;
+	border-radius: 18px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	transition: all 0.1s ease-in-out;
+	cursor: pointer;
+	padding: 5px 10px;
+	position: relative;
+
+	&:hover {
+		background: #2c2f3a;
+	}
+
+	&:before {
+		display: block;
+		position: absolute;
+		content: '';
+		width: calc(100% - 65px - 18px);
+		height: 1px;
+		background: #2c2f3a;
+		right: 18px;
+		bottom: -5px;
+	}
+
+	.messenger-contact-image {
+		width: 50px;
+		height: 50px;
+		background-repeat: no-repeat;
+		background-size: 90%;
+		background-position: center;
+		margin-right: 15px;
+	}
+
+	.messenger-contact-name {
+		font-size: 1.2em;
+	}
+}

@@ -3,7 +3,6 @@ import './App.scss';
 import axios from "axios";
 import { ApiGameSettings, ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
-import Chat from "pages/Chat";
 import Game from "pages/Game";
 import GamesHistory from "pages/GamesHistory";
 import Login from 'pages/Login';
@@ -109,14 +108,6 @@ const App = () => {
 					<Register
 						currentUser={ currentUser }
 						setCurrentUser={ setCurrentUser }
-					/>
-				</Route>
-
-				<Route exact path='/chat'>
-					<Chat
-						currentUser={ currentUser }
-						setCurrentUser={ setCurrentUser }
-						status={ status }
 					/>
 				</Route>
 

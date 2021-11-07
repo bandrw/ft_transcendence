@@ -5,6 +5,7 @@ import { SocketContext } from "context/socket";
 import { ApiGameSettings, ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import FindGame from "pages/Main/FindGame";
+import Messenger from "pages/Main/Messenger";
 import RecentGames from "pages/Main/RecentGames";
 import Social from "pages/Main/Social";
 import React  from 'react';
@@ -84,14 +85,14 @@ const Main: React.FC<MainProps> = ({
 			setOnlineUsers(prev => {
 				const newUsers: ApiUpdateUser[] = [];
 				// Edit user
-				for (let i = 0; i < onlineUsersRef.current.length; ++i) {
-					if (onlineUsersRef.current[i].login === updateUserData.login)
+				for (let i = 0; i < prev.length; ++i) {
+					if (prev[i].login === updateUserData.login)
 						newUsers.push(updateUserData);
 					else
-						newUsers.push(onlineUsersRef.current[i]);
+						newUsers.push(prev[i]);
 				}
 				// Add new user
-				if (onlineUsersRef.current.map((usr) => usr.login).indexOf(updateUserData.login) === -1)
+				if (prev.map((usr) => usr.login).indexOf(updateUserData.login) === -1)
 					newUsers.push(updateUserData);
 				return newUsers;
 			});
@@ -131,43 +132,53 @@ const Main: React.FC<MainProps> = ({
 					setCurrentUser={ setCurrentUser }
 					status={ status }
 				/>
-				<div className='main-center'>
-					<Fade
-						triggerOnce={ true }
-						style={ { position: 'relative', zIndex: 9 } }
-					>
-						<FindGame
-							currentUser={ currentUser }
-							status={ status }
-							setStatus={ setStatus }
-							enemyRef={ enemyRef }
-							enemyIsReady={ enemyIsReady }
-						/>
-					</Fade>
-					<Fade
-						delay={ 100 }
-						triggerOnce={ true }
-						style={ { position: 'relative', zIndex: 8 } }
-					>
-						<RecentGames
-							currentUser={ currentUser }
-							allUsers={ allUsers }
-						/>
-					</Fade>
+				<div className='main-top'>
+					<div className='main-center'>
+						<Fade
+							triggerOnce={ true }
+							style={ { position: 'relative', zIndex: 9 } }
+						>
+							<FindGame
+								currentUser={ currentUser }
+								status={ status }
+								setStatus={ setStatus }
+								enemyRef={ enemyRef }
+								enemyIsReady={ enemyIsReady }
+							/>
+						</Fade>
+						<Fade
+							delay={ 100 }
+							triggerOnce={ true }
+							style={ { position: 'relative', zIndex: 8 } }
+						>
+							<RecentGames
+								currentUser={ currentUser }
+								allUsers={ allUsers }
+							/>
+						</Fade>
+					</div>
+					<div className='main-right'>
+						<Fade
+							delay={ 100 }
+							triggerOnce={ true }
+							className='main-block social'
+						>
+							<Social
+								onlineUsers={ onlineUsers.filter(usr => usr.login !== currentUser.username) }
+								currentUser={ currentUser }
+								allUsers={ allUsers }
+							/>
+						</Fade>
+					</div>
 				</div>
-				<div className='main-right'>
-					<Fade
-						delay={ 100 }
-						triggerOnce={ true }
-						className='main-block social'
-					>
-						<Social
-							onlineUsers={ onlineUsers.filter(usr => usr.login !== currentUser.username) }
-							currentUser={ currentUser }
-							allUsers={ allUsers }
-						/>
-					</Fade>
-				</div>
+				<Fade
+					delay={ 400 }
+					triggerOnce={ true }
+				>
+					<Messenger
+						currentUser={ currentUser }
+					/>
+				</Fade>
 			</div>
 		</div>
 	);

@@ -43,15 +43,6 @@ type ApiUserExpand = {
 	subscribers: ApiUser[]
 }
 
-// type ApiOnlineUser = {
-// 	id: number,
-// 	login: string,
-// 	url_avatar: string,
-// 	status: ApiUserStatus,
-// 	subscriptions: ApiUser[],
-// 	subscribers: ApiUser[]
-// }
-
 type ApiUserLogin = {
 	ok: boolean,
 	msg: ApiUser
@@ -109,19 +100,26 @@ type ApiGameLoop = {
 	}
 }
 
-type ApiFetchedUser = {
+type ApiChat = {
 	id: number,
-	login: string,
-	status: string,
-	url_avatar: string,
+	userOneId: number,
+	userTwoId: number,
+}
+
+type ApiChatExpand = {
+	id: number,
+	userOneId: number,
+	userTwoId: number,
+	userOne: ApiUser,
+	userTwo: ApiUser
 }
 
 export type {
-	ApiFetchedUser,
+	ApiChat,
+	ApiChatExpand,
 	ApiGame,
 	ApiGameLoop,
 	ApiGameSettings,
-	// ApiOnlineUser,
 	ApiUpdateUser,
 	ApiUser,
 	ApiUserCreate,

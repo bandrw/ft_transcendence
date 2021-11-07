@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Inject, Post, Query } from '@nestjs/common';
+import { ChatEntity } from "chat/chat.entity";
 import { ChatService } from "chat/chat.service";
-
-import { ChatEntity } from "./chat.entity";
 
 @Controller('chat')
 export class ChatController {
@@ -20,11 +19,14 @@ export class ChatController {
 	}
 
 	@Get()
-	async getChats(@Query('userId') userId: number): Promise<ChatEntity[]> {
+	async getChats(
+		@Query('userId') userId: number,
+		@Query('expand') expand: string
+	): Promise<ChatEntity[]> {
 		if (!userId)
 			throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);
 
-		return await this.chatService.getChats(userId);
+		return await this.chatService.getChats(userId, expand === 'true');
 	}
 
 }

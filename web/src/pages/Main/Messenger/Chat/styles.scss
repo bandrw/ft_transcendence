@@ -1,0 +1,92 @@
+.messenger-chat {
+	border-left: 1px solid #2c2f3a;
+	height: 100%;
+	width: calc(100% - 300px);
+
+	.messenger-chat-empty-msg {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+		font-size: 1.2em;
+	}
+
+	.messenger-chat-info {
+		display: flex;
+		align-items: center;
+		height: 50px;
+		border-bottom: 1px solid #2c2f3a;
+		position: relative;
+
+		.messenger-chat-info-img {
+			width: 40px;
+			height: 40px;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: 90%;
+			margin-right: 25px;
+			margin-left: 20px;
+			background-color: #1a1b1f;
+			border-radius: 50%;
+		}
+
+		.messenger-chat-close-btn {
+			background: none;
+			font-size: 24px;
+			outline: none;
+			border: none;
+			color: #aaa;
+			cursor: pointer;
+			position: absolute;
+			right: 20px;
+			transition: all 0.1s ease-in-out;
+
+			&:hover {
+				color: #555;
+			}
+		}
+	}
+
+	.messenger-chat-messages {
+		height: calc(100% - 50px - 60px);
+		width: calc(100% - 40px);
+		padding: 0 20px;
+	}
+
+	.messenger-chat-form {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 60px;
+		padding-left: 20px;
+		width: calc(100% - 20px);
+
+		.messenger-chat-input {
+			height: 58px;
+			width: calc(100% - 100px - 50px);
+			background: transparent;
+			border: 1px solid #2c2f3a;
+			border-radius: 18px;
+			outline: none;
+			font-size: 1em;
+			color: white;
+			padding: 0 25px;
+
+			&:focus {
+				border-color: rgba(#29aa44, 0.5);
+			}
+		}
+
+		.messenger-chat-send-btn {
+			width: 75px;
+			height: 58px;
+			border: 1px solid #2c2f3a;
+			background: none;
+			outline: none;
+			border-radius: 18px;
+			font-size: 20px;
+			cursor: pointer;
+			color: #29aa44;
+		}
+	}
+}

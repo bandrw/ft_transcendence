@@ -19,6 +19,8 @@ body {
 
 ::-webkit-scrollbar {
 	background: #20222a;
+	width: 11px;
+	height: 11px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -28,7 +30,7 @@ body {
 }
 
 ::-webkit-scrollbar-corner {
-	display: none;
+	background: #20222a;
 }
 
 :-webkit-autofill::first-line,
