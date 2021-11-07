@@ -13,7 +13,7 @@
         <div id="user_authorized" v-show="profile">
           <div id="user_logout_button" v-on:click="logout"><p>logout</p></div>
           <div id="user_profile_button" v-on:click="goToProfile">
-            <p>profile</p>
+            <p>{{ user.login }}</p>
           </div>
         </div>
       </div>

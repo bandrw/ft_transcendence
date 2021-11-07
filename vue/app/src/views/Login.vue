@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 import eventService from "../services/eventService";
 import cryptService from "../services/cryptService";
 
@@ -51,6 +51,7 @@ export default {
   },
   methods: {
     ...mapActions(["setUsers"]),
+    ...mapMutations("profile", ["SET_HISTORY"]),
     async authorize() {
       if (!this.login) {
         this.error = "please enter login";
@@ -79,6 +80,7 @@ export default {
           this.setUsers({ users: onlineUsers, user: data.user });
           this.error = null;
           this.$refs.eventSource.listenEvents();
+          this.SET_HISTORY(data.history);
           await this.$router.push("main");
         } else {
           this.error = "Wrong password";

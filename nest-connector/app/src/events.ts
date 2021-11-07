@@ -1,16 +1,18 @@
-import { WebSocketGateway } from '@nestjs/websockets';
 import {
-  SubscribeMessage,
-  MessageBody,
-  WebSocketServer,
-  OnGatewayDisconnect,
   ConnectedSocket,
+  MessageBody,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Inject } from '@nestjs/common';
 import { GameService } from './game/game.service';
 import { UsersService } from './users/users.service';
 import { ChatService } from './chat/chat.service';
+import { getConnection } from 'typeorm';
+import { GameHistory } from './game/game.entity';
 
 @WebSocketGateway()
 export class Events implements OnGatewayDisconnect {
@@ -71,7 +73,30 @@ export class Events implements OnGatewayDisconnect {
       }
       ++i;
     }
-    client.emit('userEntity', { user: user, socketId: client.id });
+    // const history = await this.gameService.GameHistory.find({
+    //   where: [{ user_one_id: user.id }, { user_two_id: user.id }],
+    // });
+    if (user) {
+      const history = await getConnection()
+        .createQueryBuilder()
+        .select()
+        .from(GameHistory, 'gameHistory')
+        .where('user_one_id = :id', { id: user.id })
+        .orWhere('user_two_id = :id', { id: user.id })
+        .orderBy('data', 'DESC')
+        .execute();
+      console.log(history);
+      client.emit('userEntity', {
+        user: user,
+        socketId: client.id,
+        history: history,
+      });
+    } else {
+      client.emit('userEntity', {
+        user: user,
+        socketId: client.id,
+      });
+    }
   }
   @SubscribeMessage('leaveGame')
   async leaveGame(@MessageBody() data: any) {
