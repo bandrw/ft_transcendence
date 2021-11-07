@@ -51,20 +51,20 @@ const App = () => {
 	}, [onlineUsers]);
 
 	React.useEffect(() => {
-		// let isMounted = true;
+		let isMounted = true;
 
 		if (!currentUser.isAuthorized())
 			return ;
 
 		axios.get<ApiUpdateUser[]>('/users/online')
 			.then(res => {
-				// if (!isMounted)
-				// 	return ;
+				if (!isMounted)
+					return ;
 				setOnlineUsers(res.data);
 			});
 
 		return () => {
-			// isMounted = false;
+			isMounted = false;
 		};
 	}, [currentUser, setOnlineUsers]);
 
@@ -162,7 +162,7 @@ const App = () => {
 						allUsers={ allUsers }
 						onlineUsers={ onlineUsers }
 						setOnlineUsers={ setOnlineUsers }
-						usersRef={ onlineUsersRef }
+						onlineUsersRef={ onlineUsersRef }
 					/>
 				</Route>
 

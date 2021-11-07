@@ -42,3 +42,20 @@ CREATE TABLE "user_subscriptions"
 		REFERENCES "users"("id")
 		ON DELETE SET NULL
 );
+
+CREATE TABLE "chats"
+(
+	"id" serial PRIMARY KEY,
+	"userOneId" INTEGER,
+	"userTwoId" INTEGER,
+
+	CONSTRAINT "fk_userOne"
+		FOREIGN KEY("userOneId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL,
+
+	CONSTRAINT "fk_userTwo"
+		FOREIGN KEY("userTwoId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL
+);

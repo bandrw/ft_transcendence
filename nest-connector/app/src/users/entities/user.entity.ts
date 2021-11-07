@@ -1,3 +1,4 @@
+import { ChatEntity } from "chat/chat.entity";
 import { GameEntity } from "game/game.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserSubscription } from "users/entities/subscription.entity";
@@ -27,4 +28,10 @@ export class User {
 
 	@OneToMany(() => UserSubscription, subscription => subscription.target)
 	subscribers: UserSubscription[];
+
+	@OneToMany(() => ChatEntity, chat => chat.userOne)
+	createdChats: ChatEntity[];
+
+	@OneToMany(() => ChatEntity, chat => chat.userTwo)
+	acceptedChats: ChatEntity[];
 }

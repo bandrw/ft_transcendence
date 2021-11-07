@@ -31,7 +31,6 @@ export class GameGateway {
 						.catch(() => console.log('[updateStatistics] error'));
 					clearInterval(game.gameInterval);
 					this.gameService.games = this.gameService.games.filter(g => g.id !== game.id);
-					console.log('games length', this.gameService.games.length); // todo [remove finished game from this.gameService.games]
 					return;
 				}
 
