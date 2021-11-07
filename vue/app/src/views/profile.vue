@@ -33,7 +33,14 @@
     ></b-icon-x-circle>
     <div id="game_history">
       <div v-for="game in history" :key="game.id">
-        winner: {{ game.user_one_id }} | looser: {{ game.user_two_id }}
+        <div class="winner_history">
+          <p>winner: {{ game.user_one.login }}</p>
+          <img :src="game.user_one.url_avatar" alt="" />
+        </div>
+        <div class="looser_history">
+          <p>looser: {{ game.user_two.login }}</p>
+          <img :src="game.user_two.url_avatar" alt="" />
+        </div>
       </div>
     </div>
   </div>
@@ -81,13 +88,39 @@ export default {
 </script>
 
 <style scoped>
+.winner_history > p {
+  color: green;
+  /*position: absolute;*/
+  left: 15%;
+}
+
+.looser_history > p {
+  color: red;
+  /*position: absolute;*/
+  right: 15%;
+}
+
+.winner_history > img {
+  /*position: absolute;*/
+  left: 15%;
+  width: 15%;
+  height: 15%;
+}
+
+.looser_history > img {
+  /*position: absolute;*/
+  right: 15%;
+  width: 15%;
+  height: 15%;
+}
+
 #game_history {
   position: absolute;
   top: 38%;
   right: 25%;
   width: 50%;
   height: 40%;
-  background-color: red;
+  background-color: aqua;
 }
 
 p {

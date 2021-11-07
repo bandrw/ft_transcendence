@@ -11,7 +11,7 @@ export default new Vuex.Store({
   state: {
     authorized: false,
     user: false,
-    users: [],
+    onlineUsers: [],
     enemy: false,
     eventSource: false,
     innerHeight: null,
@@ -33,10 +33,10 @@ export default new Vuex.Store({
       state.eventSource.close();
     },
     ADD_USER(state, user) {
-      state.users.push(user);
+      state.onlineUsers.push(user);
     },
     DEL_USER(state, index) {
-      state.users.splice(index, 1);
+      state.onlineUsers.splice(index, 1);
     },
     INCREMENT_USER_GAMES(state) {
       ++state.user.games;
@@ -45,10 +45,10 @@ export default new Vuex.Store({
       ++state.user.wins;
     },
     INCREMENT_USERS_GAMES(state, index) {
-      ++state.users[index].games;
+      ++state.onlineUsers[index].games;
     },
     INCREMENT_USERS_WINS(state, index) {
-      ++state.users[index].wins;
+      ++state.onlineUsers[index].wins;
     },
     SET_AUTHORIZE(state, status) {
       state.authorized = status;
@@ -58,7 +58,7 @@ export default new Vuex.Store({
       state.user.password = null;
     },
     SET_USERS(state, users) {
-      state.users = users;
+      state.onlineUsers = users;
     },
     SET_ENEMY(state, enemy) {
       state.enemy = enemy;
@@ -70,10 +70,10 @@ export default new Vuex.Store({
       state.user.url_avatar = avatar;
     },
     SET_USERS_STATUS(state, data) {
-      state.users[data.index].status = data.status;
+      state.onlineUsers[data.index].status = data.status;
     },
     SET_USERS_URL_AVATAR(state, data) {
-      state.users[data.index].url_avatar = data.url_avatar;
+      state.onlineUsers[data.index].url_avatar = data.url_avatar;
     },
     SET_ENEMY_STATUS(state, status) {
       state.enemy.status = status;
@@ -97,7 +97,9 @@ export default new Vuex.Store({
   },
   getters: {
     usersExceptByName(state) {
-      return state.users.filter((users) => users.login !== state.user.login);
+      return state.onlineUsers.filter(
+        (users) => users.login !== state.user.login
+      );
     },
   },
   modules: {

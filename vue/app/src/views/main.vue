@@ -120,7 +120,7 @@ export default {
   },
   mounted() {
     if (!this.authorized) {
-      this.$router.push("login");
+      this.$router.push({ name: "login" });
     }
     document.addEventListener("keyup", this.stopPlatform);
     document.addEventListener("keydown", this.keyEvents);

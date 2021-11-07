@@ -14,11 +14,11 @@ export class GameHistory {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_one_id' })
-  userOneId: User;
+  userOne: User;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_two_id' })
-  userTwoId: User;
+  userTwo: User;
 
   @Column()
   winner_id: number;

@@ -2,15 +2,16 @@
   <span></span>
 </template>
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import eventService from "../services/eventService";
 
 export default {
   computed: {
-    ...mapState(["eventSource", "users", "user", "enemy"]),
+    ...mapState(["eventSource", "onlineUsers", "user", "enemy"]),
     ...mapState("game", ["you", "enemy", "ball", "starter"]),
   },
   methods: {
+    ...mapMutations("profile", ["UPDATE_USER_AVATAR_IN_HISTORY"]),
     ...mapMutations([
       "ADD_USER",
       "CREATE_EVENT_SOURCE",
@@ -54,13 +55,13 @@ export default {
     addUser(event) {
       const user = JSON.parse(event.data);
       let i = 0;
-      while (i < this.users.length) {
-        if (this.users[i].login === user.login) {
+      while (i < this.onlineUsers.length) {
+        if (this.onlineUsers[i].login === user.login) {
           break;
         }
         ++i;
       }
-      if (i === this.users.length) {
+      if (i === this.onlineUsers.length) {
         this.ADD_USER(user);
       }
     },
@@ -76,11 +77,11 @@ export default {
           this.INCREMENT_USER_WINS();
         }
       }
-      while (i < this.users.length) {
-        if (this.users[i].login === stats.winner) {
+      while (i < this.onlineUsers.length) {
+        if (this.onlineUsers[i].login === stats.winner) {
           this.INCREMENT_USERS_GAMES(i);
           this.INCREMENT_USERS_WINS(i);
-        } else if (this.users[i].login === stats.looser) {
+        } else if (this.onlineUsers[i].login === stats.looser) {
           this.INCREMENT_USERS_GAMES(i);
         }
         ++i;
@@ -89,8 +90,8 @@ export default {
     logoutSSE(event) {
       const user = JSON.parse(event.data);
       let index = 0;
-      while (index < this.users.length) {
-        if (this.users[index].login === user.login) {
+      while (index < this.onlineUsers.length) {
+        if (this.onlineUsers[index].login === user.login) {
           this.DEL_USER(index);
           return;
         }
@@ -100,8 +101,8 @@ export default {
     updateUser(event) {
       const user = JSON.parse(event.data);
       let index = 0;
-      while (index < this.users.length) {
-        if (this.users[index].login === user.login) {
+      while (index < this.onlineUsers.length) {
+        if (this.onlineUsers[index].login === user.login) {
           this.SET_USERS_STATUS({
             index: index,
             status: user.status,
@@ -122,6 +123,7 @@ export default {
         this.SET_ENEMY_URL_AVATAR(user.url_avatar);
         this.SET_ENEMY_STATUS(user.status);
       }
+      this.UPDATE_USER_AVATAR_IN_HISTORY(user);
     },
     setEnemy(event) {
       const enemy = JSON.parse(event.data);

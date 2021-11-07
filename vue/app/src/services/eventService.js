@@ -11,6 +11,9 @@ const apiClient = axios.create({
 });
 
 export default {
+  async users() {
+    return await apiClient.get("/users/getAll");
+  },
   async login(login) {
     return await apiClient.post("/users/login", { login: login });
   },

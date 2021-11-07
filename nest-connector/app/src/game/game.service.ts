@@ -66,8 +66,8 @@ export class GameService {
   async createHistory(winner, looser) {
     const new_game = this.GameHistory.create();
     new_game.id = ++this.id;
-    new_game.userOneId = winner;
-    new_game.userTwoId = looser;
+    new_game.userOne = winner;
+    new_game.userTwo = looser;
     new_game.winner_id = winner.id;
     await this.GameHistory.manager.save(new_game);
   }
