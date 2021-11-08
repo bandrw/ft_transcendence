@@ -107,15 +107,6 @@ export class UsersController {
 		}
 	}
 
-	// @Get('checkExist')
-	// async checkExist(@Query('login') login) {
-	// 	const r = await this.UsersService.usersRepository.findOne({
-	// 		where: { login: login },
-	// 	});
-	// 	if (r) return { ok: true, msg: r };
-	// 	return { ok: false, msg: "User doesn't exist" };
-	// }
-
 	async emitter(login: string, socketId: string) {
 		if (!login)
 			throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);

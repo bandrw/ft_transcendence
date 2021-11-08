@@ -3,6 +3,8 @@ import { GameEntity } from "game/game.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserSubscription } from "users/entities/subscription.entity";
 
+import { MessageEntity } from "../../message/message.entity";
+
 @Entity({ name: 'users' })
 export class User {
 	@PrimaryGeneratedColumn()
@@ -34,4 +36,7 @@ export class User {
 
 	@OneToMany(() => ChatEntity, chat => chat.userTwo)
 	acceptedChats: ChatEntity[];
+
+	@OneToMany(() => MessageEntity, message => message.fromUser)
+	messages: MessageEntity[]
 }

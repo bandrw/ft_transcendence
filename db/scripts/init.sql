@@ -59,3 +59,22 @@ CREATE TABLE "chats"
 		REFERENCES "users"("id")
 		ON DELETE SET NULL
 );
+
+CREATE TABLE "messages"
+(
+	"id" serial PRIMARY KEY,
+	"chatId" INTEGER,
+	"fromUserId" INTEGER,
+	"text" TEXT,
+	"date" TIMESTAMP DEFAULT NOW() NOT NULL,
+
+	CONSTRAINT "fk_chatId"
+		FOREIGN KEY("chatId")
+		REFERENCES "chats"("id")
+		ON DELETE SET NULL,
+
+	CONSTRAINT "fk_fromUserId"
+		FOREIGN KEY("fromUserId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL
+);

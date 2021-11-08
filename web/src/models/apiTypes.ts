@@ -106,12 +106,21 @@ type ApiChat = {
 	userTwoId: number,
 }
 
+type ApiMessage = {
+	id: number,
+	chatId: number,
+	fromUserId: number,
+	text: string,
+	date: number
+}
+
 type ApiChatExpand = {
 	id: number,
 	userOneId: number,
 	userTwoId: number,
 	userOne: ApiUser,
-	userTwo: ApiUser
+	userTwo: ApiUser,
+	messages: ApiMessage[]
 }
 
 export type {
@@ -120,6 +129,7 @@ export type {
 	ApiGame,
 	ApiGameLoop,
 	ApiGameSettings,
+	ApiMessage,
 	ApiUpdateUser,
 	ApiUser,
 	ApiUserCreate,

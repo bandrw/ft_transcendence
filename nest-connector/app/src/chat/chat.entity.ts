@@ -1,5 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "users/entities/user.entity";
+
+import { MessageEntity } from "../message/message.entity";
 
 @Entity({ name: 'chats' })
 export class ChatEntity {
@@ -19,4 +21,7 @@ export class ChatEntity {
 	@ManyToOne(() => User, user => user.acceptedChats)
 	@JoinColumn({ name: 'userTwoId' })
 	userTwo: User
+
+	@OneToMany(() => MessageEntity, message => message.chat)
+	messages: MessageEntity[]
 }

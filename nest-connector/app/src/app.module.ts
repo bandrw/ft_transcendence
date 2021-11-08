@@ -5,11 +5,11 @@ import { AppController } from 'app.controller';
 import { AppService } from 'app.service';
 import { ChatEntity } from "chat/chat.entity";
 import { ChatModule } from 'chat/chat.module';
-import { CssController } from 'css/css.controller';
 import { GameEntity } from "game/game.entity";
 import { GameModule } from 'game/game.module';
-import { JsController } from 'js/js.controller';
 import { LadderModule } from 'ladder/ladder.module';
+import { MessageEntity } from "message/message.entity";
+import { MessageModule } from 'message/message.module';
 import { UserSubscription } from "users/entities/subscription.entity";
 import { User } from 'users/entities/user.entity';
 import { UsersModule } from 'users/users.module';
@@ -23,7 +23,7 @@ import { UsersModule } from 'users/users.module';
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRES_PASSWORD,
 			database: process.env.POSTGRES_DB,
-			entities: [User, GameEntity, UserSubscription, ChatEntity],
+			entities: [User, GameEntity, UserSubscription, ChatEntity, MessageEntity],
 			retryAttempts: 50,
 			retryDelay: 5000
 		}),
@@ -32,8 +32,9 @@ import { UsersModule } from 'users/users.module';
 		GameModule,
 		EventEmitterModule.forRoot(),
 		ChatModule,
+		MessageModule,
 	],
-	controllers: [AppController, CssController, JsController],
+	controllers: [AppController],
 	providers: [AppService],
 })
 export class AppModule {}

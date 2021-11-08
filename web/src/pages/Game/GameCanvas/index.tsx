@@ -76,11 +76,17 @@ const GameCanvas = ({ watchMode, currentUser, gameSettings, gameRef, setStatus }
 			}
 		};
 
-		socket.on('gameResults', data => gameResultsHandler(data));
-		socket.on('gameLoop', data => gameLoopHandler(data));
-		socket.on('gameScore', data => gameScoreHandler(data));
-		socket.on('playSound', data => playSoundHandler(data));
-		console.log('[GameCanvas] socket listeners added');
+		socket.on('gameResults', gameResultsHandler);
+		socket.on('gameLoop', gameLoopHandler);
+		socket.on('gameScore', gameScoreHandler);
+		socket.on('playSound', playSoundHandler);
+
+		return () => {
+			socket.off('gameResults', gameResultsHandler);
+			socket.off('gameLoop', gameLoopHandler);
+			socket.off('gameScore', gameScoreHandler);
+			socket.off('playSound', playSoundHandler);
+		};
 
 	}, [ball, leftPlayer, rightPlayer, score, socket]);
 

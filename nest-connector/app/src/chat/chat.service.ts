@@ -34,8 +34,8 @@ export class ChatService {
 		let r2: ChatEntity[];
 
 		if (expand) {
-			r1 = await this.chatRepository.find({ where: { userOneId: userId }, relations: ['userOne', 'userTwo'] });
-			r2 = await this.chatRepository.find({ where: { userTwoId: userId }, relations: ['userOne', 'userTwo'] });
+			r1 = await this.chatRepository.find({ where: { userOneId: userId }, relations: ['userOne', 'userTwo', 'messages'] });
+			r2 = await this.chatRepository.find({ where: { userTwoId: userId }, relations: ['userOne', 'userTwo', 'messages'] });
 		} else {
 			r1 = await this.chatRepository.find({ where: { userOneId: userId } });
 			r2 = await this.chatRepository.find({ where: { userTwoId: userId } });
@@ -46,6 +46,15 @@ export class ChatService {
 		for (let i = 0; i < r2.length; ++i)
 			chats.push(r2[i]);
 
+		for (let i = 0; i < chats.length; ++i)
+			chats[i].messages.sort((msg1, msg2) => msg1.date - msg2.date);
+
 		return chats;
+	}
+
+	async getChat(id: number, expand = false): Promise<ChatEntity> {
+		if (expand)
+			return await this.chatRepository.findOne({ where: { id: id }, relations: ['userOne', 'userTwo', 'messages'] });
+		return await this.chatRepository.findOne({ where: { id: id } });
 	}
 }

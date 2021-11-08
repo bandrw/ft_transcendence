@@ -115,12 +115,19 @@ const Main: React.FC<MainProps> = ({
 			setStatus(ApiUserStatus.InGame);
 		};
 
-		socket.on('logout', data => logoutHandler(data));
-		socket.on('updateUser', data => updateUserHandler(data));
-		socket.on('enemy', data => enemyHandler(data));
-		socket.on('gameIsReady', () => gameIsReadyHandler());
-		socket.on('gameSettings', data => gameSettingsHandler(data));
-		// console.log('[Main] listeners added');
+		socket.on('logout', logoutHandler);
+		socket.on('updateUser', updateUserHandler);
+		socket.on('enemy', enemyHandler);
+		socket.on('gameIsReady', gameIsReadyHandler);
+		socket.on('gameSettings', gameSettingsHandler);
+
+		return () => {
+			socket.off('logout', logoutHandler);
+			socket.off('updateUser', updateUserHandler);
+			socket.off('enemy', enemyHandler);
+			socket.off('gameIsReady', gameIsReadyHandler);
+			socket.off('gameSettings', gameSettingsHandler);
+		};
 
 	}, [currentUser, setStatus, setOnlineUsers, socket, enemyRef, gameSettingsRef, onlineUsersRef]);
 
