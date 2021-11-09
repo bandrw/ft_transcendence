@@ -4,7 +4,7 @@ import { faBullhorn, faComment, faPlus } from "@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChatExpand, ApiMessage } from "models/apiTypes";
+import { ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Main/Messenger/Chat";
 import Contact from "pages/Main/Messenger/Contact";
@@ -12,14 +12,16 @@ import React from "react";
 import { Fade } from "react-awesome-reveal";
 
 interface MessengerProps {
-	currentUser: User
+	currentUser: User,
+	allUsers: ApiUserExpand[]
 }
 
-const Messenger = ({ currentUser }: MessengerProps) => {
+const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	const socket = React.useContext(SocketContext);
 	const [chats, setChats] = React.useState<ApiChatExpand[]>([]);
 	const [selectedChat, setSelectedChat] = React.useState<ApiChatExpand | null>(null);
 	const [showCreateMenu, setShowCreateMenu] = React.useState(false);
+	const [chatState, setChatState] = React.useState('default');
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -61,13 +63,20 @@ const Messenger = ({ currentUser }: MessengerProps) => {
 			});
 		};
 
+		const newChatHandler = (): void => {
+			axios.get<ApiChatExpand[]>('/chat', { params: { userId: currentUser.id, expand: true } })
+				.then(res => setChats(res.data));
+		};
+
 		socket.on('receiveMessage', receiveMessageHandler);
+		socket.on('newChat', newChatHandler);
 
 		return () => {
 			socket.off('receiveMessage', receiveMessageHandler);
+			socket.off('newChat', newChatHandler);
 		};
 
-	}, [socket]);
+	}, [currentUser.id, socket]);
 
 	setTimeout(() => {
 		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
@@ -107,7 +116,7 @@ const Messenger = ({ currentUser }: MessengerProps) => {
 													className='messenger-contacts-header-menu-btn'
 													onClick={ () => {
 														setShowCreateMenu(false);
-														alert('todo');
+														setChatState('newChat');
 													} }
 												>
 													<FontAwesomeIcon icon={ faComment }/>
@@ -117,7 +126,7 @@ const Messenger = ({ currentUser }: MessengerProps) => {
 													className='messenger-contacts-header-menu-btn'
 													onClick={ () => {
 														setShowCreateMenu(false);
-														alert('todo');
+														setChatState('newChannel');
 													} }
 												>
 													<FontAwesomeIcon icon={ faBullhorn }/>
@@ -145,12 +154,23 @@ const Messenger = ({ currentUser }: MessengerProps) => {
 							);
 						})
 					}
+					{
+						chats.length === 0 &&
+						<div className='messenger-contacts-empty-msg'>You have no chats yet</div>
+					}
 				</div>
 				<Chat
 					currentUser={ currentUser }
 					selectedChat={ selectedChat }
 					closeSelectedChat={ () => setSelectedChat(null) }
 					messages={ selectedChat?.messages || [] }
+					chatState={ chatState }
+					setDefaultChatState={ () => {
+						setChatState('default');
+						setSelectedChat(null);
+					} }
+					allUsers={ allUsers }
+					chats={ chats }
 				/>
 			</div>
 		</div>

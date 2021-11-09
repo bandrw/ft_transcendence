@@ -74,17 +74,22 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 		const passwordConfirm = passwordConfirmRef.current?.value.trim().toLowerCase() || '';
 
 		if (!validateInput(login, password, passwordConfirm, setErrors))
-			return;
+			return ;
 
 		setIsLoading(true);
 		setErrors('');
 		const user = await axios.get<ApiUser>('/users', {
 			params: { login: login }
 		}).then(res => res).catch(err => err.response);
+		if (!user) {
+			setErrors('Error');
+			setIsLoading(false);
+			return ;
+		}
 		if (user.status === 200) {
 			setErrors('User with this login already exists');
 			setIsLoading(false);
-			return;
+			return ;
 		}
 
 		const hashedPassword = await bcryptjs.hash(password, 10);

@@ -184,6 +184,7 @@ const Main: React.FC<MainProps> = ({
 				>
 					<Messenger
 						currentUser={ currentUser }
+						allUsers={ allUsers }
 					/>
 				</Fade>
 			</div>

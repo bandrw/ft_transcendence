@@ -2,8 +2,9 @@ import './styles.scss';
 
 import { faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChatExpand, ApiMessage } from "models/apiTypes";
+import { ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
 import Message from "pages/Main/Messenger/Chat/Message";
 import React from "react";
@@ -12,13 +13,20 @@ interface ChatProps {
 	currentUser: User,
 	selectedChat: ApiChatExpand | null,
 	closeSelectedChat: () => void,
-	messages: ApiMessage[]
+	messages: ApiMessage[],
+	chatState: string,
+	setDefaultChatState: () => void,
+	allUsers: ApiUserExpand[],
+	chats: ApiChatExpand[]
 }
 
-const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages }: ChatProps) => {
+const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages, chatState, setDefaultChatState, allUsers, chats }: ChatProps) => {
 	const socket = React.useContext(SocketContext);
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const companion = selectedChat?.userOne?.login === currentUser.username ? selectedChat?.userTwo : selectedChat?.userOne;
+	const chatsToCreate: ApiUserExpand[] = allUsers.filter(usr =>
+		!chats.find(chat => chat.userOne.id === usr.id || chat.userTwo.id === usr.id) && usr.id !== currentUser.id
+	);
 
 	const sendMsg = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -35,10 +43,63 @@ const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages }: ChatPr
 		}
 	};
 
+	if (chatState === 'newChat')
+		return (
+			<div className='messenger-chat'>
+				<div className='messenger-chat-info'>
+					<div>
+						Create a new chat
+					</div>
+					<button
+						className='messenger-chat-close-btn'
+						onClick={ setDefaultChatState }
+						title='Close'
+					>
+						<FontAwesomeIcon icon={ faTimes }/>
+					</button>
+				</div>
+				<div className='messenger-create-chat'>
+					<p>Select a user</p>
+					{
+						allUsers
+							.filter(usr => chatsToCreate.find(u => usr.login === u.login))
+							.map((usr, i) =>
+								<div
+									className='messenger-create-chat-user'
+									key={ i }
+									onClick={ () => {
+										const data = {
+											userOneId: currentUser.id,
+											userTwoId: usr.id
+										};
+										axios.post('/chat/create', data)
+											.then(res => {
+												console.log(res);
+												setDefaultChatState();
+											});
+									} }
+								>
+									<div className='messenger-create-chat-user-img' style={ { backgroundImage: `url(${usr.url_avatar})` } }/>
+									<div className='messenger-create-chat-user-login'>
+										{ usr.login }
+									</div>
+								</div>
+							)
+					}
+				</div>
+			</div>
+		);
+
 	if (!selectedChat)
 		return (
 			<div className='messenger-chat'>
-				<div className='messenger-chat-empty-msg'>Select a chat</div>
+				<div className='messenger-chat-empty-msg'>
+					{
+						chats.length === 0
+							? 'Create a chat'
+							: 'Select a chat'
+					}
+				</div>
 			</div>
 		);
 

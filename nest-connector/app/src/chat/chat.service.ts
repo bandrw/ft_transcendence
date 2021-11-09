@@ -1,12 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { ChatEntity } from "chat/chat.entity";
 import { Repository } from "typeorm";
+import { UsersService } from "users/users.service";
 
 @Injectable()
 export class ChatService {
 	@InjectRepository(ChatEntity)
 	private chatRepository: Repository<ChatEntity>;
+	@Inject()
+	private usersService: UsersService;
 
 	async createChat(userOneId: number, userTwoId: number): Promise<ChatEntity> {
 		if (userOneId === userTwoId)
@@ -22,7 +25,16 @@ export class ChatService {
 			const chat = this.chatRepository.create();
 			chat.userOneId = userOneId;
 			chat.userTwoId = userTwoId;
-			return await this.chatRepository.save(chat);
+			const r = await this.chatRepository.save(chat);
+
+			const u1 = this.usersService.onlineUsers.find(usr => usr.id === r.userOneId);
+			if (u1)
+				u1.socket.emit('newChat', JSON.stringify(r));
+			const u2 = this.usersService.onlineUsers.find(usr => usr.id === r.userTwoId);
+			if (u2)
+				u2.socket.emit('newChat', JSON.stringify(r));
+
+			return r;
 		} catch (e) {
 			throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
 		}
