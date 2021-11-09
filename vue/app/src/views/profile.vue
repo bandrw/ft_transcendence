@@ -1,9 +1,10 @@
 <template>
   <div id="user_profile">
     <img :src="user.url_avatar" id="user_profile_avatar" alt="" />
+    <h4 id="user_login">{{ user.login }}</h4>
     <b-icon-arrow-clockwise
-      scale="3.25"
-      shift-v="3.25"
+      scale="2"
+      shift-v="2"
       aria-hidden="true"
       id="user_update_avatar"
       v-on:click="updateAvatar"
@@ -31,31 +32,70 @@
       v-on:click="closeProfile"
       aria-hidden="true"
     ></b-icon-x-circle>
-    <div id="game_history">
-      <div v-for="game in history" :key="game.id">
-        <div class="winner_history">
-          <p>winner: {{ game.user_one.login }}</p>
-          <img :src="game.user_one.url_avatar" alt="" />
-        </div>
-        <div class="looser_history">
-          <p>looser: {{ game.user_two.login }}</p>
-          <img :src="game.user_two.url_avatar" alt="" />
-        </div>
-      </div>
+    <table id="game_history">
+      <tr>
+        <th colspan="2"><p>winner</p></th>
+        <th><p>score</p></th>
+        <th colspan="2"><p>looser</p></th>
+        <th><p>score</p></th>
+      </tr>
+      <tr v-for="game in this.currentPageInHistory" :key="game.id">
+        <td>
+          <p>{{ game.user_one.login }}</p>
+        </td>
+        <td>
+          <img
+            :src="game.user_one.url_avatar"
+            alt=""
+            class="game_history_avatar"
+          />
+        </td>
+        <td>
+          <p>{{ game.score_one }}</p>
+        </td>
+        <td>
+          <img
+            :src="game.user_two.url_avatar"
+            alt=""
+            class="game_history_avatar"
+          />
+        </td>
+        <td>
+          <p>{{ game.user_two.login }}</p>
+        </td>
+        <td>
+          <p>{{ game.score_two }}</p>
+        </td>
+      </tr>
+    </table>
+    <div>
+      <p id="current_page">current page: {{ this.page }}</p>
+      <b-button-group id="history_buttons">
+        <b-button @click="decrementPage"><p>left</p></b-button>
+        <b-button @click="incrementPage"><p>right</p></b-button>
+      </b-button-group>
     </div>
   </div>
 </template>
 
 <script>
 import eventService from "../services/eventService";
-import { mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
   props: ["username"],
   computed: {
     ...mapState("game", ["gameInProgress"]),
     ...mapState(["user", "authorized"]),
-    ...mapState("profile", ["profile", "history"]),
+    ...mapState("profile", [
+      "profile",
+      "currentPageInHistory",
+      "arrayPage",
+      "history",
+    ]),
+    page() {
+      return this.arrayPage + 1;
+    },
     winPercent() {
       if (isNaN(this.user.wins / this.user.games)) {
         return 0;
@@ -73,6 +113,13 @@ export default {
       "SET_USERS",
     ]),
     ...mapMutations("profile", ["SET_PROFILE"]),
+    ...mapActions("profile", ["updatePageFromHistory"]),
+    decrementPage() {
+      this.updatePageFromHistory(this.page - 1);
+    },
+    incrementPage() {
+      this.updatePageFromHistory(this.page + 1);
+    },
     closeProfile() {
       this.SET_PROFILE(!this.profile);
       this.$router.push({ name: "main" });
@@ -84,47 +131,58 @@ export default {
       this.SET_NEW_USER_AVATAR(avatar);
     },
   },
+  mounted() {
+    this.updatePageFromHistory(1);
+  },
 };
 </script>
 
 <style scoped>
-.winner_history > p {
-  color: green;
-  /*position: absolute;*/
-  left: 15%;
+#current_page {
+  text-align: center;
+  right: 35%;
+  top: 80%;
+  position: absolute;
 }
 
-.looser_history > p {
-  color: red;
-  /*position: absolute;*/
-  right: 15%;
+table,
+th,
+td {
+  border: 2px solid beige;
+  border-radius: 15px;
 }
 
-.winner_history > img {
-  /*position: absolute;*/
-  left: 15%;
-  width: 15%;
-  height: 15%;
+#user_login {
+  text-align: center;
+  top: 5%;
 }
 
-.looser_history > img {
-  /*position: absolute;*/
-  right: 15%;
-  width: 15%;
-  height: 15%;
+.game_history_avatar {
+  width: 25%;
+  height: 25%;
 }
 
 #game_history {
   position: absolute;
   top: 38%;
-  right: 25%;
-  width: 50%;
+  left: 1%;
+  width: 69%;
   height: 40%;
+  background-color: aqua;
+}
+
+#history_buttons {
+  position: absolute;
+  top: 84%;
+  left: 45%;
+  width: 25%;
+  height: 5%;
   background-color: aqua;
 }
 
 p {
   font-weight: bold;
+  font-size: small;
 }
 
 #game_stats {
@@ -134,7 +192,7 @@ p {
   left: 25%;
   top: 12%;
   height: 20%;
-  width: 65%;
+  width: 45%;
   background-color: darkolivegreen;
 }
 
@@ -173,16 +231,16 @@ p {
   position: absolute;
   top: 1%;
   right: 1%;
-  width: 10%;
-  height: 10%;
+  width: 9%;
+  height: 9%;
 }
 
 #user_profile_avatar {
   position: absolute;
   left: 1%;
   top: 1%;
-  width: 25%;
-  height: 25%;
+  width: 24%;
+  height: 24%;
 }
 
 #user_update_avatar {

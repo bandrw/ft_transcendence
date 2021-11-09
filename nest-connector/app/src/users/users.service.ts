@@ -68,10 +68,10 @@ export class UsersService {
     }
     return ret;
   }
+
   userEvent(event: string, user: OnlineUser) {
     let i = 0;
     while (i < this.onlineUsers.length) {
-      // if (this.onlineUsers[i].login != user.login) {
       this.onlineUsers[i].resp.write(
         'event: ' +
           event +
@@ -83,7 +83,6 @@ export class UsersService {
           }) +
           '\n\n',
       );
-      // }
       ++i;
     }
   }

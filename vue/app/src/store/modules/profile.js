@@ -4,6 +4,9 @@ export const state = {
   profile: false,
   users: [],
   history: [],
+  arrayPage: 0,
+  rowsPerPage: 3,
+  currentPageInHistory: [],
 };
 
 export const mutations = {
@@ -16,6 +19,9 @@ export const mutations = {
   ADD_HISTORY(state, new_game_in_history) {
     state.history.unshift(new_game_in_history);
   },
+  SET_CURRENT_PAGE_IN_HISTORY(state, page) {
+    state.currentPageInHistory = page;
+  },
   UPDATE_USER_AVATAR_IN_HISTORY(state, user) {
     let i = 0;
     while (i < state.history.length) {
@@ -25,6 +31,28 @@ export const mutations = {
         state.history[i].user_two.url_avatar = user.url_avatar;
       }
       ++i;
+    }
+  },
+  UPDATE_PAGE_NUMBER(state, pageNumber) {
+    state.arrayPage = pageNumber;
+  },
+};
+
+export const actions = {
+  updatePageFromHistory({ state, commit }, pageNumber) {
+    if (
+      pageNumber > 0 &&
+      (pageNumber - 1) * state.rowsPerPage < state.history.length
+    ) {
+      commit("UPDATE_PAGE_NUMBER", pageNumber - 1);
+      const page = [];
+      const i = state.arrayPage * state.rowsPerPage;
+      let k = 0;
+      while (i + k < state.history.length && k < state.rowsPerPage) {
+        page.push(state.history[i + k]);
+        ++k;
+      }
+      commit("SET_CURRENT_PAGE_IN_HISTORY", page);
     }
   },
 };

@@ -11,7 +11,10 @@ export default {
     ...mapState("game", ["you", "enemy", "ball", "starter"]),
   },
   methods: {
-    ...mapMutations("profile", ["UPDATE_USER_AVATAR_IN_HISTORY"]),
+    ...mapMutations("profile", [
+      "UPDATE_USER_AVATAR_IN_HISTORY",
+      "ADD_HISTORY",
+    ]),
     ...mapMutations([
       "ADD_USER",
       "CREATE_EVENT_SOURCE",
@@ -194,6 +197,9 @@ export default {
       this.CLEAR_LADDER();
       this.SET_ENEMY(null);
     },
+    addHistory(event) {
+      this.ADD_HISTORY(JSON.parse(event.data));
+    },
     listenEvents() {
       this.CREATE_EVENT_SOURCE({
         login: this.user.login,
@@ -212,6 +218,7 @@ export default {
       this.eventSource.addEventListener("gameSettings", this.gameSettings);
       this.eventSource.addEventListener("ballLaunch", this.ballLaunch);
       this.eventSource.addEventListener("enemyPosition", this.enemyPosition);
+      this.eventSource.addEventListener("addHistory", this.addHistory);
       this.eventSource.addEventListener(
         "enemyHasLeaveGame",
         this.enemyHasLeaveGame

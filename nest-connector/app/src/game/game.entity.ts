@@ -16,9 +16,15 @@ export class GameHistory {
   @JoinColumn({ name: 'user_one_id' })
   userOne: User;
 
+  @Column({ name: 'score_one', default: 0 })
+  score_one: number;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_two_id' })
   userTwo: User;
+
+  @Column({ name: 'score_two', default: 0 })
+  score_two: number;
 
   @Column()
   winner_id: number;

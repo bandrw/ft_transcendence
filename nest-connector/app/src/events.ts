@@ -73,9 +73,6 @@ export class Events implements OnGatewayDisconnect {
       }
       ++i;
     }
-    // const history = await this.gameService.GameHistory.find({
-    //   where: [{ user_one_id: user.id }, { user_two_id: user.id }],
-    // });
     if (user) {
       const history = await getConnection()
         .createQueryBuilder()
@@ -85,7 +82,6 @@ export class Events implements OnGatewayDisconnect {
         .orWhere('user_two_id = :id', { id: user.id })
         .orderBy('data', 'DESC')
         .execute();
-      console.log(history);
       client.emit('userEntity', {
         user: user,
         socketId: client.id,

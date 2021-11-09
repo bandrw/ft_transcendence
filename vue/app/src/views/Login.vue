@@ -66,8 +66,6 @@ export default {
       const users = await eventService.users().then(function (event) {
         return event.data;
       });
-      console.log(users);
-      console.log(users.length);
       let i = 0;
       let k;
       while (i < history.length) {
@@ -103,7 +101,6 @@ export default {
           this.error = null;
           this.$refs.eventSource.listenEvents();
           const history = await this.joinUsersEntitiesToHistory(data.history);
-          console.log(history);
           this.SET_HISTORY({ history: history });
           await this.$router.push("main");
         } else {

@@ -92,7 +92,7 @@ export default {
     },
     escapeEvents(event) {
       if (this.authorized && !this.game && !this.enemy) {
-        this.$refs.profile.logout();
+        this.logout();
       } else if (this.authorized && this.game) {
         if (!this.enemy) {
           this.$refs.Ladder.cancelFind(event);
@@ -144,7 +144,7 @@ export default {
   position: absolute;
   top: 25%;
   right: 1%;
-  border-radius: 10%;
+  border-radius: 11px;
 }
 
 #user_profile_button {
@@ -154,12 +154,10 @@ export default {
   position: absolute;
   top: 25%;
   left: 1%;
-  border-radius: 8%;
+  border-radius: 11px;
 }
 
 #user_authorized {
-  min-width: 100px;
-  min-height: 50px;
   width: 90%;
   height: 25%;
   position: absolute;
