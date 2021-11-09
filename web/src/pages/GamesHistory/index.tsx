@@ -10,7 +10,7 @@ import moment from "moment";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
 import Moment from "react-moment";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, Redirect, useParams } from "react-router-dom";
 
 export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');
@@ -42,19 +42,6 @@ interface GamesHistoryProps {
 }
 
 const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHistoryProps) => {
-	const history = useHistory();
-
-	React.useEffect(() => {
-		if (!currentUser.isAuthorized()) {
-			history.push('/login');
-		}
-	}, [history, currentUser]);
-
-	React.useEffect(() => {
-		if (status === ApiUserStatus.InGame)
-			history.push('/game');
-	}, [history, status]);
-
 	const params = useParams<{ login: string }>();
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 
@@ -80,6 +67,9 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 			isMounted = false;
 		};
 	}, [currentUser.username, params.login]);
+
+	if (!currentUser.isAuthorized())
+		return <Redirect to='/login'/>;
 
 	return (
 		<div>

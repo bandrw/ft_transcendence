@@ -10,7 +10,7 @@ import RecentGames from "pages/Main/RecentGames";
 import Social from "pages/Main/Social";
 import React  from 'react';
 import { Fade } from 'react-awesome-reveal';
-import { useHistory } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 interface MainProps {
 	currentUser: User,
@@ -37,18 +37,6 @@ const Main: React.FC<MainProps> = ({
 																		 setOnlineUsers,
 																		 onlineUsersRef
 	}) => {
-	const history = useHistory();
-
-	React.useEffect(() => {
-		if (!currentUser.isAuthorized()) {
-			history.push('/login');
-		}
-	}, [history, currentUser]);
-
-	React.useEffect(() => {
-		if (status === ApiUserStatus.InGame)
-			history.push('/game');
-	}, [history, status]);
 
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
 	const statusRef = React.useRef(status);
@@ -130,6 +118,9 @@ const Main: React.FC<MainProps> = ({
 		};
 
 	}, [currentUser, setStatus, setOnlineUsers, socket, enemyRef, gameSettingsRef, onlineUsersRef]);
+
+	if (!currentUser.isAuthorized())
+		return <Redirect to='/login'/>;
 
 	return (
 		<div className='main'>

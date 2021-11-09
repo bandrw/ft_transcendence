@@ -117,7 +117,6 @@ const App = () => {
 						currentUser={ currentUser }
 						setCurrentUser={ setCurrentUser }
 						gameSettingsRef={ gameSettingsRef }
-						// eventSourceRef={ eventSourceRef }
 						gameRef={ gameRef }
 						status={ status }
 						setStatus={ setStatus }

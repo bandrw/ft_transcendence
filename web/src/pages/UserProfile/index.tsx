@@ -11,7 +11,7 @@ import { GameTime } from "pages/GamesHistory";
 import FriendsList from "pages/UserProfile/FriendsList";
 import ListSection from "pages/UserProfile/ListSection";
 import React from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, Redirect, useParams } from "react-router-dom";
 
 enum SubscribeBtnState {
 	Default,
@@ -179,7 +179,6 @@ interface UserProfileProps {
 }
 
 const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProfileProps) => {
-	const history = useHistory();
 	const params = useParams<{ login: string }>();
 	const [user, setUser] = React.useState<ApiUserExpand | null>(null);
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
@@ -195,17 +194,6 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 		}
 		setFriends(allUsers.filter(usr => friendsLogins.indexOf(usr.login) !== -1));
 	}, [allUsers, user]);
-
-	React.useEffect(() => {
-		if (!currentUser.isAuthorized()) {
-			history.push('/login');
-		}
-	}, [history, currentUser]);
-
-	React.useEffect(() => {
-		if (status === ApiUserStatus.InGame)
-			history.push('/game');
-	}, [history, status]);
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -229,6 +217,9 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 			isMounted = false;
 		};
 	}, [params.login]);
+
+	if (!currentUser.isAuthorized())
+		return <Redirect to='/login'/>;
 
 	let winRate = '-';
 	let gamesCount = '0';

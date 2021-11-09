@@ -8,14 +8,13 @@ import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import GameCanvas from "pages/Game/GameCanvas";
 import React from 'react';
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 
 interface GameProps {
 	enemyInfo: ApiUpdateUser | null,
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
-	// eventSourceRef: React.MutableRefObject<EventSource | null>,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
 	status: ApiUserStatus,
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
@@ -26,9 +25,6 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef
 	const history = useHistory();
 
 	React.useEffect(() => {
-		if (!currentUser.isAuthorized())
-			history.push('/login');
-
 		if (watchMode)
 			return ;
 
@@ -40,6 +36,9 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef
 	}, [history, enemyInfo, gameRef, setStatus, watchMode, currentUser]);
 
 	const [exitWindowShown, setExitWindowShown] = React.useState(false);
+
+	if (!currentUser.isAuthorized())
+		return <Redirect to='/login'/>;
 
 	// todo [handle watcher exit buttons]
 	return (
@@ -62,8 +61,6 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef
 							<ConfirmationWindow
 								title='Are you sure you want to exit the game?'
 								okHandler={ () => {
-									// if (gameRef.current.runs && gameRef.current.interval)
-									// 	clearInterval(gameRef.current.interval);
 									gameRef.current.runs = false;
 									setStatus(ApiUserStatus.Regular);
 									history.push('/');

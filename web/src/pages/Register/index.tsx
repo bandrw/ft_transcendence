@@ -7,7 +7,7 @@ import { ApiUser, ApiUserCreate } from "models/apiTypes";
 import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
-import { Link, useHistory } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 import { SocketContext } from "../../context/socket";
 
@@ -51,13 +51,7 @@ interface RegisterProps {
 }
 
 const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
-	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-
-	React.useEffect(() => {
-		if (currentUser.isAuthorized())
-			history.push('/');
-	}, [history, currentUser]);
 
 	const loginRef = React.createRef<HTMLInputElement>();
 	const passwordRef = React.createRef<HTMLInputElement>();
@@ -65,6 +59,9 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 
 	const [errors, setErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+	if (currentUser.isAuthorized())
+		return <Redirect to='/'/>;
 
 	const register = async (e: React.FormEvent) => {
 		e.preventDefault();

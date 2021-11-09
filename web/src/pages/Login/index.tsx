@@ -7,7 +7,7 @@ import { SocketContext } from "context/socket";
 import { ApiUserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
-import { Link, useHistory } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
 interface LoginProps {
@@ -44,19 +44,16 @@ export const signIn = async (
 };
 
 const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
-	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-
-	React.useEffect(() => {
-		if (currentUser.isAuthorized())
-			history.push('/');
-	}, [history, currentUser]);
 
 	const loginRef = React.createRef<HTMLInputElement>();
 	const passwordRef = React.createRef<HTMLInputElement>();
 
 	const [loginErrors, setLoginErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+	if (currentUser.isAuthorized())
+		return <Redirect to='/'/>;
 
 	return (
 		<div className='login-container'>
@@ -73,7 +70,8 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 				signIn(login, password, setCurrentUser, setLoginErrors, socket)
 					.then(() => {
 						setIsLoading(false);
-						history.push('/');
+						// history.push('/');
+						// return <Redirect to='/'/>;
 					})
 					.catch(() => {
 						setIsLoading(false);
