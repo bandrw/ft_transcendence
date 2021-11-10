@@ -3,13 +3,12 @@ import './styles.scss';
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
+import { SocketContext } from "context/socket";
 import { ApiUser, ApiUserCreate } from "models/apiTypes";
 import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
-import { Link, Redirect } from "react-router-dom";
-
-import { SocketContext } from "../../context/socket";
+import { Link, useHistory } from "react-router-dom";
 
 const validateInput = (
 	login: string,
@@ -51,6 +50,7 @@ interface RegisterProps {
 }
 
 const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
+	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 
 	const loginRef = React.createRef<HTMLInputElement>();
@@ -60,8 +60,10 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 	const [errors, setErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-	if (currentUser.isAuthorized())
-		return <Redirect to='/'/>;
+	React.useEffect(() => {
+		if (currentUser.isAuthorized())
+			history.push('/');
+	});
 
 	const register = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -75,15 +77,10 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 
 		setIsLoading(true);
 		setErrors('');
-		const user = await axios.get<ApiUser>('/users', {
+		const user = await axios.get<ApiUser | null>('/users', {
 			params: { login: login }
-		}).then(res => res).catch(err => err.response);
-		if (!user) {
-			setErrors('Error');
-			setIsLoading(false);
-			return ;
-		}
-		if (user.status === 200) {
+		}).then(res => res.data);
+		if (user) {
 			setErrors('User with this login already exists');
 			setIsLoading(false);
 			return ;

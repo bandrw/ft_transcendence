@@ -7,7 +7,7 @@ import { SocketContext } from "context/socket";
 import { ApiUserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
-import { Link, Redirect } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
 interface LoginProps {
@@ -40,26 +40,29 @@ export const signIn = async (
 			return false;
 		});
 	if (!r)
-		throw Error();
+		setErrors('Login error');
 };
 
 const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
+	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 
-	const loginRef = React.createRef<HTMLInputElement>();
-	const passwordRef = React.createRef<HTMLInputElement>();
+	const loginRef = React.useRef<HTMLInputElement>(null);
+	const passwordRef = React.useRef<HTMLInputElement>(null);
 
 	const [loginErrors, setLoginErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-	if (currentUser.isAuthorized())
-		return <Redirect to='/'/>;
+	React.useEffect(() => {
+		if (currentUser.isAuthorized())
+			history.push('/');
+	});
 
 	return (
 		<div className='login-container'>
 			<h1>Login page</h1>
 
-			<form onSubmit={ (e) => {
+			<form onSubmit={ async (e) => {
 				e.preventDefault();
 
 				setIsLoading(true);
@@ -67,16 +70,8 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 				const login = loginRef.current?.value || '';
 				const password = passwordRef.current?.value || '';
 
-				signIn(login, password, setCurrentUser, setLoginErrors, socket)
-					.then(() => {
-						setIsLoading(false);
-						// history.push('/');
-						// return <Redirect to='/'/>;
-					})
-					.catch(() => {
-						setIsLoading(false);
-						setLoginErrors('Wrong login or password');
-					});
+				await signIn(login, password, setCurrentUser, setLoginErrors, socket);
+				setIsLoading(false);
 			} }
 			>
 				<input

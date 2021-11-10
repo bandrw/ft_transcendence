@@ -8,9 +8,9 @@ import FindGame from "pages/Main/FindGame";
 import Messenger from "pages/Main/Messenger";
 import RecentGames from "pages/Main/RecentGames";
 import Social from "pages/Main/Social";
-import React  from 'react';
+import React from 'react';
 import { Fade } from 'react-awesome-reveal';
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 
 interface MainProps {
 	currentUser: User,
@@ -40,6 +40,7 @@ const Main: React.FC<MainProps> = ({
 
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
 	const statusRef = React.useRef(status);
+	const history = useHistory();
 
 	const socket = React.useContext(SocketContext);
 
@@ -118,6 +119,11 @@ const Main: React.FC<MainProps> = ({
 		};
 
 	}, [currentUser, setStatus, setOnlineUsers, socket, enemyRef, gameSettingsRef, onlineUsersRef]);
+
+	React.useEffect(() => {
+		if (status === ApiUserStatus.InGame)
+			history.push('/game');
+	});
 
 	if (!currentUser.isAuthorized())
 		return <Redirect to='/login'/>;

@@ -46,7 +46,7 @@ export class UsersController {
 		if (login) {
 			const user = await this.usersService.findOneByLogin(login, expand === 'true');
 			if (!user)
-				throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+				return null;
 			return user;
 		}
 		return await this.usersService.findAll(expand === 'true');

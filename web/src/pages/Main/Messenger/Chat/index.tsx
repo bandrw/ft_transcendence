@@ -73,10 +73,7 @@ const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages, chatStat
 											userTwoId: usr.id
 										};
 										axios.post('/chat/create', data)
-											.then(res => {
-												console.log(res);
-												setDefaultChatState();
-											});
+											.then(() => setDefaultChatState());
 									} }
 								>
 									<div className='messenger-create-chat-user-img' style={ { backgroundImage: `url(${usr.url_avatar})` } }/>
