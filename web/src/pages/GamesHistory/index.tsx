@@ -10,7 +10,7 @@ import moment from "moment";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
 import Moment from "react-moment";
-import { Link, Redirect, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');
@@ -48,7 +48,10 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiUserExpand>('/users', { params: { login: params.login, expand: true } })
+		axios.get<ApiUserExpand>('/users', {
+			params: { login: params.login, expand: true },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
 			.then(res => {
 				if (!isMounted)
 					return;
@@ -69,7 +72,15 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 	}, [currentUser.username, params.login]);
 
 	if (!currentUser.isAuthorized())
-		return <Redirect to='/login'/>;
+		return (
+			<div>
+				<Header
+					currentUser={ currentUser }
+					setCurrentUser={ setCurrentUser }
+					status={ status }
+				/>
+			</div>
+		);
 
 	return (
 		<div>

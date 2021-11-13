@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { LadderController } from './ladder.controller';
-import { UsersModule } from '../users/users.module';
-import { LadderService } from './ladder.service';
-import { GameModule } from '../game/game.module';
+import { GameModule } from 'game/game.module';
+import { LadderController } from 'ladder/ladder.controller';
+import { LadderService } from 'ladder/ladder.service';
+import { UsersModule } from 'users/users.module';
 
 @Module({
   controllers: [LadderController],

@@ -72,7 +72,9 @@ const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages, chatStat
 											userOneId: currentUser.id,
 											userTwoId: usr.id
 										};
-										axios.post('/chat/create', data)
+										axios.post('/chat/create', data, {
+											headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+										})
 											.then(() => setDefaultChatState());
 									} }
 								>

@@ -1,14 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
-import { MessageService } from "message/message.service";
+import { Controller } from '@nestjs/common';
 
 @Controller('message')
-export class MessageController {
-	@Inject()
-	messageService: MessageService;
-
-	// @Get()
-	// async getMessages() {
-	// 	return await this.messageService.getAllMessages();
-	// }
-
-}
+export class MessageController {}

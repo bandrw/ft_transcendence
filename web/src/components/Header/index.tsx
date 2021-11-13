@@ -81,7 +81,6 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 					<button
 						style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }
 						className='user-btn'
-						// onClick={ () => setUserMenuShown(prev => !prev) }
 						onMouseOver={ () => setUserMenuShown(true) }
 						onMouseLeave={ () => setUserMenuShown(false) }
 					>

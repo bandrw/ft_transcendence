@@ -122,7 +122,10 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 			setPassedTime(0);
 			return ;
 		}
-		axios.get('/ladder/gameStatus', { params: { login: currentUser.username, status: status } })
+		axios.get('/ladder/gameStatus', {
+			params: { login: currentUser.username, status: status },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
 			.then(() => {
 				if (!isMounted)
 					return ;

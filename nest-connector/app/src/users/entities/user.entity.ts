@@ -1,9 +1,8 @@
 import { ChatEntity } from "chat/chat.entity";
 import { GameEntity } from "game/game.entity";
+import { MessageEntity } from "message/message.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserSubscription } from "users/entities/subscription.entity";
-
-import { MessageEntity } from "../../message/message.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -14,7 +13,7 @@ export class User {
 	login: string;
 
 	@Column()
-	password: string;
+	password?: string;
 
 	@Column()
 	url_avatar: string;

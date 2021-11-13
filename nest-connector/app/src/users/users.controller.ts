@@ -1,21 +1,19 @@
 import {
 	Body,
 	Controller,
-	Get, HttpException, HttpStatus, Inject,
+	Get, HttpException, HttpStatus,
 	Post,
 	Query,
-	Req,
+	Req, UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from "@nestjs/passport";
+import { AuthService } from "auth/auth.service";
 import { Request } from 'express';
-import { UsersGateway } from "users/users.gateway";
-import { OnlineUser } from 'users/users.interface';
 import { UsersService } from 'users/users.service';
 
 @Controller('users')
 export class UsersController {
-	@Inject() usersGateway: UsersGateway;
-
-	constructor(private usersService: UsersService) {}
+	constructor(private usersService: UsersService, private authService: AuthService) {}
 
 	@Post('create')
 	async createUser(
@@ -43,6 +41,9 @@ export class UsersController {
 		@Query('login') login: string,
 		@Query('expand') expand: string
 	) {
+		// if (!await this.authorize(headers.authorization))
+		// 	throw new HttpException('Access Denied', HttpStatus.UNAUTHORIZED);
+
 		if (login) {
 			const user = await this.usersService.findOneByLogin(login, expand === 'true');
 			if (!user)
@@ -52,6 +53,7 @@ export class UsersController {
 		return await this.usersService.findAll(expand === 'true');
 	}
 
+	@UseGuards(AuthGuard('jwt'))
 	@Get('online')
 	getOnline() {
 		return this.usersService.onlineUsers.map(usr => ({
@@ -64,6 +66,7 @@ export class UsersController {
 		}));
 	}
 
+	@UseGuards(AuthGuard('jwt'))
 	@Get('subscribe')
 	async subscribeHandler(
 		@Query('login') login: string,
@@ -74,6 +77,7 @@ export class UsersController {
 		return await this.usersService.subscribeToUser(login, target);
 	}
 
+	@UseGuards(AuthGuard('jwt'))
 	@Get('unsubscribe')
 	async unsubscribeHandler(
 		@Query('login') login: string,
@@ -84,16 +88,13 @@ export class UsersController {
 		return await this.usersService.unsubscribeFromUser(login, target);
 	}
 
-	// @Get('del')
-	// async delUser(@Query('id') id) {
-	// 	await this.UsersService.remove(id);
+	// @UseGuards(AuthGuard('jwt'))
+	// @Get('avatar')
+	// async updateAvatar(@Query('login') login): Promise<string> {
+	// 	return await this.usersService.updateAvatar(login);
 	// }
 
-	@Get('avatar')
-	async updateAvatar(@Query('login') login): Promise<string> {
-		return await this.usersService.updateAvatar(login);
-	}
-
+	@UseGuards(AuthGuard('jwt'))
 	@Post('logout')
 	userLogout(@Req() req: Request) {
 		const index = this.usersService.onlineUsers.map(usr => usr.login).indexOf(req.body.user.login);
@@ -107,55 +108,14 @@ export class UsersController {
 		}
 	}
 
-	async emitter(login: string, socketId: string) {
-		if (!login)
-			throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
-
-		const user = await this.usersService.findOneByLogin(login, true);
-		if (!user)
-			throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
-
-		UsersGateway.users.set(socketId, login);
-
-		const newUser: OnlineUser = {
-			id: user.id,
-			login: login,
-			socket: UsersGateway.sockets.get(socketId),
-			url_avatar: user.url_avatar,
-			status: 'green',
-			subscribers: [],
-			subscriptions: []
-		};
-
-		for (let i = 0; i < user.subscriptions.length; ++i)
-			newUser.subscriptions.push(await this.usersService.findOneById(user.subscriptions[i].targetId));
-
-		for (let i = 0; i < user.subscribers.length; ++i)
-			newUser.subscribers.push(await this.usersService.findOneById(user.subscribers[i].userId));
-
-		const index = this.usersService.onlineUsers.map(usr => usr.login).indexOf(login);
-		if (index === -1)
-			this.usersService.onlineUsers.push(newUser);
-		else
-			this.usersService.onlineUsers[index] = newUser;
-		this.usersService.userEvent('updateUser', newUser);
-		return ;
-	}
-
+	@UseGuards(AuthGuard('local'))
 	@Post('login')
-	async authentication(@Body() body: { login: string, socketId: string }) {
-
-		if (!body.login)
-			throw new HttpException('Invalid body (login)', HttpStatus.BAD_REQUEST);
+	async login(@Req() req, @Body() body: { socketId: string, code: string}) {
 		if (!body.socketId)
 			throw new HttpException('Invalid body (socketId)', HttpStatus.BAD_REQUEST);
 
-		const r = await this.usersService.findOneByLogin(body.login);
-		if (r) {
-			await this.emitter(body.login, body.socketId);
-			return { ok: true, msg: r };
-		} else {
-			return { ok: false, msg: 'User not found' };
-		}
+		await this.usersService.login(req.user.id, body.socketId);
+		return this.authService.login(req.user);
+		// return { ok: true, msg: user };
 	}
 }

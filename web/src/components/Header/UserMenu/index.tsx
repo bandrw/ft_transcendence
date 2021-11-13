@@ -6,7 +6,7 @@ import axios from "axios";
 import { User } from "models/User";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
-import { Link,useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface UserMenuProps {
 	currentUser: User,
@@ -14,13 +14,13 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ currentUser, setCurrentUser } : UserMenuProps) => {
-	const history = useHistory();
-
 	const logOut = () => {
-		axios.post('/users/logout', { user: { login: currentUser.username } })
+		axios.post('/users/logout', { user: { login: currentUser.username } }, {
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
 			.then(() => {
 				setCurrentUser(new User());
-				history.push('/login');
+				localStorage.removeItem('access_token');
 			});
 	};
 

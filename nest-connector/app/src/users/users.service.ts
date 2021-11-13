@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AvatarGenerator } from 'random-avatar-generator';
+import { Socket } from "socket.io";
 import { DeleteResult, Repository } from 'typeorm';
 import { UserSubscription } from "users/entities/subscription.entity";
 import { User } from 'users/entities/user.entity';
@@ -9,6 +10,8 @@ import { OnlineUser } from 'users/users.interface';
 @Injectable()
 export class UsersService {
 	onlineUsers: OnlineUser[] = [];
+	public usersSocketIds = new Map<string, string>();
+	public sockets = new Map<string, Socket>();
 
 	constructor(
 		@InjectRepository(User)
@@ -19,7 +22,7 @@ export class UsersService {
 
 	async findAll(expand = false): Promise<User[]> {
 		if (!expand)
-			return this.usersRepository.find();
+			return await this.usersRepository.find();
 
 		const users = await this.usersRepository.find({ relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
 		for (let i = 0; i < users.length; ++i) {
@@ -37,16 +40,16 @@ export class UsersService {
 		return users;
 	}
 
-	findOneByLogin(login: string, expand = false) {
+	async findOneByLogin(login: string, expand = false) {
 		if (expand)
-			return this.usersRepository.findOne({ where: { login: login }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
-		return this.usersRepository.findOne({ where: { login: login } });
+			return await this.usersRepository.findOne({ where: { login: login }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
+		return await this.usersRepository.findOne({ where: { login: login } });
 	}
 
 	async findOneById(id: number, expand = false): Promise<User> {
 		if (expand)
-			return this.usersRepository.findOne({ where: { id: id }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
-		return this.usersRepository.findOne({ where: { id: id } });
+			return await this.usersRepository.findOne({ where: { id: id }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
+		return await this.usersRepository.findOne({ where: { id: id } });
 	}
 
 	async subscribeToUser(login: string, targetLogin: string): Promise<UserSubscription> {
@@ -136,18 +139,19 @@ export class UsersService {
 	}
 
 	userEvent(event: string, user: OnlineUser) {
+		if (!user)
+			return ;
+
 		for (let i = 0; i < this.onlineUsers.length; ++i) {
-			// if (broadcast || this.onlineUsers[i].login != user.login) {
-				const data = JSON.stringify({
-					id: user.id,
-					login: user.login,
-					url_avatar: user.url_avatar,
-					status: user.status,
-					subscriptions: user.subscriptions,
-					subscribers: user.subscribers
-				});
-				this.onlineUsers[i].socket.emit(event, data);
-			// }
+			const data = {
+				id: user.id,
+				login: user.login,
+				url_avatar: user.url_avatar,
+				status: user.status,
+				subscriptions: user.subscriptions,
+				subscribers: user.subscribers
+			};
+			this.onlineUsers[i].socket.emit(event, JSON.stringify(data));
 		}
 	}
 
@@ -161,5 +165,32 @@ export class UsersService {
 		for (let i = 0; i < this.onlineUsers.length; ++i) {
 			this.onlineUsers[i].socket.emit(event, data);
 		}
+	}
+
+	async login(userId: number, socketId: string) {
+		const user = await this.findOneById(userId, true);
+		if (!user)
+			return { ok: false, msg: 'User not found' };
+
+		this.usersSocketIds.set(socketId, user.login);
+		const newUser: OnlineUser = {
+			id: user.id,
+			login: user.login,
+			socket: this.sockets.get(socketId),
+			url_avatar: user.url_avatar,
+			status: 'green',
+			subscribers: [],
+			subscriptions: []
+		};
+		for (let i = 0; i < user.subscriptions.length; ++i)
+			newUser.subscriptions.push(await this.findOneById(user.subscriptions[i].targetId));
+		for (let i = 0; i < user.subscribers.length; ++i)
+			newUser.subscribers.push(await this.findOneById(user.subscribers[i].userId));
+		const index = this.onlineUsers.map(usr => usr.login).indexOf(user.login);
+		if (index === -1)
+			this.onlineUsers.push(newUser);
+		else
+			this.onlineUsers[index] = newUser;
+		this.userEvent('updateUser', newUser);
 	}
 }

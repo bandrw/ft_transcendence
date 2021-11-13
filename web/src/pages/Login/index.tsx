@@ -1,14 +1,14 @@
 import './styles.scss';
 
 import axios, { AxiosResponse } from "axios";
-import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
 import { SocketContext } from "context/socket";
 import { ApiUserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
-import { Link, useHistory } from "react-router-dom";
-import { Socket } from "socket.io-client";
+import { Link, Redirect } from "react-router-dom";
+
+import { getCurrentUser } from "../../App";
 
 interface LoginProps {
 	currentUser: User,
@@ -20,31 +20,32 @@ export const signIn = async (
 	password: string,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
 	setErrors: React.Dispatch<React.SetStateAction<string> >,
-	socket: Socket
-) => {
-	const r = await axios.post<any, AxiosResponse<ApiUserLogin> >('/users/login', {
-		login,
-		socketId: socket.id
+	socketId: string
+): Promise<void> => {
+	const accessToken = await axios.post<any, AxiosResponse<ApiUserLogin> >('/users/login', {
+		username: login,
+		password: password,
+		socketId: socketId
 	})
-		.then(res => {
-			if (res.data.ok && bcryptjs.compareSync(password, res.data.msg.password)) {
-				const usr = new User();
-				usr.id = res.data.msg.id;
-				usr.username = res.data.msg.login;
-				usr.urlAvatar = res.data.msg.url_avatar;
-				usr.loginDate = Date.now();
-				setCurrentUser(usr);
-				return true;
-			}
-			setErrors('Wrong username or password');
-			return false;
+		.then(res => res.data.access_token)
+		.catch(() => {
+			setErrors('Login Error');
+			return null;
 		});
-	if (!r)
-		setErrors('Login error');
+	if (accessToken) {
+		localStorage.setItem('access_token', accessToken);
+		getCurrentUser(accessToken, socketId)
+			.then(usr => {
+				if (usr) {
+					setCurrentUser(usr);
+				} else {
+					localStorage.removeItem('access_token');
+				}
+			});
+	}
 };
 
 const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
-	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 
 	const loginRef = React.useRef<HTMLInputElement>(null);
@@ -53,10 +54,25 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 	const [loginErrors, setLoginErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-	React.useEffect(() => {
-		if (currentUser.isAuthorized())
-			history.push('/');
-	});
+	// React.useEffect(() => {
+	// 	if (currentUser.isAuthorized())
+	// 		history.push('/');
+	// }, [currentUser, history]);
+
+	// const params = new URLSearchParams(window.location.search);
+	// const authCode = params.get('code');
+	//
+	// React.useEffect(() => {
+	// 	if (authCode) {
+	// 		axios.get<ApiAuthorize>('/authorize', { params: { code: authCode } })
+	// 			.then(res => localStorage.setItem('authData', JSON.stringify(res.data)))
+	// 			.catch(err => console.log('err: ', err))
+	// 			.finally(() => history.push('/login'));
+	// 	}
+	// }, [authCode, history]);
+
+	if (currentUser.isAuthorized())
+		return <Redirect to='/'/>;
 
 	return (
 		<div className='login-container'>
@@ -70,7 +86,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 				const login = loginRef.current?.value || '';
 				const password = passwordRef.current?.value || '';
 
-				await signIn(login, password, setCurrentUser, setLoginErrors, socket);
+				await signIn(login, password, setCurrentUser, setLoginErrors, socket.id);
 				setIsLoading(false);
 			} }
 			>
@@ -117,13 +133,18 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 			</span>
 
 			<div className='login-services'>
-				<button
-					className='login-service'
-					onClick={ () => alert('not working yet') }
+				<a
+					className='login-service login-btn'
+					href={
+						`https://api.intra.42.fr/oauth/authorize/?` +
+							`client_id=${process.env.REACT_APP_42_UID}&` +
+							`redirect_uri=${encodeURIComponent('http://bandrw.local:3001/login')}&` +
+							'response_type=code'
+					}
 				>
 					Sign in with
 					<div className='login-service-icon'/>
-				</button>
+				</a>
 			</div>
 		</div>
 	);

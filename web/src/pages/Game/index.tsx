@@ -8,7 +8,7 @@ import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import GameCanvas from "pages/Game/GameCanvas";
 import React from 'react';
-import { Redirect, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 interface GameProps {
 	enemyInfo: ApiUpdateUser | null,
@@ -38,7 +38,15 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef
 	const [exitWindowShown, setExitWindowShown] = React.useState(false);
 
 	if (!currentUser.isAuthorized())
-		return <Redirect to='/login'/>;
+		return (
+			<div>
+				<Header
+					currentUser={ currentUser }
+					setCurrentUser={ setCurrentUser }
+					status={ status }
+				/>
+			</div>
+		);
 
 	// todo [handle watcher exit buttons]
 	return (

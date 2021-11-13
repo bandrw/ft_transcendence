@@ -16,7 +16,6 @@ type ApiUserCreate = {
 type ApiUser = {
 	id: number,
 	login: string,
-	password: string,
 	url_avatar: string
 }
 
@@ -34,7 +33,6 @@ type ApiGame = {
 type ApiUserExpand = {
 	id: number,
 	login: string,
-	password: string,
 	url_avatar: string,
 	intraLogin?: string,
 	wonGames: ApiGame[],
@@ -44,8 +42,7 @@ type ApiUserExpand = {
 }
 
 type ApiUserLogin = {
-	ok: boolean,
-	msg: ApiUser
+	access_token: string
 }
 
 type ApiUpdateUser = {

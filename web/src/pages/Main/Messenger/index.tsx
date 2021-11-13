@@ -26,7 +26,10 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiChatExpand[]>('/chat', { params: { userId: currentUser.id, expand: true } })
+		axios.get<ApiChatExpand[]>('/chat', {
+			params: { userId: currentUser.id, expand: true },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
 			.then(res => {
 				if (!isMounted)
 					return ;
@@ -64,7 +67,10 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 		};
 
 		const newChatHandler = (): void => {
-			axios.get<ApiChatExpand[]>('/chat', { params: { userId: currentUser.id, expand: true } })
+			axios.get<ApiChatExpand[]>('/chat', {
+				params: { userId: currentUser.id, expand: true },
+				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			})
 				.then(res => setChats(res.data));
 		};
 

@@ -8,7 +8,7 @@ import { ApiUser, ApiUserCreate } from "models/apiTypes";
 import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
-import { Link, useHistory } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 const validateInput = (
 	login: string,
@@ -50,20 +50,17 @@ interface RegisterProps {
 }
 
 const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
-	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 
-	const loginRef = React.createRef<HTMLInputElement>();
-	const passwordRef = React.createRef<HTMLInputElement>();
-	const passwordConfirmRef = React.createRef<HTMLInputElement>();
+	const loginRef = React.useRef<HTMLInputElement>(null);
+	const passwordRef = React.useRef<HTMLInputElement>(null);
+	const passwordConfirmRef = React.useRef<HTMLInputElement>(null);
 
 	const [errors, setErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-	React.useEffect(() => {
-		if (currentUser.isAuthorized())
-			history.push('/');
-	});
+	if (currentUser.isAuthorized())
+		return <Redirect to='/'/>;
 
 	const register = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -78,7 +75,8 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 		setIsLoading(true);
 		setErrors('');
 		const user = await axios.get<ApiUser | null>('/users', {
-			params: { login: login }
+			params: { login: login },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		}).then(res => res.data);
 		if (user) {
 			setErrors('User with this login already exists');
@@ -88,13 +86,15 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 
 		const hashedPassword = await bcryptjs.hash(password, 10);
 		const usersCreateResponse = await axios.post<any, AxiosResponse<ApiUserCreate> >(
-			'/users/create', {
-			login: login,
-			pass: hashedPassword
-		})
+				'/users/create', {
+				login: login,
+				pass: hashedPassword
+			}, {
+				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			})
 			.then(res => res.data);
 		if (usersCreateResponse.ok) {
-			await signIn(login, password, setCurrentUser, setErrors, socket)
+			await signIn(login, password, setCurrentUser, setErrors, socket.id)
 				.catch(err => setErrors(err.toString()));
 		} else {
 			setErrors(usersCreateResponse.msg);

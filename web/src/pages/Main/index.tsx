@@ -10,7 +10,7 @@ import RecentGames from "pages/Main/RecentGames";
 import Social from "pages/Main/Social";
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
-import { Redirect, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 interface MainProps {
 	currentUser: User,
@@ -126,7 +126,17 @@ const Main: React.FC<MainProps> = ({
 	});
 
 	if (!currentUser.isAuthorized())
-		return <Redirect to='/login'/>;
+		return (
+			<div className='main'>
+				<div className='main-container'>
+					<Header
+						currentUser={ currentUser }
+						setCurrentUser={ setCurrentUser }
+						status={ status }
+					/>
+				</div>
+			</div>
+		);
 
 	return (
 		<div className='main'>

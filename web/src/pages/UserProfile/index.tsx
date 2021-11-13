@@ -11,7 +11,7 @@ import { GameTime } from "pages/GamesHistory";
 import FriendsList from "pages/UserProfile/FriendsList";
 import ListSection from "pages/UserProfile/ListSection";
 import React from "react";
-import { Link, Redirect, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 enum SubscribeBtnState {
 	Default,
@@ -105,7 +105,10 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 				className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-default'
 				onClick={ () => {
 					setSubscribeBtnLoading(true);
-					axios.get('/users/subscribe', { params: { login: currentUser.username, target: targetLogin } })
+					axios.get('/users/subscribe', {
+						params: { login: currentUser.username, target: targetLogin },
+						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+					})
 						.then(() => setSubscribeBtnState(SubscribeBtnState.Subscribed))
 						.catch(() => {})
 						.finally(() => setSubscribeBtnLoading(false));
@@ -123,7 +126,10 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 				className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-subscribed'
 				onClick={ () => {
 					setSubscribeBtnLoading(true);
-					axios.get('/users/unsubscribe', { params: { login: currentUser.username, target: targetLogin } })
+					axios.get('/users/unsubscribe', {
+						params: { login: currentUser.username, target: targetLogin },
+						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+					})
 						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
 						.catch(() => {})
 						.finally(() => setSubscribeBtnLoading(false));
@@ -141,7 +147,10 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 				className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-accept'
 				onClick={ () => {
 					setSubscribeBtnLoading(true);
-					axios.get('/users/subscribe', { params: { login: currentUser.username, target: targetLogin } })
+					axios.get('/users/subscribe', {
+						params: { login: currentUser.username, target: targetLogin },
+						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+					})
 						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
 						.catch(() => {})
 						.finally(() => setSubscribeBtnLoading(false));
@@ -158,7 +167,10 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 			className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-friends'
 			onClick={ () => {
 				setSubscribeBtnLoading(true);
-				axios.get('/users/unsubscribe', { params: { login: currentUser.username, target: targetLogin } })
+				axios.get('/users/unsubscribe', {
+					params: { login: currentUser.username, target: targetLogin },
+					headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+				})
 					.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
 					.catch(() => {})
 					.finally(() => setSubscribeBtnLoading(false));
@@ -198,7 +210,10 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiUserExpand>('/users', { params: { login: params.login, expand: true } })
+		axios.get<ApiUserExpand>('/users', {
+			params: { login: params.login, expand: true },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
 			.then(res => {
 				if (!isMounted)
 					return ;
@@ -219,7 +234,15 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 	}, [params.login]);
 
 	if (!currentUser.isAuthorized())
-		return <Redirect to='/login'/>;
+		return (
+			<div>
+				<Header
+					currentUser={ currentUser }
+					setCurrentUser={ setCurrentUser }
+					status={ status }
+				/>
+			</div>
+		);
 
 	let winRate = '-';
 	let gamesCount = '0';

@@ -1,8 +1,8 @@
+import { Inject } from "@nestjs/common";
 import { Gamer } from 'game/game.interface';
 import { OnlineUser } from "users/users.interface";
+import { UsersService } from "users/users.service";
 import { v4 as uuidv4 } from 'uuid';
-
-import { UsersGateway } from "../users/users.gateway";
 
 export class Game {
 	public id = uuidv4();
@@ -52,6 +52,8 @@ export class Game {
 	};
 	public watchers: OnlineUser[] = [];
 
+	@Inject() private usersService: UsersService
+
 	constructor(
 		public leftPlayer: Gamer,
 		public rightPlayer: Gamer
@@ -77,7 +79,7 @@ export class Game {
 	public sendMsg(event: string, data: string) {
 		// removing disconnected watchers
 		for (let i = 0; i < this.watchers.length; ++i)
-			this.watchers = this.watchers.filter(watcher => UsersGateway.users.get(watcher.socket.id));
+			this.watchers = this.watchers.filter(watcher => this.usersService.usersSocketIds.get(watcher.socket.id));
 
 		this.leftPlayer.user.socket.emit(event, data);
 		this.rightPlayer.user.socket.emit(event, data);

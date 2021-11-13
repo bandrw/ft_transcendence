@@ -1,22 +1,25 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from "@nestjs/passport";
 import { GameService } from "game/game.service";
 
 @Controller('games')
 export class GameController {
-	constructor(private GameService: GameService) {}
+	constructor(private gameService: GameService) {}
 
-	@Get('/')
+	@UseGuards(AuthGuard('jwt'))
+	@Get()
 	async getGames() {
-		return await this.GameService.getGames();
+		return await this.gameService.getGames();
 	}
 
-	@Get('/watchGame')
+	@UseGuards(AuthGuard('jwt'))
+	@Get('watchGame')
 	addWatcher(@Query('login') login: string, @Query('gamerLogin') gamerLogin: string) {
-		this.GameService.addWatcher(login, gamerLogin);
+		this.gameService.addWatcher(login, gamerLogin);
 		return { ok: true };
 	}
 
-	// @Post('/')
+	// @Post()
 	// async pushGame(@Body() body: CreateGame) {
 	// 	if (!body.leftPlayerId || !body.rightPlayerId || !body.winnerId)
 	// 		throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);

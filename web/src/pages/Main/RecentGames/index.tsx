@@ -20,7 +20,10 @@ const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiUserExpand>('/users', { params: { login: currentUser.username, expand: true } })
+		axios.get<ApiUserExpand>('/users', {
+			params: { login: currentUser.username, expand: true },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
 			.then(res => {
 				if (!isMounted)
 					return ;

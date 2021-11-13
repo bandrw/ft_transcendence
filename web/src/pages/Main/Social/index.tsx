@@ -28,7 +28,10 @@ const SocialBlockOnlineUser = ({ user, currentUser }: SocialBlockOnlineUserProps
 				title='Watch game'
 				className='social-block-user-watch-btn'
 				onClick={ async () => {
-					await axios.get('/games/watchGame', { params: { login: currentUser.username, gamerLogin: user.login } });
+					await axios.get('/games/watchGame', {
+						params: { login: currentUser.username, gamerLogin: user.login } ,
+						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+					});
 					history.push('/game');
 				} }
 			>

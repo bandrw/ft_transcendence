@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Inject, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Post, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from "@nestjs/passport";
 import { ChatEntity } from "chat/chat.entity";
 import { ChatService } from "chat/chat.service";
 
@@ -7,6 +8,7 @@ export class ChatController {
 	@Inject()
 	private chatService: ChatService;
 
+	@UseGuards(AuthGuard('jwt'))
 	@Post('create')
 	async createChat(
 		@Body('userOneId') userOneId: number,
@@ -18,6 +20,7 @@ export class ChatController {
 		return await this.chatService.createChat(userOneId, userTwoId);
 	}
 
+	@UseGuards(AuthGuard('jwt'))
 	@Get()
 	async getChats(
 		@Query('userId') userId: number,
