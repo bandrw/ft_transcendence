@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Game } from 'game/game';
+import { Game } from 'game/Game';
 import { Gamer } from 'game/game.interface';
 import { GameService } from 'game/game.service';
 import { Ladder } from 'ladder/ladder.interface';
@@ -96,7 +96,7 @@ export class LadderService {
       },
     };
     ++this.lobbyId;
-    return new Game(gamer1, gamer2);
+    return new Game(gamer1, gamer2, this.usersService);
   }
 
   awayFromKeyboard(userIndex) {

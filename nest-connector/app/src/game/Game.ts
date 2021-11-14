@@ -1,4 +1,3 @@
-import { Inject } from "@nestjs/common";
 import { Gamer } from 'game/game.interface';
 import { OnlineUser } from "users/users.interface";
 import { UsersService } from "users/users.service";
@@ -52,11 +51,10 @@ export class Game {
 	};
 	public watchers: OnlineUser[] = [];
 
-	@Inject() private usersService: UsersService
-
 	constructor(
 		public leftPlayer: Gamer,
-		public rightPlayer: Gamer
+		public rightPlayer: Gamer,
+		private usersService: UsersService
 	) {
 		this.sendMsg('gameSettings', JSON.stringify(this.gameSettings));
 		this.leftPlayer.gamePoints = 0;

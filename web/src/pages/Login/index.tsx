@@ -1,18 +1,18 @@
 import './styles.scss';
 
+import { getCurrentUser } from "App";
 import axios, { AxiosResponse } from "axios";
 import CircleLoading from "components/CircleLoading";
 import { SocketContext } from "context/socket";
 import { ApiUserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
-import { Link, Redirect } from "react-router-dom";
-
-import { getCurrentUser } from "../../App";
+import { Link, Redirect, useHistory } from "react-router-dom";
 
 interface LoginProps {
 	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
+	socketId: string
 }
 
 export const signIn = async (
@@ -34,7 +34,7 @@ export const signIn = async (
 		});
 	if (accessToken) {
 		localStorage.setItem('access_token', accessToken);
-		getCurrentUser(accessToken, socketId)
+		getCurrentUser(accessToken, socketId, 'local')
 			.then(usr => {
 				if (usr) {
 					setCurrentUser(usr);
@@ -45,7 +45,8 @@ export const signIn = async (
 	}
 };
 
-const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
+const Login = ({ currentUser, setCurrentUser, socketId }: LoginProps) => {
+	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 
 	const loginRef = React.useRef<HTMLInputElement>(null);
@@ -54,22 +55,23 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 	const [loginErrors, setLoginErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-	// React.useEffect(() => {
-	// 	if (currentUser.isAuthorized())
-	// 		history.push('/');
-	// }, [currentUser, history]);
+	const params = new URLSearchParams(window.location.search);
+	const authCode = params.get('code');
 
-	// const params = new URLSearchParams(window.location.search);
-	// const authCode = params.get('code');
-	//
-	// React.useEffect(() => {
-	// 	if (authCode) {
-	// 		axios.get<ApiAuthorize>('/authorize', { params: { code: authCode } })
-	// 			.then(res => localStorage.setItem('authData', JSON.stringify(res.data)))
-	// 			.catch(err => console.log('err: ', err))
-	// 			.finally(() => history.push('/login'));
-	// 	}
-	// }, [authCode, history]);
+	React.useEffect(() => {
+		if (authCode) {
+			getCurrentUser(authCode, socketId, 'intra')
+				.then(user => {
+					console.log('intra login user:', user);
+					if (user) {
+						setCurrentUser(user);
+					} else {
+						localStorage.removeItem('access_token');
+					}
+				})
+				.finally(() => history.push('/login'));
+		}
+	}, [history, authCode, socketId, setCurrentUser]);
 
 	if (currentUser.isAuthorized())
 		return <Redirect to='/'/>;
@@ -95,7 +97,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					type='text'
 					placeholder='Login'
 					ref={ loginRef }
-					defaultValue='admin'
+					// defaultValue='admin'
 					autoComplete='username'
 				/>
 				<input
@@ -103,7 +105,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					type='password'
 					placeholder='Password'
 					ref={ passwordRef }
-					defaultValue='123123'
+					// defaultValue='123123'
 					autoComplete='current-password'
 				/>
 				<span className='login-errors'>
@@ -137,10 +139,10 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					className='login-service login-btn'
 					href={
 						`https://api.intra.42.fr/oauth/authorize/?` +
-							`client_id=${process.env.REACT_APP_42_UID}&` +
-							`redirect_uri=${encodeURIComponent('http://bandrw.local:3001/login')}&` +
+							`client_id=${process.env.REACT_APP_INTRA_UID}&` +
+							`redirect_uri=${encodeURIComponent(`${process.env.REACT_APP_INTRA_REDIRECT}`)}&` +
 							'response_type=code'
-					}
+					} rel="noreferrer"
 				>
 					Sign in with
 					<div className='login-service-icon'/>

@@ -89,8 +89,6 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 				'/users/create', {
 				login: login,
 				pass: hashedPassword
-			}, {
-				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 			})
 			.then(res => res.data);
 		if (usersCreateResponse.ok) {

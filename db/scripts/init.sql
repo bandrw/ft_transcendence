@@ -3,7 +3,8 @@ CREATE TABLE "users"
 	"id" serial PRIMARY KEY,
 	"login" TEXT UNIQUE,
 	"password" TEXT,
-	"url_avatar" TEXT
+	"url_avatar" TEXT,
+	"intraLogin" TEXT
 );
 
 CREATE TABLE "games_history"

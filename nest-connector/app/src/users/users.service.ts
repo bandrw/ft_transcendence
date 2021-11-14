@@ -46,6 +46,12 @@ export class UsersService {
 		return await this.usersRepository.findOne({ where: { login: login } });
 	}
 
+	async findOneByIntraLogin(login: string, expand = false) {
+		if (expand)
+			return await this.usersRepository.findOne({ where: { intraLogin: login }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
+		return await this.usersRepository.findOne({ where: { intraLogin: login } });
+	}
+
 	async findOneById(id: number, expand = false): Promise<User> {
 		if (expand)
 			return await this.usersRepository.findOne({ where: { id: id }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
@@ -69,12 +75,16 @@ export class UsersService {
 		const r = await this.userSubscriptionRepository.save(subscription);
 		if (r) {
 			const onlineUser = this.onlineUsers.find(usr => usr.id === user.id);
-			onlineUser.subscriptions.push(target);
-			this.userEvent('updateUser', onlineUser);
+			if (onlineUser) {
+				onlineUser.subscriptions.push(target);
+				this.userEvent('updateUser', onlineUser);
+			}
 
 			const onlineTarget = this.onlineUsers.find(usr => usr.id === target.id);
-			onlineTarget.subscribers.push(user);
-			this.userEvent('updateUser', onlineTarget);
+			if (onlineTarget) {
+				onlineTarget.subscribers.push(user);
+				this.userEvent('updateUser', onlineTarget);
+			}
 		}
 		return r;
 	}
@@ -93,12 +103,16 @@ export class UsersService {
 		const r = await this.userSubscriptionRepository.delete({ userId: user.id, targetId: target.id });
 		if (r) {
 			const onlineUser = this.onlineUsers.find(usr => usr.id === user.id);
-			onlineUser.subscriptions = onlineUser.subscriptions.filter(s => s.id !== target.id);
-			this.userEvent('updateUser', onlineUser);
+			if (onlineUser) {
+				onlineUser.subscriptions = onlineUser.subscriptions.filter(s => s.id !== target.id);
+				this.userEvent('updateUser', onlineUser);
+			}
 
 			const onlineTarget = this.onlineUsers.find(usr => usr.id === target.id);
-			onlineTarget.subscribers = onlineTarget.subscribers.filter(s => s.id !== user.id);
-			this.userEvent('updateUser', onlineTarget);
+			if (onlineTarget) {
+				onlineTarget.subscribers = onlineTarget.subscribers.filter(s => s.id !== user.id);
+				this.userEvent('updateUser', onlineTarget);
+			}
 		}
 		return r;
 	}
@@ -107,13 +121,36 @@ export class UsersService {
 		await this.usersRepository.delete(id);
 	}
 
-	async create(login: string, password: string) {
+	async createLocal(login: string, password: string, urlAvatar: string | null) {
 		const user = this.usersRepository.create();
 		user.password = password;
 		user.login = login;
-		const salt = Math.random().toString();
-		const generator = new AvatarGenerator();
-		user.url_avatar = generator.generateRandomAvatar(salt);
+		if (!urlAvatar) {
+			const generator = new AvatarGenerator();
+			user.url_avatar = generator.generateRandomAvatar(Math.random().toString());
+		} else {
+			user.url_avatar = urlAvatar;
+		}
+		return await this.usersRepository.manager.save(user);
+	}
+
+	private async generateLogin(intraLogin: string) {
+		if (!await this.findOneByLogin(intraLogin))
+			return intraLogin;
+
+		let i = 1;
+		while (true) {
+			if (!await this.findOneByLogin(`${intraLogin}_${i}`))
+				return `${intraLogin}_${i}`;
+			++i;
+		}
+	}
+
+	async createIntra(intraLogin: string, urlAvatar: string) {
+		const user = this.usersRepository.create();
+		user.login = await this.generateLogin(intraLogin);
+		user.intraLogin = intraLogin;
+		user.url_avatar = urlAvatar;
 		return await this.usersRepository.manager.save(user);
 	}
 

@@ -9,7 +9,7 @@ import { UsersModule } from "users/users.module";
 
 @Module({
 	imports: [PassportModule, forwardRef(() => UsersModule), JwtModule.register({
-		secret: 'some_secret',
+		secret: process.env.JWT_SECRET,
 		signOptions: { expiresIn: '3600s' }
 	})],
 	providers: [AuthService, LocalStrategy, JwtStrategy],

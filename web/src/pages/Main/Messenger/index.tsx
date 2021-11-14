@@ -105,7 +105,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 						/>
 						<button
 							className={ `messenger-contacts-header-btn ${showCreateMenu ? 'messenger-contacts-header-btn-active' : ''}` }
-							onMouseOver={ () => setShowCreateMenu(true) }
+							onClick={ () => setShowCreateMenu(prev => !prev) }
 						>
 							<FontAwesomeIcon icon={ faPlus }/>
 							{
@@ -120,20 +120,14 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 											<div className='messenger-contacts-header-menu'>
 												<div
 													className='messenger-contacts-header-menu-btn'
-													onClick={ () => {
-														setShowCreateMenu(false);
-														setChatState('newChat');
-													} }
+													onClick={ () => setChatState('newChat') }
 												>
 													<FontAwesomeIcon icon={ faComment }/>
 													New Chat
 												</div>
 												<div
 													className='messenger-contacts-header-menu-btn'
-													onClick={ () => {
-														setShowCreateMenu(false);
-														setChatState('newChannel');
-													} }
+													onClick={ () => setChatState('newChannel') }
 												>
 													<FontAwesomeIcon icon={ faBullhorn }/>
 													New Channel

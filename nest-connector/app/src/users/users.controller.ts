@@ -29,7 +29,7 @@ export class UsersController {
 				return { ok: false, msg: `Bad character ('${login[i]}') in login` };
 			}
 		}
-		const r = await this.usersService.create(login, pass)
+		const r = await this.usersService.createLocal(login, pass, null)
 			.catch((e) => {
 				throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
 			});
@@ -41,9 +41,6 @@ export class UsersController {
 		@Query('login') login: string,
 		@Query('expand') expand: string
 	) {
-		// if (!await this.authorize(headers.authorization))
-		// 	throw new HttpException('Access Denied', HttpStatus.UNAUTHORIZED);
-
 		if (login) {
 			const user = await this.usersService.findOneByLogin(login, expand === 'true');
 			if (!user)

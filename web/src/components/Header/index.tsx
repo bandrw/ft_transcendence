@@ -43,12 +43,12 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 							<FontAwesomeIcon icon={ faBell }/>
 						</button>
 						<button
-							style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }
 							className='user-btn'
 							onClick={ () => setUserMenuShown(prev => !prev) }
 							onMouseOver={ () => setUserMenuShown(true) }
 							onMouseLeave={ () => setUserMenuShown(false) }
 						>
+							<div className='user-btn-img' style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }/>
 							<div className='user-status' style={ { backgroundColor: status } }/>
 							{
 								userMenuShown &&
@@ -79,11 +79,11 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 						<FontAwesomeIcon icon={ faBell }/>
 					</button>
 					<button
-						style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }
 						className='user-btn'
 						onMouseOver={ () => setUserMenuShown(true) }
 						onMouseLeave={ () => setUserMenuShown(false) }
 					>
+						<div className='user-btn-img' style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }/>
 						<div className='user-status' style={ { backgroundColor: status } }/>
 						{
 							userMenuShown &&

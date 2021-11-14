@@ -14,24 +14,51 @@ import React from 'react';
 import { useMediaQuery } from "react-responsive";
 import { Route, Switch, useHistory } from "react-router-dom";
 
-export const getCurrentUser = async (access_token: string, socketId: string): Promise<User | null> => {
-	try {
-		const usr = await axios.get<ApiUser | null>('/auth', {
-			params: { socketId: socketId },
-			headers: { Authorization: `Bearer ${access_token}` }
-		})
-			.then(res => res.data);
-		if (usr) {
-			const user = new User();
-			user.id = usr.id;
-			user.username = usr.login;
-			user.urlAvatar = usr.url_avatar;
-			return user;
+export const getCurrentUser = async (access_token: string, socketId: string, strategy: string): Promise<User | null> => {
+	if (strategy === 'local') {
+		try {
+			const usr = await axios.get<ApiUser | null>('/auth', {
+				params: { socketId: socketId },
+				headers: { Authorization: `Bearer ${access_token}` }
+			})
+				.then(res => res.data);
+			if (usr) {
+				const user = new User();
+				user.id = usr.id;
+				user.username = usr.login;
+				user.urlAvatar = usr.url_avatar;
+				return user;
+			}
+			return null;
+		} catch {
+			return null;
 		}
-		return null;
-	} catch {
-		return null;
 	}
+
+	if (strategy === 'intra') {
+		try {
+			const r = await axios.post<any, any>('/auth/intra', {
+				socketId: socketId,
+				code: access_token
+			})
+				.then(res => res.data);
+			localStorage.setItem('access_token', r.access_token);
+			return getCurrentUser(r.access_token, socketId, 'local');
+		// 	console.log('usr =', usr);
+		// 	if (usr) {
+		// 		const user = new User();
+		// 		user.id = usr.id;
+		// 		user.username = usr.login;
+		// 		user.urlAvatar = usr.url_avatar;
+		// 		return user;
+		// 	}
+		// 	return null;
+		} catch {
+			return null;
+		}
+	}
+
+	return null;
 };
 
 const App = () => {
@@ -123,7 +150,7 @@ const App = () => {
 
 		const accessToken = localStorage.getItem('access_token');
 		if (accessToken && socketId) {
-			getCurrentUser(accessToken, socketId)
+			getCurrentUser(accessToken, socketId, 'local')
 				.then(usr => {
 					if (usr)
 						setCurrentUser(usr);
@@ -134,6 +161,7 @@ const App = () => {
 
 	}, [socketId]);
 
+	// Saving socketId in state
 	React.useEffect(() => {
 
 		const connectHandler = () => {
@@ -147,9 +175,14 @@ const App = () => {
 		};
 	}, [socket]);
 
+	// Redirect to /login
 	React.useEffect(() => {
-		if (history.location.pathname !== '/register' && !localStorage.getItem('access_token'))
+		if (
+			history.location.pathname !== '/login' && history.location.pathname !== '/register' &&
+			!localStorage.getItem('access_token')
+		) {
 			history.push('/login');
+		}
 	}, [currentUser, history]);
 
 	if (!isDesktop)
@@ -163,10 +196,14 @@ const App = () => {
 		<Switch>
 
 			<Route exact path='/login'>
-				<Login
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
-				/>
+				{
+					socketId &&
+					<Login
+						currentUser={ currentUser }
+						setCurrentUser={ setCurrentUser }
+						socketId={ socketId }
+					/>
+				}
 			</Route>
 
 			<Route exact path='/register'>
