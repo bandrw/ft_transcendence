@@ -55,7 +55,19 @@
 					cursor: pointer;
 					border-radius: 8px;
 					position: relative;
-					transition: all 0.3s ease-in-out;
+					transition: all 0.1s ease-in-out;
+
+					&:hover {
+						& > svg {
+							color: #21b941;
+						}
+					}
+
+					&:active {
+						& > svg {
+							opacity: 0.8;
+						}
+					}
 
 					.messenger-contacts-header-menu-wrapper {
 						position: absolute;

@@ -6,6 +6,7 @@ import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiChannel, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
+import Channel from "pages/Main/Messenger/Channel";
 import Chat from "pages/Main/Messenger/Chat";
 import Contact from "pages/Main/Messenger/Contact";
 import React from "react";
@@ -21,6 +22,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	const [chats, setChats] = React.useState<ApiChatExpand[]>([]);
 	const [channels, setChannels] = React.useState<ApiChannel[]>([]);
 	const [selectedChat, setSelectedChat] = React.useState<ApiChatExpand | null>(null);
+	const [selectedChannel, setSelectedChannel] = React.useState<ApiChannel | null>(null);
 	const [showCreateMenu, setShowCreateMenu] = React.useState(false);
 	const [chatState, setChatState] = React.useState('default');
 
@@ -164,8 +166,11 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 									key={ i }
 									image={ companion.url_avatar }
 									title={ companion.login }
-									isSelected={ chat === selectedChat }
-									selectChat={ () => setSelectedChat(chat) }
+									isSelected={ chat.id === selectedChat?.id }
+									selectChat={ () => {
+										setSelectedChat(chat);
+										setSelectedChannel(null);
+									} }
 								/>
 							);
 						})
@@ -173,12 +178,15 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 					{
 						channels.map((channel, i) => {
 							return (
-								<Contact
+								<Channel
 									key={ i }
 									title={ channel.title }
-									image={ '' } // todo
-									isSelected={ false } // todo
-									selectChat={ () => null }/> // todo
+									isSelected={ selectedChannel?.id === channel.id }
+									selectChannel={ () => {
+										setSelectedChannel(channel);
+										setSelectedChat(null);
+									} }
+								/>
 							);
 						})
 					}
