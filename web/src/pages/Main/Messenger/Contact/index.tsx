@@ -1,22 +1,20 @@
 import './styles.scss';
 
-import { ApiChatExpand } from "models/apiTypes";
 import React from "react";
 
 interface ContactProps {
-	username: string,
+	title: string,
 	image: string,
-	selectedChat: ApiChatExpand | null,
-	chat: ApiChatExpand,
-	selectContact: () => void
+	isSelected: boolean,
+	selectChat: () => void
 }
 
-const Contact = ({ username, image, selectedChat, chat, selectContact }: ContactProps) => {
+const Contact = ({ title, image, isSelected, selectChat }: ContactProps) => {
 
 	return (
-		<div className={ `messenger-contact ${chat === selectedChat ? 'messenger-contact-selected' : ''}` } onMouseDown={ selectContact }>
+		<div className={ `messenger-contact ${isSelected ? 'messenger-contact-selected' : ''}` } onMouseDown={ selectChat }>
 			<div className='messenger-contact-image' style={ { backgroundImage: `url(${image})` } }/>
-			<div className='messenger-contact-name'>{ username }</div>
+			<div className='messenger-contact-name'>{ title }</div>
 		</div>
 	);
 };

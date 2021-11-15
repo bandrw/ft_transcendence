@@ -1,7 +1,7 @@
 CREATE TABLE "users"
 (
 	"id" serial PRIMARY KEY,
-	"login" TEXT UNIQUE,
+	"login" VARCHAR(16) UNIQUE,
 	"password" TEXT,
 	"url_avatar" TEXT,
 	"intraLogin" TEXT
@@ -78,4 +78,36 @@ CREATE TABLE "messages"
 		FOREIGN KEY("fromUserId")
 		REFERENCES "users"("id")
 		ON DELETE SET NULL
+);
+
+CREATE TABLE "channels"
+(
+	"id" serial PRIMARY KEY,
+	"name" VARCHAR(16) UNIQUE,
+	"title" TEXT,
+	"isPrivate" BOOLEAN,
+	"password" TEXT,
+	"ownerId" INTEGER,
+
+	CONSTRAINT "fk_ownerId"
+		FOREIGN KEY("ownerId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL
+);
+
+CREATE TABLE "channel_members"
+(
+	"id" serial PRIMARY KEY,
+	"channelId" INTEGER,
+	"userId" INTEGER,
+
+	CONSTRAINT "fk_channelId"
+		FOREIGN KEY("channelId")
+		REFERENCES "channels"("id")
+		ON DELETE CASCADE,
+
+	CONSTRAINT "fk_userId"
+		FOREIGN KEY("userId")
+		REFERENCES "users"("id")
+		ON DELETE CASCADE
 );

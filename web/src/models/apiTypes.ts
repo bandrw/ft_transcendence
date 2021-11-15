@@ -30,6 +30,29 @@ type ApiGame = {
 	date: string
 }
 
+type ApiChat = {
+	id: number,
+	userOneId: number,
+	userTwoId: number,
+}
+
+type ApiMessage = {
+	id: number,
+	chatId: number,
+	fromUserId: number,
+	text: string,
+	date: number
+}
+
+type ApiChannel = {
+	id: number,
+	name: string,
+	title: string,
+	isPrivate: boolean,
+	password?: string,
+	ownerId: number
+}
+
 type ApiUserExpand = {
 	id: number,
 	login: string,
@@ -38,7 +61,12 @@ type ApiUserExpand = {
 	wonGames: ApiGame[],
 	lostGames: ApiGame[],
 	subscriptions: ApiUser[],
-	subscribers: ApiUser[]
+	subscribers: ApiUser[],
+	createdChats: ApiChat[],
+	acceptedChats: ApiChat[],
+	messages: ApiMessage[],
+	ownedChannels: ApiChannel[],
+	channels: ApiChannel[]
 }
 
 type ApiUserLogin = {
@@ -97,20 +125,6 @@ type ApiGameLoop = {
 	}
 }
 
-type ApiChat = {
-	id: number,
-	userOneId: number,
-	userTwoId: number,
-}
-
-type ApiMessage = {
-	id: number,
-	chatId: number,
-	fromUserId: number,
-	text: string,
-	date: number
-}
-
 type ApiChatExpand = {
 	id: number,
 	userOneId: number,
@@ -121,6 +135,7 @@ type ApiChatExpand = {
 }
 
 export type {
+	ApiChannel,
 	ApiChat,
 	ApiChatExpand,
 	ApiGame,

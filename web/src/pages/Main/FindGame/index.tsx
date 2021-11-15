@@ -13,19 +13,13 @@ interface AcceptWindowProps {
 	currentUser: User,
 	status: ApiUserStatus,
 	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
-	enemy: ApiUpdateUser | null,
+	enemy: ApiUpdateUser,
 	enemyIsReady: boolean
 }
 
 const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: AcceptWindowProps) => {
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 	const [timeLeft, setTimeLeft] = React.useState<number>(20);
-
-	const acceptGame = () => {
-		if (timerIntervalRef.current)
-			clearInterval(timerIntervalRef.current);
-		setStatus(ApiUserStatus.Accepted);
-	};
 
 	const declineGame = () => {
 		if (timerIntervalRef.current)
@@ -48,9 +42,6 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 		if (timeLeft < 0)
 			declineGameCallback();
 	}, [timeLeft, declineGameCallback]);
-
-	if (!enemy)
-		throw Error('No enemy');
 
 	return (
 		<div className='accept-window-wrapper'>
@@ -84,7 +75,7 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 							? <div className='accept-btn accept-btn-accepted'>
 									<FontAwesomeIcon icon={ faCheck }/>
 								</div>
-							: <button className='accept-btn' onClick={ acceptGame }>
+							: <button className='accept-btn' onClick={ () => setStatus(ApiUserStatus.Accepted) }>
 									Accept
 								</button>
 					}
@@ -190,13 +181,16 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 					triggerOnce={ true }
 					style={ { position: 'fixed' } }
 				>
-					<AcceptWindow
-						currentUser={ currentUser }
-						status={ status }
-						setStatus={ setStatus }
-						enemy={ enemyRef.current }
-						enemyIsReady={ enemyIsReady }
-					/>
+					{
+						enemyRef.current &&
+						<AcceptWindow
+							currentUser={ currentUser }
+							status={ status }
+							setStatus={ setStatus }
+							enemy={ enemyRef.current }
+							enemyIsReady={ enemyIsReady }
+						/>
+					}
 				</Fade>
 			</div>
 		);

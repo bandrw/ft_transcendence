@@ -43,16 +43,7 @@ export const getCurrentUser = async (access_token: string, socketId: string, str
 			})
 				.then(res => res.data);
 			localStorage.setItem('access_token', r.access_token);
-			return getCurrentUser(r.access_token, socketId, 'local');
-		// 	console.log('usr =', usr);
-		// 	if (usr) {
-		// 		const user = new User();
-		// 		user.id = usr.id;
-		// 		user.username = usr.login;
-		// 		user.urlAvatar = usr.url_avatar;
-		// 		return user;
-		// 	}
-		// 	return null;
+			return await getCurrentUser(r.access_token, socketId, 'local');
 		} catch {
 			return null;
 		}
@@ -97,6 +88,11 @@ const App = () => {
 				lostGames: allUser.lostGames,
 				subscriptions: onlineUsr.subscriptions,
 				subscribers: onlineUsr.subscribers,
+				createdChats: allUser.createdChats,
+				acceptedChats: allUser.acceptedChats,
+				messages: allUser.messages,
+				ownedChannels: allUser.ownedChannels,
+				channels: allUser.channels
 			};
 		}));
 	}, [onlineUsers]);
@@ -147,15 +143,16 @@ const App = () => {
 
 	// Getting user from access_token
 	React.useEffect(() => {
-
 		const accessToken = localStorage.getItem('access_token');
 		if (accessToken && socketId) {
 			getCurrentUser(accessToken, socketId, 'local')
 				.then(usr => {
-					if (usr)
+					if (usr) {
 						setCurrentUser(usr);
-					else
+					} else {
 						localStorage.removeItem('access_token');
+						setCurrentUser(new User());
+					}
 				});
 		}
 
@@ -197,12 +194,13 @@ const App = () => {
 
 			<Route exact path='/login'>
 				{
-					socketId &&
-					<Login
-						currentUser={ currentUser }
-						setCurrentUser={ setCurrentUser }
-						socketId={ socketId }
-					/>
+					socketId
+						?	<Login
+								currentUser={ currentUser }
+								setCurrentUser={ setCurrentUser }
+								socketId={ socketId }
+							/>
+						:	'no socket id'
 				}
 			</Route>
 

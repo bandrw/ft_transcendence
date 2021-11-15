@@ -13,18 +13,20 @@ export class UsersService {
 	public usersSocketIds = new Map<string, string>();
 	public sockets = new Map<string, Socket>();
 
+	private readonly allRelations = ['wonGames', 'lostGames', 'subscriptions', 'subscribers', 'createdChats', 'acceptedChats', 'messages', 'ownedChannels', 'channels'];
+
 	constructor(
 		@InjectRepository(User)
-		public usersRepository: Repository<User>,
+		private usersRepository: Repository<User>,
 		@InjectRepository(UserSubscription)
-		public userSubscriptionRepository: Repository<UserSubscription>
+		private userSubscriptionRepository: Repository<UserSubscription>
 	) {}
 
 	async findAll(expand = false): Promise<User[]> {
 		if (!expand)
 			return await this.usersRepository.find();
 
-		const users = await this.usersRepository.find({ relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
+		const users = await this.usersRepository.find({ relations: this.allRelations });
 		for (let i = 0; i < users.length; ++i) {
 			const subscriptionsExpand: any = [];
 			for (let j = 0; j < users[i].subscriptions.length; ++j) {
@@ -42,19 +44,19 @@ export class UsersService {
 
 	async findOneByLogin(login: string, expand = false) {
 		if (expand)
-			return await this.usersRepository.findOne({ where: { login: login }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
+			return await this.usersRepository.findOne({ where: { login: login }, relations: this.allRelations });
 		return await this.usersRepository.findOne({ where: { login: login } });
 	}
 
 	async findOneByIntraLogin(login: string, expand = false) {
 		if (expand)
-			return await this.usersRepository.findOne({ where: { intraLogin: login }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
+			return await this.usersRepository.findOne({ where: { intraLogin: login }, relations: this.allRelations });
 		return await this.usersRepository.findOne({ where: { intraLogin: login } });
 	}
 
 	async findOneById(id: number, expand = false): Promise<User> {
 		if (expand)
-			return await this.usersRepository.findOne({ where: { id: id }, relations: ['wonGames', 'lostGames', 'subscriptions', 'subscribers'] });
+			return await this.usersRepository.findOne({ where: { id: id }, relations: this.allRelations });
 		return await this.usersRepository.findOne({ where: { id: id } });
 	}
 

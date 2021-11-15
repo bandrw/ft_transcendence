@@ -4,7 +4,7 @@ import { faBullhorn, faComment, faPlus } from "@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
+import { ApiChannel, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
 import Chat from "pages/Main/Messenger/Chat";
 import Contact from "pages/Main/Messenger/Contact";
@@ -19,6 +19,7 @@ interface MessengerProps {
 const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	const socket = React.useContext(SocketContext);
 	const [chats, setChats] = React.useState<ApiChatExpand[]>([]);
+	const [channels, setChannels] = React.useState<ApiChannel[]>([]);
 	const [selectedChat, setSelectedChat] = React.useState<ApiChatExpand | null>(null);
 	const [showCreateMenu, setShowCreateMenu] = React.useState(false);
 	const [chatState, setChatState] = React.useState('default');
@@ -37,10 +38,21 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 				setChats(res.data);
 			});
 
+		axios.get<ApiUserExpand>('/users', {
+			params: { login: currentUser.username, expand: true },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
+			.then(res => {
+				if (!isMounted)
+					return ;
+
+				setChannels(res.data.channels);
+			});
+
 		return () => {
 			isMounted = false;
 		};
-	}, [currentUser.id]);
+	}, [currentUser.id, currentUser.username]);
 
 	React.useEffect(() => {
 
@@ -72,6 +84,11 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 			})
 				.then(res => setChats(res.data));
+			axios.get<ApiUserExpand>('/users', {
+				params: { login: currentUser.username },
+				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			})
+				.then(res => setChannels(res.data.channels));
 		};
 
 		socket.on('receiveMessage', receiveMessageHandler);
@@ -82,7 +99,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 			socket.off('newChat', newChatHandler);
 		};
 
-	}, [currentUser.id, socket]);
+	}, [currentUser.id, currentUser.username, socket]);
 
 	setTimeout(() => {
 		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
@@ -146,16 +163,27 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 								<Contact
 									key={ i }
 									image={ companion.url_avatar }
-									username={ companion.login }
-									selectedChat={ selectedChat }
-									selectContact={ () => setSelectedChat(chat) }
-									chat={ chat }
+									title={ companion.login }
+									isSelected={ chat === selectedChat }
+									selectChat={ () => setSelectedChat(chat) }
 								/>
 							);
 						})
 					}
 					{
-						chats.length === 0 &&
+						channels.map((channel, i) => {
+							return (
+								<Contact
+									key={ i }
+									title={ channel.title }
+									image={ '' } // todo
+									isSelected={ false } // todo
+									selectChat={ () => null }/> // todo
+							);
+						})
+					}
+					{
+						(chats.length + channels.length) === 0 &&
 						<div className='messenger-contacts-empty-msg'>You have no chats yet</div>
 					}
 				</div>
@@ -171,6 +199,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 					} }
 					allUsers={ allUsers }
 					chats={ chats }
+					channels={ channels }
 				/>
 			</div>
 		</div>

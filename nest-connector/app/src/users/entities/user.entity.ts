@@ -1,7 +1,8 @@
+import { ChannelEntity } from "channel/entities/channel.entity";
 import { ChatEntity } from "chat/chat.entity";
 import { GameEntity } from "game/game.entity";
 import { MessageEntity } from "message/message.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserSubscription } from "users/entities/subscription.entity";
 
 @Entity({ name: 'users' })
@@ -40,5 +41,11 @@ export class User {
 	acceptedChats: ChatEntity[];
 
 	@OneToMany(() => MessageEntity, message => message.fromUser)
-	messages: MessageEntity[]
+	messages: MessageEntity[];
+
+	@OneToMany(() => ChannelEntity, channel => channel.owner)
+	ownedChannels: ChannelEntity[];
+
+	@ManyToMany(() => ChannelEntity, channel => channel.members)
+	channels: ChannelEntity[];
 }

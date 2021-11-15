@@ -8,14 +8,4 @@ socket.on("disconnect", (reason) => {
 		socket.connect();
 });
 
-// socket.on("connect_error", (error) => {
-// 	console.log('connect_error', error);
-// });
-
-// socket.onAny((event, data) => {
-// 	console.log(`[socket context] got ${event}`);
-// });
-
-// console.log('Listeners added');
-
 export const SocketContext = React.createContext<Socket>(socket);

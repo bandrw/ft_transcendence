@@ -90,6 +90,7 @@ const Main: React.FC<MainProps> = ({
 				setStatus(ApiUserStatus.Regular);
 			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && (updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular)) {
 				setStatus(ApiUserStatus.Regular);
+				setEnemyIsReady(false);
 			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && updateUserData.status === ApiUserStatus.Accepted) {
 				setEnemyIsReady(true);
 			}
