@@ -49,7 +49,7 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 		let isMounted = true;
 
 		axios.get<ApiUserExpand>('/users', {
-			params: { login: params.login, expand: true },
+			params: { login: params.login, expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(res => {

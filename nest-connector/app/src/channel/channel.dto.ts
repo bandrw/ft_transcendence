@@ -1,8 +1,7 @@
 import {
 	IsAlphanumeric,
 	IsBoolean,
-	IsBooleanString, IsNumber,
-	IsOptional,
+	IsNumber,
 	IsString,
 	MaxLength,
 	MinLength,
@@ -26,12 +25,6 @@ export class CreateChannelDTO {
 	@IsString()
 	password: string;
 }
-
-// export class GetChannelsDTO {
-// 	@IsOptional()
-// 	@IsBooleanString()
-// 	expand: boolean;
-// }
 
 export class JoinChannelDTO {
 	@IsNumber()

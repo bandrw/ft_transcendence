@@ -15,7 +15,7 @@ interface UserMenuProps {
 
 const UserMenu = ({ currentUser, setCurrentUser } : UserMenuProps) => {
 	const logOut = () => {
-		axios.post('/users/logout', { user: { login: currentUser.username } }, {
+		axios.post('/users/logout', {} , {
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(() => {

@@ -106,7 +106,7 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 				onClick={ () => {
 					setSubscribeBtnLoading(true);
 					axios.get('/users/subscribe', {
-						params: { login: currentUser.username, target: targetLogin },
+						params: { target: targetLogin },
 						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 					})
 						.then(() => setSubscribeBtnState(SubscribeBtnState.Subscribed))
@@ -127,7 +127,7 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 				onClick={ () => {
 					setSubscribeBtnLoading(true);
 					axios.get('/users/unsubscribe', {
-						params: { login: currentUser.username, target: targetLogin },
+						params: { target: targetLogin },
 						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 					})
 						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
@@ -148,7 +148,7 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 				onClick={ () => {
 					setSubscribeBtnLoading(true);
 					axios.get('/users/subscribe', {
-						params: { login: currentUser.username, target: targetLogin },
+						params: { target: targetLogin },
 						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 					})
 						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
@@ -168,7 +168,7 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 			onClick={ () => {
 				setSubscribeBtnLoading(true);
 				axios.get('/users/unsubscribe', {
-					params: { login: currentUser.username, target: targetLogin },
+					params: { target: targetLogin },
 					headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 				})
 					.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
@@ -211,7 +211,7 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 		let isMounted = true;
 
 		axios.get<ApiUserExpand>('/users', {
-			params: { login: params.login, expand: true },
+			params: { login: params.login, expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(res => {

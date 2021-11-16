@@ -35,16 +35,18 @@ export class GameService {
 		return await this.gameRepository.find({ relations: ['winner', 'loser'] });
 	}
 
-	addWatcher(watcherLogin: string, gamerLogin: string) {
-		const watcher = this.userService.onlineUsers.find(usr => usr.login === watcherLogin);
+	addWatcher(watcherId: number, gamerLogin: string) {
+		const watcher = this.userService.onlineUsers.find(usr => usr.id === watcherId);
 		if (!watcher)
-			return ;
+			return false;
 
 		const game = this.games.find(g => g.leftPlayer.user.login === gamerLogin || g.rightPlayer.user.login === gamerLogin);
 		if (game) {
 			watcher.socket.emit('gameSettings', JSON.stringify(game.gameSettings));
 			game.watchers.push(watcher);
+			return true;
 		}
+		return false;
 	}
 
 	async updateStatistics(winnerLogin: string, loserLogin: string, score: { leftPlayer: number, rightPlayer: number }) {

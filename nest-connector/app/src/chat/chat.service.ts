@@ -58,8 +58,9 @@ export class ChatService {
 		for (let i = 0; i < r2.length; ++i)
 			chats.push(r2[i]);
 
-		for (let i = 0; i < chats.length; ++i)
-			chats[i].messages.sort((msg1, msg2) => msg1.date - msg2.date);
+		if (expand)
+			for (let i = 0; i < chats.length; ++i)
+				chats[i].messages.sort((msg1, msg2) => msg1.date - msg2.date);
 
 		return chats;
 	}

@@ -60,8 +60,8 @@ export class UsersService {
 		return await this.usersRepository.findOne({ where: { id: id } });
 	}
 
-	async subscribeToUser(login: string, targetLogin: string): Promise<UserSubscription> {
-		const user = await this.findOneByLogin(login, true);
+	async subscribeToUser(userId: number, targetLogin: string): Promise<UserSubscription> {
+		const user = await this.findOneById(userId, true);
 		if (!user)
 			throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 		const target = await this.findOneByLogin(targetLogin);
@@ -91,8 +91,8 @@ export class UsersService {
 		return r;
 	}
 
-	async unsubscribeFromUser(login: string, targetLogin: string): Promise<DeleteResult> {
-		const user = await this.findOneByLogin(login, true);
+	async unsubscribeFromUser(userId: number, targetLogin: string): Promise<DeleteResult> {
+		const user = await this.findOneById(userId, true);
 		if (!user)
 			throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 		const target = await this.findOneByLogin(targetLogin);

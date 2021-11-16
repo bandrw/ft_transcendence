@@ -30,7 +30,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 		let isMounted = true;
 
 		axios.get<ApiChatExpand[]>('/chat', {
-			params: { userId: currentUser.id, expand: true },
+			params: { expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(res => {
@@ -41,7 +41,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 			});
 
 		axios.get<ApiUserExpand>('/users', {
-			params: { login: currentUser.username, expand: true },
+			params: { login: currentUser.username, expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(res => {
@@ -82,7 +82,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 
 		const newChatHandler = (): void => {
 			axios.get<ApiChatExpand[]>('/chat', {
-				params: { userId: currentUser.id, expand: true },
+				params: { expand: '' },
 				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 			})
 				.then(res => setChats(res.data));

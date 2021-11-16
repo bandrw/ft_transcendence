@@ -4,24 +4,23 @@ import {
 	Get, HttpException, HttpStatus,
 	Post,
 	Query,
-	Req, UseGuards,
+	Req, UseGuards, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
+import { EmptyDTO } from "app.dto";
 import { AuthService } from "auth/auth.service";
-import { Request } from 'express';
+import { isDefined } from "class-validator";
+import { CreateUserDTO, GetUsersDTO, LoginDTO, SubscribeHandlerDTO } from "users/users.dto";
 import { UsersService } from 'users/users.service';
 
 @Controller('users')
 export class UsersController {
 	constructor(private usersService: UsersService, private authService: AuthService) {}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Post('create')
-	async createUser(
-		@Body('login') login: string,
-		@Body('pass') pass: string,
-	) {
-		if (!login || !pass)
-			throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);
+	async createUser(@Body() body: CreateUserDTO) {
+		const { login, pass } = body;
 
 		const bad = ' \\/|;<>&?:{}[]()';
 		for (let i = 0; i < login.length; i++) {
@@ -30,29 +29,33 @@ export class UsersController {
 			}
 		}
 		const r = await this.usersService.createLocal(login, pass, null)
-			.catch((e) => {
+			.catch(e => {
 				throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
 			});
 		return { ok: true, msg: `User ${r.login} created` };
 	}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Get()
-	async getUsers(
-		@Query('login') login: string,
-		@Query('expand') expand: string
-	) {
+	async getUsers(@Query() query: GetUsersDTO) {
+		const { login, expand } = query;
+
 		if (login) {
-			const user = await this.usersService.findOneByLogin(login, expand === 'true');
+			const user = await this.usersService.findOneByLogin(login, isDefined(expand));
 			if (!user)
 				return null;
 			return user;
 		}
-		return await this.usersService.findAll(expand === 'true');
+		return await this.usersService.findAll(isDefined(expand));
 	}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get('online')
-	getOnline() {
+	getOnline(@Query() query: EmptyDTO) {
+		const {  } = query;
+
+		// excluding socket property
 		return this.usersService.onlineUsers.map(usr => ({
 			id: usr.id,
 			login: usr.login,
@@ -63,26 +66,24 @@ export class UsersController {
 		}));
 	}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get('subscribe')
-	async subscribeHandler(
-		@Query('login') login: string,
-		@Query('target') target: string
-	) {
-		if (!login || !target || login === target)
-			throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);
-		return await this.usersService.subscribeToUser(login, target);
+	async subscribeHandler(@Req() req, @Query() query: SubscribeHandlerDTO) {
+		const user = req.user;
+		const { target } = query;
+
+		return await this.usersService.subscribeToUser(user.id, target);
 	}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get('unsubscribe')
-	async unsubscribeHandler(
-		@Query('login') login: string,
-		@Query('target') target: string
-	) {
-		if (!login || !target || login === target)
-			throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);
-		return await this.usersService.unsubscribeFromUser(login, target);
+	async unsubscribeHandler(@Req() req, @Query() query: SubscribeHandlerDTO) {
+		const user = req.user;
+		const { target } = query;
+
+		return await this.usersService.unsubscribeFromUser(user.id, target);
 	}
 
 	// @UseGuards(AuthGuard('jwt'))
@@ -91,11 +92,15 @@ export class UsersController {
 	// 	return await this.usersService.updateAvatar(login);
 	// }
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('logout')
-	userLogout(@Req() req: Request) {
-		const index = this.usersService.onlineUsers.map(usr => usr.login).indexOf(req.body.user.login);
-		if (index != -1) {
+	userLogout(@Req() req, @Body() body: EmptyDTO) {
+		const user = req.user;
+		const {  } = body;
+
+		const index = this.usersService.onlineUsers.map(usr => usr.id).indexOf(user.id);
+		if (index !== -1) {
 			this.usersService.userEvent('logout', this.usersService.onlineUsers[index]);
 			this.usersService.onlineUsers.splice(index, 1);
 			this.usersService.onlineUsers = this.usersService.onlineUsers.filter(val => {
@@ -105,14 +110,14 @@ export class UsersController {
 		}
 	}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('local'))
 	@Post('login')
-	async login(@Req() req, @Body() body: { socketId: string, code: string}) {
-		if (!body.socketId)
-			throw new HttpException('Invalid body (socketId)', HttpStatus.BAD_REQUEST);
+	async login(@Req() req, @Body() body: LoginDTO) {
+		const user = req.user;
+		const { socketId } = body;
 
-		await this.usersService.login(req.user.id, body.socketId);
-		return this.authService.login(req.user);
-		// return { ok: true, msg: user };
+		await this.usersService.login(user.id, socketId);
+		return this.authService.login(user);
 	}
 }

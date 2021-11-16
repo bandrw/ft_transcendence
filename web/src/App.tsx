@@ -38,7 +38,6 @@ export const getCurrentUser = async (access_token: string, socketId: string, str
 	if (strategy === 'intra') {
 		try {
 			const r = await axios.post<any, any>('/auth/intra', {
-				socketId: socketId,
 				code: access_token
 			})
 				.then(res => res.data);
@@ -126,7 +125,7 @@ const App = () => {
 			return ;
 
 		axios.get<ApiUserExpand[]>('/users', {
-			params: { expand: true },
+			params: { expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(res => {

@@ -2,15 +2,14 @@ import {
 	Body,
 	Controller,
 	Get,
-	HttpException,
-	HttpStatus,
 	Post,
 	Query,
 	Req,
 	UnauthorizedException,
-	UseGuards
+	UseGuards, UsePipes, ValidationPipe
 } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
+import { AuthDTO, AuthIntraDTO } from "auth/auth.dto";
 import { AuthService } from "auth/auth.service";
 import axios from "axios";
 import { UsersService } from "users/users.service";
@@ -20,21 +19,22 @@ export class AuthController {
 
 	constructor(private usersService: UsersService, private authService: AuthService) {}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get()
-	async auth(@Req() req, @Query('socketId') socketId: string) {
-		if (!socketId)
-			throw new HttpException('Invalid body (socketId)', HttpStatus.BAD_REQUEST);
+	async auth(@Req() req, @Query() query: AuthDTO) {
+		const user = req.user;
+		const { socketId } = query;
 
-		await this.usersService.login(req.user.id, socketId);
-		return req.user;
+		await this.usersService.login(user.id, socketId);
+		return user;
 	}
 
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Post('/intra')
-	async authIntra(
-		@Body('socketId') socketId: string,
-		@Body('code') code: string
-	) {
+	async authIntra(@Body() body: AuthIntraDTO) {
+		const { code } = body;
+
 		const data = {
 			grant_type: 'authorization_code',
 			client_id: process.env.INTRA_UID,

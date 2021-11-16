@@ -144,10 +144,7 @@ const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages, chatStat
 									className='messenger-create-chat-user'
 									key={ i }
 									onClick={ () => {
-										const data = {
-											userOneId: currentUser.id,
-											userTwoId: usr.id
-										};
+										const data = { userTwoId: usr.id };
 										axios.post('/chat/create', data, {
 											headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 										})

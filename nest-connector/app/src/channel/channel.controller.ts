@@ -19,10 +19,7 @@ export class ChannelController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('create')
-	async createChannel(
-		@Req() req,
-		@Body() body: CreateChannelDTO
-	) {
+	async createChannel(@Req() req, @Body() body: CreateChannelDTO) {
 		const { name, title, isPrivate, password } = body;
 		const user = req.user;
 

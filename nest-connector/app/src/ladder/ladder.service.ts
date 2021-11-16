@@ -33,8 +33,8 @@ export class LadderService {
     }
   }
 
-  updateStatus(login: string, status: string) {
-    const user = this.usersService.onlineUsers.find(usr => usr.login === login);
+  updateStatus(userId: number, status: string) {
+    const user = this.usersService.onlineUsers.find(usr => usr.id === userId);
     if (!user)
       throw new HttpException('Cannot find user', HttpStatus.BAD_REQUEST);
 
@@ -50,20 +50,20 @@ export class LadderService {
     } else if (status === 'blue') {
       this.removeFromLadder(user, this.awayFromKeyboard.bind(this));
     } else if (status === 'red') {
-      this.gameStart(user, login);
+      this.gameStart(user);
     }
   }
 
-  gameStart(user: OnlineUser, login: string) {
-    this.userPersonalEvent('enemyIsReady', user, login);
+  gameStart(user: OnlineUser) {
+    this.userPersonalEvent('enemyIsReady', user, user.login);
     let k = 0;
     while (k < this.lobby.length) {
       if (this.lobby[k].first && this.lobby[k].second &&
-        (this.lobby[k].first.login === login || this.lobby[k].second.login === login) &&
+        (this.lobby[k].first.login === user.login || this.lobby[k].second.login === user.login) &&
         this.lobby[k].first.status === 'red' && this.lobby[k].second.status === 'red'
       ) {
-        this.updateStatus(this.lobby[k].first.login, 'inGame');
-        this.updateStatus(this.lobby[k].second.login, 'inGame');
+        this.updateStatus(this.lobby[k].first.id, 'inGame');
+        this.updateStatus(this.lobby[k].second.id, 'inGame');
         this.userPersonalEvent('gameIsReady', null, this.lobby[k].first.login);
         this.userPersonalEvent('gameIsReady', null, this.lobby[k].second.login);
         this.gameService.startGame(this.buildGame(this.lobby[k].first, this.lobby[k].second));

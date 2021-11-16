@@ -21,7 +21,7 @@ const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
 		let isMounted = true;
 
 		axios.get<ApiUserExpand>('/users', {
-			params: { login: currentUser.username, expand: true },
+			params: { login: currentUser.username, expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(res => {
