@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { faCheck, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faCheck, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { SocketContext } from "context/socket";
@@ -31,7 +31,7 @@ const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
 			isPrivate: isPrivate,
 			password: password
 		};
-		await axios.post('/channel/create', data, {
+		await axios.post('/channels/create', data, {
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		});
 		setDefaultChatState();
@@ -87,6 +87,7 @@ const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
 interface ChatProps {
 	currentUser: User,
 	selectedChat: ApiChatExpand | null,
+	selectedChannel: ApiChannel | null,
 	closeSelectedChat: () => void,
 	messages: ApiMessage[],
 	chatState: string,
@@ -96,10 +97,11 @@ interface ChatProps {
 	channels: ApiChannel[]
 }
 
-const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages, chatState, setDefaultChatState, allUsers, chats, channels }: ChatProps) => {
+const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
+								messages, chatState, setDefaultChatState, allUsers, chats, channels }: ChatProps) => {
+
 	const socket = React.useContext(SocketContext);
 	const inputRef = React.useRef<HTMLInputElement>(null);
-	const companion = selectedChat?.userOne?.login === currentUser.username ? selectedChat?.userTwo : selectedChat?.userOne;
 	const chatsToCreate: ApiUserExpand[] = allUsers.filter(usr =>
 		!chats.find(chat => chat.userOne.id === usr.id || chat.userTwo.id === usr.id) && usr.id !== currentUser.id
 	);
@@ -145,7 +147,7 @@ const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages, chatStat
 									key={ i }
 									onClick={ () => {
 										const data = { userTwoId: usr.id };
-										axios.post('/chat/create', data, {
+										axios.post('/chats/create', data, {
 											headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 										})
 											.then(() => setDefaultChatState());
@@ -169,50 +171,95 @@ const Chat = ({ currentUser, selectedChat, closeSelectedChat, messages, chatStat
 			/>
 		);
 
-	if (!selectedChat)
+	if (selectedChat) {
+		const companion = selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
+
 		return (
 			<div className='messenger-chat'>
-				<div className='messenger-chat-empty-msg'>
+				<div className='messenger-chat-info'>
+					<div className='messenger-chat-info-img' style={ { backgroundImage: `url(${companion.url_avatar})` } }/>
+					<div>{ companion.login }</div>
+					<button
+						className='messenger-chat-close-btn'
+						onClick={ closeSelectedChat }
+						title='Close'
+					>
+						<FontAwesomeIcon icon={ faTimes }/>
+					</button>
+				</div>
+				<div className='messenger-chat-messages'>
 					{
-						(chats.length + channels.length) === 0
-							? 'Create a chat'
-							: 'Select a chat'
+						companion &&
+						messages.map((msg, i) =>
+							<Message
+								key={ i }
+								message={ msg }
+								fromCompanion={ companion.id === msg.fromUserId }
+							/>
+						)
 					}
 				</div>
+				<form className='messenger-chat-form' onSubmit={ sendMsg }>
+					<input
+						className='messenger-chat-input'
+						ref={ inputRef }
+						type='text'
+						placeholder='Write a message'
+					/>
+					<button type='submit' className='messenger-chat-send-btn'>
+						<FontAwesomeIcon icon={ faPaperPlane }/>
+					</button>
+				</form>
+			</div>
+		);
+	}
+
+	if (selectedChannel)
+		return (
+			<div className='messenger-chat'>
+				<div className='messenger-chat-info'>
+					<div className='messenger-chat-info-img'>
+						<FontAwesomeIcon icon={ faBullhorn }/>
+					</div>
+					<div>{ selectedChannel.title }</div>
+					<button
+						className='messenger-chat-close-btn'
+						onClick={ closeSelectedChat }
+						title='Close'
+					>
+						<FontAwesomeIcon icon={ faTimes }/>
+					</button>
+				</div>
+				<div className='messenger-chat-messages'>
+					{
+						// companion &&
+						// messages.map((msg, i) =>
+						// 	<Message key={ i } message={ msg } companion={ companion }/>)
+					}
+				</div>
+				<form className='messenger-chat-form' onSubmit={ sendMsg }>
+					<input
+						className='messenger-chat-input'
+						ref={ inputRef }
+						type='text'
+						placeholder='Write a message'
+					/>
+					<button type='submit' className='messenger-chat-send-btn'>
+						<FontAwesomeIcon icon={ faPaperPlane }/>
+					</button>
+				</form>
 			</div>
 		);
 
 	return (
 		<div className='messenger-chat'>
-			<div className='messenger-chat-info'>
-				<div className='messenger-chat-info-img' style={ { backgroundImage: `url(${companion?.url_avatar})` } }/>
-				<div>{ companion?.login }</div>
-				<button
-					className='messenger-chat-close-btn' 
-					onClick={ closeSelectedChat }
-					title='Close'
-				>
-					<FontAwesomeIcon icon={ faTimes }/>
-				</button>
-			</div>
-			<div className='messenger-chat-messages'>
+			<div className='messenger-chat-empty-msg'>
 				{
-					companion &&
-					messages.map((msg, i) =>
-						<Message key={ i } message={ msg } companion={ companion } />)
+					(chats.length + channels.length) === 0
+						? 'Create a chat'
+						: 'Select a chat'
 				}
 			</div>
-			<form className='messenger-chat-form' onSubmit={ sendMsg }>
-				<input
-					className='messenger-chat-input'
-					ref={ inputRef }
-					type='text'
-					placeholder='Write a message'
-				/>
-				<button type='submit' className='messenger-chat-send-btn'>
-					<FontAwesomeIcon icon={ faPaperPlane }/>
-				</button>
-			</form>
 		</div>
 	);
 };

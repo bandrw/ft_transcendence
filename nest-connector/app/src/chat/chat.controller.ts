@@ -16,7 +16,7 @@ import { ChatEntity } from "chat/chat.entity";
 import { ChatService } from "chat/chat.service";
 import { isDefined } from "class-validator";
 
-@Controller('chat')
+@Controller('chats')
 export class ChatController {
 	@Inject()
 	private chatService: ChatService;
@@ -24,9 +24,8 @@ export class ChatController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('create')
-	async createChat(@Req() req, @Body() body: CreateChatDTO) {
+	async createChat(@Req() req, @Body() { userTwoId }: CreateChatDTO) {
 		const user = req.user;
-		const { userTwoId } = body;
 
 		return await this.chatService.createChat(user.id, userTwoId);
 	}
@@ -34,9 +33,8 @@ export class ChatController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get()
-	async getChats(@Req() req, @Query() query: ExpandDTO): Promise<ChatEntity[]> {
+	async getChats(@Req() req, @Query() { expand }: ExpandDTO): Promise<ChatEntity[]> {
 		const user = req.user;
-		const { expand } = query;
 
 		return await this.chatService.getChats(user.id, isDefined(expand));
 	}

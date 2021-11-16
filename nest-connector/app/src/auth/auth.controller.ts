@@ -22,9 +22,8 @@ export class AuthController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get()
-	async auth(@Req() req, @Query() query: AuthDTO) {
+	async auth(@Req() req, @Query() { socketId }: AuthDTO) {
 		const user = req.user;
-		const { socketId } = query;
 
 		await this.usersService.login(user.id, socketId);
 		return user;
@@ -32,8 +31,7 @@ export class AuthController {
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Post('/intra')
-	async authIntra(@Body() body: AuthIntraDTO) {
-		const { code } = body;
+	async authIntra(@Body() { code }: AuthIntraDTO) {
 
 		const data = {
 			grant_type: 'authorization_code',

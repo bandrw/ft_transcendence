@@ -135,6 +135,7 @@ const Main: React.FC<MainProps> = ({
 						setCurrentUser={ setCurrentUser }
 						status={ status }
 					/>
+					<div>[TMP] Authorizing { socket.id ? '...' : '[No socket]' }</div>
 				</div>
 			</div>
 		);

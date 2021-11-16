@@ -11,8 +11,7 @@ export class GameController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get()
-	async getGames(@Query() query: EmptyDTO) {
-		const {  } = query;
+	async getGames(@Query() {  }: EmptyDTO) {
 
 		return await this.gameService.getGames();
 	}
@@ -20,9 +19,8 @@ export class GameController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get('watchGame')
-	addWatcher(@Req() req, @Query() query: AddWatcherDTO) {
+	addWatcher(@Req() req, @Query() { gamerLogin }: AddWatcherDTO) {
 		const user = req.user;
-		const { gamerLogin } = query;
 
 		return { ok: this.gameService.addWatcher(user.id, gamerLogin) };
 	}

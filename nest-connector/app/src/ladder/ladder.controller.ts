@@ -9,9 +9,8 @@ export class LadderController {
 
 	@UseGuards(AuthGuard('jwt'))
 	@Get('setStatus')
-	findGame(@Req() req, @Query() query: FindGameDTO) {
+	findGame(@Req() req, @Query() { status }: FindGameDTO) {
 		const user = req.user;
-		const { status } = query;
 
 		this.ladder.updateStatus(user.id, status);
 	}

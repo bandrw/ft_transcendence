@@ -1,15 +1,15 @@
 import './styles.scss';
 
-import { ApiMessage, ApiUser } from "models/apiTypes";
+import { ApiMessage } from "models/apiTypes";
 import Moment from "react-moment";
 
 interface MessageProps {
 	message: ApiMessage,
-	companion: ApiUser
+	fromCompanion: boolean
 }
 
-const Message = ({ message, companion }: MessageProps) => {
-	if (companion.id === message.fromUserId)
+const Message = ({ message, fromCompanion }: MessageProps) => {
+	if (fromCompanion)
 		return (
 			<div className='message companions-message'>
 				{ message.text }

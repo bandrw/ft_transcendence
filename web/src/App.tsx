@@ -143,8 +143,10 @@ const App = () => {
 	// Getting user from access_token
 	React.useEffect(() => {
 		const accessToken = localStorage.getItem('access_token');
-		if (accessToken && socketId) {
-			getCurrentUser(accessToken, socketId, 'local')
+		const sockId = socketId ? socketId : socket.id;
+
+		if (accessToken && sockId) {
+			getCurrentUser(accessToken, sockId, 'local')
 				.then(usr => {
 					if (usr) {
 						setCurrentUser(usr);
@@ -155,7 +157,7 @@ const App = () => {
 				});
 		}
 
-	}, [socketId]);
+	}, [socket.id, socketId]);
 
 	// Saving socketId in state
 	React.useEffect(() => {
@@ -164,10 +166,18 @@ const App = () => {
 			setSocketId(socket.id);
 		};
 
+		const disconnectHandler = (reason: string) => {
+			setSocketId(null);
+			if (reason === 'io server disconnect')
+				socket.connect();
+		};
+
 		socket.on('connect', connectHandler);
+		socket.on('disconnect', disconnectHandler);
 
 		return () => {
 			socket.off('connect', connectHandler);
+			socket.off('disconnect', disconnectHandler);
 		};
 	}, [socket]);
 
@@ -199,7 +209,7 @@ const App = () => {
 								setCurrentUser={ setCurrentUser }
 								socketId={ socketId }
 							/>
-						:	'no socket id'
+						:	'[TMP] no socket id'
 				}
 			</Route>
 

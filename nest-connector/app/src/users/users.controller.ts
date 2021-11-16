@@ -19,9 +19,7 @@ export class UsersController {
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Post('create')
-	async createUser(@Body() body: CreateUserDTO) {
-		const { login, pass } = body;
-
+	async createUser(@Body() { login, pass }: CreateUserDTO) {
 		const bad = ' \\/|;<>&?:{}[]()';
 		for (let i = 0; i < login.length; i++) {
 			if (bad.indexOf(login[i]) !== -1) {
@@ -37,8 +35,7 @@ export class UsersController {
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Get()
-	async getUsers(@Query() query: GetUsersDTO) {
-		const { login, expand } = query;
+	async getUsers(@Query() { login, expand }: GetUsersDTO) {
 
 		if (login) {
 			const user = await this.usersService.findOneByLogin(login, isDefined(expand));
@@ -52,9 +49,7 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get('online')
-	getOnline(@Query() query: EmptyDTO) {
-		const {  } = query;
-
+	getOnline(@Query() {  }: EmptyDTO) {
 		// excluding socket property
 		return this.usersService.onlineUsers.map(usr => ({
 			id: usr.id,
@@ -69,9 +64,8 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get('subscribe')
-	async subscribeHandler(@Req() req, @Query() query: SubscribeHandlerDTO) {
+	async subscribeHandler(@Req() req, @Query() { target }: SubscribeHandlerDTO) {
 		const user = req.user;
-		const { target } = query;
 
 		return await this.usersService.subscribeToUser(user.id, target);
 	}
@@ -79,9 +73,8 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Get('unsubscribe')
-	async unsubscribeHandler(@Req() req, @Query() query: SubscribeHandlerDTO) {
+	async unsubscribeHandler(@Req() req, @Query() { target }: SubscribeHandlerDTO) {
 		const user = req.user;
-		const { target } = query;
 
 		return await this.usersService.unsubscribeFromUser(user.id, target);
 	}
@@ -95,9 +88,8 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('logout')
-	userLogout(@Req() req, @Body() body: EmptyDTO) {
+	userLogout(@Req() req, @Body() {  }: EmptyDTO) {
 		const user = req.user;
-		const {  } = body;
 
 		const index = this.usersService.onlineUsers.map(usr => usr.id).indexOf(user.id);
 		if (index !== -1) {
@@ -113,9 +105,8 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('local'))
 	@Post('login')
-	async login(@Req() req, @Body() body: LoginDTO) {
+	async login(@Req() req, @Body() { socketId }: LoginDTO) {
 		const user = req.user;
-		const { socketId } = body;
 
 		await this.usersService.login(user.id, socketId);
 		return this.authService.login(user);

@@ -2,6 +2,8 @@ import { ChatEntity } from "chat/chat.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "users/entities/user.entity";
 
+import { ChannelEntity } from "../channel/entities/channel.entity";
+
 @Entity({ name: 'messages' })
 export class MessageEntity {
 	@PrimaryGeneratedColumn()
@@ -13,6 +15,13 @@ export class MessageEntity {
 	@OneToOne(() => ChatEntity, chat => chat.messages)
 	@JoinColumn({ name: 'chatId' })
 	chat: ChatEntity;
+
+	@Column()
+	channelId: number;
+
+	@OneToOne(() => ChannelEntity, channel => channel.messages)
+	@JoinColumn({ name: 'channelId' })
+	channel: ChatEntity;
 
 	@Column()
 	fromUserId: number;

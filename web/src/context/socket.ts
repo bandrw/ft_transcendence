@@ -3,9 +3,4 @@ import { io, Socket } from "socket.io-client";
 
 export const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:3000');
 
-socket.on("disconnect", (reason) => {
-	if (reason === "io server disconnect")
-		socket.connect();
-});
-
 export const SocketContext = React.createContext<Socket>(socket);

@@ -11,7 +11,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { CreateChannelDTO, JoinChannelDTO } from "channel/channel.dto";
 import { ChannelService } from "channel/channel.service";
 
-@Controller('channel')
+@Controller('channels')
 export class ChannelController {
 
 	constructor(private channelService: ChannelService) {}
@@ -19,8 +19,7 @@ export class ChannelController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('create')
-	async createChannel(@Req() req, @Body() body: CreateChannelDTO) {
-		const { name, title, isPrivate, password } = body;
+	async createChannel(@Req() req, @Body() { name, title, isPrivate, password }: CreateChannelDTO) {
 		const user = req.user;
 
 		return await this.channelService.createChannel(name, title, user.id, isPrivate, password);
@@ -29,9 +28,8 @@ export class ChannelController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('join')
-	async joinChannel(@Req() req, @Body() body: JoinChannelDTO) {
+	async joinChannel(@Req() req, @Body() { channelId }: JoinChannelDTO) {
 		const user = req.user;
-		const { channelId } = body;
 
 		return await this.channelService.addMember(channelId, user.id);
 	}

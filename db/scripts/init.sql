@@ -61,25 +61,6 @@ CREATE TABLE "chats"
 		ON DELETE SET NULL
 );
 
-CREATE TABLE "messages"
-(
-	"id" serial PRIMARY KEY,
-	"chatId" INTEGER,
-	"fromUserId" INTEGER,
-	"text" TEXT,
-	"date" TIMESTAMP DEFAULT NOW() NOT NULL,
-
-	CONSTRAINT "fk_chatId"
-		FOREIGN KEY("chatId")
-		REFERENCES "chats"("id")
-		ON DELETE SET NULL,
-
-	CONSTRAINT "fk_fromUserId"
-		FOREIGN KEY("fromUserId")
-		REFERENCES "users"("id")
-		ON DELETE SET NULL
-);
-
 CREATE TABLE "channels"
 (
 	"id" serial PRIMARY KEY,
@@ -110,4 +91,29 @@ CREATE TABLE "channel_members"
 		FOREIGN KEY("userId")
 		REFERENCES "users"("id")
 		ON DELETE CASCADE
+);
+
+CREATE TABLE "messages"
+(
+	"id" serial PRIMARY KEY,
+	"chatId" INTEGER,
+	"channelId" INTEGER,
+	"fromUserId" INTEGER,
+	"text" TEXT,
+	"date" TIMESTAMP DEFAULT NOW() NOT NULL,
+
+	CONSTRAINT "fk_chatId"
+		FOREIGN KEY("chatId")
+		REFERENCES "chats"("id")
+		ON DELETE SET NULL,
+
+	CONSTRAINT "fk_channelId"
+		FOREIGN KEY("channelId")
+		REFERENCES "channels"("id")
+		ON DELETE SET NULL,
+
+	CONSTRAINT "fk_fromUserId"
+		FOREIGN KEY("fromUserId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL
 );

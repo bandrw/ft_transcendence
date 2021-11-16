@@ -29,7 +29,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiChatExpand[]>('/chat', {
+		axios.get<ApiChatExpand[]>('/chats', {
 			params: { expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
@@ -81,13 +81,13 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 		};
 
 		const newChatHandler = (): void => {
-			axios.get<ApiChatExpand[]>('/chat', {
+			axios.get<ApiChatExpand[]>('/chats', {
 				params: { expand: '' },
 				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 			})
 				.then(res => setChats(res.data));
 			axios.get<ApiUserExpand>('/users', {
-				params: { login: currentUser.username },
+				params: { login: currentUser.username, expand: '' },
 				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 			})
 				.then(res => setChannels(res.data.channels));
@@ -198,7 +198,11 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 				<Chat
 					currentUser={ currentUser }
 					selectedChat={ selectedChat }
-					closeSelectedChat={ () => setSelectedChat(null) }
+					selectedChannel={ selectedChannel }
+					closeSelectedChat={ () => {
+						setSelectedChat(null);
+						setSelectedChannel(null);
+					} }
 					messages={ selectedChat?.messages || [] }
 					chatState={ chatState }
 					setDefaultChatState={ () => {

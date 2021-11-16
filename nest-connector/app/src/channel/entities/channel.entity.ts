@@ -1,5 +1,7 @@
-import { Column, Entity, JoinColumn, JoinTable,ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "users/entities/user.entity";
+
+import { MessageEntity } from "../../message/message.entity";
 
 @Entity({ name: 'channels' })
 export class ChannelEntity {
@@ -32,4 +34,7 @@ export class ChannelEntity {
 		inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
 	})
 	members: User[];
+
+	@OneToMany(() => MessageEntity, message => message.channel)
+	messages: MessageEntity[];
 }
