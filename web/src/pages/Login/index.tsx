@@ -62,7 +62,6 @@ const Login = ({ currentUser, setCurrentUser, socketId }: LoginProps) => {
 		if (authCode) {
 			getCurrentUser(authCode, socketId, 'intra')
 				.then(user => {
-					console.log('intra login user:', user);
 					if (user) {
 						setCurrentUser(user);
 					} else {
@@ -135,18 +134,26 @@ const Login = ({ currentUser, setCurrentUser, socketId }: LoginProps) => {
 			</span>
 
 			<div className='login-services'>
-				<a
-					className='login-service login-btn'
-					href={
-						`https://api.intra.42.fr/oauth/authorize/?` +
-							`client_id=${process.env.REACT_APP_INTRA_UID}&` +
-							`redirect_uri=${encodeURIComponent(`${process.env.REACT_APP_INTRA_REDIRECT}`)}&` +
-							'response_type=code'
-					} rel="noreferrer"
-				>
-					Sign in with
-					<div className='login-service-icon'/>
-				</a>
+				{
+					authCode
+						? <div
+								className='login-service login-btn'
+							>
+								<CircleLoading bgColor='#fff' width='35px' height='35px'/>
+							</div>
+						: <a
+								className='login-service login-btn'
+								href={
+									`https://api.intra.42.fr/oauth/authorize/?` +
+									`client_id=${process.env.REACT_APP_INTRA_UID}&` +
+									`redirect_uri=${encodeURIComponent(`${process.env.REACT_APP_INTRA_REDIRECT}`)}&` +
+									'response_type=code'
+								} rel="noreferrer"
+							>
+								Sign in with
+								<div className='login-service-icon'/>
+							</a>
+				}
 			</div>
 		</div>
 	);

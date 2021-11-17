@@ -198,16 +198,18 @@ const App = () => {
 			</div>
 		);
 
+	const sockId = socketId ? socketId : socket.id;
+
 	return (
 		<Switch>
 
 			<Route exact path='/login'>
 				{
-					socketId
+					sockId
 						?	<Login
 								currentUser={ currentUser }
 								setCurrentUser={ setCurrentUser }
-								socketId={ socketId }
+								socketId={ sockId }
 							/>
 						:	'[TMP] no socket id'
 				}
