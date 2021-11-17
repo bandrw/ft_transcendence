@@ -4,11 +4,11 @@ import { faBullhorn, faComment, faPlus } from "@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChannel, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
+import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
-import Channel from "pages/Main/Messenger/Channel";
 import Chat from "pages/Main/Messenger/Chat";
-import Contact from "pages/Main/Messenger/Contact";
+import LeftMenuChannel from "pages/Main/Messenger/LeftMenuChannel";
+import LeftMenuChat from "pages/Main/Messenger/LeftMenuChat";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
 
@@ -20,9 +20,9 @@ interface MessengerProps {
 const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	const socket = React.useContext(SocketContext);
 	const [chats, setChats] = React.useState<ApiChatExpand[]>([]);
-	const [channels, setChannels] = React.useState<ApiChannel[]>([]);
+	const [channels, setChannels] = React.useState<ApiChannelExpand[]>([]);
 	const [selectedChat, setSelectedChat] = React.useState<ApiChatExpand | null>(null);
-	const [selectedChannel, setSelectedChannel] = React.useState<ApiChannel | null>(null);
+	const [selectedChannel, setSelectedChannel] = React.useState<ApiChannelExpand | null>(null);
 	const [showCreateMenu, setShowCreateMenu] = React.useState(false);
 	const [chatState, setChatState] = React.useState('default');
 
@@ -60,24 +60,34 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 
 		const receiveMessageHandler = (data: string): void => {
 			const msg: ApiMessage = JSON.parse(data);
-			setSelectedChat(prev => {
-				const cpy: ApiChatExpand | null = JSON.parse(JSON.stringify(prev));
-				if (cpy && !cpy.messages.find(m => m.id === msg.id))
-					cpy.messages = cpy.messages.concat(msg);
-				return cpy;
-			});
 
-			setChats(prev => {
-				const out: ApiChatExpand[] = [];
-				for (let i in prev) {
-					const cpy: ApiChatExpand = JSON.parse(JSON.stringify(prev[i]));
-					if (prev[i].id === msg.chatId) {
+			if (msg.chatId) {
+				setSelectedChat(prev => {
+					const cpy: ApiChatExpand | null = JSON.parse(JSON.stringify(prev));
+					if (cpy && !cpy.messages.find(m => m.id === msg.id))
 						cpy.messages = cpy.messages.concat(msg);
+					return cpy;
+				});
+
+				setChats(prev => {
+					const out: ApiChatExpand[] = [];
+					for (let i in prev) {
+						const cpy: ApiChatExpand = JSON.parse(JSON.stringify(prev[i]));
+						if (prev[i].id === msg.chatId) {
+							cpy.messages = cpy.messages.concat(msg);
+						}
+						out.push(cpy);
 					}
-					out.push(cpy);
-				}
-				return out;
-			});
+					return out;
+				});
+			} else if (msg.channelId) {
+				setSelectedChannel(prev => {
+					const cpy: ApiChannelExpand | null = JSON.parse(JSON.stringify(prev));
+					if (cpy && !cpy.messages.find(m => m.id === msg.id))
+						cpy.messages = cpy.messages.concat(msg);
+					return cpy;
+				});
+			}
 		};
 
 		const newChatHandler = (): void => {
@@ -162,7 +172,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 							const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
 
 							return (
-								<Contact
+								<LeftMenuChat
 									key={ i }
 									image={ companion.url_avatar }
 									title={ companion.login }
@@ -178,7 +188,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 					{
 						channels.map((channel, i) => {
 							return (
-								<Channel
+								<LeftMenuChannel
 									key={ i }
 									title={ channel.title }
 									isSelected={ selectedChannel?.id === channel.id }

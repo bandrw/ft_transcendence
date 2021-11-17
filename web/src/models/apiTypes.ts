@@ -39,6 +39,7 @@ type ApiChat = {
 type ApiMessage = {
 	id: number,
 	chatId: number,
+	channelId: number,
 	fromUserId: number,
 	text: string,
 	date: number
@@ -51,6 +52,16 @@ type ApiChannel = {
 	isPrivate: boolean,
 	password?: string,
 	ownerId: number
+}
+
+type ApiChannelExpand = {
+	id: number,
+	name: string,
+	title: string,
+	isPrivate: boolean,
+	password?: string,
+	ownerId: number,
+	messages: ApiMessage[]
 }
 
 type ApiUserExpand = {
@@ -66,7 +77,7 @@ type ApiUserExpand = {
 	acceptedChats: ApiChat[],
 	messages: ApiMessage[],
 	ownedChannels: ApiChannel[],
-	channels: ApiChannel[]
+	channels: ApiChannelExpand[]
 }
 
 type ApiUserLogin = {
@@ -136,6 +147,7 @@ type ApiChatExpand = {
 
 export type {
 	ApiChannel,
+	ApiChannelExpand,
 	ApiChat,
 	ApiChatExpand,
 	ApiGame,

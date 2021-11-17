@@ -2,15 +2,14 @@ import './styles.scss';
 
 import React from "react";
 
-interface ContactProps {
+interface LeftMenuChatProps {
 	title: string,
 	image: string,
 	isSelected: boolean,
 	selectChat: () => void
 }
 
-const Contact = ({ title, image, isSelected, selectChat }: ContactProps) => {
-
+const LeftMenuChat = ({ title, image, isSelected, selectChat }: LeftMenuChatProps) => {
 	return (
 		<div className={ `messenger-contact ${isSelected ? 'messenger-contact-selected' : ''}` } onMouseDown={ selectChat }>
 			<div className='messenger-contact-image' style={ { backgroundImage: `url(${image})` } }/>
@@ -19,4 +18,4 @@ const Contact = ({ title, image, isSelected, selectChat }: ContactProps) => {
 	);
 };
 
-export default Contact;
+export default LeftMenuChat;

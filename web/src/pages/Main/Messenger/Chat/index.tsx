@@ -1,100 +1,26 @@
 import './styles.scss';
 
-import { faBullhorn, faCheck, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChannel, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
+import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
+import CreateChannel from "pages/Main/Messenger/Chat/CreateChannel";
+import CreateChat from "pages/Main/Messenger/Chat/CreateChat";
 import Message from "pages/Main/Messenger/Chat/Message";
-import React, { FormEvent } from "react";
-
-interface CreateChannelProps {
-	setDefaultChatState: () => void
-}
-
-const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
-	const [isPrivate, setIsPrivate] = React.useState(false);
-	const nameRef = React.useRef<HTMLInputElement>(null);
-	const titleRef = React.useRef<HTMLInputElement>(null);
-	const passwordRef = React.useRef<HTMLInputElement>(null);
-
-	const createChannelForm = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const name = nameRef.current?.value || '';
-		const title = titleRef.current?.value || '';
-		const password = passwordRef.current?.value || '';
-
-		const data = {
-			name: name,
-			title: title,
-			isPrivate: isPrivate,
-			password: password
-		};
-		await axios.post('/channels/create', data, {
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-		});
-		setDefaultChatState();
-	};
-
-	return (
-		<div className='messenger-chat'>
-			<div className='messenger-chat-info'>
-				<div>
-					Create a new channel
-				</div>
-				<button
-					className='messenger-chat-close-btn'
-					onClick={ setDefaultChatState }
-					title='Close'
-				>
-					<FontAwesomeIcon icon={ faTimes }/>
-				</button>
-			</div>
-			<form className='messenger-create-channel' onSubmit={ createChannelForm }>
-				<input ref={ nameRef } required={ true } type='text' placeholder='Name'/>
-				<input ref={ titleRef } required={ true } type='text' placeholder='Title'/>
-				<div className='messenger-create-channel-visibility'>
-					<button type='button' className='is-private-checkbox' onClick={ () => setIsPrivate(false) }>
-						<div className={ isPrivate ? 'visibility' : 'visibility-active' }>
-							{
-								!isPrivate &&
-								<FontAwesomeIcon icon={ faCheck }/>
-							}
-						</div>
-						<span>Public</span>
-					</button>
-					<button type='button' className='is-private-checkbox' onClick={ () => setIsPrivate(true) }>
-						<div className={ isPrivate ? 'visibility-active' : 'visibility' }>
-							{
-								isPrivate &&
-								<FontAwesomeIcon icon={ faCheck }/>
-							}
-						</div>
-						<span>Private</span>
-					</button>
-				</div>
-				{
-					isPrivate &&
-					<input ref={ passwordRef } name='password' type='password' placeholder='Password'/>
-				}
-				<button type='submit'>Create</button>
-			</form>
-		</div>
-	);
-};
+import React  from "react";
 
 interface ChatProps {
 	currentUser: User,
 	selectedChat: ApiChatExpand | null,
-	selectedChannel: ApiChannel | null,
+	selectedChannel: ApiChannelExpand | null,
 	closeSelectedChat: () => void,
 	messages: ApiMessage[],
 	chatState: string,
 	setDefaultChatState: () => void,
 	allUsers: ApiUserExpand[],
 	chats: ApiChatExpand[],
-	channels: ApiChannel[]
+	channels: ApiChannelExpand[]
 }
 
 const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
@@ -108,13 +34,26 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 
 	const sendMsg = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (inputRef.current && selectedChat) {
-			const text = inputRef.current.value.trim();
-			if (text.length === 0)
-				return ;
+		if (!inputRef.current)
+			return ;
+
+		const text = inputRef.current.value.trim();
+		if (text.length === 0)
+			return ;
+
+		if (selectedChat) {
 			const data = {
 				text: text,
 				chatId: selectedChat.id
+			};
+			socket.emit('sendMessage', JSON.stringify(data));
+			inputRef.current.value = '';
+		}
+
+		if (selectedChannel) {
+			const data = {
+				text: text,
+				channelId: selectedChannel.id
 			};
 			socket.emit('sendMessage', JSON.stringify(data));
 			inputRef.current.value = '';
@@ -123,45 +62,11 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 
 	if (chatState === 'newChat')
 		return (
-			<div className='messenger-chat'>
-				<div className='messenger-chat-info'>
-					<div>
-						Create a new chat
-					</div>
-					<button
-						className='messenger-chat-close-btn'
-						onClick={ setDefaultChatState }
-						title='Close'
-					>
-						<FontAwesomeIcon icon={ faTimes }/>
-					</button>
-				</div>
-				<div className='messenger-create-chat'>
-					<p>Select a user</p>
-					{
-						allUsers
-							.filter(usr => chatsToCreate.find(u => usr.login === u.login))
-							.map((usr, i) =>
-								<div
-									className='messenger-create-chat-user'
-									key={ i }
-									onClick={ () => {
-										const data = { userTwoId: usr.id };
-										axios.post('/chats/create', data, {
-											headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-										})
-											.then(() => setDefaultChatState());
-									} }
-								>
-									<div className='messenger-create-chat-user-img' style={ { backgroundImage: `url(${usr.url_avatar})` } }/>
-									<div className='messenger-create-chat-user-login'>
-										{ usr.login }
-									</div>
-								</div>
-							)
-					}
-				</div>
-			</div>
+			<CreateChat
+				setDefaultChatState={ setDefaultChatState }
+				chatsToCreate={ chatsToCreate }
+				allUsers={ allUsers }
+			/>
 		);
 
 	if (chatState === 'newChannel')
@@ -189,12 +94,11 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 				</div>
 				<div className='messenger-chat-messages'>
 					{
-						companion &&
 						messages.map((msg, i) =>
 							<Message
 								key={ i }
 								message={ msg }
-								fromCompanion={ companion.id === msg.fromUserId }
+								isFromCompanion={ msg.fromUserId !== currentUser.id }
 							/>
 						)
 					}
@@ -232,9 +136,18 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 				</div>
 				<div className='messenger-chat-messages'>
 					{
-						// companion &&
-						// messages.map((msg, i) =>
-						// 	<Message key={ i } message={ msg } companion={ companion }/>)
+						selectedChannel.messages.map((msg, i) => {
+							const author = allUsers.find(usr => usr.id === msg.fromUserId);
+
+							return (
+								<Message
+									key={ i }
+									message={ msg }
+									isFromCompanion={ msg.fromUserId !== currentUser.id }
+									author={ author ? { name: author.login, imageUrl: author.url_avatar } : undefined }
+								/>
+							);
+						})
 					}
 				</div>
 				<form className='messenger-chat-form' onSubmit={ sendMsg }>

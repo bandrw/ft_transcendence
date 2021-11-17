@@ -4,13 +4,13 @@ import { faBullhorn } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
-interface ChannelProps {
+interface LeftMenuChannelProps {
 	isSelected: boolean,
 	title: string,
 	selectChannel: () => void
 }
 
-const Channel = ({ isSelected, title, selectChannel }: ChannelProps) => {
+const LeftMenuChannel = ({ isSelected, title, selectChannel }: LeftMenuChannelProps) => {
 	return (
 		<div className={ `messenger-channel ${isSelected ? 'messenger-channel-selected' : ''}` } onMouseDown={ selectChannel }>
 			<div className='messenger-channel-image'>
@@ -21,4 +21,4 @@ const Channel = ({ isSelected, title, selectChannel }: ChannelProps) => {
 	);
 };
 
-export default Channel;
+export default LeftMenuChannel;

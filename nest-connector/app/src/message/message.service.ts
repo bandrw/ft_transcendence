@@ -8,9 +8,17 @@ export class MessageService {
 	@InjectRepository(MessageEntity)
 	private messageRepository: Repository<MessageEntity>;
 
-	async createMessage(text: string, chatId: number, fromUserId: number): Promise<MessageEntity> {
+	async createChatMessage(text: string, chatId: number, fromUserId: number): Promise<MessageEntity> {
 		const message = this.messageRepository.create();
 		message.chatId = chatId;
+		message.fromUserId = fromUserId;
+		message.text = text;
+		return await this.messageRepository.save(message);
+	}
+
+	async createChannelMessage(text: string, channelId: number, fromUserId: number): Promise<MessageEntity> {
+		const message = this.messageRepository.create();
+		message.channelId = channelId;
 		message.fromUserId = fromUserId;
 		message.text = text;
 		return await this.messageRepository.save(message);

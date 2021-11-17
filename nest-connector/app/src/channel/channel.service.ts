@@ -46,4 +46,10 @@ export class ChannelService {
 		}
 	}
 
+	async getChannel(id: number, expand = false): Promise<ChannelEntity> {
+		if (expand)
+			return await this.channelRepository.findOne({ where: { id: id }, relations: ['owner', 'members', 'messages'] });
+		return await this.channelRepository.findOne({ where: { id: id } });
+	}
+
 }

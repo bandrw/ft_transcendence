@@ -13,7 +13,7 @@ export class UsersService {
 	public usersSocketIds = new Map<string, string>();
 	public sockets = new Map<string, Socket>();
 
-	private readonly allRelations = ['wonGames', 'lostGames', 'subscriptions', 'subscribers', 'createdChats', 'acceptedChats', 'messages', 'ownedChannels', 'channels'];
+	private readonly allRelations = ['wonGames', 'lostGames', 'subscriptions', 'subscribers', 'createdChats', 'acceptedChats', 'messages', 'ownedChannels', 'channels', 'channels.messages'];
 
 	constructor(
 		@InjectRepository(User)
