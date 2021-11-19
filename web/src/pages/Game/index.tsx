@@ -52,29 +52,6 @@ const Game = ({ enemyInfo, currentUser, setCurrentUser, gameSettingsRef, gameRef
 				currentUser={ currentUser }
 				setCurrentUser={ setCurrentUser }
 				status={ ApiUserStatus.InGame }
-				// centerBlock={
-				// 	<div className='header-center'>
-				// 		<button
-				// 			className='header-center-exit-btn'
-				// 			onClick={ () => setExitWindowShown(true) }
-				// 		>
-				// 			<FontAwesomeIcon icon={ faDoorOpen }/>
-				// 			<span>EXIT</span>
-				// 		</button>
-				// 		{
-				// 			exitWindowShown &&
-				// 			<ConfirmationWindow
-				// 				title='Are you sure you want to exit the game?'
-				// 				okHandler={ () => {
-				// 					gameRef.current.runs = false;
-				// 					setStatus(ApiUserStatus.Regular);
-				// 					history.push('/');
-				// 				} }
-				// 				cancelHandler={ () => setExitWindowShown(false) }
-				// 			/>
-				// 		}
-				// 	</div>
-				// }
 			/>
 			{
 				gameSettingsRef.current &&

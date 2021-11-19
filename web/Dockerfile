@@ -9,6 +9,7 @@ RUN npm install -g serve
 CMD ["serve", "-s", "build", "-l", "3000"]
 
 COPY package.json ./
+COPY package-lock.json ./
 COPY tsconfig.json ./
 
 RUN npm install

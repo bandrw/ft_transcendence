@@ -2,6 +2,7 @@ import './styles.scss';
 
 import { faBullhorn, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
@@ -125,7 +126,10 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 					<div className='messenger-chat-info-img'>
 						<FontAwesomeIcon icon={ faBullhorn }/>
 					</div>
-					<div>{ selectedChannel.title }</div>
+					<div className='messenger-chat-info-name'>
+						<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
+						<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+					</div>
 					<button
 						className='messenger-chat-close-btn'
 						onClick={ closeSelectedChat }
@@ -150,17 +154,30 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 						})
 					}
 				</div>
-				<form className='messenger-chat-form' onSubmit={ sendMsg }>
-					<input
-						className='messenger-chat-input'
-						ref={ inputRef }
-						type='text'
-						placeholder='Write a message'
-					/>
-					<button type='submit' className='messenger-chat-send-btn'>
-						<FontAwesomeIcon icon={ faPaperPlane }/>
-					</button>
-				</form>
+				{
+					selectedChannel.members.find(member => member.id === currentUser.id)
+					?	<form className='messenger-chat-form' onSubmit={ sendMsg }>
+							<input
+								className='messenger-chat-input'
+								ref={ inputRef }
+								type='text'
+								placeholder='Write a message'
+							/>
+							<button type='submit' className='messenger-chat-send-btn'>
+								<FontAwesomeIcon icon={ faPaperPlane }/>
+							</button>
+						</form>
+					:	<button
+							className='messenger-chat-join-btn'
+							onClick={ () => {
+								axios.post('/channels/join', { channelId: selectedChannel.id }, {
+									headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+								}).then(() => console.log('joined')).catch();
+							} }
+						>
+							Join
+						</button>
+				}
 			</div>
 		);
 

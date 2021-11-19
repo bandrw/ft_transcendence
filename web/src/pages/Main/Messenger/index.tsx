@@ -25,7 +25,10 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	const [selectedChannel, setSelectedChannel] = React.useState<ApiChannelExpand | null>(null);
 	const [showCreateMenu, setShowCreateMenu] = React.useState(false);
 	const [chatState, setChatState] = React.useState('default');
+	const [allChannels, setAllChannels] = React.useState<ApiChannelExpand[]>([]);
+	const [searchPattern, setSearchPattern] = React.useState('');
 
+	// Fetching user's chats and channels
 	React.useEffect(() => {
 		let isMounted = true;
 
@@ -56,6 +59,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 		};
 	}, [currentUser.id, currentUser.username]);
 
+	// Events handlers
 	React.useEffect(() => {
 
 		const receiveMessageHandler = (data: string): void => {
@@ -113,11 +117,26 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 
 	}, [currentUser.id, currentUser.username, socket]);
 
+	// Fetching all channels
+	React.useEffect(() => {
+		axios.get<ApiChannelExpand[]>('/channels', {
+			params: { expand: '' },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
+			.then(res => setAllChannels(res.data));
+	}, []);
+
 	setTimeout(() => {
 		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
 		if (chatMessages.length > 0)
 			chatMessages[0].scrollTop = chatMessages[0].scrollHeight;
 	}, 0);
+
+	const matchedChannels: ApiChannelExpand[] = allChannels.filter(channel =>
+		searchPattern.length !== 0 &&
+			(channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
+			channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()))
+	);
 
 	return (
 		<div className='main-block messenger'>
@@ -131,6 +150,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 							type='text'
 							placeholder='Search'
 							className='messenger-contacts-header-search'
+							onChange={ (e) => setSearchPattern(e.target.value) }
 						/>
 						<button
 							className={ `messenger-contacts-header-btn ${showCreateMenu ? 'messenger-contacts-header-btn-active' : ''}` }
@@ -168,7 +188,11 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 						</button>
 					</div>
 					{
-						chats.map((chat, i) => {
+						chats.filter(chat => {
+							const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
+
+							return companion.login.trim().toLowerCase().includes(searchPattern.trim().toLowerCase());
+						}).map((chat, i) => {
 							const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
 
 							return (
@@ -186,8 +210,10 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 						})
 					}
 					{
-						channels.map((channel, i) => {
-							return (
+						channels.filter(channel =>
+							channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
+								channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase())
+						).map((channel, i) =>
 								<LeftMenuChannel
 									key={ i }
 									title={ channel.title }
@@ -197,8 +223,20 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 										setSelectedChat(null);
 									} }
 								/>
-							);
-						})
+						)
+					}
+					{
+						matchedChannels.map((channel, i) =>
+							<LeftMenuChannel
+								key={ i }
+								title={ channel.title }
+								isSelected={ selectedChannel?.id === channel.id }
+								selectChannel={ () => {
+									setSelectedChannel(channel);
+									setSelectedChat(null);
+								} }
+							/>
+						)
 					}
 					{
 						(chats.length + channels.length) === 0 &&

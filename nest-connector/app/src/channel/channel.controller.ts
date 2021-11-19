@@ -1,15 +1,17 @@
 import {
 	Body,
-	Controller,
-	Post,
+	Controller, Get,
+	Post, Query,
 	Req,
 	UseGuards,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
+import { ExpandDTO } from "app.dto";
 import { CreateChannelDTO, JoinChannelDTO } from "channel/channel.dto";
 import { ChannelService } from "channel/channel.service";
+import { isDefined } from "class-validator";
 
 @Controller('channels')
 export class ChannelController {
@@ -23,6 +25,13 @@ export class ChannelController {
 		const user = req.user;
 
 		return await this.channelService.createChannel(name, title, user.id, isPrivate, password);
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Get()
+	async getChannels(@Req() req, @Query() { expand }: ExpandDTO) {
+		return await this.channelService.getChannels(isDefined(expand));
 	}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))

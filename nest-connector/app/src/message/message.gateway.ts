@@ -27,10 +27,12 @@ export class MessageGateway {
 			return ;
 
 		if (msgData.chatId) {
+			const chat = await this.chatService.getChat(msgData.chatId);
+			if (sender.id !== chat.userOneId && sender.id !== chat.userTwoId)
+				return ;
+
 			const msg = await this.messageService.createChatMessage(msgData.text, msgData.chatId, sender.id);
 			if (msg) {
-				const chat = await this.chatService.getChat(msgData.chatId);
-
 				const onlineUsrOne = this.usersService.onlineUsers.find(usr => usr.id === chat.userOneId);
 				if (onlineUsrOne)
 					onlineUsrOne.socket.emit('receiveMessage', JSON.stringify(msg));
@@ -40,10 +42,12 @@ export class MessageGateway {
 					onlineUsrTwo.socket.emit('receiveMessage', JSON.stringify(msg));
 			}
 		} else if (msgData.channelId) {
+			const channel = await this.channelService.getChannel(msgData.channelId, true);
+			if (!channel.members.find(member => member.id === sender.id))
+				return ;
+
 			const msg = await this.messageService.createChannelMessage(msgData.text, msgData.channelId, sender.id);
 			if (msg) {
-				const channel = await this.channelService.getChannel(msgData.channelId, true);
-
 				for (let i = 0; i < channel.members.length; ++i) {
 					const inOnline = this.usersService.onlineUsers.find(usr => usr.id === channel.members[i].id);
 					if (inOnline)

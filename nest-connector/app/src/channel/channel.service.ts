@@ -52,4 +52,10 @@ export class ChannelService {
 		return await this.channelRepository.findOne({ where: { id: id } });
 	}
 
+	async getChannels(expand = false): Promise<ChannelEntity[]> {
+		if (expand)
+			return await this.channelRepository.find({ relations: ['owner', 'members', 'messages'] });
+		return await this.channelRepository.find();
+	}
+
 }
