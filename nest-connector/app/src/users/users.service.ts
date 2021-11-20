@@ -22,7 +22,14 @@ export class UsersService {
     );
   }
 
-  logout(login: string) {
+  logout(login: string, i = -1) {
+    if (i !== -1) {
+      this.userEvent('logout_SSE', this.onlineUsers[i]);
+      this.onlineUsers[i].resp.end();
+      this.onlineUsers[i] = null;
+      this.onlineUsers = this.onlineUsers.filter((user) => user);
+      return;
+    }
     let index = 0;
     while (index < this.onlineUsers.length) {
       if (this.onlineUsers[index] && this.onlineUsers[index].login === login) {

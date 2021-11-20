@@ -35,7 +35,7 @@ export default {
       return !this.authorized ? "user_unauthorized" : "empty";
     },
     screenSize() {
-      return this.innerHeight > 350 && this.innerWidth > 830;
+      return this.innerHeight > 800 && this.innerWidth > 800;
     },
   },
   methods: {
@@ -69,20 +69,11 @@ export default {
 
 <style>
 body {
-  background-color: #79e7af;
+  background: #79e7af;
 }
 
 h1 {
   text-align: center;
-}
-
-.tab {
-  text-align: left;
-  width: 20%;
-  background-color: beige;
-  font-size: larger;
-  margin: 1%;
-  top: 5%;
 }
 
 #user_unauthorized {

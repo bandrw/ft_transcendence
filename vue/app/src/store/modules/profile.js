@@ -5,7 +5,7 @@ export const state = {
   users: [],
   history: [],
   arrayPage: 0,
-  rowsPerPage: 3,
+  rowsPerPage: 5,
   currentPageInHistory: [],
 };
 

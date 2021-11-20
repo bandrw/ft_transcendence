@@ -32,49 +32,59 @@
       v-on:click="closeProfile"
       aria-hidden="true"
     ></b-icon-x-circle>
+    <h3 id="history_label">match history:</h3>
+    <b-button
+      id="leftHistoryButton"
+      v-show="showButtonLeft"
+      @click="decrementPage"
+      ><b-icon-arrow-bar-left></b-icon-arrow-bar-left
+    ></b-button>
+    <b-button
+      id="rightHistoryButton"
+      v-show="showButtonRight"
+      @click="incrementPage"
+      ><b-icon-arrow-bar-right></b-icon-arrow-bar-right
+    ></b-button>
     <table id="game_history">
       <tr>
-        <th colspan="2"><p>winner</p></th>
-        <th><p>score</p></th>
-        <th colspan="2"><p>looser</p></th>
-        <th><p>score</p></th>
+        <th class="user"><p>winner</p></th>
+        <th class="score"><p>score</p></th>
+        <th class="user"><p>looser</p></th>
+        <th class="score"><p>score</p></th>
       </tr>
-      <tr v-for="game in this.currentPageInHistory" :key="game.id">
-        <td>
+      <tr
+        v-for="game in this.currentPageInHistory"
+        :key="game.id"
+        :style="{
+          'background-color':
+            game.user_one.login === user.login ? 'yellowgreen' : 'orangered',
+          game,
+        }"
+      >
+        <td class="user">
           <p>{{ game.user_one.login }}</p>
-        </td>
-        <td>
           <img
             :src="game.user_one.url_avatar"
             alt=""
             class="game_history_avatar"
           />
         </td>
-        <td>
+        <td class="score">
           <p>{{ game.score_one }}</p>
         </td>
-        <td>
+        <td class="user">
+          <p>{{ game.user_two.login }}</p>
           <img
             :src="game.user_two.url_avatar"
             alt=""
             class="game_history_avatar"
           />
         </td>
-        <td>
-          <p>{{ game.user_two.login }}</p>
-        </td>
-        <td>
+        <td class="score">
           <p>{{ game.score_two }}</p>
         </td>
       </tr>
     </table>
-    <div>
-      <p id="current_page">current page: {{ this.page }}</p>
-      <b-button-group id="history_buttons">
-        <b-button @click="decrementPage"><p>left</p></b-button>
-        <b-button @click="incrementPage"><p>right</p></b-button>
-      </b-button-group>
-    </div>
   </div>
 </template>
 
@@ -92,9 +102,16 @@ export default {
       "currentPageInHistory",
       "arrayPage",
       "history",
+      "rowsPerPage",
     ]),
     page() {
       return this.arrayPage + 1;
+    },
+    showButtonRight() {
+      return this.rowsPerPage * this.page < this.history.length;
+    },
+    showButtonLeft() {
+      return this.page > 1;
     },
     winPercent() {
       if (isNaN(this.user.wins / this.user.games)) {
@@ -138,46 +155,78 @@ export default {
 </script>
 
 <style scoped>
-#current_page {
-  text-align: center;
-  right: 35%;
-  top: 80%;
+.user {
+  width: 35%;
+}
+.score {
+  width: 15%;
+}
+
+#leftHistoryButton {
+  left: 40%;
+  top: 40%;
   position: absolute;
 }
 
-table,
-th,
+#rightHistoryButton {
+  right: 43%;
+  top: 40%;
+  position: absolute;
+}
+
+td > p {
+  left: 10%;
+  position: relative;
+}
+
+td > img {
+  left: 15%;
+}
+
+#history_label {
+  top: 37%;
+  left: 17%;
+  position: absolute;
+}
+
 td {
-  border: 2px solid beige;
-  border-radius: 15px;
+  position: relative;
+  border-right: 1px solid black;
+}
+
+table {
+  border-collapse: collapse;
+  border: 1px solid black;
+  text-align: center;
+  vertical-align: center;
+}
+
+th {
+  background-color: darkolivegreen;
+  border-right: 1px solid black;
 }
 
 #user_login {
   text-align: center;
-  top: 5%;
+  top: 3%;
+  left: 50%;
+  position: absolute;
 }
 
 .game_history_avatar {
-  width: 25%;
-  height: 25%;
+  width: 45px;
+  height: 45px;
+  left: 10%;
+  top: 7%;
+  position: absolute;
 }
 
 #game_history {
   position: absolute;
-  top: 38%;
-  left: 1%;
-  width: 69%;
+  top: 45%;
+  left: 25%;
+  width: 45%;
   height: 40%;
-  background-color: aqua;
-}
-
-#history_buttons {
-  position: absolute;
-  top: 84%;
-  left: 45%;
-  width: 25%;
-  height: 5%;
-  background-color: aqua;
 }
 
 p {
@@ -187,7 +236,7 @@ p {
 
 #game_stats {
   border: 3px black solid;
-  border-radius: 25px;
+  border-radius: 12px;
   position: absolute;
   left: 25%;
   top: 12%;

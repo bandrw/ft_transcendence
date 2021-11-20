@@ -13,6 +13,7 @@ import { UsersService } from './users/users.service';
 import { ChatService } from './chat/chat.service';
 import { getConnection } from 'typeorm';
 import { GameHistory } from './game/game.entity';
+import { LadderService } from './ladder/ladder.service';
 
 @WebSocketGateway()
 export class Events implements OnGatewayDisconnect {
@@ -23,6 +24,8 @@ export class Events implements OnGatewayDisconnect {
     private userService: UsersService,
     @Inject(ChatService)
     private chatService: ChatService,
+    @Inject(LadderService)
+    private ladder: LadderService,
   ) {}
   @WebSocketServer() server: Server;
   @SubscribeMessage('start')
@@ -119,7 +122,13 @@ export class Events implements OnGatewayDisconnect {
         this.userService.onlineUsers[i] &&
         this.userService.onlineUsers[i].socketId === client.id
       ) {
-        this.userService.logout(this.userService.onlineUsers[i].login);
+        if (this.userService.onlineUsers[i].status !== 'green') {
+          this.ladder.updateStatus(
+            this.userService.onlineUsers[i].login,
+            'green',
+          );
+        }
+        this.userService.logout(this.userService.onlineUsers[i].login, i);
         return;
       }
       ++i;

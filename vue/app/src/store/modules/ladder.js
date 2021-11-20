@@ -12,6 +12,7 @@ export const state = {
   breaker: false,
   readyStatus: "gameNotAccepted",
   enemyReadyStatus: "gameNotAccepted",
+  acceptColor: "green",
 };
 
 export const mutations = {
@@ -41,8 +42,16 @@ export const mutations = {
     state.timerAccept -= 0.1;
     if (state.timerAccept < 3) {
       state.str_timerAccept = state.timerAccept.toFixed(1);
+      if (state.acceptColor !== "red") {
+        state.acceptColor = "red";
+      }
     } else if (state.timerAccept < 7) {
       state.str_timerAccept = state.timerAccept.toFixed(0);
+      if (state.acceptColor !== "yellow" && state.timerAccept < 5) {
+        state.acceptColor = "yellow";
+      } else if (state.acceptColor !== "green" && state.timerAccept >= 5) {
+        state.acceptColor = "green";
+      }
     }
   },
   SET_READY_STATUS(state, status) {

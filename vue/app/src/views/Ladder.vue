@@ -1,31 +1,55 @@
 <template>
-  <div v-on:click="findGame" :id="idGame" class="Jquery_bundle">
+  <div v-on:click="findGame" :id="idGame">
     <div v-if="enemy">
       <div
         v-show="readyStatus === 'gameNotAccepted'"
         id="accept_button"
         @click="gameAccept"
       >
-        {{ ladder }}
+        <h4>accept</h4>
       </div>
       <div id="decline_button" v-on:click="cancelAccept">cancel</div>
-      <div id="timeout">{{ str_timerAccept }}</div>
-      <div id="ladder_you">
-        <img :src="user.url_avatar" width="100%" height="100%" alt="" />
+      <div id="timeout">
+        <h2
+          :style="{
+            color: acceptColor,
+            left: acceptColor === 'red' ? '10%' : '35%',
+          }"
+        >
+          {{ str_timerAccept }}
+        </h2>
       </div>
-      <div id="ladder_ready_you" :style="{ backgroundColor: readyColor }"></div>
-      <div
+      <img
+        :src="user.url_avatar"
+        width="100%"
+        height="100%"
+        alt=""
+        id="ladder_you"
+      />
+      <b-icon-check
+        v-if="readyStatus === 'gameAccepted'"
+        id="ladder_ready_you"
+        scale="2"
+        shift-v="2"
+      ></b-icon-check>
+      <b-icon-check
+        v-if="enemyReadyStatus === 'gameAccepted'"
         id="ladder_ready_enemy"
-        :style="{ backgroundColor: enemyReadyColor }"
-      ></div>
-      <div id="ladder_enemy">
-        <img :src="enemy.url_avatar" width="100%" height="100%" alt="" />
-      </div>
+        scale="2"
+        shift-v="2"
+      ></b-icon-check>
+      <img
+        :src="enemy.url_avatar"
+        width="100%"
+        height="100%"
+        alt=""
+        id="ladder_enemy"
+      />
     </div>
     <div v-else>
-      <p v-if="authorized">{{ ladder }}</p>
+      <h2>{{ ladder }}</h2>
       <div v-if="gameFinding">
-        {{ str_timerFind }}
+        <h1>{{ str_timerFind }}</h1>
         <div id="cancel" v-on:click="cancelFind">cancel</div>
       </div>
     </div>
@@ -33,7 +57,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import eventService from "../services/eventService";
 
 export default {
@@ -48,26 +72,13 @@ export default {
       "timerAccept",
       "str_timerAccept",
       "str_timerFind",
+      "acceptColor",
     ]),
     gameFinding: function () {
       return this.game && !this.enemy && this.authorized;
     },
     idGame: function () {
       return this.enemy ? "game_accept" : "search_ladder";
-    },
-    readyColor: function () {
-      if (this.readyStatus === "gameNotAccepted") {
-        return "yellow";
-      } else {
-        return "green";
-      }
-    },
-    enemyReadyColor: function () {
-      if (this.enemyReadyStatus === "gameNotAccepted") {
-        return "yellow";
-      } else {
-        return "green";
-      }
     },
   },
   methods: {
@@ -147,7 +158,6 @@ export default {
       if (this.authorized && this.timerAccept > 0.1) {
         this.ACCEPT_TICK();
       } else {
-        // this.clearIntervals();
         if (this.readyStatus === "gameNotAccepted") {
           this.clearData("blue");
         } else if (this.readyStatus === "gameAccepted") {
@@ -165,65 +175,88 @@ export default {
 </script>
 
 <style scoped>
+h4 {
+  left: 10%;
+  position: absolute;
+  top: 10%;
+}
+
+h2 {
+  position: absolute;
+  top: 35%;
+  left: 30%;
+}
+
 #search_ladder {
   width: 20%;
   height: 15%;
-  background-color: darkviolet;
+  background-color: khaki;
+  border-radius: 15px;
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: 3%;
+  bottom: 3%;
 }
 
 #game_accept {
   width: 35%;
   height: 30%;
-  background-color: chartreuse;
+  background-color: khaki;
   position: absolute;
   right: 33%;
   bottom: 35%;
+  border-radius: 20px;
 }
 
 #cancel {
   width: 25%;
   height: 25%;
-  background-color: red;
+  background-color: chocolate;
   position: absolute;
   right: 10%;
   bottom: 10%;
+  border-radius: 8px;
 }
 
 #accept_button {
   width: 25%;
   height: 25%;
-  background-color: green;
+  background-color: slategray;
   position: absolute;
   right: 37%;
+  border-radius: 10px;
   bottom: 10%;
 }
 
 #decline_button {
   width: 15%;
   height: 12%;
-  background-color: red;
+  background-color: chocolate;
+  border-radius: 8px;
   position: absolute;
   top: 1%;
   right: 1%;
 }
 
 #timeout {
-  width: 10%;
-  height: 15%;
-  background-color: gold;
   text-align: center;
   position: absolute;
   top: 10%;
   right: 45%;
+  background-color: slategray;
+  border-radius: 8px;
+  width: 15%;
+  height: 16%;
+}
+
+#timeout > h2 {
+  top: 1%;
+  position: absolute;
 }
 
 #ladder_you {
   width: 20%;
   height: 40%;
-  background-color: aliceblue;
+  background-color: khaki;
   text-align: center;
   position: absolute;
   left: 10%;
@@ -233,7 +266,7 @@ export default {
 #ladder_enemy {
   width: 20%;
   height: 40%;
-  background-color: aliceblue;
+  background-color: khaki;
   text-align: center;
   position: absolute;
   right: 10%;
