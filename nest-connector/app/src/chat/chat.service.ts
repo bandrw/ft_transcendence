@@ -1,64 +1,76 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { PersonalChat } from './personal-chat';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from "@nestjs/typeorm";
+import { ChatEntity } from "chat/chat.entity";
+import { Repository } from "typeorm";
+import { UsersService } from "users/users.service";
 
 @Injectable()
 export class ChatService {
-  @Inject(UsersService)
-  private usersService: UsersService;
-  private personalChats: PersonalChat[] = [];
+	@InjectRepository(ChatEntity)
+	private chatRepository: Repository<ChatEntity>;
+	@Inject()
+	private usersService: UsersService;
 
-  createNewPersonalChat(from: string, to: string) {
-    let fromUser;
-    let toUser;
-    let i = 0;
-    let fromUserIndex;
-    let toUserIndex;
-    while (i < this.usersService.onlineUsers.length) {
-      if (this.usersService.onlineUsers[i].login === from) {
-        fromUser = this.usersService.onlineUsers[i];
-        fromUserIndex = i;
-      } else if (this.usersService.onlineUsers[i].login === to) {
-        toUser = this.usersService.onlineUsers[i];
-        toUserIndex = i;
-      }
-      if (fromUser && toUser) {
-        break;
-      }
-      ++i;
-    }
-    if (i === this.usersService.onlineUsers.length) {
-      this.personalChats.push(
-        new PersonalChat(fromUser, toUser, this.personalChats.length),
-      );
-      this.usersService.onlineUsers[fromUserIndex].resp.write(
-        `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[toUserIndex].login}}`,
-      );
-      this.usersService.onlineUsers[toUserIndex].resp.write(
-        `event: chatProperties\ndata: {id: ${i}, name: ${this.usersService.onlineUsers[fromUserIndex].login}}`,
-      );
-    }
-  }
+	async createChat(userOneId: number, userTwoId: number): Promise<ChatEntity> {
+		if (userOneId === userTwoId)
+			throw new HttpException('Cannot create chat', HttpStatus.BAD_REQUEST);
 
-  transferPersonalMessage(id: number, to: string, message: string) {
-    if (this.personalChats[id].userOne.login === to) {
-      this.personalChats[id].userOne.resp.write(
-        `event: personalMessage\ndata: ${message}`,
-      );
-    } else {
-      this.personalChats[id].userTwo.resp.write(
-        `event: personalMessage\ndata: ${message}`,
-      );
-    }
-  }
+		// Check if chat already exists
+		if (await this.chatRepository.findOne({ where: { userOneId: userOneId, userTwoId: userTwoId } }))
+			throw new HttpException('Chat already exists', HttpStatus.BAD_REQUEST);
+		if (await this.chatRepository.findOne({ where: { userOneId: userTwoId, userTwoId: userOneId } }))
+			throw new HttpException('Chat already exists', HttpStatus.BAD_REQUEST);
 
-  // removePersonalChat(personalChat: PersonalChat) {
-  //   personalChat.userOne.resp.write(
-  //     `event: personalChatClose\ndata: ${personalChat.userTwo.login}\n\n`,
-  //   );
-  //   personalChat.userTwo.resp.write(
-  //     `event: personalChatClose\ndata: ${personalChat.userOne.login}\n\n`,
-  //   );
-  //   this.personalChats[personalChat.id] = null;
-  // }
+		try {
+			const chat = this.chatRepository.create();
+			chat.userOneId = userOneId;
+			chat.userTwoId = userTwoId;
+			const r = await this.chatRepository.save(chat);
+
+			const u1 = this.usersService.onlineUsers.find(usr => usr.id === r.userOneId);
+			if (u1)
+				u1.socket.emit('newChat', JSON.stringify(r));
+			const u2 = this.usersService.onlineUsers.find(usr => usr.id === r.userTwoId);
+			if (u2)
+				u2.socket.emit('newChat', JSON.stringify(r));
+
+			return r;
+		} catch (e) {
+			throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	async getChats(userId: number, expand: boolean): Promise<ChatEntity[]> {
+		const chats: ChatEntity[] = [];
+		let r1: ChatEntity[];
+		let r2: ChatEntity[];
+
+		if (expand) {
+			r1 = await this.chatRepository.find({ where: { userOneId: userId }, relations: ['userOne', 'userTwo', 'messages'] });
+			r2 = await this.chatRepository.find({ where: { userTwoId: userId }, relations: ['userOne', 'userTwo', 'messages'] });
+		} else {
+			r1 = await this.chatRepository.find({ where: { userOneId: userId } });
+			r2 = await this.chatRepository.find({ where: { userTwoId: userId } });
+		}
+
+		for (let i = 0; i < r1.length; ++i)
+			chats.push(r1[i]);
+		for (let i = 0; i < r2.length; ++i)
+			chats.push(r2[i]);
+
+		if (expand)
+			for (let i = 0; i < chats.length; ++i)
+				chats[i].messages.sort((msg1, msg2) => msg1.date - msg2.date);
+
+		return chats;
+	}
+
+	async getChat(id: number, expand = false): Promise<ChatEntity> {
+		if (expand) {
+			const r = await this.chatRepository.findOne({ where: { id: id }, relations: ['userOne', 'userTwo', 'messages'] });
+			r.messages.sort((msg1, msg2) => msg1.date - msg2.date);
+			return r;
+		}
+		return await this.chatRepository.findOne({ where: { id: id } });
+	}
 }

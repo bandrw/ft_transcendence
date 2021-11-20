@@ -1,4 +1,4 @@
-# Front-end part of ft_transcendence
+# Front-end part of Ft_transcendence
 
 ### Setup
 ```
@@ -7,7 +7,7 @@ npm install
 
 ### Run
 ```
-npm run serve
+npm run start
 ```
 
-## Written on React.js
+## `Written on React/Typescript`

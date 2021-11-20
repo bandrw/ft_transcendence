@@ -1,33 +1,27 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from "@nestjs/passport";
+import { EmptyDTO } from "app.dto";
+import { AddWatcherDTO } from "game/game.dto";
 import { GameService } from "game/game.service";
 
 @Controller('games')
 export class GameController {
-	constructor(private GameService: GameService) {}
+	constructor(private gameService: GameService) {}
 
-	@Get('/')
-	async getGames() {
-		return await this.GameService.getGames();
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Get()
+	async getGames(@Query() {  }: EmptyDTO) {
+
+		return await this.gameService.getGames();
 	}
 
-	@Get('/watchGame')
-	addWatcher(@Query('login') login: string, @Query('gamerLogin') gamerLogin: string) {
-		this.GameService.addWatcher(login, gamerLogin);
-		return { ok: true };
-	}
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Get('watchGame')
+	addWatcher(@Req() req, @Query() { gamerLogin }: AddWatcherDTO) {
+		const user = req.user;
 
-	// @Post('/')
-	// async pushGame(@Body() body: CreateGame) {
-	// 	if (!body.leftPlayerId || !body.rightPlayerId || !body.winnerId)
-	// 		throw new HttpException('Invalid body', HttpStatus.BAD_REQUEST);
-	//
-	// 	const leftPlayer = await this.UsersService.findOne(body.leftPlayerId);
-	// 	const rightPlayer = await this.UsersService.findOne(body.rightPlayerId);
-	// 	const winner = leftPlayer.id === body.winnerId ? leftPlayer : rightPlayer;
-	// 	await this.GameService.pushGame(leftPlayer, rightPlayer, winner)
-	// 		.catch(e => {
-	// 			throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
-	// 		});
-	// 	return { ok: true, msg: 'GameEntity created' };
-	// }
+		return { ok: this.gameService.addWatcher(user.id, gamerLogin) };
+	}
 }

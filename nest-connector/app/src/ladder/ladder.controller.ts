@@ -1,18 +1,23 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { AuthGuard } from "@nestjs/passport";
+import { FindGameDTO } from "ladder/ladder.dto";
 import { LadderService } from 'ladder/ladder.service';
-
 
 @Controller('ladder')
 export class LadderController {
-  constructor(private ladder: LadderService) {}
+	constructor(private ladder: LadderService) {}
 
-  @Get('gameStatus')
-  findGame(@Query('login') login, @Query('status') status) {
-    this.ladder.updateStatus(login, status);
-  }
+	@UseGuards(AuthGuard('jwt'))
+	@Get('setStatus')
+	findGame(@Req() req, @Query() { status }: FindGameDTO) {
+		const user = req.user;
 
-  @Get('systemStatus')
-  systemStatus(@Query('login') login) {
-    this.ladder.traceLadder(login);
-  }
+		this.ladder.updateStatus(user.id, status);
+	}
+
+	// @UseGuards(AuthGuard('jwt'))
+	// @Get('systemStatus')
+	// systemStatus(@Query('login') login) {
+	// 	this.ladder.traceLadder(login);
+	// }
 }

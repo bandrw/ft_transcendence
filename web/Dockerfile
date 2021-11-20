@@ -1,4 +1,4 @@
-FROM node:16.13-alpine
+FROM node:lts-alpine
 
 WORKDIR /app
 
@@ -9,6 +9,7 @@ RUN npm install -g serve
 CMD ["serve", "-s", "build", "-l", "3000"]
 
 COPY package.json ./
+COPY package-lock.json ./
 COPY tsconfig.json ./
 
 RUN npm install

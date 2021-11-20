@@ -1,15 +1,24 @@
 import './styles.scss';
 
-import { faExternalLinkAlt, faGamepad, faUserFriends } from "@fortawesome/free-solid-svg-icons";
+import { faExternalLinkAlt, faGamepad, faUserCheck, faUserFriends, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import CircleLoading from "components/CircleLoading";
 import Header from "components/Header";
-import { ApiGame, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
+import FriendsList from "pages/UserProfile/FriendsList";
 import ListSection from "pages/UserProfile/ListSection";
 import React from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+
+enum SubscribeBtnState {
+	Default,
+	Subscribed,
+	AcceptFriendship,
+	InFriendship
+}
 
 interface GameItemProps {
 	enemy?: ApiUser,
@@ -47,36 +56,168 @@ const GameItem = ({ enemy, game, user }: GameItemProps) => {
 	);
 };
 
+const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: User, targetLogin: string, allUsers: ApiUserExpand[] }) => {
+	const [subscribeBtnState, setSubscribeBtnState] = React.useState(SubscribeBtnState.Default);
+	const [subscribeBtnLoading, setSubscribeBtnLoading] = React.useState(false);
+
+	React.useEffect(() => {
+		const currUser = allUsers.find(usr => usr.login === currentUser.username);
+		if (!currUser)
+			return ;
+
+		if (!currUser.subscriptions) {
+			console.log('[SubscribeBtn] subscriptions is undefined');
+			return;
+		}
+		if (!currUser.subscribers) {
+			console.log('[SubscribeBtn] subscribers is undefined');
+			return;
+		}
+
+		if (currUser.subscriptions.find(s => s.login === targetLogin)) {
+			if (currUser.subscribers.find(s => s.login === targetLogin))
+				setSubscribeBtnState(SubscribeBtnState.InFriendship);
+			else
+				setSubscribeBtnState(SubscribeBtnState.Subscribed);
+		} else if (currUser.subscribers.find(s => s.login === targetLogin)) {
+			setSubscribeBtnState(SubscribeBtnState.AcceptFriendship);
+		} else {
+			setSubscribeBtnState(SubscribeBtnState.Default);
+		}
+	}, [allUsers, currentUser.username, targetLogin]);
+
+	if (subscribeBtnLoading)
+		return (
+			<button
+				className='user-profile-header-subscribe-btn'
+			>
+				<CircleLoading
+					bgColor='#fff'
+					width='35px'
+					height='35px'
+				/>
+			</button>
+		);
+
+	if (subscribeBtnState === SubscribeBtnState.Default)
+		return (
+			<button
+				className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-default'
+				onClick={ () => {
+					setSubscribeBtnLoading(true);
+					axios.get('/users/subscribe', {
+						params: { target: targetLogin },
+						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+					})
+						.then(() => setSubscribeBtnState(SubscribeBtnState.Subscribed))
+						.catch(() => {})
+						.finally(() => setSubscribeBtnLoading(false));
+				} }
+				title='Subscribe'
+			>
+				Subscribe
+				<FontAwesomeIcon icon={ faUserPlus }/>
+			</button>
+		);
+
+	if (subscribeBtnState === SubscribeBtnState.Subscribed)
+		return (
+			<button
+				className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-subscribed'
+				onClick={ () => {
+					setSubscribeBtnLoading(true);
+					axios.get('/users/unsubscribe', {
+						params: { target: targetLogin },
+						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+					})
+						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
+						.catch(() => {})
+						.finally(() => setSubscribeBtnLoading(false));
+				} }
+				title='Unsubscribe'
+			>
+				Subscribed
+				<FontAwesomeIcon icon={ faUserCheck }/>
+			</button>
+		);
+
+	if (subscribeBtnState === SubscribeBtnState.AcceptFriendship)
+		return (
+			<button
+				className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-accept'
+				onClick={ () => {
+					setSubscribeBtnLoading(true);
+					axios.get('/users/subscribe', {
+						params: { target: targetLogin },
+						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+					})
+						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
+						.catch(() => {})
+						.finally(() => setSubscribeBtnLoading(false));
+				} }
+				title='Subscribe'
+			>
+				Accept
+				<FontAwesomeIcon icon={ faUserCheck }/>
+			</button>
+		);
+
+	return (
+		<button
+			className='user-profile-header-subscribe-btn user-profile-header-subscribe-btn-friends'
+			onClick={ () => {
+				setSubscribeBtnLoading(true);
+				axios.get('/users/unsubscribe', {
+					params: { target: targetLogin },
+					headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+				})
+					.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
+					.catch(() => {})
+					.finally(() => setSubscribeBtnLoading(false));
+			} }
+			title='Unsubscribe'
+		>
+			Friend
+			<FontAwesomeIcon icon={ faUserFriends }/>
+		</button>
+	);
+};
+
 interface UserProfileProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	allUsers: ApiUser[]
+	allUsers: ApiUserExpand[]
 }
 
 const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProfileProps) => {
-	const history = useHistory();
-
-	React.useEffect(() => {
-		if (!currentUser.isAuthorized()) {
-			history.push('/login');
-		}
-	}, [history, currentUser]);
-
-	React.useEffect(() => {
-		if (status === ApiUserStatus.InGame)
-			history.push('/game');
-	}, [history, status]);
-
 	const params = useParams<{ login: string }>();
-	const [user, setUser] = React.useState<ApiUser | null>(null);
+	const [user, setUser] = React.useState<ApiUserExpand | null>(null);
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
+	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
 
 	React.useEffect(() => {
-		axios.get<ApiUser>('/users', { params: { login: params.login, expand: true } })
-			.then(res => {
-				setUser(res.data);
+		const friendsLogins: string[] = [];
+		const u = allUsers.find(usr => usr.login === user?.login);
+		if (u) {
+			for (let i in u.subscribers)
+				if (u.subscriptions.find(usr => usr.login === u.subscribers[i].login))
+					friendsLogins.push(u.subscribers[i].login);
+		}
+		setFriends(allUsers.filter(usr => friendsLogins.indexOf(usr.login) !== -1));
+	}, [allUsers, user]);
 
+	React.useEffect(() => {
+		let isMounted = true;
+
+		axios.get<ApiUserExpand>('/users', {
+			params: { login: params.login, expand: '' },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
+			.then(res => {
+				if (!isMounted)
+					return ;
+				setUser(res.data);
 				if (!res.data.wonGames || !res.data.lostGames)
 					return;
 				const games: ApiGame[] = [];
@@ -86,18 +227,31 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 					games.push(res.data.lostGames[i]);
 				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
 			});
+
+		return () => {
+			isMounted = false;
+		};
 	}, [params.login]);
+
+	if (!currentUser.isAuthorized())
+		return (
+			<div>
+				<Header
+					currentUser={ currentUser }
+					setCurrentUser={ setCurrentUser }
+					status={ status }
+				/>
+			</div>
+		);
 
 	let winRate = '-';
 	let gamesCount = '0';
 
 	if (user) {
-		if (user.lostGames && user.wonGames) {
-			if (user.lostGames.length + user.wonGames.length !== 0) {
-				winRate = `${ Math.round(100 * user.wonGames.length / (user.lostGames.length + user.wonGames.length)) } %`;
-			}
-			gamesCount = `${ user.lostGames.length + user.wonGames.length }`;
+		if (user.lostGames.length + user.wonGames.length !== 0) {
+			winRate = `${ Math.round(100 * user.wonGames.length / (user.lostGames.length + user.wonGames.length)) } %`;
 		}
+		gamesCount = `${ user.lostGames.length + user.wonGames.length }`;
 	}
 
 	return (
@@ -110,10 +264,20 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 			<div className='user-profile-wrapper'>
 				<div className='user-profile'>
 					<div className='user-profile-info-img' style={ { backgroundImage: `url(${ user?.url_avatar })` } }/>
-					<div className='user-profile-header-username'>{ user?.login }</div>
+					<div className='user-profile-header-top'>
+						<div className='user-profile-header-username'>{ user?.login }</div>
+						{
+							(user && user.login !== currentUser.username) &&
+							<SubscribeBtn
+								currentUser={ currentUser }
+								targetLogin={ user.login }
+								allUsers={ allUsers }
+							/>
+						}
+					</div>
 					<div className='user-profile-header'>
 						<div className='user-profile-header-section'>
-							<div className='user-profile-header-section-content'>{ 10 }</div>
+							<div className='user-profile-header-section-content'>{ friends.length }</div>
 							<div className='user-profile-header-section-label'>friends</div>
 						</div>
 						<div className='user-profile-header-section'>
@@ -124,10 +288,6 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 							<div className='user-profile-header-section-content'>{ gamesCount }</div>
 							<div className='user-profile-header-section-label'>games</div>
 						</div>
-						{ /*<div className='user-profile-header-section'>*/ }
-						{ /*	<div className='user-profile-header-section-content'>{ `October, 31` }</div>*/ }
-						{ /*	<div className='user-profile-header-section-label'>member since</div>*/ }
-						{ /*</div>*/ }
 						<div className='user-profile-header-section'>
 							<div className='user-profile-header-section-content'>
 								{
@@ -168,16 +328,7 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 							}
 						/>
 						<div style={ { height: '50px' } }/>
-						<ListSection
-							title='Friends'
-							list={ [] }
-							emptyListSubstitute={
-								<div className='list-section-empty'>
-									No friends yet
-									<FontAwesomeIcon icon={ faUserFriends }/>
-								</div>
-							}
-						/>
+						<FriendsList friends={ friends }/>
 					</div>
 				</div>
 			</div>

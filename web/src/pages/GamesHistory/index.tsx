@@ -4,13 +4,13 @@ import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import Header from "components/Header";
-import { ApiGame, ApiUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import { User } from "models/User";
 import moment from "moment";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
 import Moment from "react-moment";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');
@@ -38,30 +38,20 @@ interface GamesHistoryProps {
 	currentUser: User,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	allUsers: ApiUser[]
+	allUsers: ApiUserExpand[]
 }
 
 const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHistoryProps) => {
-	const history = useHistory();
-
-	React.useEffect(() => {
-		if (!currentUser.isAuthorized()) {
-			history.push('/login');
-		}
-	}, [history, currentUser]);
-
-	React.useEffect(() => {
-		if (status === ApiUserStatus.InGame)
-			history.push('/game');
-	}, [history, status]);
-
 	const params = useParams<{ login: string }>();
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 
 	React.useEffect(() => {
 		let isMounted = true;
 
-		axios.get<ApiUser>('/users', { params: { login: params.login, expand: true } })
+		axios.get<ApiUserExpand>('/users', {
+			params: { login: params.login, expand: '' },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		})
 			.then(res => {
 				if (!isMounted)
 					return;
@@ -80,6 +70,17 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 			isMounted = false;
 		};
 	}, [currentUser.username, params.login]);
+
+	if (!currentUser.isAuthorized())
+		return (
+			<div>
+				<Header
+					currentUser={ currentUser }
+					setCurrentUser={ setCurrentUser }
+					status={ status }
+				/>
+			</div>
+		);
 
 	return (
 		<div>

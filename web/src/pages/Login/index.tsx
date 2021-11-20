@@ -1,63 +1,85 @@
 import './styles.scss';
 
+import { getCurrentUser } from "App";
 import axios, { AxiosResponse } from "axios";
-import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
+import { SocketContext } from "context/socket";
 import { ApiUserLogin } from "models/apiTypes";
 import { User } from "models/User";
 import React from 'react';
-import { Link, useHistory } from "react-router-dom";
+import { Link, Redirect, useHistory } from "react-router-dom";
 
 interface LoginProps {
 	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
+	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
+	socketId: string
 }
 
 export const signIn = async (
 	login: string,
 	password: string,
 	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
-	setErrors: React.Dispatch<React.SetStateAction<string> >
-) => {
-	const r = await axios.post<any, AxiosResponse<ApiUserLogin> >('/users/login', {
-		login
+	setErrors: React.Dispatch<React.SetStateAction<string> >,
+	socketId: string
+): Promise<void> => {
+	const accessToken = await axios.post<any, AxiosResponse<ApiUserLogin> >('/users/login', {
+		username: login,
+		password: password,
+		socketId: socketId
 	})
-		.then(res => {
-			if (res.data.ok && bcryptjs.compareSync(password, res.data.msg.password)) {
-				const usr = new User();
-				usr.id = res.data.msg.id;
-				usr.username = res.data.msg.login;
-				usr.urlAvatar = res.data.msg.url_avatar;
-				usr.loginDate = Date.now();
-				setCurrentUser(usr);
-				return true;
-			}
-			setErrors('Wrong username or password');
-			return false;
+		.then(res => res.data.access_token)
+		.catch(() => {
+			setErrors('Login Error');
+			return null;
 		});
-	if (!r)
-		throw Error();
+	if (accessToken) {
+		localStorage.setItem('access_token', accessToken);
+		getCurrentUser(accessToken, socketId, 'local')
+			.then(usr => {
+				if (usr) {
+					setCurrentUser(usr);
+				} else {
+					localStorage.removeItem('access_token');
+				}
+			});
+	}
 };
 
-const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
+const Login = ({ currentUser, setCurrentUser, socketId }: LoginProps) => {
 	const history = useHistory();
+	const socket = React.useContext(SocketContext);
 
-	React.useEffect(() => {
-		if (currentUser.isAuthorized())
-			history.push('/');
-	}, [history, currentUser]);
-
-	const loginRef = React.createRef<HTMLInputElement>();
-	const passwordRef = React.createRef<HTMLInputElement>();
+	const loginRef = React.useRef<HTMLInputElement>(null);
+	const passwordRef = React.useRef<HTMLInputElement>(null);
 
 	const [loginErrors, setLoginErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+	const params = new URLSearchParams(window.location.search);
+	const authCode = params.get('code');
+
+	React.useEffect(() => {
+		if (authCode) {
+			getCurrentUser(authCode, socketId, 'intra')
+				.then(user => {
+					if (user) {
+						setCurrentUser(user);
+					} else {
+						localStorage.removeItem('access_token');
+					}
+				})
+				.finally(() => history.push('/login'));
+		}
+	}, [history, authCode, socketId, setCurrentUser]);
+
+	if (currentUser.isAuthorized())
+		return <Redirect to='/'/>;
 
 	return (
 		<div className='login-container'>
 			<h1>Login page</h1>
 
-			<form onSubmit={ (e) => {
+			<form onSubmit={ async (e) => {
 				e.preventDefault();
 
 				setIsLoading(true);
@@ -65,15 +87,8 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 				const login = loginRef.current?.value || '';
 				const password = passwordRef.current?.value || '';
 
-				signIn(login, password, setCurrentUser, setLoginErrors)
-					.then(() => {
-						setIsLoading(false);
-						history.push('/');
-					})
-					.catch(() => {
-						setIsLoading(false);
-						setLoginErrors('Wrong login or password');
-					});
+				await signIn(login, password, setCurrentUser, setLoginErrors, socket.id);
+				setIsLoading(false);
 			} }
 			>
 				<input
@@ -81,7 +96,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					type='text'
 					placeholder='Login'
 					ref={ loginRef }
-					defaultValue='admin'
+					// defaultValue='admin'
 					autoComplete='username'
 				/>
 				<input
@@ -89,7 +104,7 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 					type='password'
 					placeholder='Password'
 					ref={ passwordRef }
-					defaultValue='123123'
+					// defaultValue='123123'
 					autoComplete='current-password'
 				/>
 				<span className='login-errors'>
@@ -119,13 +134,26 @@ const Login = ({ currentUser, setCurrentUser }: LoginProps) => {
 			</span>
 
 			<div className='login-services'>
-				<button
-					className='login-service'
-					onClick={ () => alert('not working yet') }
-				>
-					Sign in with
-					<div className='login-service-icon'/>
-				</button>
+				{
+					authCode
+						? <div
+								className='login-service login-btn'
+							>
+								<CircleLoading bgColor='#fff' width='35px' height='35px'/>
+							</div>
+						: <a
+								className='login-service login-btn'
+								href={
+									`https://api.intra.42.fr/oauth/authorize/?` +
+									`client_id=${process.env.REACT_APP_INTRA_UID}&` +
+									`redirect_uri=${encodeURIComponent(`${process.env.REACT_APP_INTRA_REDIRECT}`)}&` +
+									'response_type=code'
+								} rel="noreferrer"
+							>
+								Sign in with
+								<div className='login-service-icon'/>
+							</a>
+				}
 			</div>
 		</div>
 	);

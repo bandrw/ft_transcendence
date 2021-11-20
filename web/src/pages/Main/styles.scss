@@ -12,7 +12,13 @@
 		max-width: calc(2560px - 80px);
 		height: fit-content;
 		display: flex;
-		justify-content: space-between;
+		flex-direction: column;
+
+		.main-top {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+		}
 
 		.main-center {
 			padding-top: 20px;

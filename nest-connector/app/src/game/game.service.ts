@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Game } from 'game/game';
+import { Game } from 'game/Game';
 import { GameEntity } from "game/game.entity";
 import { Repository } from "typeorm";
-import { User } from "users/user.entity";
+import { User } from "users/entities/user.entity";
 import { UsersService } from 'users/users.service';
 
 @Injectable()
@@ -35,16 +35,18 @@ export class GameService {
 		return await this.gameRepository.find({ relations: ['winner', 'loser'] });
 	}
 
-	addWatcher(watcherLogin: string, gamerLogin: string) {
-		const watcher = this.userService.onlineUsers.find(usr => usr.login === watcherLogin);
+	addWatcher(watcherId: number, gamerLogin: string) {
+		const watcher = this.userService.onlineUsers.find(usr => usr.id === watcherId);
 		if (!watcher)
-			return ;
+			return false;
 
 		const game = this.games.find(g => g.leftPlayer.user.login === gamerLogin || g.rightPlayer.user.login === gamerLogin);
 		if (game) {
-			watcher.resp.write(`event: gameSettings\ndata: ${ JSON.stringify(game.gameSettings) }\n\n`);
+			watcher.socket.emit('gameSettings', JSON.stringify(game.gameSettings));
 			game.watchers.push(watcher);
+			return true;
 		}
+		return false;
 	}
 
 	async updateStatistics(winnerLogin: string, loserLogin: string, score: { leftPlayer: number, rightPlayer: number }) {

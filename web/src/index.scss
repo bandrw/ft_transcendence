@@ -19,6 +19,8 @@ body {
 
 ::-webkit-scrollbar {
 	background: #20222a;
+	width: 11px;
+	height: 11px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -28,7 +30,7 @@ body {
 }
 
 ::-webkit-scrollbar-corner {
-	display: none;
+	background: #20222a;
 }
 
 :-webkit-autofill::first-line,
@@ -36,10 +38,10 @@ body {
 :-webkit-autofill:hover,
 :-webkit-autofill:focus,
 :-webkit-autofill:active {
-	font-size: 1em;
 	color: white;
 	-webkit-box-shadow: 0 0 0 1000px #1a1b1f inset;
 	transition: box-shadow 0s;
+	-webkit-text-fill-color: white;
 }
 
 .user-status {

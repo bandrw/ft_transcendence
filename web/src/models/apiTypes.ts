@@ -12,52 +12,78 @@ type ApiUserCreate = {
 	ok: boolean,
 	msg: string
 }
+
+type ApiUser = {
+	id: number,
+	login: string,
+	url_avatar: string
+}
+
 type ApiGame = {
 	id: number,
 	winnerId?: number,
 	loserId?: number,
-	winner?: {
-		id: number,
-		login: string,
-		password: string,
-		url_avatar: string
-	},
-	loser?: {
-		id: number,
-		login: string,
-		password: string,
-		url_avatar: string
-	},
+	winner?: ApiUser,
+	loser?: ApiUser,
 	leftScore: number,
 	rightScore: number,
 	date: string
 }
 
-type ApiUser = {
+type ApiChat = {
 	id: number,
-	login: string,
-	password: string,
-	url_avatar: string,
-	intraLogin?: string,
-	wonGames?: ApiGame[],
-	lostGames?: ApiGame[]
+	userOneId: number,
+	userTwoId: number,
 }
 
-type ApiOnlineUser = {
+type ApiMessage = {
+	id: number,
+	chatId: number,
+	channelId: number,
+	fromUserId: number,
+	text: string,
+	date: number
+}
+
+type ApiChannel = {
+	id: number,
+	name: string,
+	title: string,
+	isPrivate: boolean,
+	password?: string,
+	ownerId: number,
+	members: ApiUser[]
+}
+
+type ApiChannelExpand = {
+	id: number,
+	name: string,
+	title: string,
+	isPrivate: boolean,
+	password?: string,
+	ownerId: number,
+	members: ApiUser[],
+	messages: ApiMessage[]
+}
+
+type ApiUserExpand = {
 	id: number,
 	login: string,
 	url_avatar: string,
-	status: ApiUserStatus
+	intraLogin?: string,
+	wonGames: ApiGame[],
+	lostGames: ApiGame[],
+	subscriptions: ApiUser[],
+	subscribers: ApiUser[],
+	createdChats: ApiChat[],
+	acceptedChats: ApiChat[],
+	messages: ApiMessage[],
+	ownedChannels: ApiChannel[],
+	channels: ApiChannelExpand[]
 }
 
 type ApiUserLogin = {
-	ok: boolean,
-	msg: ApiUser
-}
-
-type ApiUserCheckExist = {
-	ok: boolean,
-	msg: string | ApiUser
+	access_token: string
 }
 
 type ApiUpdateUser = {
@@ -65,6 +91,8 @@ type ApiUpdateUser = {
 	login: string,
 	url_avatar: string,
 	status: ApiUserStatus,
+	subscriptions: ApiUser[],
+	subscribers: ApiUser[]
 }
 
 type ApiGameSettings = {
@@ -90,6 +118,10 @@ type ApiGameSettings = {
 		login: string,
 		url_avatar: string,
 		status: string
+	},
+	score: {
+		leftPlayer: number,
+		rightPlayer: number
 	}
 }
 
@@ -106,22 +138,27 @@ type ApiGameLoop = {
 	}
 }
 
-type ApiFetchedUser = {
+type ApiChatExpand = {
 	id: number,
-	login: string,
-	status: string,
-	url_avatar: string,
+	userOneId: number,
+	userTwoId: number,
+	userOne: ApiUser,
+	userTwo: ApiUser,
+	messages: ApiMessage[]
 }
 
 export type {
-	ApiFetchedUser,
+	ApiChannel,
+	ApiChannelExpand,
+	ApiChat,
+	ApiChatExpand,
 	ApiGame,
 	ApiGameLoop,
 	ApiGameSettings,
-	ApiOnlineUser,
+	ApiMessage,
 	ApiUpdateUser,
 	ApiUser,
-	ApiUserCheckExist,
 	ApiUserCreate,
-	ApiUserLogin
+	ApiUserExpand,
+	ApiUserLogin,
 };

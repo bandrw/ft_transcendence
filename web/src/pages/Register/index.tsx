@@ -3,11 +3,12 @@ import './styles.scss';
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
-import { ApiUserCheckExist, ApiUserCreate } from "models/apiTypes";
+import { SocketContext } from "context/socket";
+import { ApiUser, ApiUserCreate } from "models/apiTypes";
 import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
-import { Link, useHistory } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 const validateInput = (
 	login: string,
@@ -49,19 +50,17 @@ interface RegisterProps {
 }
 
 const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
-	const history = useHistory();
+	const socket = React.useContext(SocketContext);
 
-	React.useEffect(() => {
-		if (currentUser.isAuthorized())
-			history.push('/');
-	}, [history, currentUser]);
-
-	const loginRef = React.createRef<HTMLInputElement>();
-	const passwordRef = React.createRef<HTMLInputElement>();
-	const passwordConfirmRef = React.createRef<HTMLInputElement>();
+	const loginRef = React.useRef<HTMLInputElement>(null);
+	const passwordRef = React.useRef<HTMLInputElement>(null);
+	const passwordConfirmRef = React.useRef<HTMLInputElement>(null);
 
 	const [errors, setErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+	if (currentUser.isAuthorized())
+		return <Redirect to='/'/>;
 
 	const register = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -71,29 +70,29 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 		const passwordConfirm = passwordConfirmRef.current?.value.trim().toLowerCase() || '';
 
 		if (!validateInput(login, password, passwordConfirm, setErrors))
-			return;
+			return ;
 
 		setIsLoading(true);
 		setErrors('');
-		const checkExistResponse: ApiUserCheckExist = await axios.get<ApiUserCheckExist>('/users/checkExist', {
-			params: { login: login }
-		})
-			.then(res => res.data);
-		if (checkExistResponse.ok) {
+		const user = await axios.get<ApiUser | null>('/users', {
+			params: { login: login },
+			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+		}).then(res => res.data);
+		if (user) {
 			setErrors('User with this login already exists');
 			setIsLoading(false);
-			return;
+			return ;
 		}
 
 		const hashedPassword = await bcryptjs.hash(password, 10);
 		const usersCreateResponse = await axios.post<any, AxiosResponse<ApiUserCreate> >(
-			'/users/create', {
-			login: login,
-			pass: hashedPassword
-		})
+				'/users/create', {
+				login: login,
+				pass: hashedPassword
+			})
 			.then(res => res.data);
 		if (usersCreateResponse.ok) {
-			await signIn(login, password, setCurrentUser, setErrors)
+			await signIn(login, password, setCurrentUser, setErrors, socket.id)
 				.catch(err => setErrors(err.toString()));
 		} else {
 			setErrors(usersCreateResponse.msg);
