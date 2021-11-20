@@ -66,8 +66,11 @@ export class ChatService {
 	}
 
 	async getChat(id: number, expand = false): Promise<ChatEntity> {
-		if (expand)
-			return await this.chatRepository.findOne({ where: { id: id }, relations: ['userOne', 'userTwo', 'messages'] });
+		if (expand) {
+			const r = await this.chatRepository.findOne({ where: { id: id }, relations: ['userOne', 'userTwo', 'messages'] });
+			r.messages.sort((msg1, msg2) => msg1.date - msg2.date);
+			return r;
+		}
 		return await this.chatRepository.findOne({ where: { id: id } });
 	}
 }

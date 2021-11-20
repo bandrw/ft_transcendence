@@ -47,13 +47,8 @@ export class MessageGateway {
 				return ;
 
 			const msg = await this.messageService.createChannelMessage(msgData.text, msgData.channelId, sender.id);
-			if (msg) {
-				for (let i = 0; i < channel.members.length; ++i) {
-					const inOnline = this.usersService.onlineUsers.find(usr => usr.id === channel.members[i].id);
-					if (inOnline)
-						inOnline.socket.emit('receiveMessage', JSON.stringify(msg));
-				}
-			}
+			if (msg)
+				this.usersService.broadcastEventData('receiveMessage', JSON.stringify(msg));
 		}
 	}
 

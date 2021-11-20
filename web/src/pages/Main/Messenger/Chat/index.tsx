@@ -172,7 +172,7 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 							onClick={ () => {
 								axios.post('/channels/join', { channelId: selectedChannel.id }, {
 									headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-								}).then(() => console.log('joined')).catch();
+								}).then(() => {});
 							} }
 						>
 							Join

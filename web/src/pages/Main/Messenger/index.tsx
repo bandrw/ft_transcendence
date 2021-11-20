@@ -85,16 +85,17 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 					return out;
 				});
 			} else if (msg.channelId) {
-				setSelectedChannel(prev => {
-					const cpy: ApiChannelExpand | null = JSON.parse(JSON.stringify(prev));
-					if (cpy && !cpy.messages.find(m => m.id === msg.id))
-						cpy.messages = cpy.messages.concat(msg);
+				setAllChannels(prev => {
+					const cpy: ApiChannelExpand[] = JSON.parse(JSON.stringify(prev));
+					const ch = cpy.find(channel => channel.id === msg.channelId);
+					if (ch)
+						ch.messages = [...ch.messages, msg];
 					return cpy;
 				});
 			}
 		};
 
-		const newChatHandler = (): void => {
+		const newChatHandler = () => {
 			axios.get<ApiChatExpand[]>('/chats', {
 				params: { expand: '' },
 				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
@@ -107,12 +108,33 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 				.then(res => setChannels(res.data.channels));
 		};
 
+		const newChannelHandler = (data: string) => {
+			const newChannel: ApiChannelExpand = JSON.parse(data);
+			setAllChannels(prev => [...prev, newChannel]);
+		};
+
+		const updateChannelHandler = () => {
+			axios.get<ApiChannelExpand[]>('/channels', {
+				params: { expand: '' },
+				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			}).then(res => setAllChannels(res.data));
+			axios.get<ApiUserExpand>('/users', {
+				params: { login: currentUser.username, expand: '' },
+				headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			})
+				.then(res => setChannels(res.data.channels));
+		};
+
 		socket.on('receiveMessage', receiveMessageHandler);
 		socket.on('newChat', newChatHandler);
+		socket.on('newChannel', newChannelHandler);
+		socket.on('updateChannel', updateChannelHandler);
 
 		return () => {
 			socket.off('receiveMessage', receiveMessageHandler);
 			socket.off('newChat', newChatHandler);
+			socket.off('newChannel', newChannelHandler);
+			socket.off('updateChannel', updateChannelHandler);
 		};
 
 	}, [currentUser.id, currentUser.username, socket]);
@@ -126,6 +148,17 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 			.then(res => setAllChannels(res.data));
 	}, []);
 
+	// Updating selectedChannel
+	React.useEffect(() => {
+		if (!selectedChannel)
+			return ;
+
+		const channel = allChannels.find(ch => ch.id === selectedChannel.id);
+		if (channel)
+			setSelectedChannel(channel);
+
+	}, [allChannels, selectedChannel]);
+
 	setTimeout(() => {
 		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
 		if (chatMessages.length > 0)
@@ -134,6 +167,7 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 
 	const matchedChannels: ApiChannelExpand[] = allChannels.filter(channel =>
 		searchPattern.length !== 0 &&
+			!channels.find(ch => ch.id === channel.id) &&
 			(channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
 			channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()))
 	);
@@ -187,33 +221,34 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 							}
 						</button>
 					</div>
-					{
-						chats.filter(chat => {
-							const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
+					<div className='messenger-contacts-scroll'>
+						{
+							chats.filter(chat => {
+								const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
 
-							return companion.login.trim().toLowerCase().includes(searchPattern.trim().toLowerCase());
-						}).map((chat, i) => {
-							const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
+								return companion.login.trim().toLowerCase().includes(searchPattern.trim().toLowerCase());
+							}).map((chat, i) => {
+								const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
 
-							return (
-								<LeftMenuChat
-									key={ i }
-									image={ companion.url_avatar }
-									title={ companion.login }
-									isSelected={ chat.id === selectedChat?.id }
-									selectChat={ () => {
-										setSelectedChat(chat);
-										setSelectedChannel(null);
-									} }
-								/>
-							);
-						})
-					}
-					{
-						channels.filter(channel =>
-							channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
+								return (
+									<LeftMenuChat
+										key={ i }
+										image={ companion.url_avatar }
+										title={ companion.login }
+										isSelected={ chat.id === selectedChat?.id }
+										selectChat={ () => {
+											setSelectedChat(chat);
+											setSelectedChannel(null);
+										} }
+									/>
+								);
+							})
+						}
+						{
+							channels.filter(channel =>
+								channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
 								channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase())
-						).map((channel, i) =>
+							).map((channel, i) =>
 								<LeftMenuChannel
 									key={ i }
 									title={ channel.title }
@@ -223,25 +258,27 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 										setSelectedChat(null);
 									} }
 								/>
-						)
-					}
-					{
-						matchedChannels.map((channel, i) =>
-							<LeftMenuChannel
-								key={ i }
-								title={ channel.title }
-								isSelected={ selectedChannel?.id === channel.id }
-								selectChannel={ () => {
-									setSelectedChannel(channel);
-									setSelectedChat(null);
-								} }
-							/>
-						)
-					}
-					{
-						(chats.length + channels.length) === 0 &&
-						<div className='messenger-contacts-empty-msg'>You have no chats yet</div>
-					}
+							)
+						}
+						{ searchPattern && <div className='messenger-contacts-search-scope'>global search</div> }
+						{
+							matchedChannels.map((channel, i) =>
+								<LeftMenuChannel
+									key={ i }
+									title={ channel.title }
+									isSelected={ selectedChannel?.id === channel.id }
+									selectChannel={ () => {
+										setSelectedChannel(channel);
+										setSelectedChat(null);
+									} }
+								/>
+							)
+						}
+						{
+							(chats.length + channels.length) === 0 &&
+							<div className='messenger-contacts-empty-msg'>You have no chats yet</div>
+						}
+					</div>
 				</div>
 				<Chat
 					currentUser={ currentUser }
