@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app_vue">
     <div :id="userAuthorizationStatus" v-if="screenSize">
       <div v-if="!this.authorized">
         <b-nav tabs>
@@ -32,10 +32,10 @@ export default {
   computed: {
     ...mapState(["authorized", "innerHeight", "innerWidth"]),
     userAuthorizationStatus() {
-      return !this.authorized ? "user_unauthorized" : "empty";
+      return !this.authorized ? "user_unauthorized" : "";
     },
     screenSize() {
-      return this.innerHeight > 800 && this.innerWidth > 800;
+      return this.innerHeight > 500 && this.innerWidth > 800;
     },
   },
   methods: {
@@ -68,8 +68,11 @@ export default {
 </script>
 
 <style>
-body {
+#app_vue {
   background: #79e7af;
+  width: 100%;
+  height: 100%;
+  position: absolute;
 }
 
 h1 {

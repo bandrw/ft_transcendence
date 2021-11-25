@@ -62,6 +62,8 @@ export class Events implements OnGatewayDisconnect {
   }
   @SubscribeMessage('login')
   async login(@ConnectedSocket() client: Socket, @MessageBody() login: string) {
+    console.log(process.cwd());
+    console.log(process.env.NEST_JWT_SECRET_KEY);
     const user = await this.userService.usersRepository.findOne({
       where: { login: login },
     });
@@ -92,7 +94,7 @@ export class Events implements OnGatewayDisconnect {
       });
     } else {
       client.emit('userEntity', {
-        user: user,
+        user: null,
         socketId: client.id,
       });
     }

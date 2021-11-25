@@ -11,7 +11,9 @@ import { GameModule } from './game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChatModule } from './chat/chat.module';
 import { Events } from './events';
-import { GameHistory } from "./game/game.entity";
+import { GameHistory } from './game/game.entity';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { GameHistory } from "./game/game.entity";
     GameModule,
     ChatModule,
     EventEmitterModule.forRoot(),
+    AuthModule,
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
   ],
   controllers: [AppController, CssController, JsController],
   providers: [AppService, Events],

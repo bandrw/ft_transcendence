@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div
+  <div id="game">
+<!--    <div
       id="game_you"
       :style="{ right: youRealPosX + '%', width: this.you.width + '%' }"
     ></div>
@@ -11,14 +11,23 @@
     <div
       id="game_ball"
       :style="{ right: ballRealPosX + '%', bottom: ballRealPosY + '%' }"
-    ></div>
+    ></div>-->
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
+import * as Matter from "matter-js";
 
 export default {
+  data() {
+    return {
+      engine: null,
+      runner: null,
+      render: null,
+      circle: null,
+    };
+  },
   computed: {
     ...mapState("game", ["you", "enemy", "ball", "id"]),
     ...mapState(["user"]),
@@ -78,10 +87,30 @@ export default {
       }
     },
   },
+  mounted() {
+    this.engine = Matter.Engine.create();
+      // this.render = Matter.Render.create({
+      //   element: document.getElementById("game"),
+      // });
+      // Matter.Render.run(this.render);
+    this.runner = Matter.Runner.create();
+    Matter.Runner.run(this.runner, this.engine);
+    // this.circle = Matter.Bodies.circle(200, 200, 150);
+  },
+  beforeDestroy() {
+    Matter.Engine.clear(this.engine);
+    Matter.Runner.stop(this.runner);
+  },
 };
 </script>
 
 <style scoped>
+#game {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
 #game_you {
   bottom: 0;
   height: 1%;

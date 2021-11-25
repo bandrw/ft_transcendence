@@ -60,6 +60,8 @@ export default {
         this.error = "please enter password";
         return;
       }
+      let res = await eventService.login2(this.login, this.password);
+      console.log(res.data);
       this.$socket.emit("login", this.login);
     },
     async joinUsersEntitiesToHistory(history) {
@@ -89,6 +91,7 @@ export default {
         this.error = "user with the same login already in game";
         return;
       }
+      console.log(data);
       if (data.user) {
         if (cryptService.comparePassword(this.password, data.user.password)) {
           const onlineUsers = await eventService

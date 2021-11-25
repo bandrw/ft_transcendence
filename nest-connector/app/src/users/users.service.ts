@@ -22,6 +22,10 @@ export class UsersService {
     );
   }
 
+  async findOne(username: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({ login: username });
+  }
+
   logout(login: string, i = -1) {
     if (i !== -1) {
       this.userEvent('logout_SSE', this.onlineUsers[i]);

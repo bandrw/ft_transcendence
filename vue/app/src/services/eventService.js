@@ -17,6 +17,12 @@ export default {
   async login(login) {
     return await apiClient.post("/users/login", { login: login });
   },
+  async login2(login, pass) {
+    return await apiClient.post("/auth/login", {
+      username: login,
+      password: pass,
+    });
+  },
   async onlineUsers() {
     return await apiClient.get("/users/getOnline");
   },

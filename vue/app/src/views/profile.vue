@@ -221,12 +221,16 @@ th {
   position: absolute;
 }
 
+tr {
+  line-height: 55px;
+}
+
 #game_history {
   position: absolute;
   top: 45%;
   left: 25%;
   width: 45%;
-  height: 40%;
+  /*height: 40%;*/
 }
 
 p {
