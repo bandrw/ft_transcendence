@@ -64,26 +64,6 @@ export default {
       console.log(res.data);
       this.$socket.emit("login", this.login);
     },
-    async joinUsersEntitiesToHistory(history) {
-      const users = await eventService.users().then(function (event) {
-        return event.data;
-      });
-      let i = 0;
-      let k;
-      while (i < history.length) {
-        k = 0;
-        while (k < users.length) {
-          if (history[i].user_one_id === users[k].id) {
-            history[i].user_one = users[k];
-          } else if (history[i].user_two_id === users[k].id) {
-            history[i].user_two = users[k];
-          }
-          ++k;
-        }
-        ++i;
-      }
-      return history;
-    },
   },
   sockets: {
     async userEntity(user) {
@@ -98,13 +78,11 @@ export default {
             .then(function (response) {
               return response.data ? response.data : [];
             });
-          // data.user.socketId = data.socketId;
           this.setUsers({ users: onlineUsers, user: user });
           this.error = null;
           this.$refs.eventSource.listenEvents();
-          const history = await this.joinUsersEntitiesToHistory(user.history);
-          this.SET_HISTORY(history);
-          await this.$router.push("main");
+          this.SET_HISTORY(user.history);
+          await this.$router.push({ name: "main" });
         } else {
           this.error = "Wrong password";
         }

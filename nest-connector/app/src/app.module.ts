@@ -11,9 +11,10 @@ import { GameModule } from './game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChatModule } from './chat/chat.module';
 import { Events } from './events';
-import { GameHistory } from './game/game.entity';
+import { GameHistory } from './history/history.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { HistoryModule } from './history/history.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ConfigModule } from '@nestjs/config';
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     AuthModule.register(process.env.NEST_JWT_SECRET_KEY),
+    HistoryModule,
   ],
   controllers: [AppController, CssController, JsController],
   providers: [AppService, Events],

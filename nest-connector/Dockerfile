@@ -10,7 +10,7 @@ RUN npm i -g @nestjs/cli
 #RUN npm install --save @nestjs/typeorm typeorm postgres pg
 EXPOSE 3000
 ADD .env /transcendence/.env
-RUN chonw root:root /transcendence/.env
+RUN chown root:root /transcendence/.env
 WORKDIR /transcendence
 #RUN npm install
 CMD npm install && npm run start:dev

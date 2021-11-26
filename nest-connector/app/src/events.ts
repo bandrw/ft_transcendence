@@ -12,9 +12,10 @@ import { GameService } from './game/game.service';
 import { UsersService } from './users/users.service';
 import { ChatService } from './chat/chat.service';
 import { getConnection } from 'typeorm';
-import { GameHistory } from './game/game.entity';
+import { GameHistory } from './history/history.entity';
 import { LadderService } from './ladder/ladder.service';
 import { OnlineUser } from './users/users.interface';
+import { HistoryService } from './history/history.service';
 
 @WebSocketGateway()
 export class Events implements OnGatewayDisconnect {
@@ -27,6 +28,8 @@ export class Events implements OnGatewayDisconnect {
     private chatService: ChatService,
     @Inject(LadderService)
     private ladder: LadderService,
+    @Inject(HistoryService)
+    private historyService: HistoryService,
   ) {}
   @WebSocketServer() server: Server;
   @SubscribeMessage('start')
@@ -79,15 +82,7 @@ export class Events implements OnGatewayDisconnect {
     }
     if (user) {
       user.socketId = client.id;
-      user.history = await getConnection()
-        .createQueryBuilder()
-        .select()
-        .from(GameHistory, 'gameHistory')
-        .where('user_one_id = :id', { id: user.id })
-        .orWhere('user_two_id = :id', { id: user.id })
-        .orderBy('data', 'DESC')
-        .limit(100)
-        .execute();
+      user.history = await this.historyService.GetHistory(user);
       this.userService.onlineUsers.push(user);
       client.emit('userEntity', user);
     } else {
