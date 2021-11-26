@@ -201,10 +201,7 @@ export default {
       this.ADD_HISTORY(JSON.parse(event.data));
     },
     listenEvents() {
-      this.CREATE_EVENT_SOURCE({
-        login: this.user.login,
-        socketId: this.user.socketId,
-      });
+      this.CREATE_EVENT_SOURCE(this.user.login);
       this.eventSource.addEventListener("login", this.addUser);
       this.eventSource.addEventListener(
         "updateUsersStats",

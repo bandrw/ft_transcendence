@@ -1,9 +1,8 @@
-export interface OnlineUser {
-  login: string;
-  url_avatar: string;
-  resp: any;
-  status: string;
-  games: number;
-  wins: number;
-  socketId: string;
+import { User } from './user.entity';
+
+export interface OnlineUser extends User {
+  resp?: any;
+  status?: string;
+  socketId?: string;
+  history?: [];
 }

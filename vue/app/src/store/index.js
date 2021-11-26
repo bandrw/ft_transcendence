@@ -24,9 +24,9 @@ export default new Vuex.Store({
     SET_INNER_WIDTH(state, width) {
       state.innerWidth = width;
     },
-    CREATE_EVENT_SOURCE(state, data) {
+    CREATE_EVENT_SOURCE(state, login) {
       state.eventSource = new EventSource(
-        `http://localhost:3000/users/login?login=${data.login}&socketId=${data.socketId}`
+        `http://localhost:3000/users/login?login=${login}`
       );
     },
     CLOSE_EVENT_SOURCE(state) {

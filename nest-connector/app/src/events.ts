@@ -14,6 +14,7 @@ import { ChatService } from './chat/chat.service';
 import { getConnection } from 'typeorm';
 import { GameHistory } from './game/game.entity';
 import { LadderService } from './ladder/ladder.service';
+import { OnlineUser } from './users/users.interface';
 
 @WebSocketGateway()
 export class Events implements OnGatewayDisconnect {
@@ -62,7 +63,7 @@ export class Events implements OnGatewayDisconnect {
   }
   @SubscribeMessage('login')
   async login(@ConnectedSocket() client: Socket, @MessageBody() login: string) {
-    const user = await this.userService.usersRepository.findOne({
+    const user: OnlineUser = await this.userService.usersRepository.findOne({
       where: { login: login },
     });
     let i = 0;
@@ -77,24 +78,20 @@ export class Events implements OnGatewayDisconnect {
       ++i;
     }
     if (user) {
-      const history = await getConnection()
+      user.socketId = client.id;
+      user.history = await getConnection()
         .createQueryBuilder()
         .select()
         .from(GameHistory, 'gameHistory')
         .where('user_one_id = :id', { id: user.id })
         .orWhere('user_two_id = :id', { id: user.id })
         .orderBy('data', 'DESC')
+        .limit(100)
         .execute();
-      client.emit('userEntity', {
-        user: user,
-        socketId: client.id,
-        history: history,
-      });
+      this.userService.onlineUsers.push(user);
+      client.emit('userEntity', user);
     } else {
-      client.emit('userEntity', {
-        user: null,
-        socketId: client.id,
-      });
+      client.emit('userEntity', null);
     }
   }
   @SubscribeMessage('leaveGame')

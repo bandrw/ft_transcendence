@@ -75,26 +75,24 @@ export class UsersController {
   @Header('Content-Type', 'text/event-stream')
   @Header('Transfer-Encoding', 'chunked')
   @HttpCode(200)
-  async emitter(
+  emitter(
     @Req() req: Request,
     @Query('login') login,
-    @Query('socketId') socketId,
     @Res() response: Response,
   ) {
-    const user = await this.UsersService.usersRepository.findOne({
-      where: { login: login },
-    });
     req.socket.setTimeout(1000 * 60 * 60 * 60);
-    const newUser: OnlineUser = {
-      login: login,
-      resp: response,
-      url_avatar: user.url_avatar,
-      status: 'green',
-      games: user.games,
-      wins: user.wins,
-      socketId: socketId,
-    };
-    this.UsersService.onlineUsers.push(newUser);
-    this.UsersService.userEvent('login', newUser);
+    let i = 0;
+    while (i < this.UsersService.onlineUsers.length) {
+      if (
+        this.UsersService.onlineUsers &&
+        this.UsersService.onlineUsers[i].login === login
+      ) {
+        this.UsersService.onlineUsers[i].resp = response;
+        this.UsersService.onlineUsers[i].status = 'green';
+        this.UsersService.userEvent('login', this.UsersService.onlineUsers[i]);
+        return;
+      }
+      ++i;
+    }
   }
 }

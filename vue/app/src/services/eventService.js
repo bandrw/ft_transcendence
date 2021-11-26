@@ -14,10 +14,10 @@ export default {
   async users() {
     return await apiClient.get("/users/getAll");
   },
-  async login(login) {
-    return await apiClient.post("/users/login", { login: login });
-  },
-  async login2(login, pass) {
+  // async login(login) {
+  //   return await apiClient.post("/users/login", { login: login });
+  // },
+  async login(login, pass) {
     return await apiClient.post("/auth/login", {
       username: login,
       password: pass,

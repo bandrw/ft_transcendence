@@ -60,7 +60,7 @@ export default {
         this.error = "please enter password";
         return;
       }
-      let res = await eventService.login2(this.login, this.password);
+      let res = await eventService.login(this.login, this.password);
       console.log(res.data);
       this.$socket.emit("login", this.login);
     },
@@ -86,25 +86,24 @@ export default {
     },
   },
   sockets: {
-    async userEntity(data) {
-      if (data === "doubleLogin") {
+    async userEntity(user) {
+      if (user === "doubleLogin") {
         this.error = "user with the same login already in game";
         return;
       }
-      console.log(data);
-      if (data.user) {
-        if (cryptService.comparePassword(this.password, data.user.password)) {
+      if (user) {
+        if (cryptService.comparePassword(this.password, user.password)) {
           const onlineUsers = await eventService
             .onlineUsers()
             .then(function (response) {
               return response.data ? response.data : [];
             });
-          data.user.socketId = data.socketId;
-          this.setUsers({ users: onlineUsers, user: data.user });
+          // data.user.socketId = data.socketId;
+          this.setUsers({ users: onlineUsers, user: user });
           this.error = null;
           this.$refs.eventSource.listenEvents();
-          const history = await this.joinUsersEntitiesToHistory(data.history);
-          this.SET_HISTORY({ history: history });
+          const history = await this.joinUsersEntitiesToHistory(user.history);
+          this.SET_HISTORY(history);
           await this.$router.push("main");
         } else {
           this.error = "Wrong password";
