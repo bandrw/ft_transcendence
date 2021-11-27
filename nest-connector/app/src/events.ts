@@ -11,8 +11,6 @@ import { Inject } from '@nestjs/common';
 import { GameService } from './game/game.service';
 import { UsersService } from './users/users.service';
 import { ChatService } from './chat/chat.service';
-import { getConnection } from 'typeorm';
-import { GameHistory } from './history/history.entity';
 import { LadderService } from './ladder/ladder.service';
 import { OnlineUser } from './users/users.interface';
 import { HistoryService } from './history/history.service';
@@ -84,7 +82,7 @@ export class Events implements OnGatewayDisconnect {
       user.socketId = client.id;
       user.history = await this.historyService.GetHistory(user);
       this.userService.onlineUsers.push(user);
-      client.emit('userEntity', user);
+      client.emit('userEntity', { login: user.login, password: user.password });
     } else {
       client.emit('userEntity', null);
     }

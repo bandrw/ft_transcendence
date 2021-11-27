@@ -18,16 +18,10 @@ export default {
     ...mapMutations([
       "ADD_USER",
       "CREATE_EVENT_SOURCE",
-      "INCREMENT_USERS_WINS",
-      "INCREMENT_USERS_GAMES",
       "INCREMENT_USER_WINS",
       "INCREMENT_USER_GAMES",
       "DEL_USER",
       "SET_ENEMY",
-      "SET_USERS_STATUS",
-      "SET_USERS_URL_AVATAR",
-      "SET_ENEMY_STATUS",
-      "SET_ENEMY_URL_AVATAR",
       "SET_USER_STATUS",
       "SET_USER_URL_AVATAR",
     ]),
@@ -60,32 +54,27 @@ export default {
       let i = 0;
       while (i < this.onlineUsers.length) {
         if (this.onlineUsers[i].login === user.login) {
-          break;
+          return;
         }
         ++i;
       }
-      if (i === this.onlineUsers.length) {
-        this.ADD_USER(user);
-      }
+      this.ADD_USER(user);
     },
     updateUserStats(event) {
       const stats = JSON.parse(event.data);
       let i = 0;
-      if (
-        this.user.login === stats.winner ||
-        this.user.login === stats.looser
-      ) {
-        this.INCREMENT_USER_GAMES();
-        if (this.user.login === stats.winner) {
-          this.INCREMENT_USER_WINS();
-        }
-      }
+      let k = 0;
       while (i < this.onlineUsers.length) {
         if (this.onlineUsers[i].login === stats.winner) {
-          this.INCREMENT_USERS_GAMES(i);
-          this.INCREMENT_USERS_WINS(i);
+          this.INCREMENT_USER_GAMES(i);
+          this.INCREMENT_USER_WINS(i);
+          ++k;
         } else if (this.onlineUsers[i].login === stats.looser) {
-          this.INCREMENT_USERS_GAMES(i);
+          this.INCREMENT_USER_GAMES(i);
+          ++k;
+        }
+        if (k === 2) {
+          return;
         }
         ++i;
       }
@@ -106,32 +95,29 @@ export default {
       let index = 0;
       while (index < this.onlineUsers.length) {
         if (this.onlineUsers[index].login === user.login) {
-          this.SET_USERS_STATUS({
+          this.SET_USER_STATUS({
             index: index,
             status: user.status,
           });
-          this.SET_USERS_URL_AVATAR({
+          this.SET_USER_URL_AVATAR({
             index: index,
             url_avatar: user.url_avatar,
           });
-          break;
+          this.UPDATE_USER_AVATAR_IN_HISTORY(user);
+          return;
         }
         ++index;
       }
-      if (this.user.login === user.login) {
-        this.SET_USER_URL_AVATAR(user.url_avatar);
-        this.SET_USER_STATUS(user.status);
-      }
-      if (this.enemy && this.enemy.login === user.login) {
-        this.SET_ENEMY_URL_AVATAR(user.url_avatar);
-        this.SET_ENEMY_STATUS(user.status);
-      }
-      this.UPDATE_USER_AVATAR_IN_HISTORY(user);
     },
     setEnemy(event) {
       const enemy = JSON.parse(event.data);
-      this.SET_ENEMY(enemy);
-      this.SET_ENEMY_READY_STATUS("gameNotAccepted");
+      for (let i = 0; i < this.onlineUsers.length; i++) {
+        if (this.onlineUsers[i].login === enemy.login) {
+          this.SET_ENEMY(i);
+          this.SET_ENEMY_READY_STATUS("gameNotAccepted");
+          return;
+        }
+      }
     },
     enemyIsReady() {
       this.SET_ENEMY_READY_STATUS("gameAccepted");

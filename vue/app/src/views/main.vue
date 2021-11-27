@@ -40,7 +40,7 @@ export default {
       "CLEAR_LEFT_INTERVAL",
       "SET_GAME_IN_PROGRESS",
     ]),
-    ...mapMutations("profile", ["SET_PROFILE"]),
+    ...mapMutations("profile", ["SET_PROFILE", "SET_HISTORY", "CLEAR_HISTORY"]),
     ...mapMutations("ladder", [
       "CLEAR_FIND_INTERVAL",
       "CLEAR_ACCEPT_INTERVAL",
@@ -76,6 +76,7 @@ export default {
       this.SET_AUTHORIZE(false);
       this.SET_PROFILE(false);
       this.SET_USERS(null);
+      this.CLEAR_HISTORY();
       await this.$router.push({ name: "login" });
     },
     getData(res) {

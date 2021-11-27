@@ -44,6 +44,7 @@ export class UsersController {
             status: e.status,
             games: e.games,
             wins: e.wins,
+            history: e.history,
           };
         } else {
           return null;

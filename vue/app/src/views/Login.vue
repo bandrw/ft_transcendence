@@ -67,21 +67,24 @@ export default {
   },
   sockets: {
     async userEntity(user) {
-      if (user === "doubleLogin") {
+      if (user && user === "doubleLogin") {
         this.error = "user with the same login already in game";
-        return;
-      }
-      if (user) {
+      } else if (user) {
         if (cryptService.comparePassword(this.password, user.password)) {
           const onlineUsers = await eventService
             .onlineUsers()
             .then(function (response) {
               return response.data ? response.data : [];
             });
-          this.setUsers({ users: onlineUsers, user: user });
+          for (let i = 0; i < onlineUsers.length; i++) {
+            if (onlineUsers[i].login === user.login) {
+              this.setUsers({ users: onlineUsers, index: i });
+              this.SET_HISTORY(this.user.history);
+              break;
+            }
+          }
           this.error = null;
           this.$refs.eventSource.listenEvents();
-          this.SET_HISTORY(user.history);
           await this.$router.push({ name: "main" });
         } else {
           this.error = "Wrong password";

@@ -10,6 +10,11 @@ export const state = {
 };
 
 export const mutations = {
+  CLEAR_HISTORY(state) {
+    state.arrayPage = 0;
+    state.currentPageInHistory = [];
+    state.history = [];
+  },
   SET_PROFILE(state, profile) {
     state.profile = profile;
   },
@@ -22,6 +27,7 @@ export const mutations = {
   SET_CURRENT_PAGE_IN_HISTORY(state, page) {
     state.currentPageInHistory = page;
   },
+
   UPDATE_USER_AVATAR_IN_HISTORY(state, user) {
     let i = 0;
     while (i < state.history.length) {
