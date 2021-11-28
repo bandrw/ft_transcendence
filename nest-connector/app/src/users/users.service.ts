@@ -66,21 +66,24 @@ export class UsersService {
     });
     const salt = Math.random().toString();
     const generator = new AvatarGenerator();
-    const ret = generator.generateRandomAvatar(salt);
-    user.url_avatar = ret;
+    user.url_avatar = generator.generateRandomAvatar(salt);
     await this.usersRepository.manager.save(user);
     let i = 0;
     while (i < this.onlineUsers.length) {
       if (this.onlineUsers[i].login == user.login) {
-        this.onlineUsers[i].url_avatar = ret;
-        this.userEvent('updateUser', this.onlineUsers[i]);
+        this.onlineUsers[i].url_avatar = user.url_avatar;
+        this.userEvent('updateUserURL_avatar', {
+          login: this.onlineUsers[i].login,
+          url_avatar: this.onlineUsers[i].url_avatar,
+        });
+        break;
       }
       ++i;
     }
-    return ret;
+    return user.url_avatar;
   }
 
-  userEvent(event: string, user: OnlineUser) {
+  userEvent(event: string, user: any) {
     let i = 0;
     while (i < this.onlineUsers.length) {
       this.onlineUsers[i].resp.write(
@@ -116,20 +119,23 @@ export class UsersService {
     }
   }
   userPersonalEvent(event: string, user: OnlineUser, login: string) {
-    let i = 0;
+    let i;
+    let data;
+
+    if (user) {
+      data = JSON.stringify({
+        login: user.login,
+        url_avatar: user.url_avatar,
+        status: user.status,
+      });
+    } else {
+      data = false;
+    }
+    i = 0;
     while (i < this.onlineUsers.length) {
       if (this.onlineUsers[i].login === login) {
-        let data;
-        if (user) {
-          data = JSON.stringify({
-            login: user.login,
-            url_avatar: user.url_avatar,
-            status: user.status,
-          });
-        } else {
-          data = false;
-        }
         this.onlineUsers[i].resp.write(`event: ${event}\ndata: ${data}\n\n`);
+        return;
       }
       ++i;
     }

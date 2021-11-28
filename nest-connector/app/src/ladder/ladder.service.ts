@@ -43,7 +43,10 @@ export class LadderService {
     } else {
       this.users.onlineUsers[i].status = status;
     }
-    this.users.userEvent('updateUser', this.users.onlineUsers[i]);
+    this.users.userEvent('updateUserStatus', {
+      login: this.users.onlineUsers[i].login,
+      status: this.users.onlineUsers[i].status,
+    });
     if (status === 'yellow') {
       this.addToLadder(this.users.onlineUsers[i]);
     } else if (status === 'green') {
@@ -116,7 +119,10 @@ export class LadderService {
 
   awayFromKeyboard(userIndex) {
     this.lobby[userIndex].first.status = 'yellow';
-    this.users.userEvent('updateUser', this.lobby[userIndex].first);
+    this.users.userEvent('updateUserStatus', {
+      login: this.lobby[userIndex].first.login,
+      status: this.lobby[userIndex].first.status,
+    });
   }
 
   addToLadder(user: OnlineUser) {
@@ -138,8 +144,14 @@ export class LadderService {
   sendEvents(i: number) {
     this.lobby[i].first.status = 'orange';
     this.lobby[i].second.status = 'orange';
-    this.users.userEvent('updateUser', this.lobby[i].first);
-    this.users.userEvent('updateUser', this.lobby[i].second);
+    this.users.userEvent('updateUserStatus', {
+      login: this.lobby[i].first.login,
+      status: this.lobby[i].first.status,
+    });
+    this.users.userEvent('updateUserStatus', {
+      login: this.lobby[i].second.login,
+      status: this.lobby[i].second.status,
+    });
     this.users.userPersonalEvent(
       'enemy',
       this.lobby[i].first,
@@ -187,7 +199,10 @@ export class LadderService {
 
   sendSingleEvents(userIndex: number) {
     this.lobby[userIndex].first.status = 'yellow';
-    this.users.userEvent('updateUser', this.lobby[userIndex].first);
+    this.users.userEvent('updateUserStatus', {
+      login: this.lobby[userIndex].first.login,
+      status: this.lobby[userIndex].first.status,
+    });
     this.users.userPersonalEvent(
       'enemy',
       null,

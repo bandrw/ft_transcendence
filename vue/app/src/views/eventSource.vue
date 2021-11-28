@@ -90,25 +90,6 @@ export default {
         ++index;
       }
     },
-    updateUser(event) {
-      const user = JSON.parse(event.data);
-      let index = 0;
-      while (index < this.onlineUsers.length) {
-        if (this.onlineUsers[index].login === user.login) {
-          this.SET_USER_STATUS({
-            index: index,
-            status: user.status,
-          });
-          this.SET_USER_URL_AVATAR({
-            index: index,
-            url_avatar: user.url_avatar,
-          });
-          this.UPDATE_USER_AVATAR_IN_HISTORY(user);
-          return;
-        }
-        ++index;
-      }
-    },
     setEnemy(event) {
       const enemy = JSON.parse(event.data);
       for (let i = 0; i < this.onlineUsers.length; i++) {
@@ -186,6 +167,35 @@ export default {
     addHistory(event) {
       this.ADD_HISTORY(JSON.parse(event.data));
     },
+    updateUserStatus(event) {
+      const user = JSON.parse(event.data);
+      let index = 0;
+      while (index < this.onlineUsers.length) {
+        if (this.onlineUsers[index].login === user.login) {
+          this.SET_USER_STATUS({
+            index: index,
+            status: user.status,
+          });
+          return;
+        }
+        ++index;
+      }
+    },
+    updateUserURL_avatar(event) {
+      const user = JSON.parse(event.data);
+      let index = 0;
+      while (index < this.onlineUsers.length) {
+        if (this.onlineUsers[index].login === user.login) {
+          this.SET_USER_URL_AVATAR({
+            index: index,
+            url_avatar: user.url_avatar,
+          });
+          this.UPDATE_USER_AVATAR_IN_HISTORY(user);
+          return;
+        }
+        ++index;
+      }
+    },
     listenEvents() {
       this.CREATE_EVENT_SOURCE(this.user.login);
       this.eventSource.addEventListener("login", this.addUser);
@@ -194,7 +204,14 @@ export default {
         this.updateUserStats
       );
       this.eventSource.addEventListener("logout_SSE", this.logoutSSE);
-      this.eventSource.addEventListener("updateUser", this.updateUser);
+      this.eventSource.addEventListener(
+        "updateUserStatus",
+        this.updateUserStatus
+      );
+      this.eventSource.addEventListener(
+        "updateUserURL_avatar",
+        this.updateUserURL_avatar
+      );
       this.eventSource.addEventListener("enemy", this.setEnemy);
       this.eventSource.addEventListener("enemyIsReady", this.enemyIsReady);
       this.eventSource.addEventListener("gameIsReady", this.gameIsReady);

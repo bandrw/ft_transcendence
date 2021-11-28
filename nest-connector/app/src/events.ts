@@ -64,9 +64,6 @@ export class Events implements OnGatewayDisconnect {
   }
   @SubscribeMessage('login')
   async login(@ConnectedSocket() client: Socket, @MessageBody() login: string) {
-    const user: OnlineUser = await this.userService.usersRepository.findOne({
-      where: { login: login },
-    });
     let i = 0;
     while (i < this.userService.onlineUsers.length) {
       if (
@@ -78,6 +75,9 @@ export class Events implements OnGatewayDisconnect {
       }
       ++i;
     }
+    const user: OnlineUser = await this.userService.usersRepository.findOne({
+      where: { login: login },
+    });
     if (user) {
       user.socketId = client.id;
       user.history = await this.historyService.GetHistory(user);
