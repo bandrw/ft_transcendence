@@ -2,6 +2,7 @@ import './styles.scss';
 
 import { faExternalLinkAlt, faGamepad, faUserCheck, faUserFriends, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppSelector } from "app/hooks";
 import axios from "axios";
 import CircleLoading from "components/CircleLoading";
 import Header from "components/Header";
@@ -66,7 +67,7 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 			return ;
 
 		if (!currUser.subscriptions) {
-			console.log('[SubscribeBtn] subscriptions is undefined');
+			console.log('[SubscribeBtn] subscriptions is undefined'); // todo: [remove if]
 			return;
 		}
 		if (!currUser.subscribers) {
@@ -184,25 +185,24 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 };
 
 interface UserProfileProps {
-	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	allUsers: ApiUserExpand[]
 }
 
-const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProfileProps) => {
+const UserProfile = ({ status }: UserProfileProps) => {
 	const params = useParams<{ login: string }>();
 	const [user, setUser] = React.useState<ApiUserExpand | null>(null);
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { allUsers } = useAppSelector(state => state.allUsers);
 
 	React.useEffect(() => {
 		const friendsLogins: string[] = [];
 		const u = allUsers.find(usr => usr.login === user?.login);
 		if (u) {
-			for (let i in u.subscribers)
-				if (u.subscriptions.find(usr => usr.login === u.subscribers[i].login))
-					friendsLogins.push(u.subscribers[i].login);
+			for (let subscriber of u.subscribers)
+				if (u.subscriptions.find(usr => usr.login === subscriber.login))
+					friendsLogins.push(subscriber.login);
 		}
 		setFriends(allUsers.filter(usr => friendsLogins.indexOf(usr.login) !== -1));
 	}, [allUsers, user]);
@@ -221,10 +221,10 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 				if (!res.data.wonGames || !res.data.lostGames)
 					return;
 				const games: ApiGame[] = [];
-				for (let i in res.data.wonGames)
-					games.push(res.data.wonGames[i]);
-				for (let i in res.data.lostGames)
-					games.push(res.data.lostGames[i]);
+				for (let game of res.data.wonGames)
+					games.push(game);
+				for (let game of res.data.lostGames)
+					games.push(game);
 				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
 			});
 
@@ -237,8 +237,6 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 		return (
 			<div>
 				<Header
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
 					status={ status }
 				/>
 			</div>
@@ -257,8 +255,6 @@ const UserProfile = ({ currentUser, setCurrentUser, status, allUsers }: UserProf
 	return (
 		<div>
 			<Header
-				currentUser={ currentUser }
-				setCurrentUser={ setCurrentUser }
 				status={ status }
 			/>
 			<div className='user-profile-wrapper'>

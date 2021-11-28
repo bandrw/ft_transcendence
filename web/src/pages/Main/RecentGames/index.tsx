@@ -2,20 +2,17 @@ import './styles.scss';
 
 import { faArrowRight, faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAppSelector } from "app/hooks";
 import axios from "axios";
 import { ApiGame, ApiUserExpand } from "models/apiTypes";
-import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
 import React from 'react';
 import { Link } from "react-router-dom";
 
-interface RecentGamesProps {
-	currentUser: User,
-	allUsers: ApiUserExpand[]
-}
-
-const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
+const RecentGames = () => {
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { allUsers } = useAppSelector(state => state.allUsers);
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -31,10 +28,10 @@ const RecentGames = ({ currentUser, allUsers }: RecentGamesProps) => {
 				if (!res.data.wonGames || !res.data.lostGames)
 					return ;
 				const games: ApiGame[] = [];
-				for (let i in res.data.wonGames)
-					games.push(res.data.wonGames[i]);
-				for (let i in res.data.lostGames)
-					games.push(res.data.lostGames[i]);
+				for (let game of res.data.wonGames)
+					games.push(game);
+				for (let game of res.data.lostGames)
+					games.push(game);
 				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
 			});
 

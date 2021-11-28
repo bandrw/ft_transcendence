@@ -1,4 +1,4 @@
-# Front-end part of Ft_transcendence
+# Front-end part of FT_transcendence
 
 ### Setup
 ```

@@ -2,10 +2,10 @@ import './styles.scss';
 
 import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppSelector } from "app/hooks";
 import axios from "axios";
 import Header from "components/Header";
 import { ApiGame, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
-import { User } from "models/User";
 import moment from "moment";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
@@ -35,15 +35,14 @@ export const GameTime = ({ date }: { date: string }) => {
 };
 
 interface GamesHistoryProps {
-	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
-	allUsers: ApiUserExpand[]
 }
 
-const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHistoryProps) => {
+const GamesHistory = ({ status }: GamesHistoryProps) => {
 	const params = useParams<{ login: string }>();
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { allUsers } = useAppSelector(state => state.allUsers);
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -59,10 +58,10 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 				if (!res.data.wonGames || !res.data.lostGames)
 					return;
 				const games: ApiGame[] = [];
-				for (let i in res.data.wonGames)
-					games.push(res.data.wonGames[i]);
-				for (let i in res.data.lostGames)
-					games.push(res.data.lostGames[i]);
+				for (let game of res.data.wonGames)
+					games.push(game);
+				for (let game of res.data.lostGames)
+					games.push(game);
 				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
 			});
 
@@ -75,8 +74,6 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 		return (
 			<div>
 				<Header
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
 					status={ status }
 				/>
 			</div>
@@ -85,8 +82,6 @@ const GamesHistory = ({ currentUser, setCurrentUser, status, allUsers }: GamesHi
 	return (
 		<div>
 			<Header
-				currentUser={ currentUser }
-				setCurrentUser={ setCurrentUser }
 				status={ status }
 			/>
 			<div className='games-history-wrapper'>

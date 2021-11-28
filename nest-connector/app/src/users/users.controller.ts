@@ -91,7 +91,7 @@ export class UsersController {
 	userLogout(@Req() req, @Body() {  }: EmptyDTO) {
 		const user = req.user;
 
-		const index = this.usersService.onlineUsers.map(usr => usr.id).indexOf(user.id);
+		const index = this.usersService.onlineUsers.findIndex(usr => usr.id === user.id);
 		if (index !== -1) {
 			this.usersService.userEvent('logout', this.usersService.onlineUsers[index]);
 			this.usersService.onlineUsers.splice(index, 1);

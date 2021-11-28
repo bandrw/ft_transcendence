@@ -32,7 +32,6 @@ export class AuthController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Post('/intra')
 	async authIntra(@Body() { code }: AuthIntraDTO) {
-
 		const data = {
 			grant_type: 'authorization_code',
 			client_id: process.env.INTRA_UID,

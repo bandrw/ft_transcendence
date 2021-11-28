@@ -3,22 +3,21 @@ import './styles.scss';
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { faBell } from "@fortawesome/free-solid-svg-icons/faBell";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAppSelector } from "app/hooks";
 import UserMenu from "components/Header/UserMenu";
 import { ApiUserStatus } from "models/apiTypes";
-import { User } from "models/User";
 import React from 'react';
 import { Link,useHistory } from "react-router-dom";
 
 interface HeaderProps {
-	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User>>,
 	status: ApiUserStatus,
 	centerBlock?: JSX.Element
 }
 
-const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProps) => {
+const Header = ({ status, centerBlock }: HeaderProps) => {
 	const history = useHistory();
 	const [userMenuShown, setUserMenuShown] = React.useState(false);
+	const { currentUser } = useAppSelector(state => state.currentUser);
 
 	if (history.location.pathname !== '/')
 		return (
@@ -52,10 +51,7 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 							<div className='user-status' style={ { backgroundColor: status } }/>
 							{
 								userMenuShown &&
-								<UserMenu
-									currentUser={ currentUser }
-									setCurrentUser={ setCurrentUser }
-								/>
+								<UserMenu/>
 							}
 						</button>
 					</div>
@@ -87,10 +83,7 @@ const Header = ({ currentUser, setCurrentUser, status, centerBlock }: HeaderProp
 						<div className='user-status' style={ { backgroundColor: status } }/>
 						{
 							userMenuShown &&
-							<UserMenu
-								currentUser={ currentUser }
-								setCurrentUser={ setCurrentUser }
-							/>
+							<UserMenu/>
 						}
 					</button>
 				</div>

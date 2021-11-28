@@ -2,19 +2,18 @@ import './styles.scss';
 
 import { faCircle, faTv } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppSelector } from "app/hooks";
 import axios from "axios";
 import { ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
-import { User } from "models/User";
 import React from 'react';
 import { Fade } from "react-awesome-reveal";
 import { Link, useHistory } from "react-router-dom";
 
 interface SocialBlockOnlineUserProps {
 	user: ApiUpdateUser,
-	currentUser: User
 }
 
-const SocialBlockOnlineUser = ({ user, currentUser }: SocialBlockOnlineUserProps) => {
+const SocialBlockOnlineUser = ({ user }: SocialBlockOnlineUserProps) => {
 	const history = useHistory();
 	let statusDescription: string | JSX.Element;
 	let statusColor: string;
@@ -95,20 +94,20 @@ const SocialBlockFriend = ({ user }: { user: ApiUserExpand }) => {
 
 interface SocialProps {
 	onlineUsers: ApiUpdateUser[],
-	currentUser: User,
-	allUsers: ApiUserExpand[]
 }
 
-const Social = ({ onlineUsers, currentUser, allUsers }: SocialProps) => {
+const Social = ({ onlineUsers }: SocialProps) => {
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { allUsers } = useAppSelector(state => state.allUsers);
 
 	React.useEffect(() => {
 		const friendsLogins: string[] = [];
 		const u = allUsers.find(usr => usr.login === currentUser.username);
 		if (u) {
-			for (let i in u.subscribers)
-				if (u.subscriptions.find(usr => usr.login === u.subscribers[i].login))
-					friendsLogins.push(u.subscribers[i].login);
+			for (let subscriber of u.subscribers)
+				if (u.subscriptions.find(usr => usr.login === subscriber.login))
+					friendsLogins.push(subscriber.login);
 		}
 		setFriends(allUsers.filter(usr => friendsLogins.indexOf(usr.login) !== -1));
 	}, [allUsers, currentUser.username, onlineUsers]);
@@ -133,7 +132,7 @@ const Social = ({ onlineUsers, currentUser, allUsers }: SocialProps) => {
 						friends.map((user, i) => {
 							const userInOnline = onlineUsers.find(usr => usr.id === user.id);
 							if (userInOnline)
-								return <SocialBlockOnlineUser key={ i } user={ userInOnline } currentUser={ currentUser }/>;
+								return <SocialBlockOnlineUser key={ i } user={ userInOnline }/>;
 							return <SocialBlockFriend key={ i } user={ user }/>;
 						})
 					}
@@ -148,7 +147,7 @@ const Social = ({ onlineUsers, currentUser, allUsers }: SocialProps) => {
 				<ul>
 					{
 						onlineUsers.map((user, i) =>
-							<SocialBlockOnlineUser key={ i } user={ user } currentUser={ currentUser }/>
+							<SocialBlockOnlineUser key={ i } user={ user }/>
 						)
 					}
 				</ul>

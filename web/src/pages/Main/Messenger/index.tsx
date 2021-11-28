@@ -2,22 +2,17 @@ import './styles.scss';
 
 import { faBullhorn, faComment, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppSelector } from "app/hooks";
 import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
-import { User } from "models/User";
 import Chat from "pages/Main/Messenger/Chat";
 import LeftMenuChannel from "pages/Main/Messenger/LeftMenuChannel";
 import LeftMenuChat from "pages/Main/Messenger/LeftMenuChat";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
 
-interface MessengerProps {
-	currentUser: User,
-	allUsers: ApiUserExpand[]
-}
-
-const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
+const Messenger = () => {
 	const socket = React.useContext(SocketContext);
 	const [chats, setChats] = React.useState<ApiChatExpand[]>([]);
 	const [channels, setChannels] = React.useState<ApiChannelExpand[]>([]);
@@ -27,6 +22,8 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 	const [chatState, setChatState] = React.useState('default');
 	const [allChannels, setAllChannels] = React.useState<ApiChannelExpand[]>([]);
 	const [searchPattern, setSearchPattern] = React.useState('');
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { allUsers } = useAppSelector(state => state.allUsers);
 
 	// Fetching user's chats and channels
 	React.useEffect(() => {
@@ -75,9 +72,9 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 
 				setChats(prev => {
 					const out: ApiChatExpand[] = [];
-					for (let i in prev) {
-						const cpy: ApiChatExpand = JSON.parse(JSON.stringify(prev[i]));
-						if (prev[i].id === msg.chatId) {
+					for (let chat of prev) {
+						const cpy: ApiChatExpand = JSON.parse(JSON.stringify(chat));
+						if (chat.id === msg.chatId) {
 							cpy.messages = cpy.messages.concat(msg);
 						}
 						out.push(cpy);
@@ -158,12 +155,6 @@ const Messenger = ({ currentUser, allUsers }: MessengerProps) => {
 			setSelectedChannel(channel);
 
 	}, [allChannels, selectedChannel]);
-
-	setTimeout(() => {
-		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
-		if (chatMessages.length > 0)
-			chatMessages[0].scrollTop = chatMessages[0].scrollHeight;
-	}, 0);
 
 	const matchedChannels: ApiChannelExpand[] = allChannels.filter(channel =>
 		searchPattern.length !== 0 &&

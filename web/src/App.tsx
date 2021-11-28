@@ -1,5 +1,9 @@
 import './App.scss';
 
+import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { setAllUsers } from "app/reducers/allUsersSlice";
+import { setCurrentUser } from "app/reducers/currentUserSlice";
+import { setOnlineUsers } from "app/reducers/onlineUsersSlice";
 import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
@@ -56,45 +60,49 @@ const App = () => {
 
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-	const [status, setStatus] = React.useState<ApiUserStatus>(ApiUserStatus.Regular);
+	const [status, setStatus] = React.useState<ApiUserStatus>(ApiUserStatus.Regular); // todo [move status to redux]
 	const enemyRef = React.useRef<ApiUpdateUser | null>(null);
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
-	const [currentUser, setCurrentUser] =  React.useState<User>(new User());
-	const [onlineUsers, setOnlineUsers] = React.useState<ApiUpdateUser[]>([]);
 	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
-	const [allUsers, setAllUsers] = React.useState<ApiUserExpand[]>([]);
 	const [socketId, setSocketId] = React.useState<string | null>(null);
+	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
+	const statusRef = React.useRef(status);
+
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { onlineUsers } = useAppSelector(state => state.onlineUsers);
+	const dispatch = useAppDispatch();
 
 	// Saving onlineUsers in onlineUsersRef
 	React.useEffect(() => {
 		onlineUsersRef.current = onlineUsers;
 	}, [onlineUsers, onlineUsersRef]);
 
-	// Updating allUsers on change in onlineUsers
-	React.useEffect(() => {
-		setAllUsers(prev => prev.map(allUser => {
-			const onlineUsr = onlineUsers.find(usr => allUser.id === usr.id);
-			if (!onlineUsr)
-				return allUser;
-
-			return {
-				id: allUser.id,
-				login: allUser.login,
-				url_avatar: allUser.url_avatar,
-				intraLogin: allUser.intraLogin,
-				wonGames: allUser.wonGames,
-				lostGames: allUser.lostGames,
-				subscriptions: onlineUsr.subscriptions,
-				subscribers: onlineUsr.subscribers,
-				createdChats: allUser.createdChats,
-				acceptedChats: allUser.acceptedChats,
-				messages: allUser.messages,
-				ownedChannels: allUser.ownedChannels,
-				channels: allUser.channels
-			};
-		}));
-	}, [onlineUsers]);
+	// // Updating allUsers on onlineUsers change // todo
+	// React.useEffect(() => {
+	// 	const updated: ApiUserExpand[] = allUsers.map(usr => {
+	// 		const onlineUsr = onlineUsers.find(u => u.id === usr.id);
+	// 		if (!onlineUsr)
+	// 			return usr;
+	//
+	// 		return {
+	// 			id: usr.id,
+	// 			login: usr.login,
+	// 			url_avatar: usr.url_avatar,
+	// 			intraLogin: usr.intraLogin,
+	// 			wonGames: usr.wonGames,
+	// 			lostGames: usr.lostGames,
+	// 			subscriptions: onlineUsr.subscriptions,
+	// 			subscribers: onlineUsr.subscribers,
+	// 			createdChats: usr.createdChats,
+	// 			acceptedChats: usr.acceptedChats,
+	// 			messages: usr.messages,
+	// 			ownedChannels: usr.ownedChannels,
+	// 			channels: usr.channels
+	// 		};
+	// 	});
+	// 	dispatch(setAllUsers(updated));
+	// }, [dispatch, onlineUsers]);
 
 	// Fetching onlineUsers
 	React.useEffect(() => {
@@ -109,13 +117,13 @@ const App = () => {
 			.then(res => {
 				if (!isMounted)
 					return ;
-				setOnlineUsers(res.data);
+				dispatch(setOnlineUsers(res.data));
 			});
 
 		return () => {
 			isMounted = false;
 		};
-	}, [currentUser, setOnlineUsers]);
+	}, [currentUser, dispatch]);
 
 	// Fetching allUsers
 	React.useEffect(() => {
@@ -132,13 +140,13 @@ const App = () => {
 				if (!isMounted)
 					return ;
 
-				setAllUsers(res.data);
+				dispatch(setAllUsers(res.data));
 			});
 
 		return () => {
 			isMounted = false;
 		};
-	}, [currentUser]);
+	}, [currentUser, dispatch]);
 
 	// Getting user from access_token
 	React.useEffect(() => {
@@ -149,15 +157,15 @@ const App = () => {
 			getCurrentUser(accessToken, sockId, 'local')
 				.then(usr => {
 					if (usr) {
-						setCurrentUser(usr);
+						dispatch(setCurrentUser(usr));
 					} else {
 						localStorage.removeItem('access_token');
-						setCurrentUser(new User());
+						dispatch(setCurrentUser(new User()));
 					}
 				});
 		}
 
-	}, [socket.id, socketId]);
+	}, [dispatch, socket.id, socketId]);
 
 	// Saving socketId in state
 	React.useEffect(() => {
@@ -191,6 +199,83 @@ const App = () => {
 		}
 	}, [currentUser, history]);
 
+	// Event handlers
+	React.useEffect(() => {
+		if (!currentUser.isAuthorized())
+			return;
+
+		const logoutHandler = (data: string) => {
+			const logoutData: ApiUpdateUser = JSON.parse(data);
+			dispatch(setOnlineUsers(onlineUsersRef.current.filter(usr => usr.login !== logoutData.login)));
+		};
+
+		const gameSettingsHandler = (e: string) => {
+			const gameSettings: ApiGameSettings = JSON.parse(e);
+			gameSettingsRef.current = gameSettings;
+
+			// If watch mode is on, don't send start
+			if (gameSettings.leftPlayer.login !== currentUser.username && gameSettings.rightPlayer.login !== currentUser.username)
+				return ;
+
+			const data = {
+				login: currentUser.username,
+				id: gameSettings.id
+			};
+			setTimeout(() => socket.emit('start', JSON.stringify(data)), 3000);
+		};
+
+		const updateUserHandler = (data: string) => {
+			const updateUserData: ApiUpdateUser = JSON.parse(data);
+
+			const updatedUsers: ApiUpdateUser[] = [];
+			// Edit user
+			for (let user of onlineUsers) {
+				if (user.login === updateUserData.login) {
+					updatedUsers.push(updateUserData);
+				} else {
+					updatedUsers.push(user);
+				}
+			}
+			// Add new user
+			if (!onlineUsers.find(usr => usr.login === updateUserData.login))
+				updatedUsers.push(updateUserData);
+			dispatch(setOnlineUsers(updatedUsers));
+
+			if (!enemyRef.current && statusRef.current !== ApiUserStatus.Regular) {
+				setStatus(ApiUserStatus.Regular);
+			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && (updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular)) {
+				setStatus(ApiUserStatus.Regular);
+				setEnemyIsReady(false);
+			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && updateUserData.status === ApiUserStatus.Accepted) {
+				setEnemyIsReady(true);
+			}
+		};
+
+		const enemyHandler = (e: string) => {
+			enemyRef.current = JSON.parse(e);
+			setStatus(ApiUserStatus.FoundEnemy);
+		};
+
+		const gameIsReadyHandler = () => {
+			setStatus(ApiUserStatus.InGame);
+		};
+
+		socket.on('logout', logoutHandler);
+		socket.on('updateUser', updateUserHandler);
+		socket.on('enemy', enemyHandler);
+		socket.on('gameIsReady', gameIsReadyHandler);
+		socket.on('gameSettings', gameSettingsHandler);
+
+		return () => {
+			socket.off('logout', logoutHandler);
+			socket.off('updateUser', updateUserHandler);
+			socket.off('enemy', enemyHandler);
+			socket.off('gameIsReady', gameIsReadyHandler);
+			socket.off('gameSettings', gameSettingsHandler);
+		};
+
+	}, [currentUser, setStatus, socket, enemyRef, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch]);
+
 	if (!isDesktop)
 		return (
 			<div style={ { fontSize: '2em', marginTop: '100px' } }>
@@ -207,8 +292,6 @@ const App = () => {
 				{
 					sockId
 						?	<Login
-								currentUser={ currentUser }
-								setCurrentUser={ setCurrentUser }
 								socketId={ sockId }
 							/>
 						:	'[TMP] no socket id'
@@ -216,17 +299,12 @@ const App = () => {
 			</Route>
 
 			<Route exact path='/register'>
-				<Register
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
-				/>
+				<Register/>
 			</Route>
 
 			<Route exact path='/game'>
 				<Game
 					enemyInfo={ enemyRef.current }
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
 					gameSettingsRef={ gameSettingsRef }
 					gameRef={ gameRef }
 					status={ status }
@@ -236,34 +314,23 @@ const App = () => {
 
 			<Route path='/games/:login'>
 				<GamesHistory
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
 					status={ status }
-					allUsers={ allUsers }
 				/>
 			</Route>
 
 			<Route path='/users/:login'>
 				<UserProfile
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
 					status={ status }
-					allUsers={ allUsers }
 				/>
 			</Route>
 
 			<Route exact path='/'>
 				<Main
-					currentUser={ currentUser }
-					setCurrentUser={ setCurrentUser }
 					status={ status }
 					setStatus={ setStatus }
 					enemyRef={ enemyRef }
-					gameSettingsRef={ gameSettingsRef }
-					allUsers={ allUsers }
 					onlineUsers={ onlineUsers }
-					setOnlineUsers={ setOnlineUsers }
-					onlineUsersRef={ onlineUsersRef }
+					enemyIsReady={ enemyIsReady }
 				/>
 			</Route>
 

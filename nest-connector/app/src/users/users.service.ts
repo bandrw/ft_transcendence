@@ -225,7 +225,7 @@ export class UsersService {
 			newUser.subscriptions.push(await this.findOneById(user.subscriptions[i].targetId));
 		for (let i = 0; i < user.subscribers.length; ++i)
 			newUser.subscribers.push(await this.findOneById(user.subscribers[i].userId));
-		const index = this.onlineUsers.map(usr => usr.login).indexOf(user.login);
+		const index = this.onlineUsers.findIndex(usr => usr.login === user.login);
 		if (index === -1)
 			this.onlineUsers.push(newUser);
 		else

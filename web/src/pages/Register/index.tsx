@@ -1,11 +1,12 @@
 import './styles.scss';
 
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { setCurrentUser } from "app/reducers/currentUserSlice";
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
 import { SocketContext } from "context/socket";
 import { ApiUser, ApiUserCreate } from "models/apiTypes";
-import { User } from "models/User";
 import { signIn } from "pages/Login";
 import React from 'react';
 import { Link, Redirect } from "react-router-dom";
@@ -44,12 +45,7 @@ const validateInput = (
 	return true;
 };
 
-interface RegisterProps {
-	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User> >
-}
-
-const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
+const Register = () => {
 	const socket = React.useContext(SocketContext);
 
 	const loginRef = React.useRef<HTMLInputElement>(null);
@@ -58,6 +54,8 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 
 	const [errors, setErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const dispatch = useAppDispatch();
 
 	if (currentUser.isAuthorized())
 		return <Redirect to='/'/>;
@@ -92,7 +90,7 @@ const Register = ({ currentUser, setCurrentUser }: RegisterProps) => {
 			})
 			.then(res => res.data);
 		if (usersCreateResponse.ok) {
-			await signIn(login, password, setCurrentUser, setErrors, socket.id)
+			await signIn(login, password, (usr) => dispatch(setCurrentUser(usr)), setErrors, socket.id)
 				.catch(err => setErrors(err.toString()));
 		} else {
 			setErrors(usersCreateResponse.msg);

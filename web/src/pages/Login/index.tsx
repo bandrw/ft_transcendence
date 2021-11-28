@@ -1,6 +1,8 @@
 import './styles.scss';
 
 import { getCurrentUser } from "App";
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { setCurrentUser } from "app/reducers/currentUserSlice";
 import axios, { AxiosResponse } from "axios";
 import CircleLoading from "components/CircleLoading";
 import { SocketContext } from "context/socket";
@@ -10,15 +12,13 @@ import React from 'react';
 import { Link, Redirect, useHistory } from "react-router-dom";
 
 interface LoginProps {
-	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
 	socketId: string
 }
 
 export const signIn = async (
 	login: string,
 	password: string,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User> >,
+	setCurrentUser: (usr: User) => void,
 	setErrors: React.Dispatch<React.SetStateAction<string> >,
 	socketId: string
 ): Promise<void> => {
@@ -45,9 +45,11 @@ export const signIn = async (
 	}
 };
 
-const Login = ({ currentUser, setCurrentUser, socketId }: LoginProps) => {
+const Login = ({ socketId }: LoginProps) => {
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const dispatch = useAppDispatch();
 
 	const loginRef = React.useRef<HTMLInputElement>(null);
 	const passwordRef = React.useRef<HTMLInputElement>(null);
@@ -63,14 +65,14 @@ const Login = ({ currentUser, setCurrentUser, socketId }: LoginProps) => {
 			getCurrentUser(authCode, socketId, 'intra')
 				.then(user => {
 					if (user) {
-						setCurrentUser(user);
+						dispatch(setCurrentUser(user));
 					} else {
 						localStorage.removeItem('access_token');
 					}
 				})
 				.finally(() => history.push('/login'));
 		}
-	}, [history, authCode, socketId, setCurrentUser]);
+	}, [history, authCode, socketId, dispatch]);
 
 	if (currentUser.isAuthorized())
 		return <Redirect to='/'/>;
@@ -87,7 +89,7 @@ const Login = ({ currentUser, setCurrentUser, socketId }: LoginProps) => {
 				const login = loginRef.current?.value || '';
 				const password = passwordRef.current?.value || '';
 
-				await signIn(login, password, setCurrentUser, setLoginErrors, socket.id);
+				await signIn(login, password, (usr: User) => dispatch(setCurrentUser(usr)), setLoginErrors, socket.id);
 				setIsLoading(false);
 			} }
 			>

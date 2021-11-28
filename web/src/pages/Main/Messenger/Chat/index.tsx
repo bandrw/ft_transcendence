@@ -77,6 +77,12 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 			/>
 		);
 
+	setTimeout(() => {
+		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
+		if (chatMessages.length > 0)
+			chatMessages[0].scrollTop = chatMessages[0].scrollHeight;
+	}, 0);
+
 	if (selectedChat) {
 		const companion = selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
 

@@ -2,24 +2,24 @@ import './styles.scss';
 
 import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { setCurrentUser } from "app/reducers/currentUserSlice";
 import axios from "axios";
 import { User } from "models/User";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
 import { Link } from "react-router-dom";
 
-interface UserMenuProps {
-	currentUser: User,
-	setCurrentUser: React.Dispatch<React.SetStateAction<User>>
-}
+const UserMenu = () => {
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const dispatch = useAppDispatch();
 
-const UserMenu = ({ currentUser, setCurrentUser } : UserMenuProps) => {
 	const logOut = () => {
 		axios.post('/users/logout', {} , {
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
 			.then(() => {
-				setCurrentUser(new User());
+				dispatch(setCurrentUser(new User()));
 				localStorage.removeItem('access_token');
 			});
 	};
