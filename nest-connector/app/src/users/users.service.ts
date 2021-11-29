@@ -21,10 +21,6 @@ export class UsersService {
       }),
     );
   }
-
-  async findOne(username: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({ login: username });
-  }
   clearUserData(index) {
     this.userEvent('logout_SSE', this.onlineUsers[index]);
     this.onlineUsers[index].resp.end();
@@ -32,19 +28,8 @@ export class UsersService {
     this.onlineUsers = this.onlineUsers.filter((user) => user);
   }
 
-  logout(login: string, i = -1) {
-    if (i !== -1) {
-      this.clearUserData(i);
-      return;
-    }
-    let index = 0;
-    while (index < this.onlineUsers.length) {
-      if (this.onlineUsers[index] && this.onlineUsers[index].login === login) {
-        this.clearUserData(index);
-        return;
-      }
-      ++index;
-    }
+  async findOne(username: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({ login: username });
   }
 
   async remove(id: string): Promise<void> {

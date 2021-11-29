@@ -112,13 +112,7 @@ export class Events implements OnGatewayDisconnect {
         this.userService.onlineUsers[i] &&
         this.userService.onlineUsers[i].socketId === client.id
       ) {
-        if (this.userService.onlineUsers[i].status !== 'green') {
-          this.ladder.updateStatus(
-            this.userService.onlineUsers[i].login,
-            'green',
-          );
-        }
-        this.userService.logout(this.userService.onlineUsers[i].login, i);
+        this.ladder.logout(this.userService.onlineUsers[i].login, i);
         return;
       }
       ++i;

@@ -33,6 +33,30 @@ export class LadderService {
     }
   }
 
+  logout(login: string, i = -1) {
+    if (i !== -1) {
+      if (this.users.onlineUsers[i].status !== 'green') {
+        this.updateStatus(this.users.onlineUsers[i].login, 'green');
+      }
+      this.users.clearUserData(i);
+      return;
+    }
+    let index = 0;
+    while (index < this.users.onlineUsers.length) {
+      if (
+        this.users.onlineUsers[index] &&
+        this.users.onlineUsers[index].login === login
+      ) {
+        if (this.users.onlineUsers[index].status !== 'green') {
+          this.updateStatus(this.users.onlineUsers[index].login, 'green');
+        }
+        this.users.clearUserData(index);
+        return;
+      }
+      ++index;
+    }
+  }
+
   updateStatus(login: string, status: string) {
     let i = 0;
     while (this.users.onlineUsers[i].login != login) {

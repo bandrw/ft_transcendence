@@ -60,10 +60,6 @@ export class UsersController {
   async updateAvatar(@Query('login') login): Promise<string> {
     return await this.UsersService.updateAvatar(login);
   }
-  @Post('logout')
-  userLogout(@Req() req: Request) {
-    this.UsersService.logout(req.body.user.login);
-  }
 
   @Get('checkExist')
   async checkExist(@Query('login') login) {

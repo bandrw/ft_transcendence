@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { LadderService } from './ladder.service';
+import { Request } from 'express';
 
 @Controller('ladder')
 export class LadderController {
@@ -13,5 +14,9 @@ export class LadderController {
   @Get('systemStatus')
   systemStatus(@Query('login') login) {
     this.ladder.traceLadder(login);
+  }
+  @Post('logout')
+  userLogout(@Req() req: Request) {
+    this.ladder.logout(req.body.user.login);
   }
 }
