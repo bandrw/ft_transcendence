@@ -18,6 +18,9 @@
     <div v-show="message" id="thank_you">
       <h4 id="error_message">{{ message }}</h4>
     </div>
+    <router-link :to="{ name: 'login' }" class="tip"
+    >Already have an account? Login.</router-link
+    >
   </div>
 </template>
 

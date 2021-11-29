@@ -25,22 +25,22 @@ export class UsersService {
   async findOne(username: string): Promise<User | undefined> {
     return this.usersRepository.findOne({ login: username });
   }
+  clearUserData(index) {
+    this.userEvent('logout_SSE', this.onlineUsers[index]);
+    this.onlineUsers[index].resp.end();
+    this.onlineUsers[index] = null;
+    this.onlineUsers = this.onlineUsers.filter((user) => user);
+  }
 
   logout(login: string, i = -1) {
     if (i !== -1) {
-      this.userEvent('logout_SSE', this.onlineUsers[i]);
-      this.onlineUsers[i].resp.end();
-      this.onlineUsers[i] = null;
-      this.onlineUsers = this.onlineUsers.filter((user) => user);
+      this.clearUserData(i);
       return;
     }
     let index = 0;
     while (index < this.onlineUsers.length) {
       if (this.onlineUsers[index] && this.onlineUsers[index].login === login) {
-        this.userEvent('logout_SSE', this.onlineUsers[index]);
-        this.onlineUsers[index].resp.end();
-        this.onlineUsers[index] = null;
-        this.onlineUsers = this.onlineUsers.filter((user) => user);
+        this.clearUserData(index);
         return;
       }
       ++index;

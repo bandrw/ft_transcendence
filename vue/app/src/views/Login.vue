@@ -30,6 +30,9 @@
       id="intra_img"
       alt=""
     />
+    <router-link :to="{ name: 'register' }" class="tip"
+      >Don't have an account? Register.</router-link
+    >
   </div>
 </template>
 
@@ -44,6 +47,7 @@ export default {
       login: null,
       password: null,
       error: null,
+      token: null,
     };
   },
   computed: {
@@ -52,6 +56,7 @@ export default {
   methods: {
     ...mapActions(["setUsers"]),
     ...mapMutations("profile", ["SET_HISTORY"]),
+    ...mapMutations(["SET_TOKEN"]),
     async authorize() {
       if (!this.login) {
         this.error = "please enter login";
@@ -61,8 +66,10 @@ export default {
         return;
       }
       let res = await eventService.login(this.login, this.password);
-      console.log(res.data);
-      this.$socket.emit("login", this.login);
+      if (res.data.access_token) {
+        this.SET_TOKEN(res.data.access_token);
+        this.$socket.emit("login", this.login);
+      }
     },
   },
   sockets: {
@@ -102,6 +109,7 @@ export default {
 </script>
 
 <style scoped>
+
 #login_login_input {
   left: 25%;
   top: 20%;

@@ -1,16 +1,10 @@
 <template>
   <div id="app_vue">
+    <div v-show="!this.authorized" id="nav">
+      <router-link :to="{ name: 'login' }">Login</router-link>
+      <router-link :to="{ name: 'register' }">Register</router-link>
+    </div>
     <div :id="userAuthorizationStatus" v-if="screenSize">
-      <div v-if="!this.authorized">
-        <b-nav tabs>
-          <b-nav-item :active="active1" @click="switchToLogin"
-            >Login</b-nav-item
-          >
-          <b-nav-item :active="active2" @click="switchToRegister"
-            >Register</b-nav-item
-          >
-        </b-nav>
-      </div>
       <router-view />
     </div>
     <div v-else>
@@ -23,12 +17,6 @@
 import { mapMutations, mapState } from "vuex";
 
 export default {
-  data() {
-    return {
-      active1: true,
-      active2: false,
-    };
-  },
   computed: {
     ...mapState(["authorized", "innerHeight", "innerWidth"]),
     userAuthorizationStatus() {
@@ -40,20 +28,6 @@ export default {
   },
   methods: {
     ...mapMutations(["SET_INNER_HEIGHT", "SET_INNER_WIDTH"]),
-    switchToLogin() {
-      if (!this.active1) {
-        this.active1 = true;
-        this.active2 = false;
-        this.$router.push("login");
-      }
-    },
-    switchToRegister() {
-      if (!this.active2) {
-        this.active2 = true;
-        this.active1 = false;
-        this.$router.push("register");
-      }
-    },
     updateScreenSize() {
       this.SET_INNER_WIDTH(window.innerWidth);
       this.SET_INNER_HEIGHT(window.innerHeight);
@@ -68,8 +42,30 @@ export default {
 </script>
 
 <style>
+a {
+  font-weight: bold;
+  color: #2c3e50;
+  margin: auto 0.8em auto 0.4em;
+  text-decoration: none;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+}
+
+#nav {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  padding: 0.2em 1em;
+  background: linear-gradient(to right, #16c0b0, #ccfff2);
+}
+
+.router-link-exact-active {
+  color: white;
+  border-bottom: 2px solid #fff;
+}
+
 #app_vue {
-  background: #79e7af;
+  background: #ccfff2;
   width: 100%;
   height: 100%;
   position: absolute;
@@ -89,11 +85,12 @@ h1 {
   position: absolute;
   left: 15%;
   top: 15%;
+  background: linear-gradient(to bottom, #16c0b0, #ccfff2);
 }
 
 #user_login_button {
   border-radius: 15px;
-  background: linear-gradient(145deg, #cacaca, #79e7af);
+  background: #16c0b0;
   box-shadow: 24px 24px 47px #9b9b9b, -24px -24px 47px #ffffff;
   width: 25%;
   height: 25%;

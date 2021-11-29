@@ -24,6 +24,7 @@ export default {
       "SET_ENEMY",
       "SET_USER_STATUS",
       "SET_USER_URL_AVATAR",
+      "CLEAR_ENEMY",
     ]),
     ...mapMutations("ladder", [
       "CLEAR_ACCEPT_INTERVAL",
@@ -92,6 +93,10 @@ export default {
     },
     setEnemy(event) {
       const enemy = JSON.parse(event.data);
+      if (!enemy) {
+        this.CLEAR_ENEMY();
+        return;
+      }
       for (let i = 0; i < this.onlineUsers.length; i++) {
         if (this.onlineUsers[i].login === enemy.login) {
           this.SET_ENEMY(i);

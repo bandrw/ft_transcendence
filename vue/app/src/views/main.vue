@@ -53,6 +53,7 @@ export default {
       "SET_USERS",
       "CLEAR_USER",
       "SET_NEW_USER_AVATAR",
+      "CLEAR_TOKEN",
     ]),
     showUserDropdown() {
       this.SET_PROFILE(true);
@@ -70,8 +71,10 @@ export default {
       if (this.gameInProgress) {
         this.$refs.Ladder.clearLadder();
       }
-      this.CLOSE_EVENT_SOURCE();
+      this.CLEAR_TOKEN();
       await eventService.logout(this.user);
+      // location.reload();
+      this.CLOSE_EVENT_SOURCE();
       this.SET_ENEMY(null);
       this.SET_AUTHORIZE(false);
       this.SET_PROFILE(false);
@@ -130,6 +133,11 @@ export default {
 </script>
 
 <style>
+.tip {
+  position: absolute;
+  bottom: 0;
+}
+
 #mouse_outer {
   height: 27%;
   width: 18%;

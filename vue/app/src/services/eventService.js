@@ -11,6 +11,12 @@ const apiClient = axios.create({
 });
 
 export default {
+  setTokenHeader(token) {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  },
+  clearTokenHeader() {
+    axios.defaults.headers.common["Authorization"] = null;
+  },
   async users() {
     return await apiClient.get("/users/getAll");
   },

@@ -4,6 +4,7 @@ import * as ladder from "./modules/ladder";
 import * as game from "./modules/game";
 import * as chat from "./modules/chat";
 import * as profile from "./modules/profile";
+import eventService from "../services/eventService";
 
 Vue.use(Vuex);
 
@@ -18,6 +19,14 @@ export default new Vuex.Store({
     innerWidth: null,
   },
   mutations: {
+    SET_TOKEN(state, token) {
+      localStorage.setItem("token", token);
+      eventService.setTokenHeader(token);
+    },
+    CLEAR_TOKEN() {
+      localStorage.removeItem("token");
+      eventService.clearTokenHeader();
+    },
     SET_INNER_HEIGHT(state, height) {
       state.innerHeight = height;
     },
@@ -56,6 +65,9 @@ export default new Vuex.Store({
     },
     SET_ENEMY(state, index) {
       state.enemy = state.onlineUsers[index];
+    },
+    CLEAR_ENEMY(state) {
+      state.enemy = null;
     },
     CLEAR_USER(state) {
       state.user = null;
