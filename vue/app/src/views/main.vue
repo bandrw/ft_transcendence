@@ -40,14 +40,14 @@ export default {
       "CLEAR_LEFT_INTERVAL",
       "SET_GAME_IN_PROGRESS",
     ]),
-    ...mapMutations("profile", ["SET_PROFILE", "SET_HISTORY", "CLEAR_HISTORY"]),
+    ...mapMutations("profile", ["SET_PROFILE", "SET_HISTORY"]),
     ...mapMutations("ladder", [
       "CLEAR_FIND_INTERVAL",
       "CLEAR_ACCEPT_INTERVAL",
       "CLEAR_LADDER",
     ]),
     ...mapMutations([
-      "CLOSE_EVENT_SOURCE",
+      // "CLOSE_EVENT_SOURCE",
       "SET_ENEMY",
       "SET_AUTHORIZE",
       "SET_USERS",
@@ -73,14 +73,14 @@ export default {
       }
       this.CLEAR_TOKEN();
       await eventService.logout(this.user);
-      // location.reload();
-      this.CLOSE_EVENT_SOURCE();
-      this.SET_ENEMY(null);
-      this.SET_AUTHORIZE(false);
-      this.SET_PROFILE(false);
-      this.SET_USERS(null);
-      this.CLEAR_HISTORY();
-      await this.$router.push({ name: "login" });
+      location.reload();
+      // this.CLOSE_EVENT_SOURCE();
+      // this.SET_ENEMY(null);
+      // this.SET_AUTHORIZE(false);
+      // this.SET_PROFILE(false);
+      // this.SET_USERS(null);
+      // this.CLEAR_HISTORY();
+      // await this.$router.push({ name: "login" });
     },
     getData(res) {
       return res.data;
