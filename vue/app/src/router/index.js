@@ -12,11 +12,13 @@ const routes = [
     path: "/",
     name: "main",
     component: main,
+    meta: { requireAuth: true },
     children: [
       {
         path: "/profile/:username",
         name: "profile",
         component: profile,
+        meta: { requireAuth: true },
       },
     ],
   },
@@ -31,16 +33,20 @@ const routes = [
     component: Register,
     alias: "/registration",
   },
-  {
-    path: "/main",
-    redirect: { name: "main" },
-  },
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const loggedIn = localStorage.getItem("token");
+  if (to.matched.some((record) => record.meta.requireAuth) && !loggedIn) {
+    next({ name: "login" });
+  }
+  next();
 });
 
 export default router;

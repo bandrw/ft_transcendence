@@ -1,11 +1,4 @@
-import { Injectable, Res } from '@nestjs/common';
-import { Response } from 'express';
-import { createReadStream } from 'fs';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class AppService {
-  baseApp(@Res() response: Response) {
-    const file = createReadStream('src/app.html');
-    file.pipe(response);
-  }
-}
+export class AppService {}

@@ -245,7 +245,6 @@ tr {
   top: 45%;
   left: 25%;
   width: 45%;
-  /*height: 40%;*/
 }
 
 p {
