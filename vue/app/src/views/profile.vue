@@ -85,6 +85,7 @@
         </td>
       </tr>
     </table>
+    <Ladder ref="Ladder" />
   </div>
 </template>
 
@@ -98,11 +99,12 @@ export default {
     ...mapState("game", ["gameInProgress"]),
     ...mapState(["user", "authorized"]),
     ...mapState("profile", [
-      "profile",
+      "userDropdown",
       "currentPageInHistory",
       "arrayPage",
       "history",
       "rowsPerPage",
+      "profile",
     ]),
     page() {
       return this.arrayPage + 1;
@@ -129,7 +131,7 @@ export default {
       "SET_AUTHORIZE",
       "SET_USERS",
     ]),
-    ...mapMutations("profile", ["SET_PROFILE"]),
+    ...mapMutations("profile", ["SET_USER_DROPDOWN", "SET_PROFILE"]),
     ...mapActions("profile", ["updatePageFromHistory"]),
     decrementPage() {
       this.updatePageFromHistory(this.page - 1);
@@ -138,7 +140,7 @@ export default {
       this.updatePageFromHistory(this.page + 1);
     },
     closeProfile() {
-      this.SET_PROFILE(!this.profile);
+      this.SET_USER_DROPDOWN(!this.userDropdown);
       this.$router.push({ name: "main" });
     },
     async updateAvatar() {
@@ -150,6 +152,19 @@ export default {
   },
   mounted() {
     this.updatePageFromHistory(1);
+  },
+  beforeRouteEnter(to, from, next) {
+    if (to.name === "profile" && from.name === "main") {
+      next((cb) => {
+        cb.SET_PROFILE(true);
+      });
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (to.name === "main" && from.name === "profile") {
+      this.SET_PROFILE(false);
+    }
+    next();
   },
 };
 </script>

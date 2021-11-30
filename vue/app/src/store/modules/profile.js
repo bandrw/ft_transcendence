@@ -1,6 +1,7 @@
 export const namespaced = true;
 
 export const state = {
+  userDropdown: false,
   profile: false,
   users: [],
   history: [],
@@ -10,16 +11,14 @@ export const state = {
 };
 
 export const mutations = {
-  CLEAR_HISTORY(state) {
-    state.arrayPage = 0;
-    state.currentPageInHistory = [];
-    state.history = [];
-  },
-  SET_PROFILE(state, profile) {
-    state.profile = profile;
+  SET_USER_DROPDOWN(state, userDropdown) {
+    state.userDropdown = userDropdown;
   },
   SET_HISTORY(state, history) {
     state.history = history;
+  },
+  SET_PROFILE(state, profile) {
+    state.profile = profile;
   },
   ADD_HISTORY(state, new_game_in_history) {
     state.history.unshift(new_game_in_history);

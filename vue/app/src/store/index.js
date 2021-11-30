@@ -25,7 +25,6 @@ export default new Vuex.Store({
     },
     CLEAR_TOKEN() {
       localStorage.removeItem("token");
-      // eventService.clearTokenHeader();
     },
     SET_INNER_HEIGHT(state, height) {
       state.innerHeight = height;

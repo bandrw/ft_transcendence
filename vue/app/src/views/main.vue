@@ -10,7 +10,7 @@
           id="profile_image"
           @mouseover="showUserDropdown"
         />
-        <div id="user_authorized" v-show="profile">
+        <div id="user_authorized" v-show="userDropdown">
           <div id="user_logout_button" v-on:click="logout"><p>logout</p></div>
           <div id="user_profile_button" v-on:click="goToProfile">
             <p>{{ user.login }}</p>
@@ -31,7 +31,7 @@ export default {
   computed: {
     ...mapState("ladder", ["ladder", "game"]),
     ...mapState(["authorized", "user", "enemy"]),
-    ...mapState("profile", ["profile"]),
+    ...mapState("profile", ["userDropdown", "profile"]),
     ...mapState("game", ["gameInProgress", "id"]),
   },
   methods: {
@@ -40,14 +40,13 @@ export default {
       "CLEAR_LEFT_INTERVAL",
       "SET_GAME_IN_PROGRESS",
     ]),
-    ...mapMutations("profile", ["SET_PROFILE", "SET_HISTORY"]),
+    ...mapMutations("profile", ["SET_USER_DROPDOWN", "SET_HISTORY"]),
     ...mapMutations("ladder", [
       "CLEAR_FIND_INTERVAL",
       "CLEAR_ACCEPT_INTERVAL",
       "CLEAR_LADDER",
     ]),
     ...mapMutations([
-      // "CLOSE_EVENT_SOURCE",
       "SET_ENEMY",
       "SET_AUTHORIZE",
       "SET_USERS",
@@ -56,10 +55,10 @@ export default {
       "CLEAR_TOKEN",
     ]),
     showUserDropdown() {
-      this.SET_PROFILE(true);
+      this.SET_USER_DROPDOWN(true);
     },
     hideUserDropdown() {
-      this.SET_PROFILE(false);
+      this.SET_USER_DROPDOWN(false);
     },
     goToProfile() {
       this.$router.push({
@@ -74,13 +73,6 @@ export default {
       this.CLEAR_TOKEN();
       await eventService.logout(this.user);
       location.reload();
-      // this.CLOSE_EVENT_SOURCE();
-      // this.SET_ENEMY(null);
-      // this.SET_AUTHORIZE(false);
-      // this.SET_PROFILE(false);
-      // this.SET_USERS(null);
-      // this.CLEAR_HISTORY();
-      // await this.$router.push({ name: "login" });
     },
     getData(res) {
       return res.data;
@@ -95,7 +87,9 @@ export default {
       }
     },
     escapeEvents(event) {
-      if (this.authorized && !this.game && !this.enemy) {
+      if (this.profile && !this.game) {
+        this.$router.push({ name: "main" });
+      } else if (this.authorized && !this.game && !this.enemy) {
         this.logout();
       } else if (this.authorized && this.game) {
         if (!this.enemy) {
