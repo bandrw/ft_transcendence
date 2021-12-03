@@ -2,6 +2,7 @@ import './styles.scss';
 
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { setCurrentUser } from "app/reducers/currentUserSlice";
+import { getToken } from "app/token";
 import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
@@ -74,7 +75,7 @@ const Register = () => {
 		setErrors('');
 		const user = await axios.get<ApiUser | null>('/users', {
 			params: { login: login },
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			headers: { Authorization: `Bearer ${getToken()}` }
 		}).then(res => res.data);
 		if (user) {
 			setErrors('User with this login already exists');

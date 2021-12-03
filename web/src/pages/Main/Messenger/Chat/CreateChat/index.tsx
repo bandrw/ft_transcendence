@@ -1,5 +1,6 @@
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getToken } from "app/token";
 import axios from "axios";
 import { ApiUserExpand } from "models/apiTypes";
 import React from "react";
@@ -37,7 +38,7 @@ const CreateChat = ({ setDefaultChatState, chatsToCreate, allUsers }: CreateChat
 								onClick={ () => {
 									const data = { userTwoId: usr.id };
 									axios.post('/chats/create', data, {
-										headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+										headers: { Authorization: `Bearer ${getToken()}` }
 									})
 										.then(() => setDefaultChatState());
 								} }

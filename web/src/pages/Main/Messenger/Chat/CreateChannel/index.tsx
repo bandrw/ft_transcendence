@@ -1,5 +1,6 @@
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getToken } from "app/token";
 import axios from "axios";
 import * as bcryptjs from "bcryptjs";
 import React, { FormEvent } from "react";
@@ -27,7 +28,7 @@ const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
 			password: await bcryptjs.hash(password, 10)
 		};
 		await axios.post('/channels/create', data, {
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			headers: { Authorization: `Bearer ${getToken()}` }
 		});
 		setDefaultChatState();
 	};

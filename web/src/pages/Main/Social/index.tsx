@@ -3,6 +3,7 @@ import './styles.scss';
 import { faCircle, faTv } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppSelector } from "app/hooks";
+import { getToken } from "app/token";
 import axios from "axios";
 import { ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
 import React from 'react';
@@ -29,7 +30,7 @@ const SocialBlockOnlineUser = ({ user }: SocialBlockOnlineUserProps) => {
 				onClick={ async () => {
 					await axios.get('/games/watchGame', {
 						params: { gamerLogin: user.login } ,
-						headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+						headers: { Authorization: `Bearer ${getToken()}` }
 					});
 					history.push('/game');
 				} }

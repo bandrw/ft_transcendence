@@ -6,6 +6,7 @@ import { setCurrentUser } from "app/reducers/currentUserSlice";
 import { setEnemy } from "app/reducers/enemySlice";
 import { setOnlineUsers } from "app/reducers/onlineUsersSlice";
 import { setStatus } from "app/reducers/statusSlice";
+import { getToken, removeToken, setToken } from "app/token";
 import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
@@ -47,7 +48,7 @@ export const getCurrentUser = async (access_token: string, socketId: string, str
 				code: access_token
 			})
 				.then(res => res.data);
-			localStorage.setItem('access_token', r.access_token);
+			setToken(r.access_token);
 			return await getCurrentUser(r.access_token, socketId, 'local');
 		} catch {
 			return null;
@@ -114,7 +115,7 @@ const App = () => {
 			return ;
 
 		axios.get<ApiUpdateUser[]>('/users/online', {
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			headers: { Authorization: `Bearer ${getToken()}` }
 		})
 			.then(res => {
 				if (!isMounted)
@@ -136,7 +137,7 @@ const App = () => {
 
 		axios.get<ApiUserExpand[]>('/users', {
 			params: { expand: '' },
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			headers: { Authorization: `Bearer ${getToken()}` }
 		})
 			.then(res => {
 				if (!isMounted)
@@ -152,7 +153,7 @@ const App = () => {
 
 	// Getting user from access_token
 	React.useEffect(() => {
-		const accessToken = localStorage.getItem('access_token');
+		const accessToken = getToken();
 		const sockId = socketId ? socketId : socket.id;
 
 		if (accessToken && sockId) {
@@ -161,7 +162,7 @@ const App = () => {
 					if (usr) {
 						dispatch(setCurrentUser(usr));
 					} else {
-						localStorage.removeItem('access_token');
+						removeToken();
 						dispatch(setCurrentUser(new User()));
 					}
 				});
@@ -195,7 +196,7 @@ const App = () => {
 	React.useEffect(() => {
 		if (
 			history.location.pathname !== '/login' && history.location.pathname !== '/register' &&
-			!localStorage.getItem('access_token')
+			!getToken()
 		) {
 			history.push('/login');
 		}

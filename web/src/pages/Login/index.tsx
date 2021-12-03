@@ -3,6 +3,7 @@ import './styles.scss';
 import { getCurrentUser } from "App";
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { setCurrentUser } from "app/reducers/currentUserSlice";
+import { removeToken, setToken } from "app/token";
 import axios, { AxiosResponse } from "axios";
 import CircleLoading from "components/CircleLoading";
 import { SocketContext } from "context/socket";
@@ -33,13 +34,13 @@ export const signIn = async (
 			return null;
 		});
 	if (accessToken) {
-		localStorage.setItem('access_token', accessToken);
+		setToken(accessToken);
 		getCurrentUser(accessToken, socketId, 'local')
 			.then(usr => {
 				if (usr) {
 					setCurrentUser(usr);
 				} else {
-					localStorage.removeItem('access_token');
+					removeToken();
 				}
 			});
 	}
@@ -67,7 +68,7 @@ const Login = ({ socketId }: LoginProps) => {
 					if (user) {
 						dispatch(setCurrentUser(user));
 					} else {
-						localStorage.removeItem('access_token');
+						removeToken();
 					}
 				})
 				.finally(() => history.push('/login'));

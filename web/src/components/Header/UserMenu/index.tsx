@@ -4,6 +4,7 @@ import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { setCurrentUser } from "app/reducers/currentUserSlice";
+import { getToken, removeToken } from "app/token";
 import axios from "axios";
 import { User } from "models/User";
 import React from "react";
@@ -16,11 +17,11 @@ const UserMenu = () => {
 
 	const logOut = () => {
 		axios.post('/users/logout', {} , {
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			headers: { Authorization: `Bearer ${getToken()}` }
 		})
 			.then(() => {
 				dispatch(setCurrentUser(new User()));
-				localStorage.removeItem('access_token');
+				removeToken();
 			});
 	};
 

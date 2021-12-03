@@ -3,6 +3,7 @@ import './styles.scss';
 import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppSelector } from "app/hooks";
+import { getToken } from "app/token";
 import axios from "axios";
 import Header from "components/Header";
 import { ApiGame, ApiUserExpand } from "models/apiTypes";
@@ -45,7 +46,7 @@ const GamesHistory = () => {
 
 		axios.get<ApiUserExpand>('/users', {
 			params: { login: params.login, expand: '' },
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			headers: { Authorization: `Bearer ${getToken()}` }
 		})
 			.then(res => {
 				if (!isMounted)

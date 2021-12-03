@@ -14,10 +14,67 @@
 	.messenger-chat-info {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		height: 60px;
 		border-bottom: 1px solid #2c2f3a;
 		position: relative;
 		padding-left: 25px;
+		padding-right: 75px;
+
+		.messenger-chat-info-companion {
+			display: flex;
+			color: white;
+			align-items: center;
+			padding: 5px 25px 5px 10px;
+			border-radius: 18px;
+			transition: all 0.1s ease-in-out;
+
+			&:hover {
+				background: #2c2f3a;
+			}
+		}
+
+		.messenger-chat-info-play-btn {
+			font-size: 1em;
+			height: 50px;
+			border: none;
+			outline: none;
+			background: #2c2f3a;
+			color: white;
+			padding: 10px;
+			border-radius: 18px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			cursor: pointer;
+			margin-left: 25px;
+
+			.messenger-chat-info-play-btn-text {
+				width: 150px;
+			}
+
+			.messenger-chat-info-play-btn-img {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 60px;
+				height: 35px;
+				background: #29aa44;
+				border-radius: 14px;
+				transition: all 0.1s ease-in-out;
+			}
+
+			&:hover {
+				.messenger-chat-info-play-btn-img {
+					background-color: #21b941;
+				}
+			}
+			&:active {
+				.messenger-chat-info-play-btn-img {
+					opacity: 0.8;
+				}
+			}
+		}
 
 		.messenger-chat-info-name {
 			font-size: 1.2em;
@@ -41,7 +98,7 @@
 			background-repeat: no-repeat;
 			background-position: center;
 			background-size: 100%;
-			margin-right: 25px;
+			margin-right: 15px;
 			border-radius: 50%;
 			font-size: 30px;
 		}

@@ -1,7 +1,8 @@
 import './styles.scss';
 
-import { faBullhorn, faLock, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faLock, faPaperPlane, faPlay, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getToken } from "app/token";
 import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
@@ -10,6 +11,7 @@ import CreateChannel from "pages/Main/Messenger/Chat/CreateChannel";
 import CreateChat from "pages/Main/Messenger/Chat/CreateChat";
 import Message from "pages/Main/Messenger/Chat/Message";
 import React  from "react";
+import { Link } from 'react-router-dom';
 
 interface ChatProps {
 	currentUser: User,
@@ -90,8 +92,20 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 		return (
 			<div className='messenger-chat'>
 				<div className='messenger-chat-info'>
-					<div className='messenger-chat-info-img' style={ { backgroundImage: `url(${companion.url_avatar})` } }/>
-					<div>{ companion.login }</div>
+					<Link className='messenger-chat-info-companion' to={ `/users/${companion.login}` }>
+						<div className='messenger-chat-info-img' style={ { backgroundImage: `url(${companion.url_avatar})` } }/>
+						<div>{ companion.login }</div>
+					</Link>
+					<button
+						className='messenger-chat-info-play-btn'
+						onClick={ () => {
+						} }
+					>
+						<span className='messenger-chat-info-play-btn-text'>Play pong</span>
+						<span className='messenger-chat-info-play-btn-img'>
+							<FontAwesomeIcon icon={ faPlay }/>
+						</span>
+					</button>
 					<button
 						className='messenger-chat-close-btn'
 						onClick={ closeSelectedChat }
@@ -153,7 +167,7 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 							e.preventDefault();
 
 							axios.post('/channels/join', { channelId: selectedChannel.id, password: joinPassword }, {
-								headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+								headers: { Authorization: `Bearer ${getToken()}` }
 							}).catch(() => setJoinError('Wrong password'));
 						} }
 						className='messenger-chat-join-private-form'
@@ -225,7 +239,7 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 							className='messenger-chat-join-btn'
 							onClick={ () => {
 								axios.post('/channels/join', { channelId: selectedChannel.id }, {
-									headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+									headers: { Authorization: `Bearer ${getToken()}` }
 								}).then(() => {});
 							} }
 						>

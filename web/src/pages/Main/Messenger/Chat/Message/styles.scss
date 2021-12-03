@@ -17,6 +17,26 @@
 		bottom: 7px;
 		color: #eee;
 	}
+
+	&:hover {
+		&:after {
+			visibility: visible;
+			opacity: 1;
+		}
+	}
+
+	&:after {
+		transition: all 0.1s ease-in-out;
+		visibility: hidden;
+		opacity: 0;
+		position: absolute;
+		content: attr(data-date);
+		font-size: 12px;
+		white-space: nowrap;
+		color: #bbb;
+		left: calc(100% + 10px);
+		bottom: 5px;
+	}
 }
 
 .companions-message {
@@ -55,4 +75,9 @@
 .users-message {
 	background: #29aa44;
 	margin-left: auto;
+
+	&:after {
+		left: initial;
+		right: calc(100% + 10px);
+	}
 }

@@ -4,6 +4,7 @@ import { faCheck, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { setStatus } from "app/reducers/statusSlice";
+import { getToken } from "app/token";
 import axios from "axios";
 import { ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import React from 'react';
@@ -114,7 +115,7 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 		}
 		axios.get('/ladder/setStatus', {
 			params: { status: status },
-			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+			headers: { Authorization: `Bearer ${getToken()}` }
 		})
 			.then(() => {
 				if (!isMounted)
