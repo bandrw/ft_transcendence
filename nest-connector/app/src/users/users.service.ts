@@ -181,15 +181,9 @@ export class UsersService {
 		if (!user)
 			return ;
 
+		const data = UsersService.onlineUserToJson(user);
+
 		for (let i = 0; i < this.onlineUsers.length; ++i) {
-			const data = {
-				id: user.id,
-				login: user.login,
-				url_avatar: user.url_avatar,
-				status: user.status,
-				subscriptions: user.subscriptions,
-				subscribers: user.subscribers
-			};
 			this.onlineUsers[i].socket.emit(event, JSON.stringify(data));
 		}
 	}
@@ -231,5 +225,16 @@ export class UsersService {
 		else
 			this.onlineUsers[index] = newUser;
 		this.userEvent('updateUser', newUser);
+	}
+
+	static onlineUserToJson(user) {
+		return {
+			id: user.id,
+			login: user.login,
+			url_avatar: user.url_avatar,
+			status: user.status,
+			subscriptions: user.subscriptions,
+			subscribers: user.subscribers
+		};
 	}
 }

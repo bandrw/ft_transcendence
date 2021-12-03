@@ -14,16 +14,15 @@
 	background: #21232b;
 	box-shadow: 0 0 20px #1a1b1f;
 	z-index: 10;
-	padding: 5px 10px;
 	border-radius: 10px;
 
 	.user-menu-username {
 		color: #aaa;
 		transition: all 0.1s ease-out;
 		margin: 5px 0;
-		width: 150px;
+		width: 100%;
 		height: 45px;
-		font-size: 18px;
+		font-size: 16px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -33,20 +32,22 @@
 
 	.user-menu-btn {
 		transition: all 0.1s ease-out;
-		margin: 5px 0;
 		cursor: pointer;
-		width: 150px;
+		width: 160px;
 		height: 45px;
 		font-size: 16px;
 		background: #21232b;
 		border: none;
 		outline: none;
-		border-radius: 10px;
 		color: white;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		position: relative;
+
+		&:last-child {
+			border-radius: 0 0 10px 10px;
+		}
 
 		&:hover {
 			background: #2c2f3a;

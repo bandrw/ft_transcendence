@@ -45,7 +45,7 @@ export class ChannelService {
 			return m;
 		const channel = await this.getChannel(channelId);
 		if (channel.isPrivate) {
-			if (!bcryptjs.compareSync(password, channel.password)) {
+			if (channel.ownerId !== userId && !bcryptjs.compareSync(password, channel.password)) {
 				throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
 			}
 		}

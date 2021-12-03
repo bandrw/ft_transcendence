@@ -16,10 +16,10 @@ const LeftMenuChannel = ({ isSelected, title, selectChannel, isPrivate }: LeftMe
 		<div className={ `messenger-channel ${isSelected ? 'messenger-channel-selected' : ''}` } onMouseDown={ selectChannel }>
 			<div className='messenger-channel-image'>
 				<FontAwesomeIcon icon={ faBullhorn }/>
+				{ isPrivate && <FontAwesomeIcon className='messenger-channel-image-private' icon={ faLock }/> }
 			</div>
 			<div className='messenger-channel-name'>
 				{ title }
-				{ isPrivate && <FontAwesomeIcon icon={ faLock }/> }
 			</div>
 		</div>
 	);

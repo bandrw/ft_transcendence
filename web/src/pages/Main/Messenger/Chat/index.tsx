@@ -1,33 +1,33 @@
 import './styles.scss';
 
-import { faBullhorn, faLock, faPaperPlane, faPlay, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faLock, faPaperPlane, faPlay, faTimes, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
 import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
-import { User } from "models/User";
 import CreateChannel from "pages/Main/Messenger/Chat/CreateChannel";
 import CreateChat from "pages/Main/Messenger/Chat/CreateChat";
 import Message from "pages/Main/Messenger/Chat/Message";
-import React  from "react";
+import React from "react";
 import { Link } from 'react-router-dom';
 
 interface ChatProps {
-	currentUser: User,
 	selectedChat: ApiChatExpand | null,
 	selectedChannel: ApiChannelExpand | null,
 	closeSelectedChat: () => void,
 	messages: ApiMessage[],
 	chatState: string,
 	setDefaultChatState: () => void,
-	allUsers: ApiUserExpand[],
 	chats: ApiChatExpand[],
 	channels: ApiChannelExpand[]
 }
 
-const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
-								messages, chatState, setDefaultChatState, allUsers, chats, channels }: ChatProps) => {
+const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
+								messages, chatState, setDefaultChatState, chats, channels }: ChatProps) => {
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { allUsers } = useAppSelector(state => state.allUsers);
 	const socket = React.useContext(SocketContext);
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const [joinPassword, setJoinPassword] = React.useState('');
@@ -35,6 +35,12 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 		!chats.find(chat => chat.userOne.id === usr.id || chat.userTwo.id === usr.id) && usr.id !== currentUser.id
 	);
 	const [joinError, setJoinError] = React.useState<string>('');
+	const [duelStatus, setDuelStatus] = React.useState<string>('green');
+	const [localDuelStatus, setLocalDuelStatus] = React.useState<string>('green');
+
+	const getChatCompanion = React.useCallback((selectedChat: ApiChatExpand) => {
+		return selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
+	}, [currentUser.username]);
 
 	const sendMsg = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -64,6 +70,23 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 		}
 	};
 
+	React.useEffect(() => {
+
+		const duelStatusHandler = (duelStatus: string) => {
+			setDuelStatus(duelStatus);
+		};
+
+		socket.on('duelStatus', duelStatusHandler);
+
+		return () => {
+			socket.off('duelStatus', duelStatusHandler);
+			if (selectedChat) {
+				const companion = getChatCompanion(selectedChat);
+				socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id }));
+			}
+		};
+	}, [currentUser.username, getChatCompanion, selectedChat, socket]);
+
 	if (chatState === 'newChat')
 		return (
 			<CreateChat
@@ -87,7 +110,7 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 	}, 0);
 
 	if (selectedChat) {
-		const companion = selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
+		const companion = getChatCompanion(selectedChat);
 
 		return (
 			<div className='messenger-chat'>
@@ -96,16 +119,51 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 						<div className='messenger-chat-info-img' style={ { backgroundImage: `url(${companion.url_avatar})` } }/>
 						<div>{ companion.login }</div>
 					</Link>
-					<button
-						className='messenger-chat-info-play-btn'
-						onClick={ () => {
-						} }
-					>
-						<span className='messenger-chat-info-play-btn-text'>Play pong</span>
-						<span className='messenger-chat-info-play-btn-img'>
+					{
+						duelStatus === 'yellow' && localDuelStatus === 'green' &&
+						<button
+							className='messenger-chat-info-play-btn'
+							onClick={ () => {
+								socket.emit('requestDuel', JSON.stringify({ enemyId: companion.id }));
+								setLocalDuelStatus('yellow');
+							} }
+						>
+							<span className='messenger-chat-info-play-btn-text'>Accept</span>
+							<span className='messenger-chat-info-play-btn-img'>
 							<FontAwesomeIcon icon={ faPlay }/>
 						</span>
-					</button>
+						</button>
+					}
+					{
+						duelStatus === 'green' && localDuelStatus === 'green' &&
+						<button
+							className='messenger-chat-info-play-btn'
+							onClick={ () => {
+								socket.emit('requestDuel', JSON.stringify({ enemyId: companion.id }));
+								setLocalDuelStatus('yellow');
+							} }
+						>
+							<span className='messenger-chat-info-play-btn-text'>Play pong</span>
+							<span className='messenger-chat-info-play-btn-img'>
+							<FontAwesomeIcon icon={ faPlay }/>
+						</span>
+						</button>
+					}
+					{
+						duelStatus === 'yellow' && localDuelStatus === 'yellow' &&
+						<button
+							className='messenger-chat-info-play-btn'
+							onClick={ () => {
+								socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id }));
+								setLocalDuelStatus('green');
+							} }
+						>
+							<span className='messenger-chat-info-play-btn-text'>Waiting...</span>
+							<span className='messenger-chat-info-play-btn-img messenger-chat-info-play-btn-img-searching'>
+							<FontAwesomeIcon icon={ faTimesCircle }/>
+						</span>
+						</button>
+					}
 					<button
 						className='messenger-chat-close-btn'
 						onClick={ closeSelectedChat }
@@ -147,12 +205,14 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 			return (
 				<div className='messenger-chat'>
 					<div className='messenger-chat-info'>
-						<div className='messenger-chat-info-img'>
-							<FontAwesomeIcon icon={ faBullhorn }/>
-						</div>
-						<div className='messenger-chat-info-name'>
-							<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
-							<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+						<div className='messenger-chat-info-channel'>
+							<div className='messenger-chat-info-img'>
+								<FontAwesomeIcon icon={ faBullhorn }/>
+							</div>
+							<div className='messenger-chat-info-name'>
+								<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
+								<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+							</div>
 						</div>
 						<button
 							className='messenger-chat-close-btn'
@@ -191,12 +251,14 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 		return (
 			<div className='messenger-chat'>
 				<div className='messenger-chat-info'>
-					<div className='messenger-chat-info-img'>
-						<FontAwesomeIcon icon={ faBullhorn }/>
-					</div>
-					<div className='messenger-chat-info-name'>
-						<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
-						<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+					<div className='messenger-chat-info-channel'>
+						<div className='messenger-chat-info-img'>
+							<FontAwesomeIcon icon={ faBullhorn }/>
+						</div>
+						<div className='messenger-chat-info-name'>
+							<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
+							<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+						</div>
 					</div>
 					<button
 						className='messenger-chat-close-btn'

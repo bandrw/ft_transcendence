@@ -100,7 +100,7 @@ const GamesHistory = () => {
 										const enemy = loser?.login === params.login ? winner : loser;
 										const user = winner?.login === params.login ? winner : loser;
 
-										const enemyColor = 'pink';
+										// const enemyColor = 'pink';
 
 										return (
 											<div className='games-history-game' key={ i }>
@@ -109,7 +109,7 @@ const GamesHistory = () => {
 														style={ { backgroundImage: `url(${enemy?.url_avatar})` } }
 														className='games-history-game-img'
 													>
-														<div className='games-history-user-status' style={ { backgroundColor: enemyColor } }/>
+														{ /*<div className='games-history-user-status' style={ { backgroundColor: enemyColor } }/>*/ }
 													</div>
 													<Link to={ `/users/${enemy?.login}` } className='games-history-user-login'>{ enemy?.login }</Link>
 												</div>

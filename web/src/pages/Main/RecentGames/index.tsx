@@ -75,8 +75,6 @@ const RecentGames = () => {
 				gamesHistory.slice(0, 3).map((game, i) => {
 					const enemyId = (game.winnerId === currentUser.id ? game.loserId : game.winnerId);
 					const enemy = allUsers.find(user => (user.id === enemyId));
-					// const enemyColor = enemy ? enemy.status : 'transparent';
-					const enemyColor = 'pink';
 
 					return (
 						<div className='recent-game' key={ i }>
@@ -85,7 +83,7 @@ const RecentGames = () => {
 									style={ { backgroundImage: `url(${enemy?.url_avatar})` } }
 									className='recent-game-img'
 								>
-									<div className='user-status' style={ { backgroundColor: enemyColor } }/>
+									{ /*<div className='user-status' style={ { backgroundColor: enemyColor } }/>*/ }
 								</div>
 								<Link to={ `/users/${enemy?.login}` } className='user-login'>{ enemy?.login }</Link>
 							</div>

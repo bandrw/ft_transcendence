@@ -21,6 +21,10 @@
 		padding-left: 25px;
 		padding-right: 75px;
 
+		.messenger-chat-info-channel {
+			display: flex;
+		}
+
 		.messenger-chat-info-companion {
 			display: flex;
 			color: white;
@@ -28,6 +32,10 @@
 			padding: 5px 25px 5px 10px;
 			border-radius: 18px;
 			transition: all 0.1s ease-in-out;
+
+			div {
+				font-size: 16px;
+			}
 
 			&:hover {
 				background: #2c2f3a;
@@ -64,6 +72,10 @@
 				transition: all 0.1s ease-in-out;
 			}
 
+			.messenger-chat-info-play-btn-img-searching {
+				background-color: #e30000;
+			}
+
 			&:hover {
 				.messenger-chat-info-play-btn-img {
 					background-color: #21b941;
@@ -80,7 +92,8 @@
 			font-size: 1.2em;
 
 			.messenger-chat-info-title {
-				font-size: 0.9em;
+				text-align: left;
+				font-size: 16px;
 				height: 24px;
 			}
 

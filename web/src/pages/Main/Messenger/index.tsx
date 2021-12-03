@@ -24,7 +24,6 @@ const Messenger = () => {
 	const [allChannels, setAllChannels] = React.useState<ApiChannelExpand[]>([]);
 	const [searchPattern, setSearchPattern] = React.useState('');
 	const { currentUser } = useAppSelector(state => state.currentUser);
-	const { allUsers } = useAppSelector(state => state.allUsers);
 
 	// Fetching user's chats and channels
 	React.useEffect(() => {
@@ -187,7 +186,7 @@ const Messenger = () => {
 							type='text'
 							placeholder='Search'
 							className='messenger-contacts-header-search'
-							onChange={ (e) => setSearchPattern(e.target.value) }
+							onChange={ e => setSearchPattern(e.target.value) }
 						/>
 						<button
 							className={ `messenger-contacts-header-btn ${showCreateMenu ? 'messenger-contacts-header-btn-active' : ''}` }
@@ -286,20 +285,12 @@ const Messenger = () => {
 					</div>
 				</div>
 				<Chat
-					currentUser={ currentUser }
 					selectedChat={ selectedChat }
 					selectedChannel={ selectedChannel }
-					closeSelectedChat={ () => {
-						setSelectedChat(null);
-						setSelectedChannel(null);
-					} }
+					closeSelectedChat={ () => { setSelectedChat(null); setSelectedChannel(null); } }
 					messages={ selectedChat?.messages || [] }
 					chatState={ chatState }
-					setDefaultChatState={ () => {
-						setChatState('default');
-						setSelectedChat(null);
-					} }
-					allUsers={ allUsers }
+					setDefaultChatState={ () => { setChatState('default'); setSelectedChat(null); } }
 					chats={ chats }
 					channels={ channels }
 				/>

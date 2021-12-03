@@ -63,12 +63,12 @@ const App = () => {
 
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-	// const enemyRef = React.useRef<ApiUpdateUser | null>(null);
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
 	const [socketId, setSocketId] = React.useState<string | null>(null);
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
+	const sockId = socketId ? socketId : socket.id;
 
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { onlineUsers } = useAppSelector(state => state.onlineUsers);
@@ -183,6 +183,17 @@ const App = () => {
 				socket.connect();
 		};
 
+		// todo [можно придумать что-то получше]
+		const sockInterval = setInterval(() => {
+			if (sockId) {
+				clearInterval(sockInterval);
+			}
+			if (socket.id) {
+				setSocketId(socket.id);
+				clearInterval(sockInterval);
+			}
+		}, 100);
+
 		socket.on('connect', connectHandler);
 		socket.on('disconnect', disconnectHandler);
 
@@ -190,7 +201,7 @@ const App = () => {
 			socket.off('connect', connectHandler);
 			socket.off('disconnect', disconnectHandler);
 		};
-	}, [socket]);
+	}, [sockId, socket]);
 
 	// Redirect to /login
 	React.useEffect(() => {
@@ -291,8 +302,6 @@ const App = () => {
 				Window is too small :(
 			</div>
 		);
-
-	const sockId = socketId ? socketId : socket.id;
 
 	return (
 		<Switch>
