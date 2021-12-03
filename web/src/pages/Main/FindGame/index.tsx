@@ -89,15 +89,15 @@ const AcceptWindow = ({ enemy, enemyIsReady }: AcceptWindowProps) => {
 };
 
 interface FindGameProps {
-	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
 	enemyIsReady: boolean
 }
 
-const FindGame = ({ enemyRef, enemyIsReady }: FindGameProps) => {
+const FindGame = ({ enemyIsReady }: FindGameProps) => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { status } = useAppSelector(state => state.status);
+	const { enemy } = useAppSelector(state => state.enemy);
 	const dispatch = useAppDispatch();
 
 	React.useEffect(() => {
@@ -105,8 +105,6 @@ const FindGame = ({ enemyRef, enemyIsReady }: FindGameProps) => {
 
 		if (!currentUser.isAuthorized())
 			return ;
-		// if (status === ApiUserStatus.InGame)
-		// 	return ;
 
 		if (status === ApiUserStatus.FoundEnemy) {
 			if (timerIntervalRef.current)
@@ -140,7 +138,7 @@ const FindGame = ({ enemyRef, enemyIsReady }: FindGameProps) => {
 		return () => {
 			isMounted = false;
 		};
-	}, [status, currentUser, currentUser.username]);
+	}, [status, currentUser]);
 
 	if (status === ApiUserStatus.Searching)
 		return (
@@ -183,9 +181,9 @@ const FindGame = ({ enemyRef, enemyIsReady }: FindGameProps) => {
 					style={ { position: 'fixed' } }
 				>
 					{
-						enemyRef.current &&
+						enemy &&
 						<AcceptWindow
-							enemy={ enemyRef.current }
+							enemy={ enemy }
 							enemyIsReady={ enemyIsReady }
 						/>
 					}

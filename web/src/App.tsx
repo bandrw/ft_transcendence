@@ -3,6 +3,7 @@ import './App.scss';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { setAllUsers } from "app/reducers/allUsersSlice";
 import { setCurrentUser } from "app/reducers/currentUserSlice";
+import { setEnemy } from "app/reducers/enemySlice";
 import { setOnlineUsers } from "app/reducers/onlineUsersSlice";
 import { setStatus } from "app/reducers/statusSlice";
 import axios from "axios";
@@ -61,7 +62,7 @@ const App = () => {
 
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-	const enemyRef = React.useRef<ApiUpdateUser | null>(null);
+	// const enemyRef = React.useRef<ApiUpdateUser | null>(null);
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
@@ -71,6 +72,7 @@ const App = () => {
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { onlineUsers } = useAppSelector(state => state.onlineUsers);
 	const { status } = useAppSelector(state => state.status);
+	const { enemy } = useAppSelector(state => state.enemy);
 	const dispatch = useAppDispatch();
 
 	// Saving onlineUsers in onlineUsersRef
@@ -241,18 +243,24 @@ const App = () => {
 				updatedUsers.push(updateUserData);
 			dispatch(setOnlineUsers(updatedUsers));
 
-			if (!enemyRef.current && status !== ApiUserStatus.Regular) {
-				dispatch(setStatus(ApiUserStatus.Regular));
-			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && (updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular)) {
+			const enemyDeclined = enemy &&
+				updateUserData.login === enemy.login &&
+				(updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular);
+			const enemyAccepted = enemy &&
+				updateUserData.login === enemy.login &&
+				updateUserData.status === ApiUserStatus.Accepted;
+
+			if (enemyDeclined) {
 				dispatch(setStatus(ApiUserStatus.Regular));
 				setEnemyIsReady(false);
-			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && updateUserData.status === ApiUserStatus.Accepted) {
+			} else if (enemyAccepted) {
 				setEnemyIsReady(true);
 			}
 		};
 
 		const enemyHandler = (e: string) => {
-			enemyRef.current = JSON.parse(e);
+			const enemyData: ApiUpdateUser | null = JSON.parse(e);
+			dispatch(setEnemy(enemyData));
 			dispatch(setStatus(ApiUserStatus.FoundEnemy));
 		};
 
@@ -274,7 +282,7 @@ const App = () => {
 			socket.off('gameSettings', gameSettingsHandler);
 		};
 
-	}, [currentUser, socket, enemyRef, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch, status]);
+	}, [currentUser, socket, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch, status, enemy]);
 
 	if (!isDesktop)
 		return (
@@ -308,7 +316,7 @@ const App = () => {
 
 			<Route exact path='/game'>
 				<Game
-					enemyInfo={ enemyRef.current }
+					enemyInfo={ enemy }
 					gameSettingsRef={ gameSettingsRef }
 					gameRef={ gameRef }
 				/>
@@ -324,7 +332,6 @@ const App = () => {
 
 			<Route exact path='/'>
 				<Main
-					enemyRef={ enemyRef }
 					enemyIsReady={ enemyIsReady }
 				/>
 			</Route>

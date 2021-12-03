@@ -3,7 +3,7 @@ import './styles.scss';
 import { useAppSelector } from "app/hooks";
 import Header from "components/Header";
 import { SocketContext } from "context/socket";
-import { ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import { ApiUserStatus } from "models/apiTypes";
 import FindGame from "pages/Main/FindGame";
 import Messenger from "pages/Main/Messenger";
 import RecentGames from "pages/Main/RecentGames";
@@ -13,14 +13,10 @@ import { Fade } from 'react-awesome-reveal';
 import { useHistory } from "react-router-dom";
 
 interface MainProps {
-	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
 	enemyIsReady: boolean
 }
 
-const Main: React.FC<MainProps> = ({
-																		 enemyRef,
-																		 enemyIsReady
-	}) => {
+const Main: React.FC<MainProps> = ({ enemyIsReady }) => {
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 	const { currentUser } = useAppSelector(state => state.currentUser);
@@ -53,7 +49,6 @@ const Main: React.FC<MainProps> = ({
 							style={ { position: 'relative', zIndex: 9 } }
 						>
 							<FindGame
-								enemyRef={ enemyRef }
 								enemyIsReady={ enemyIsReady }
 							/>
 						</Fade>

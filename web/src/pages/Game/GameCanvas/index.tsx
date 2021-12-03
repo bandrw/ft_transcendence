@@ -275,8 +275,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 
 		prepareGame();
 
-		// if (!gameRef.current.runs)
-			runGame();
+		runGame();
 
 		return () => {
 			gameRuns = false;
@@ -316,9 +315,9 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 						<GameResults
 							winner={ gameResults.winner }
 							loser={
-								(gameResults.winner === gameSettings.leftPlayer.login
+								gameResults.winner === gameSettings.leftPlayer.login
 								? gameSettings.rightPlayer.login
-								: gameSettings.leftPlayer.login) || ''
+								: gameSettings.leftPlayer.login
 							}
 							gameRef={ gameRef }
 						/>
