@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { faBullhorn, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faLock, faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { SocketContext } from "context/socket";
@@ -26,12 +26,13 @@ interface ChatProps {
 
 const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 								messages, chatState, setDefaultChatState, allUsers, chats, channels }: ChatProps) => {
-
 	const socket = React.useContext(SocketContext);
 	const inputRef = React.useRef<HTMLInputElement>(null);
+	const [joinPassword, setJoinPassword] = React.useState('');
 	const chatsToCreate: ApiUserExpand[] = allUsers.filter(usr =>
 		!chats.find(chat => chat.userOne.id === usr.id || chat.userTwo.id === usr.id) && usr.id !== currentUser.id
 	);
+	const [joinError, setJoinError] = React.useState<string>('');
 
 	const sendMsg = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -125,7 +126,54 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 		);
 	}
 
-	if (selectedChannel)
+	if (selectedChannel) {
+		const isMember = selectedChannel.members.find(member => member.id === currentUser.id);
+
+		if (selectedChannel.isPrivate && !isMember)
+			return (
+				<div className='messenger-chat'>
+					<div className='messenger-chat-info'>
+						<div className='messenger-chat-info-img'>
+							<FontAwesomeIcon icon={ faBullhorn }/>
+						</div>
+						<div className='messenger-chat-info-name'>
+							<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
+							<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+						</div>
+						<button
+							className='messenger-chat-close-btn'
+							onClick={ closeSelectedChat }
+							title='Close'
+						>
+							<FontAwesomeIcon icon={ faTimes }/>
+						</button>
+					</div>
+					<form
+						onSubmit={ (e) => {
+							e.preventDefault();
+
+							axios.post('/channels/join', { channelId: selectedChannel.id, password: joinPassword }, {
+								headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+							}).catch(() => setJoinError('Wrong password'));
+						} }
+						className='messenger-chat-join-private-form'
+					>
+						<div className='messenger-chat-join-private-form-top'>
+							<FontAwesomeIcon icon={ faLock }/>
+							<span>Channel is private</span>
+						</div>
+						<input
+							onChange={ (e) => setJoinPassword(e.target.value) }
+							type='password'
+							name='private_channel_password'
+							placeholder='Password'
+						/>
+						<div className='messenger-chat-join-private-errors'>{ joinError }</div>
+						<button disabled={ joinPassword.length === 0 } type='submit'>Join</button>
+					</form>
+				</div>
+			);
+
 		return (
 			<div className='messenger-chat'>
 				<div className='messenger-chat-info'>
@@ -161,8 +209,8 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 					}
 				</div>
 				{
-					selectedChannel.members.find(member => member.id === currentUser.id)
-					?	<form className='messenger-chat-form' onSubmit={ sendMsg }>
+					isMember
+						?	<form className='messenger-chat-form' onSubmit={ sendMsg }>
 							<input
 								className='messenger-chat-input'
 								ref={ inputRef }
@@ -173,7 +221,7 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 								<FontAwesomeIcon icon={ faPaperPlane }/>
 							</button>
 						</form>
-					:	<button
+						:	<button
 							className='messenger-chat-join-btn'
 							onClick={ () => {
 								axios.post('/channels/join', { channelId: selectedChannel.id }, {
@@ -186,6 +234,7 @@ const Chat = ({ currentUser, selectedChat, selectedChannel, closeSelectedChat,
 				}
 			</div>
 		);
+	}
 
 	return (
 		<div className='messenger-chat'>

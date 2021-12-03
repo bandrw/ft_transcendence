@@ -13,23 +13,18 @@ import { Fade } from 'react-awesome-reveal';
 import { useHistory } from "react-router-dom";
 
 interface MainProps {
-	status: ApiUserStatus,
-	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
 	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
-	onlineUsers: ApiUpdateUser[],
 	enemyIsReady: boolean
 }
 
 const Main: React.FC<MainProps> = ({
-																		 status,
-																		 setStatus,
 																		 enemyRef,
-																		 onlineUsers,
 																		 enemyIsReady
 	}) => {
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { status } = useAppSelector(state => state.status);
 
 	// Redirect to /game
 	React.useEffect(() => {
@@ -41,9 +36,7 @@ const Main: React.FC<MainProps> = ({
 		return (
 			<div className='main'>
 				<div className='main-container'>
-					<Header
-						status={ status }
-					/>
+					<Header/>
 					<div>[TMP] Authorizing { socket.id ? '...' : '[No socket]' }</div>
 				</div>
 			</div>
@@ -52,9 +45,7 @@ const Main: React.FC<MainProps> = ({
 	return (
 		<div className='main'>
 			<div className='main-container'>
-				<Header
-					status={ status }
-				/>
+				<Header/>
 				<div className='main-top'>
 					<div className='main-center'>
 						<Fade
@@ -62,9 +53,6 @@ const Main: React.FC<MainProps> = ({
 							style={ { position: 'relative', zIndex: 9 } }
 						>
 							<FindGame
-								currentUser={ currentUser }
-								status={ status }
-								setStatus={ setStatus }
 								enemyRef={ enemyRef }
 								enemyIsReady={ enemyIsReady }
 							/>
@@ -83,9 +71,7 @@ const Main: React.FC<MainProps> = ({
 							triggerOnce={ true }
 							className='main-block social'
 						>
-							<Social
-								onlineUsers={ onlineUsers.filter(usr => usr.login !== currentUser.username) }
-							/>
+							<Social/>
 						</Fade>
 					</div>
 				</div>

@@ -5,19 +5,18 @@ import { faBell } from "@fortawesome/free-solid-svg-icons/faBell";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from "app/hooks";
 import UserMenu from "components/Header/UserMenu";
-import { ApiUserStatus } from "models/apiTypes";
 import React from 'react';
 import { Link,useHistory } from "react-router-dom";
 
 interface HeaderProps {
-	status: ApiUserStatus,
 	centerBlock?: JSX.Element
 }
 
-const Header = ({ status, centerBlock }: HeaderProps) => {
+const Header = ({ centerBlock }: HeaderProps) => {
 	const history = useHistory();
 	const [userMenuShown, setUserMenuShown] = React.useState(false);
 	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { status } = useAppSelector(state => state.status);
 
 	if (history.location.pathname !== '/')
 		return (

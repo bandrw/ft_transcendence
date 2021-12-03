@@ -24,6 +24,7 @@ export class ChannelController {
 	async createChannel(@Req() req, @Body() { name, title, isPrivate, password }: CreateChannelDTO) {
 		const user = req.user;
 
+		// todo [name validation]
 		return await this.channelService.createChannel(name, title, user.id, isPrivate, password);
 	}
 
@@ -31,16 +32,18 @@ export class ChannelController {
 	@UseGuards(AuthGuard('jwt'))
 	@Get()
 	async getChannels(@Req() req, @Query() { expand }: ExpandDTO) {
-		return await this.channelService.getChannels(isDefined(expand));
+		const { user } = req;
+
+		return await this.channelService.getChannels(user.id, isDefined(expand));
 	}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('join')
-	async joinChannel(@Req() req, @Body() { channelId }: JoinChannelDTO) {
+	async joinChannel(@Req() req, @Body() { channelId, password }: JoinChannelDTO) {
 		const user = req.user;
 
-		return await this.channelService.addMember(channelId, user.id);
+		return await this.channelService.addMember(channelId, user.id, password);
 	}
 
 }

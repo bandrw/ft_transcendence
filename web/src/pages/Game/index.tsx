@@ -1,6 +1,7 @@
 import './styles.scss';
 
-import { useAppSelector } from "app/hooks";
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { setStatus } from "app/reducers/statusSlice";
 import Header from "components/Header";
 import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
 import GameCanvas from "pages/Game/GameCanvas";
@@ -11,14 +12,15 @@ interface GameProps {
 	enemyInfo: ApiUpdateUser | null,
 	gameSettingsRef: React.MutableRefObject<ApiGameSettings | null>,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
-	status: ApiUserStatus,
-	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
-const Game = ({ enemyInfo, gameSettingsRef, gameRef, status, setStatus }: GameProps) => {
-	const watchMode = (status !== ApiUserStatus.InGame);
+const Game = ({ enemyInfo, gameSettingsRef, gameRef }: GameProps) => {
 	const history = useHistory();
 	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { status } = useAppSelector(state => state.status);
+	const dispatch = useAppDispatch();
+
+	const watchMode = (status !== ApiUserStatus.InGame);
 
 	React.useEffect(() => {
 		if (watchMode)
@@ -26,36 +28,28 @@ const Game = ({ enemyInfo, gameSettingsRef, gameRef, status, setStatus }: GamePr
 
 		if (!enemyInfo) {
 			gameRef.current.runs = false;
-			setStatus(ApiUserStatus.Regular);
+			dispatch(setStatus(ApiUserStatus.Regular));
 			history.push('/');
 		}
-	}, [history, enemyInfo, gameRef, setStatus, watchMode, currentUser]);
-
-	// const [exitWindowShown, setExitWindowShown] = React.useState(false);
+	}, [history, enemyInfo, gameRef, watchMode, currentUser, dispatch]);
 
 	if (!currentUser.isAuthorized())
 		return (
 			<div>
-				<Header
-					status={ status }
-				/>
+				<Header/>
 			</div>
 		);
 
 	// todo [handle watcher exit buttons]
 	return (
 		<div>
-			<Header
-				status={ ApiUserStatus.InGame }
-			/>
+			<Header/>
 			{
 				gameSettingsRef.current &&
 				<GameCanvas
 					watchMode={ watchMode }
-					currentUser={ currentUser }
 					gameSettings={ gameSettingsRef.current }
 					gameRef={ gameRef }
-					setStatus={ setStatus }
 				/>
 			}
 		</div>

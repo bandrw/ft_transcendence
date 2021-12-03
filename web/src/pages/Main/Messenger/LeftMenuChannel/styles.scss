@@ -45,5 +45,13 @@
 
 	.messenger-channel-name {
 		font-size: 1.2em;
+		display: flex;
+		align-items: center;
+
+		svg {
+			margin-left: 10px;
+			color: #ccc;
+			font-size: 0.8em;
+		}
 	}
 }

@@ -92,14 +92,13 @@ const SocialBlockFriend = ({ user }: { user: ApiUserExpand }) => {
 	);
 };
 
-interface SocialProps {
-	onlineUsers: ApiUpdateUser[],
-}
-
-const Social = ({ onlineUsers }: SocialProps) => {
+const Social = () => {
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
 	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { onlineUsers } = useAppSelector(state => state.onlineUsers);
 	const { allUsers } = useAppSelector(state => state.allUsers);
+
+	const onlineUsersDisplay = onlineUsers.filter(usr => usr.login !== currentUser.username);
 
 	React.useEffect(() => {
 		const friendsLogins: string[] = [];
@@ -142,11 +141,11 @@ const Social = ({ onlineUsers }: SocialProps) => {
 				<div className='social-block-title'>
 					<span>online</span>
 					<FontAwesomeIcon icon={ faCircle }/>
-					<span>{ onlineUsers.length }</span>
+					<span>{ onlineUsersDisplay.length }</span>
 				</div>
 				<ul>
 					{
-						onlineUsers.map((user, i) =>
+						onlineUsersDisplay.map((user, i) =>
 							<SocialBlockOnlineUser key={ i } user={ user }/>
 						)
 					}

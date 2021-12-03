@@ -138,11 +138,22 @@ const Messenger = () => {
 
 	// Fetching all channels
 	React.useEffect(() => {
+		let isMounted = true;
+
 		axios.get<ApiChannelExpand[]>('/channels', {
 			params: { expand: '' },
 			headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
 		})
-			.then(res => setAllChannels(res.data));
+			.then(res => {
+				if (!isMounted)
+					return ;
+
+				setAllChannels(res.data);
+			});
+
+		return () => {
+			isMounted = false;
+		};
 	}, []);
 
 	// Updating selectedChannel
@@ -248,6 +259,7 @@ const Messenger = () => {
 										setSelectedChannel(channel);
 										setSelectedChat(null);
 									} }
+									isPrivate={ channel.isPrivate }
 								/>
 							)
 						}
@@ -262,6 +274,7 @@ const Messenger = () => {
 										setSelectedChannel(channel);
 										setSelectedChat(null);
 									} }
+									isPrivate={ channel.isPrivate }
 								/>
 							)
 						}

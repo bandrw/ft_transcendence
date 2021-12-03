@@ -1,10 +1,10 @@
 import './styles.scss';
 
+import { useAppSelector } from "app/hooks";
 import { SocketContext } from "context/socket";
-import { ApiGameLoop, ApiGameSettings, ApiUserStatus } from "models/apiTypes";
+import { ApiGameLoop, ApiGameSettings } from "models/apiTypes";
 import GameBall from "models/GameBall";
 import Player from "models/Player";
-import { User } from "models/User";
 import GameResults from "pages/Game/GameResults";
 import React, { useEffect, useMemo } from "react";
 import { Fade } from "react-awesome-reveal";
@@ -12,18 +12,17 @@ import { Link } from 'react-router-dom';
 
 interface GameCanvasProps {
 	watchMode: boolean,
-	currentUser: User,
 	gameSettings: ApiGameSettings,
 	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
-	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>
 }
 
-const GameCanvas = ({ watchMode, currentUser, gameSettings, gameRef, setStatus }: GameCanvasProps) => {
+const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const leftPlayer = useMemo(() => new Player(), []);
 	const rightPlayer = useMemo(() => new Player(), []);
 	const ball = useMemo(() => new GameBall(), []);
+	const { currentUser } = useAppSelector(state => state.currentUser);
 
 	const score = useMemo(() => ({
 		leftPlayer: gameSettings.score.leftPlayer,
@@ -322,7 +321,6 @@ const GameCanvas = ({ watchMode, currentUser, gameSettings, gameRef, setStatus }
 								: gameSettings.leftPlayer.login) || ''
 							}
 							gameRef={ gameRef }
-							setStatus={ setStatus }
 						/>
 					</Fade>
 			}

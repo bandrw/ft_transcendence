@@ -1,7 +1,6 @@
 import {
-	IsAlphanumeric,
 	IsBoolean,
-	IsNumber,
+	IsNumber, IsOptional,
 	IsString,
 	MaxLength,
 	MinLength,
@@ -9,11 +8,10 @@ import {
 } from "class-validator";
 
 export class CreateChannelDTO {
-	@IsAlphanumeric()
 	@MinLength(4)
 	@MaxLength(16)
 	@IsString()
-	name: string; // todo [ name can contain '_' ]
+	name: string;
 
 	@IsString()
 	title: string;
@@ -29,4 +27,8 @@ export class CreateChannelDTO {
 export class JoinChannelDTO {
 	@IsNumber()
 	channelId: number;
+
+	@IsOptional()
+	@IsString()
+	password: string;
 }

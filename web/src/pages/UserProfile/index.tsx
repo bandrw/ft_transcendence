@@ -6,7 +6,7 @@ import { useAppSelector } from "app/hooks";
 import axios from "axios";
 import CircleLoading from "components/CircleLoading";
 import Header from "components/Header";
-import { ApiGame, ApiUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiUser, ApiUserExpand } from "models/apiTypes";
 import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
 import FriendsList from "pages/UserProfile/FriendsList";
@@ -184,11 +184,7 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 	);
 };
 
-interface UserProfileProps {
-	status: ApiUserStatus,
-}
-
-const UserProfile = ({ status }: UserProfileProps) => {
+const UserProfile = () => {
 	const params = useParams<{ login: string }>();
 	const [user, setUser] = React.useState<ApiUserExpand | null>(null);
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
@@ -236,9 +232,7 @@ const UserProfile = ({ status }: UserProfileProps) => {
 	if (!currentUser.isAuthorized())
 		return (
 			<div>
-				<Header
-					status={ status }
-				/>
+				<Header/>
 			</div>
 		);
 
@@ -254,9 +248,7 @@ const UserProfile = ({ status }: UserProfileProps) => {
 
 	return (
 		<div>
-			<Header
-				status={ status }
-			/>
+			<Header/>
 			<div className='user-profile-wrapper'>
 				<div className='user-profile'>
 					<div className='user-profile-info-img' style={ { backgroundImage: `url(${ user?.url_avatar })` } }/>

@@ -2,29 +2,30 @@ import './styles.scss';
 
 import { faCheck, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { setStatus } from "app/reducers/statusSlice";
 import axios from "axios";
 import { ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
-import { User } from "models/User";
 import React from 'react';
 import { Fade } from "react-awesome-reveal";
 import { clearInterval, setInterval } from "timers";
 
 interface AcceptWindowProps {
-	currentUser: User,
-	status: ApiUserStatus,
-	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
 	enemy: ApiUpdateUser,
 	enemyIsReady: boolean
 }
 
-const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: AcceptWindowProps) => {
+const AcceptWindow = ({ enemy, enemyIsReady }: AcceptWindowProps) => {
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 	const [timeLeft, setTimeLeft] = React.useState<number>(20);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { status } = useAppSelector(state => state.status);
+	const dispatch = useAppDispatch();
 
 	const declineGame = () => {
 		if (timerIntervalRef.current)
 			clearInterval(timerIntervalRef.current);
-		setStatus(ApiUserStatus.Declined);
+		dispatch(setStatus(ApiUserStatus.Declined));
 	};
 
 	React.useEffect(() => {
@@ -36,7 +37,7 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 		};
 	}, []);
 
-	const declineGameCallback = React.useCallback(declineGame, [setStatus]);
+	const declineGameCallback = React.useCallback(declineGame, [dispatch]);
 
 	React.useEffect(() => {
 		if (timeLeft < 0)
@@ -75,7 +76,7 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 							? <div className='accept-btn accept-btn-accepted'>
 									<FontAwesomeIcon icon={ faCheck }/>
 								</div>
-							: <button className='accept-btn' onClick={ () => setStatus(ApiUserStatus.Accepted) }>
+							: <button className='accept-btn' onClick={ () => dispatch(setStatus(ApiUserStatus.Accepted)) }>
 									Accept
 								</button>
 					}
@@ -88,16 +89,16 @@ const AcceptWindow = ({ currentUser, status, setStatus, enemy, enemyIsReady }: A
 };
 
 interface FindGameProps {
-	currentUser: User,
-	status: ApiUserStatus,
-	setStatus: React.Dispatch<React.SetStateAction<ApiUserStatus>>,
 	enemyRef: React.MutableRefObject<ApiUpdateUser | null>,
 	enemyIsReady: boolean
 }
 
-const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: FindGameProps) => {
+const FindGame = ({ enemyRef, enemyIsReady }: FindGameProps) => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { status } = useAppSelector(state => state.status);
+	const dispatch = useAppDispatch();
 
 	React.useEffect(() => {
 		let isMounted = true;
@@ -151,7 +152,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 						<span className='find-game-searching-time'>{ `${passedTime} s` }</span>
 					</div>
 					<button
-						onClick={ () => setStatus(ApiUserStatus.Regular) }
+						onClick={ () => dispatch(setStatus(ApiUserStatus.Regular)) }
 						className='find-game-cancel'
 					>
 						<FontAwesomeIcon icon={ faTimesCircle }/>
@@ -170,7 +171,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 						<span className='find-game-searching-time'>{ `${passedTime} s` }</span>
 					</div>
 					<button
-						onClick={ () => setStatus(ApiUserStatus.Regular) }
+						onClick={ () => dispatch(setStatus(ApiUserStatus.Regular)) }
 						className='find-game-cancel'
 					>
 						<FontAwesomeIcon icon={ faTimesCircle }/>
@@ -184,9 +185,6 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 					{
 						enemyRef.current &&
 						<AcceptWindow
-							currentUser={ currentUser }
-							status={ status }
-							setStatus={ setStatus }
 							enemy={ enemyRef.current }
 							enemyIsReady={ enemyIsReady }
 						/>
@@ -201,7 +199,7 @@ const FindGame = ({ currentUser, status, setStatus, enemyRef, enemyIsReady }: Fi
 			<div className='find-game-back'>
 				<span>Find game</span>
 				<button
-					onClick={ () => setStatus(ApiUserStatus.Searching) }
+					onClick={ () => dispatch(setStatus(ApiUserStatus.Searching)) }
 					className='find-game-btn'
 				>
 					<FontAwesomeIcon icon={ faPlay }/>

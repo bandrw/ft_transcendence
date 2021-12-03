@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppSelector } from "app/hooks";
 import axios from "axios";
 import Header from "components/Header";
-import { ApiGame, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
+import { ApiGame, ApiUserExpand } from "models/apiTypes";
 import moment from "moment";
 import React from "react";
 import { Fade } from "react-awesome-reveal";
@@ -34,11 +34,7 @@ export const GameTime = ({ date }: { date: string }) => {
 	);
 };
 
-interface GamesHistoryProps {
-	status: ApiUserStatus,
-}
-
-const GamesHistory = ({ status }: GamesHistoryProps) => {
+const GamesHistory = () => {
 	const params = useParams<{ login: string }>();
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 	const { currentUser } = useAppSelector(state => state.currentUser);
@@ -73,17 +69,13 @@ const GamesHistory = ({ status }: GamesHistoryProps) => {
 	if (!currentUser.isAuthorized())
 		return (
 			<div>
-				<Header
-					status={ status }
-				/>
+				<Header/>
 			</div>
 		);
 
 	return (
 		<div>
-			<Header
-				status={ status }
-			/>
+			<Header/>
 			<div className='games-history-wrapper'>
 				<Fade className='games-history'>
 					<div>

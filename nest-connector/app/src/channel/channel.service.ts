@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
+import * as bcryptjs from 'bcryptjs';
 import { ChannelEntity } from "channel/entities/channel.entity";
 import { ChannelMemberEntity } from "channel/entities/channelMember.entity";
 import { Repository } from "typeorm";
@@ -38,10 +39,16 @@ export class ChannelService {
 		}
 	}
 
-	async addMember(channelId: number, userId: number): Promise<ChannelMemberEntity> {
+	async addMember(channelId: number, userId: number, password: string | null = null): Promise<ChannelMemberEntity> {
 		const m = await this.channelMemberRepository.findOne({ where: { channelId: channelId, userId: userId } });
 		if (m)
 			return m;
+		const channel = await this.getChannel(channelId);
+		if (channel.isPrivate) {
+			if (!bcryptjs.compareSync(password, channel.password)) {
+				throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
+			}
+		}
 
 		try {
 			const member = this.channelMemberRepository.create();
@@ -64,11 +71,16 @@ export class ChannelService {
 		return await this.channelRepository.findOne({ where: { id: id } });
 	}
 
-	async getChannels(expand = false): Promise<ChannelEntity[]> {
+	async getChannels(userId: number, expand = false): Promise<ChannelEntity[]> {
 		if (expand) {
 			const r = await this.channelRepository.find({ relations: ['owner', 'members', 'messages'] });
-			for (let i = 0; i < r.length; ++i)
-				r[i].messages.sort((msg1, msg2) => msg1.date - msg2.date);
+			for (const channel of r) {
+				if (channel.isPrivate && !channel.members.find(member => member.id === userId)) {
+					channel.messages = [];
+				} else {
+					channel.messages.sort((msg1, msg2) => msg1.date - msg2.date);
+				}
+			}
 			return r;
 		}
 		return await this.channelRepository.find();

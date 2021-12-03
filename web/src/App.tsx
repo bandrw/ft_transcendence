@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { setAllUsers } from "app/reducers/allUsersSlice";
 import { setCurrentUser } from "app/reducers/currentUserSlice";
 import { setOnlineUsers } from "app/reducers/onlineUsersSlice";
+import { setStatus } from "app/reducers/statusSlice";
 import axios from "axios";
 import { SocketContext } from "context/socket";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
@@ -60,17 +61,16 @@ const App = () => {
 
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-	const [status, setStatus] = React.useState<ApiUserStatus>(ApiUserStatus.Regular); // todo [move status to redux]
 	const enemyRef = React.useRef<ApiUpdateUser | null>(null);
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const gameRef = React.useRef<{ runs: boolean, interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
 	const [socketId, setSocketId] = React.useState<string | null>(null);
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
-	const statusRef = React.useRef(status);
 
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { onlineUsers } = useAppSelector(state => state.onlineUsers);
+	const { status } = useAppSelector(state => state.status);
 	const dispatch = useAppDispatch();
 
 	// Saving onlineUsers in onlineUsersRef
@@ -241,10 +241,10 @@ const App = () => {
 				updatedUsers.push(updateUserData);
 			dispatch(setOnlineUsers(updatedUsers));
 
-			if (!enemyRef.current && statusRef.current !== ApiUserStatus.Regular) {
-				setStatus(ApiUserStatus.Regular);
+			if (!enemyRef.current && status !== ApiUserStatus.Regular) {
+				dispatch(setStatus(ApiUserStatus.Regular));
 			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && (updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular)) {
-				setStatus(ApiUserStatus.Regular);
+				dispatch(setStatus(ApiUserStatus.Regular));
 				setEnemyIsReady(false);
 			} else if (enemyRef.current && updateUserData.login === enemyRef.current.login && updateUserData.status === ApiUserStatus.Accepted) {
 				setEnemyIsReady(true);
@@ -253,11 +253,11 @@ const App = () => {
 
 		const enemyHandler = (e: string) => {
 			enemyRef.current = JSON.parse(e);
-			setStatus(ApiUserStatus.FoundEnemy);
+			dispatch(setStatus(ApiUserStatus.FoundEnemy));
 		};
 
 		const gameIsReadyHandler = () => {
-			setStatus(ApiUserStatus.InGame);
+			dispatch(setStatus(ApiUserStatus.InGame));
 		};
 
 		socket.on('logout', logoutHandler);
@@ -274,7 +274,7 @@ const App = () => {
 			socket.off('gameSettings', gameSettingsHandler);
 		};
 
-	}, [currentUser, setStatus, socket, enemyRef, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch]);
+	}, [currentUser, socket, enemyRef, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch, status]);
 
 	if (!isDesktop)
 		return (
@@ -294,7 +294,11 @@ const App = () => {
 						?	<Login
 								socketId={ sockId }
 							/>
-						:	'[TMP] no socket id'
+						:	<div>
+								<div>[TMP] no socket id</div>
+								<div>{ `socketId: ${ socketId }` }</div>
+								<div>{ `socket.id: ${ socket.id }` }</div>
+							</div>
 				}
 			</Route>
 
@@ -307,29 +311,20 @@ const App = () => {
 					enemyInfo={ enemyRef.current }
 					gameSettingsRef={ gameSettingsRef }
 					gameRef={ gameRef }
-					status={ status }
-					setStatus={ setStatus }
 				/>
 			</Route>
 
 			<Route path='/games/:login'>
-				<GamesHistory
-					status={ status }
-				/>
+				<GamesHistory/>
 			</Route>
 
 			<Route path='/users/:login'>
-				<UserProfile
-					status={ status }
-				/>
+				<UserProfile/>
 			</Route>
 
 			<Route exact path='/'>
 				<Main
-					status={ status }
-					setStatus={ setStatus }
 					enemyRef={ enemyRef }
-					onlineUsers={ onlineUsers }
 					enemyIsReady={ enemyIsReady }
 				/>
 			</Route>
