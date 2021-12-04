@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiUserExpand } from "models/apiTypes";
+import { ApiUserExpand } from "models/ApiTypes";
 
 interface AllUsersState {
 	allUsers: ApiUserExpand[]

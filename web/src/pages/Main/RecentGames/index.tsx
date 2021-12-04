@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
 import axios from "axios";
-import { ApiGame, ApiUserExpand } from "models/apiTypes";
+import { ApiGame, ApiUserExpand } from "models/ApiTypes";
 import { GameTime } from "pages/GamesHistory";
 import React from 'react';
 import { Link } from "react-router-dom";

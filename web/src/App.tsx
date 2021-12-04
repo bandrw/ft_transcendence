@@ -9,7 +9,7 @@ import { setStatus } from "app/reducers/statusSlice";
 import { getToken, removeToken, setToken } from "app/token";
 import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from "models/ApiTypes";
 import { User } from "models/User";
 import Game from "pages/Game";
 import GamesHistory from "pages/GamesHistory";

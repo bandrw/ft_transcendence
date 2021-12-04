@@ -6,7 +6,7 @@ import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
 import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
+import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/ApiTypes";
 import Chat from "pages/Main/Messenger/Chat";
 import LeftMenuChannel from "pages/Main/Messenger/LeftMenuChannel";
 import LeftMenuChat from "pages/Main/Messenger/LeftMenuChat";
@@ -241,6 +241,7 @@ const Messenger = () => {
 										selectChat={ () => {
 											setSelectedChat(chat);
 											setSelectedChannel(null);
+											setChatState('default');
 										} }
 									/>
 								);
@@ -258,6 +259,7 @@ const Messenger = () => {
 									selectChannel={ () => {
 										setSelectedChannel(channel);
 										setSelectedChat(null);
+										setChatState('default');
 									} }
 									isPrivate={ channel.isPrivate }
 								/>
@@ -273,6 +275,7 @@ const Messenger = () => {
 									selectChannel={ () => {
 										setSelectedChannel(channel);
 										setSelectedChat(null);
+										setChatState('default');
 									} }
 									isPrivate={ channel.isPrivate }
 								/>
@@ -291,6 +294,7 @@ const Messenger = () => {
 					messages={ selectedChat?.messages || [] }
 					chatState={ chatState }
 					setDefaultChatState={ () => { setChatState('default'); setSelectedChat(null); } }
+					setSettingsChatState={ () => setChatState('settings') }
 					chats={ chats }
 					channels={ channels }
 				/>

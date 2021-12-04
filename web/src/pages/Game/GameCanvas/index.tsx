@@ -2,7 +2,7 @@ import './styles.scss';
 
 import { useAppSelector } from "app/hooks";
 import { SocketContext } from "context/socket";
-import { ApiGameLoop, ApiGameSettings } from "models/apiTypes";
+import { ApiGameLoop, ApiGameSettings } from "models/ApiTypes";
 import GameBall from "models/GameBall";
 import Player from "models/Player";
 import GameResults from "pages/Game/GameResults";

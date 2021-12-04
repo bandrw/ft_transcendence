@@ -1,7 +1,8 @@
+import { BanListsEntity } from "ban-lists/ban-lists.entity";
+import { ChannelMemberEntity } from "channel/entities/channelMember.entity";
+import { MessageEntity } from "message/message.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "users/entities/user.entity";
-
-import { MessageEntity } from "../../message/message.entity";
 
 @Entity({ name: 'channels' })
 export class ChannelEntity {
@@ -35,6 +36,12 @@ export class ChannelEntity {
 	})
 	members: User[];
 
+	@OneToMany(() => ChannelMemberEntity, member => member.channel)
+	memberEntities: ChannelMemberEntity[];
+
 	@OneToMany(() => MessageEntity, message => message.channel)
 	messages: MessageEntity[];
+
+	@OneToMany(() => BanListsEntity, banLists => banLists.channel)
+	banLists: BanListsEntity[];
 }

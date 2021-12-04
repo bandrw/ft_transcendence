@@ -45,6 +45,13 @@ type ApiMessage = {
 	date: number
 }
 
+type ApiChannelMember = {
+	id: number,
+	login: string,
+	url_avatar: string,
+	isAdmin: boolean
+}
+
 type ApiChannel = {
 	id: number,
 	name: string,
@@ -52,7 +59,6 @@ type ApiChannel = {
 	isPrivate: boolean,
 	password?: string,
 	ownerId: number,
-	members: ApiUser[]
 }
 
 type ApiChannelExpand = {
@@ -62,7 +68,7 @@ type ApiChannelExpand = {
 	isPrivate: boolean,
 	password?: string,
 	ownerId: number,
-	members: ApiUser[],
+	members: ApiChannelMember[],
 	messages: ApiMessage[]
 }
 

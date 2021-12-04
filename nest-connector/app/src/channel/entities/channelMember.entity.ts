@@ -10,7 +10,7 @@ export class ChannelMemberEntity {
 	@Column()
 	channelId: number;
 
-	@ManyToOne(() => ChannelEntity, channel => channel.members)
+	@ManyToOne(() => ChannelEntity, channel => channel.memberEntities)
 	@JoinColumn({ name: 'channelId' })
 	channel: ChannelEntity;
 
@@ -20,4 +20,7 @@ export class ChannelMemberEntity {
 	@ManyToOne(() => User, user => user.channels)
 	@JoinColumn({ name: 'userId' })
 	user: User;
+
+	@Column()
+	isAdmin: boolean;
 }

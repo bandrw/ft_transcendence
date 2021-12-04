@@ -7,7 +7,7 @@ import { removeToken, setToken } from "app/token";
 import axios, { AxiosResponse } from "axios";
 import CircleLoading from "components/CircleLoading";
 import { SocketContext } from "context/socket";
-import { ApiUserLogin } from "models/apiTypes";
+import { ApiUserLogin } from "models/ApiTypes";
 import { User } from "models/User";
 import React from 'react';
 import { Link, Redirect, useHistory } from "react-router-dom";

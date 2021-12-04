@@ -1,3 +1,4 @@
+import { BanListsEntity } from "ban-lists/ban-lists.entity";
 import { MessageEntity } from "message/message.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "users/entities/user.entity";
@@ -23,4 +24,7 @@ export class ChatEntity {
 
 	@OneToMany(() => MessageEntity, message => message.chat)
 	messages: MessageEntity[];
+
+	@OneToMany(() => BanListsEntity, banLists => banLists.chat)
+	banLists: BanListsEntity[];
 }

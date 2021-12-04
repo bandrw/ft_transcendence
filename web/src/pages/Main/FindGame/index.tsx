@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "app/hooks";
 import { setStatus } from "app/reducers/statusSlice";
 import { getToken } from "app/token";
 import axios from "axios";
-import { ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import { ApiUpdateUser, ApiUserStatus } from "models/ApiTypes";
 import React from 'react';
 import { Fade } from "react-awesome-reveal";
 import { clearInterval, setInterval } from "timers";

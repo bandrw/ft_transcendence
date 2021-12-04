@@ -6,7 +6,7 @@ import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
 import axios from "axios";
 import Header from "components/Header";
-import { ApiGame, ApiUserExpand } from "models/apiTypes";
+import { ApiGame, ApiUserExpand } from "models/ApiTypes";
 import moment from "moment";
 import React from "react";
 import { Fade } from "react-awesome-reveal";

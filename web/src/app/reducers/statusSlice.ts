@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiUserStatus } from "models/apiTypes";
+import { ApiUserStatus } from "models/ApiTypes";
 
 interface statusState {
 	status: ApiUserStatus

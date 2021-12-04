@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from 'app.controller';
 import { AppService } from 'app.service';
 import { AuthModule } from 'auth/auth.module';
+import { BanListsEntity } from "ban-lists/ban-lists.entity";
+import { BanListsModule } from 'ban-lists/ban-lists.module';
 import { ChannelModule } from 'channel/channel.module';
 import { ChannelEntity } from "channel/entities/channel.entity";
 import { ChannelMemberEntity } from "channel/entities/channelMember.entity";
@@ -27,7 +29,7 @@ import { UsersModule } from 'users/users.module';
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRES_PASSWORD,
 			database: process.env.POSTGRES_DB,
-			entities: [User, GameEntity, UserSubscription, ChatEntity, MessageEntity, ChannelEntity, ChannelMemberEntity],
+			entities: [User, GameEntity, UserSubscription, ChatEntity, MessageEntity, ChannelEntity, ChannelMemberEntity, BanListsEntity],
 			retryAttempts: 50,
 			retryDelay: 5000
 		}),
@@ -39,6 +41,7 @@ import { UsersModule } from 'users/users.module';
 		MessageModule,
 		AuthModule,
 		ChannelModule,
+		BanListsModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

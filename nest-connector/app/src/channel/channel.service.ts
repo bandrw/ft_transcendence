@@ -54,6 +54,8 @@ export class ChannelService {
 			const member = this.channelMemberRepository.create();
 			member.channelId = channelId;
 			member.userId = userId;
+			if (userId === channel.ownerId)
+				member.isAdmin = true;
 			const r = await this.channelMemberRepository.save(member);
 			this.usersService.broadcastEventData('updateChannel', '');
 			return r;
@@ -64,26 +66,47 @@ export class ChannelService {
 
 	async getChannel(id: number, expand = false): Promise<ChannelEntity> {
 		if (expand) {
-			const r = await this.channelRepository.findOne({ where: { id: id }, relations: ['owner', 'members', 'messages'] });
+			const r = await this.channelRepository.findOne({ where: { id: id }, relations: ['owner', 'members', 'messages', 'memberEntities', 'memberEntities.user'] });
 			r.messages.sort((msg1, msg2) => msg1.date - msg2.date);
 			return r;
 		}
 		return await this.channelRepository.findOne({ where: { id: id } });
 	}
 
-	async getChannels(userId: number, expand = false): Promise<ChannelEntity[]> {
+	async getChannels(userId: number, expand = false) {
 		if (expand) {
-			const r = await this.channelRepository.find({ relations: ['owner', 'members', 'messages'] });
+			const r = await this.channelRepository.find({ relations: ['owner', 'members', 'messages', 'memberEntities', 'memberEntities.user'] });
 			for (const channel of r) {
 				if (channel.isPrivate && !channel.members.find(member => member.id === userId)) {
 					channel.messages = [];
 				} else {
 					channel.messages.sort((msg1, msg2) => msg1.date - msg2.date);
 				}
+				for (let i = 0; i < channel.memberEntities.length; ++i) {
+					channel.members[i].isAdmin = channel.memberEntities.find(m => m.userId === channel.members[i].id)?.isAdmin || false;
+				}
+				delete channel.memberEntities;
 			}
 			return r;
 		}
 		return await this.channelRepository.find();
+	}
+
+	async updateMemberStatus(userId: number, channelId: number, memberId: number, status: string) {
+		const channel = await this.getChannel(channelId, true);
+		if (channel.ownerId !== userId)
+			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
+		const member = channel.memberEntities.find(m => m.id === memberId);
+		if (!member)
+			throw new HttpException('No member', HttpStatus.BAD_REQUEST);
+
+		if (status === 'admin')
+			member.isAdmin = true;
+		else if (status === 'member')
+			member.isAdmin = false;
+		const r = await this.channelMemberRepository.save(member);
+		this.usersService.broadcastEventData('updateChannel', '');
+		return r;
 	}
 
 }

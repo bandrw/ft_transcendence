@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
 import axios from "axios";
-import { ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/apiTypes";
+import { ApiUpdateUser, ApiUserExpand, ApiUserStatus } from "models/ApiTypes";
 import React from 'react';
 import { Fade } from "react-awesome-reveal";
 import { Link, useHistory } from "react-router-dom";

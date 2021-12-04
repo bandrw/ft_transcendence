@@ -14,7 +14,6 @@
 	.messenger-chat-info {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
 		height: 60px;
 		border-bottom: 1px solid #2c2f3a;
 		position: relative;
@@ -90,45 +89,68 @@
 
 		.messenger-chat-info-name {
 			font-size: 1.2em;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
 
 			.messenger-chat-info-title {
 				text-align: left;
 				font-size: 16px;
-				height: 24px;
+				align-items: center;
 			}
 
 			.messenger-chat-info-members {
-				height: 16px;
+				align-items: center;
 				font-size: 0.6em;
 				color: #aaa;
 				text-align: left;
 			}
 		}
 
-		.messenger-chat-info-img {
-			width: 40px;
+		button {
+			background: none;
+			outline: none;
+			border: none;
+			font-size: 24px;
+			color: #aaa;
+			cursor: pointer;
+			transition: all 0.1s ease-in-out;
 			height: 40px;
-			background-repeat: no-repeat;
-			background-position: center;
-			background-size: 100%;
+			width: 40px;
+			border-radius: 10px;
+
+			&:hover {
+				background: #2c2f3a;
+			}
+			&:active {
+				opacity: 0.8;
+			}
+		}
+
+		.messenger-chat-info-settings-btn {
+			position: absolute;
+			right: 75px;
+		}
+
+		.messenger-chat-info-img {
+			width: 50px;
+			height: 50px;
 			margin-right: 15px;
 			border-radius: 50%;
-			font-size: 30px;
+			font-size: 26px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid #1a1b1f;
 		}
 
 		.messenger-chat-close-btn {
-			background: none;
-			font-size: 24px;
-			outline: none;
-			border: none;
-			color: #aaa;
-			cursor: pointer;
+			font-size: 26px;
 			position: absolute;
 			right: 20px;
-			transition: all 0.1s ease-in-out;
 
-			&:hover {
-				color: #555;
+			svg {
+				margin-top: 3px;
 			}
 		}
 	}
@@ -283,6 +305,10 @@
 			display: flex;
 		}
 
+		.messenger-create-channel-errors {
+			color: #e30000;
+		}
+
 		& > input {
 			width: 250px;
 			background: transparent;
@@ -376,6 +402,118 @@
 
 			&:hover {
 				background: #2c2f3a;
+			}
+		}
+	}
+
+	.messenger-chat-settings {
+		padding: 50px 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+		height: calc(100% - 60px);
+		box-sizing: border-box;
+		overflow-y: scroll;
+
+		&::-webkit-scrollbar {
+			width: 8px;
+			background: transparent;
+		}
+
+		.messenger-chat-settings-title {
+			font-size: 26px;
+		}
+
+		.messenger-chat-settings-subscribers {
+			font-size: 14px;
+			color: #ccc;
+		}
+
+		.messenger-chat-settings-members-list {
+			margin-top: 25px;
+			background: #2c2f3a;
+			width: 50%;
+			padding: 40px 25px 15px;
+			box-sizing: border-box;
+			border-radius: 18px;
+			position: relative;
+
+			.messenger-chat-settings-members-list__member {
+				height: 50px;
+				display: flex;
+				align-items: center;
+				margin-bottom: 10px;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+
+				.messenger-chat-settings-members-list__member-img {
+					background-repeat: no-repeat;
+					background-position: center;
+					background-size: contain;
+					width: 40px;
+					height: 40px;
+					border-radius: 50%;
+					background-color: #1a1b1f;
+					margin-right: 15px;
+				}
+
+				.messenger-chat-settings-members-list__member-login {
+					width: calc(70% - 40px);
+					text-align: left;
+				}
+
+				.messenger-chat-settings-members-list__member-status {
+					width: calc(30% - 40px);
+					display: flex;
+					justify-content: center;
+
+					svg {
+						color: gold;
+					}
+
+					.toggle-btn {
+						margin: 0 8px;
+						background: #777;
+						border: none;
+						border-radius: 4px;
+						width: 25px;
+						height: 8px;
+						outline: none;
+						cursor: pointer;
+						position: relative;
+						display: flex;
+						align-items: center;
+
+						&:before {
+							display: block;
+							content: '';
+							position: absolute;
+							left: -8px;
+							width: 16px;
+							height: 16px;
+							background: #29aa44;
+							border-radius: 50%;
+						}
+					}
+
+					.toggle-btn-active {
+						&:before {
+							left: initial;
+							right: -8px;
+						}
+					}
+				}
+			}
+
+			&:before {
+				content: 'Members';
+				position: absolute;
+				top: 10px;
+				left: 25px;
+				color: #29aa44;
 			}
 		}
 	}

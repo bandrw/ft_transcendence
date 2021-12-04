@@ -7,7 +7,7 @@ import { getToken } from "app/token";
 import axios from "axios";
 import CircleLoading from "components/CircleLoading";
 import Header from "components/Header";
-import { ApiGame, ApiUser, ApiUserExpand } from "models/apiTypes";
+import { ApiGame, ApiUser, ApiUserExpand } from "models/ApiTypes";
 import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
 import FriendsList from "pages/UserProfile/FriendsList";

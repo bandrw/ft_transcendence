@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiUpdateUser } from "models/apiTypes";
+import { ApiUpdateUser } from "models/ApiTypes";
 
 interface OnlineUsersState {
 	onlineUsers: ApiUpdateUser[]

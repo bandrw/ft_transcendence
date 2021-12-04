@@ -3,7 +3,7 @@ import './styles.scss';
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { setStatus } from "app/reducers/statusSlice";
 import Header from "components/Header";
-import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/apiTypes";
+import { ApiGameSettings, ApiUpdateUser, ApiUserStatus } from "models/ApiTypes";
 import GameCanvas from "pages/Game/GameCanvas";
 import React from 'react';
 import { useHistory } from "react-router-dom";

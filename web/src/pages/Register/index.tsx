@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from "axios";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from "components/CircleLoading";
 import { SocketContext } from "context/socket";
-import { ApiUser, ApiUserCreate } from "models/apiTypes";
+import { ApiUser, ApiUserCreate } from "models/ApiTypes";
 import { signIn } from "pages/Login";
 import React from 'react';
 import { Link, Redirect } from "react-router-dom";

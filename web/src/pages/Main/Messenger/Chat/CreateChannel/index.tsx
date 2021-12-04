@@ -10,10 +10,11 @@ interface CreateChannelProps {
 }
 
 const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
-	const [isPrivate, setIsPrivate] = React.useState(false);
+	const [isPrivate, setIsPrivate] = React.useState<boolean>(false);
 	const nameRef = React.useRef<HTMLInputElement>(null);
 	const titleRef = React.useRef<HTMLInputElement>(null);
 	const passwordRef = React.useRef<HTMLInputElement>(null);
+	const [errors, setErrors] = React.useState('');
 
 	const createChannelForm = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -21,16 +22,22 @@ const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
 		const title = titleRef.current?.value || '';
 		const password = passwordRef.current?.value || '';
 
+		if (isPrivate && password.length < 6) {
+			setErrors('Password\'s length must be longer than 6');
+			return ;
+		}
+
 		const data = {
-			name: name,
-			title: title,
-			isPrivate: isPrivate,
-			password: await bcryptjs.hash(password, 10)
+			name,
+			title,
+			isPrivate,
+			password: isPrivate ? await bcryptjs.hash(password, 10) : null
 		};
-		await axios.post('/channels/create', data, {
+		axios.post<any, any>('/channels/create', data, {
 			headers: { Authorization: `Bearer ${getToken()}` }
-		});
-		setDefaultChatState();
+		})
+			.then(() => setDefaultChatState())
+			.catch(e => setErrors(e.response?.data?.message || 'Error'));
 	};
 
 	return (
@@ -74,6 +81,7 @@ const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
 					isPrivate &&
 					<input ref={ passwordRef } name='password' type='password' placeholder='Password'/>
 				}
+				<div className='messenger-create-channel-errors'>{ errors }</div>
 				<button type='submit'>Create</button>
 			</form>
 		</div>

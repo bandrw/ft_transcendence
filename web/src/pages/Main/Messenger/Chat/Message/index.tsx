@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { ApiMessage } from "models/apiTypes";
+import { ApiMessage } from "models/ApiTypes";
 import moment from "moment";
 import Moment from "react-moment";
 import { Link } from "react-router-dom";

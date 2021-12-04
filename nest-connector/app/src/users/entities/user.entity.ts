@@ -1,3 +1,4 @@
+import { BanListsEntity } from "ban-lists/ban-lists.entity";
 import { ChannelEntity } from "channel/entities/channel.entity";
 import { ChatEntity } from "chat/chat.entity";
 import { GameEntity } from "game/game.entity";
@@ -48,4 +49,9 @@ export class User {
 
 	@ManyToMany(() => ChannelEntity, channel => channel.members)
 	channels: ChannelEntity[];
+
+	@OneToMany(() => BanListsEntity, banList => banList.initiator)
+	banLists: BanListsEntity[];
+
+	isAdmin: boolean;
 }

@@ -81,6 +81,7 @@ CREATE TABLE "channel_members"
 	"id" serial PRIMARY KEY,
 	"channelId" INTEGER,
 	"userId" INTEGER,
+	"isAdmin" BOOLEAN DEFAULT FALSE,
 
 	CONSTRAINT "fk_channelId"
 		FOREIGN KEY("channelId")
@@ -116,4 +117,28 @@ CREATE TABLE "messages"
 		FOREIGN KEY("fromUserId")
 		REFERENCES "users"("id")
 		ON DELETE SET NULL
+);
+
+CREATE TABLE "ban_lists"
+(
+	"id" serial PRIMARY KEY,
+	"initiatorId" INTEGER,
+	"chatId" INTEGER,
+	"channelId" INTEGER,
+	"unbanDate" TIMESTAMP,
+
+	CONSTRAINT "fk_initiatorId"
+		FOREIGN KEY("initiatorId")
+		REFERENCES "users"("id")
+		ON DELETE CASCADE,
+
+	CONSTRAINT "fk_chatId"
+		FOREIGN KEY("chatId")
+		REFERENCES "chats"("id")
+		ON DELETE CASCADE,
+
+	CONSTRAINT "fk_channelId"
+		FOREIGN KEY("channelId")
+		REFERENCES "channels"("id")
+		ON DELETE CASCADE
 );

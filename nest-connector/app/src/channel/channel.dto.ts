@@ -1,5 +1,5 @@
 import {
-	IsBoolean,
+	IsBoolean, IsIn,
 	IsNumber, IsOptional,
 	IsString,
 	MaxLength,
@@ -31,4 +31,16 @@ export class JoinChannelDTO {
 	@IsOptional()
 	@IsString()
 	password: string;
+}
+
+export class UpdateMemberStatusDTO {
+	@IsNumber()
+	channelId: number;
+
+	@IsNumber()
+	memberId: number;
+
+	@IsString()
+	@IsIn(['member', 'admin'])
+	status: string;
 }

@@ -1,12 +1,19 @@
 import './styles.scss';
 
-import { faBullhorn, faLock, faPaperPlane, faPlay, faTimes, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+	faBullhorn, faChevronLeft, faCrown,
+	faLock,
+	faPaperPlane,
+	faPlay, faSlidersH,
+	faTimes,
+	faTimesCircle
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
 import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/apiTypes";
+import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/ApiTypes";
 import CreateChannel from "pages/Main/Messenger/Chat/CreateChannel";
 import CreateChat from "pages/Main/Messenger/Chat/CreateChat";
 import Message from "pages/Main/Messenger/Chat/Message";
@@ -20,12 +27,13 @@ interface ChatProps {
 	messages: ApiMessage[],
 	chatState: string,
 	setDefaultChatState: () => void,
+	setSettingsChatState: () => void,
 	chats: ApiChatExpand[],
 	channels: ApiChannelExpand[]
 }
 
 const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
-								messages, chatState, setDefaultChatState, chats, channels }: ChatProps) => {
+								messages, chatState, setDefaultChatState, setSettingsChatState, chats, channels }: ChatProps) => {
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { allUsers } = useAppSelector(state => state.allUsers);
 	const socket = React.useContext(SocketContext);
@@ -102,6 +110,79 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 				setDefaultChatState={ setDefaultChatState }
 			/>
 		);
+
+	if (chatState === 'settings') {
+		if (selectedChannel)
+			return (
+				<div className='messenger-chat'>
+					<div className='messenger-chat-info'>
+						<button
+							onClick={ () => setDefaultChatState() }
+							style={ { marginRight: 15 } }
+						>
+							<FontAwesomeIcon style={ { marginTop: 2 } } icon={ faChevronLeft }/>
+						</button>
+						<div className='messenger-chat-info-channel'>
+							Settings
+						</div>
+						<button
+							className='messenger-chat-close-btn'
+							onClick={ closeSelectedChat }
+							title='Close'
+						>
+							<FontAwesomeIcon icon={ faTimes }/>
+						</button>
+					</div>
+					<div className='messenger-chat-settings'>
+						<div className='messenger-chat-settings-title'>
+							{ selectedChannel.title }
+						</div>
+						<div className='messenger-chat-settings-subscribers'>
+							{
+								selectedChannel.members.length === 1
+									?	`1 subscriber`
+									:	`${selectedChannel.members.length} subscribers`
+							}
+						</div>
+						<div className='messenger-chat-settings-members-list'>
+							{
+								selectedChannel.members.map(member =>
+									<div key={ member.id } className='messenger-chat-settings-members-list__member'>
+										<span
+											className='messenger-chat-settings-members-list__member-img'
+											style={ { backgroundImage: `url(${member.url_avatar})` } }
+										/>
+										<span className='messenger-chat-settings-members-list__member-login'>{ member.login }</span>
+										<div className='messenger-chat-settings-members-list__member-status'>
+											{
+												selectedChannel.ownerId === member.id
+													?	<FontAwesomeIcon icon={ faCrown }/>
+													:	<button
+															className={ `toggle-btn ${member.isAdmin && 'toggle-btn-active'}` }
+															onClick={ () => {
+																const data = {
+																	channelId: selectedChannel.id,
+																	memberId: member.id,
+																	status: ''
+																};
+																if (member.isAdmin) {
+																	data.status = 'member';
+																} else {
+																	data.status = 'admin';
+																}
+																axios.put('/channels/updateMemberStatus', data, { headers: { Authorization: `Bearer ${getToken()}` } }).then();
+															} }
+														/>
+											}
+										</div>
+									</div>
+								)
+							}
+						</div>
+					</div>
+				</div>
+			);
+	}
 
 	setTimeout(() => {
 		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
@@ -210,8 +291,12 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 								<FontAwesomeIcon icon={ faBullhorn }/>
 							</div>
 							<div className='messenger-chat-info-name'>
-								<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
-								<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+								<div className='messenger-chat-info-title'>
+									{ selectedChannel.title }
+								</div>
+								<div className='messenger-chat-info-members'>
+									{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }
+								</div>
 							</div>
 						</div>
 						<button
@@ -237,7 +322,7 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 							<span>Channel is private</span>
 						</div>
 						<input
-							onChange={ (e) => setJoinPassword(e.target.value) }
+							onChange={ e => setJoinPassword(e.target.value) }
 							type='password'
 							name='private_channel_password'
 							placeholder='Password'
@@ -256,10 +341,17 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 							<FontAwesomeIcon icon={ faBullhorn }/>
 						</div>
 						<div className='messenger-chat-info-name'>
-							<div className='messenger-chat-info-title'>{ selectedChannel.title }</div>
-							<div className='messenger-chat-info-members'>{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }</div>
+							<div className='messenger-chat-info-title'>
+								{ selectedChannel.title }
+							</div>
+							<div className='messenger-chat-info-members'>
+								{ `${selectedChannel.members.length} ${selectedChannel.members.length > 1 ? 'members' : 'member'}` }
+							</div>
 						</div>
 					</div>
+					<button className='messenger-chat-info-settings-btn' onClick={ () => setSettingsChatState() }>
+						<FontAwesomeIcon icon={ faSlidersH }/>
+					</button>
 					<button
 						className='messenger-chat-close-btn'
 						onClick={ closeSelectedChat }
