@@ -123,12 +123,18 @@ CREATE TABLE "ban_lists"
 (
 	"id" serial PRIMARY KEY,
 	"initiatorId" INTEGER,
+	"memberId" INTEGER,
 	"chatId" INTEGER,
 	"channelId" INTEGER,
 	"unbanDate" TIMESTAMP,
 
 	CONSTRAINT "fk_initiatorId"
 		FOREIGN KEY("initiatorId")
+		REFERENCES "users"("id")
+		ON DELETE SET NULL,
+
+	CONSTRAINT "fk_memberId"
+		FOREIGN KEY("memberId")
 		REFERENCES "users"("id")
 		ON DELETE CASCADE,
 

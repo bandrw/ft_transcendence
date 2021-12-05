@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { ExpandDTO } from "app.dto";
-import { CreateChannelDTO, JoinChannelDTO, UpdateMemberStatusDTO } from "channel/channel.dto";
+import { CreateChannelDTO, JoinChannelDTO, MuteMemberDTO, UpdateMemberStatusDTO } from "channel/channel.dto";
 import { ChannelService } from "channel/channel.service";
 import { isDefined } from "class-validator";
 
@@ -53,6 +53,15 @@ export class ChannelController {
 		const user = req.user;
 
 		return await this.channelService.updateMemberStatus(user.id, channelId, memberId, status);
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Post('muteMember')
+	async muteMember(@Req() req, @Body() { channelId, memberId, unbanDate }: MuteMemberDTO) {
+		const user = req.user;
+
+		return await this.channelService.muteMember(user.id, channelId, memberId, unbanDate);
 	}
 
 }

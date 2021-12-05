@@ -11,8 +11,14 @@ export class BanListsEntity {
 	@Column()
 	initiatorId: number;
 
-	@ManyToOne(() => User, user => user.banLists)
+	@ManyToOne(() => User, user => user.bannedList)
 	initiator: User;
+
+	@Column()
+	memberId: number;
+
+	@ManyToOne(() => User, user => user.banLists)
+	member: User;
 
 	@Column()
 	chatId: number;
@@ -27,5 +33,5 @@ export class BanListsEntity {
 	channel: ChannelEntity;
 
 	@Column({ type: "timestamp" })
-	unbanDate: number;
+	unbanDate: Date;
 }

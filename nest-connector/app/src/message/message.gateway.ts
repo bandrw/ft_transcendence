@@ -45,6 +45,13 @@ export class MessageGateway {
 			const channel = await this.channelService.getChannel(msgData.channelId, true);
 			if (!channel.members.find(member => member.id === sender.id))
 				return ;
+			const member = channel.members.find(m => m.id === sender.id);
+			const ban = member.banLists.find(list =>
+				list.channelId === msgData.channelId &&
+				(list.unbanDate === null || new Date(list.unbanDate) > new Date()));
+			if (ban) {
+				return ;
+			}
 
 			const msg = await this.messageService.createChannelMessage(msgData.text, msgData.channelId, sender.id);
 			if (msg) {

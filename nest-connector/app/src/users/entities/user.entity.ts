@@ -51,6 +51,9 @@ export class User {
 	channels: ChannelEntity[];
 
 	@OneToMany(() => BanListsEntity, banList => banList.initiator)
+	bannedList: BanListsEntity[];
+
+	@OneToMany(() => BanListsEntity, banList => banList.member)
 	banLists: BanListsEntity[];
 
 	isAdmin: boolean;

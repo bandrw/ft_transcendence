@@ -45,11 +45,21 @@ type ApiMessage = {
 	date: number
 }
 
+type ApiBanList = {
+	id: number,
+	initiatorId: number,
+	memberId: number,
+	chatId: number,
+	channelId: number,
+	unbanDate: string
+}
+
 type ApiChannelMember = {
 	id: number,
 	login: string,
 	url_avatar: string,
-	isAdmin: boolean
+	isAdmin: boolean,
+	banLists: ApiBanList[]
 }
 
 type ApiChannel = {
@@ -156,6 +166,7 @@ type ApiChatExpand = {
 export type {
 	ApiChannel,
 	ApiChannelExpand,
+	ApiChannelMember,
 	ApiChat,
 	ApiChatExpand,
 	ApiGame,

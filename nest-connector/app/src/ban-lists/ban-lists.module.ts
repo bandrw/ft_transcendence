@@ -5,6 +5,7 @@ import { BanListsService } from 'ban-lists/ban-lists.service';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([BanListsEntity])],
-	providers: [BanListsService]
+	providers: [BanListsService],
+	exports: [BanListsService]
 })
 export class BanListsModule {}

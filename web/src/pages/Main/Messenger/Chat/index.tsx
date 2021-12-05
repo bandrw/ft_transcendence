@@ -1,19 +1,20 @@
 import './styles.scss';
 
 import {
-	faBullhorn, faChevronLeft, faCrown,
+	faBullhorn, faChevronLeft, faCommentSlash, faCrown,
 	faLock,
 	faPaperPlane,
 	faPlay, faSlidersH,
 	faTimes,
-	faTimesCircle
+	faTimesCircle, faVolumeMute
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
 import axios from "axios";
 import { SocketContext } from "context/socket";
-import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/ApiTypes";
+import { ApiChannelExpand, ApiChannelMember, ApiChatExpand, ApiMessage, ApiUserExpand } from "models/ApiTypes";
+import moment from "moment";
 import CreateChannel from "pages/Main/Messenger/Chat/CreateChannel";
 import CreateChat from "pages/Main/Messenger/Chat/CreateChat";
 import Message from "pages/Main/Messenger/Chat/Message";
@@ -45,6 +46,7 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 	const [joinError, setJoinError] = React.useState<string>('');
 	const [duelStatus, setDuelStatus] = React.useState<string>('green');
 	const [localDuelStatus, setLocalDuelStatus] = React.useState<string>('green');
+	const [showMuteChoices, setShowMuteChoices] = React.useState<number | null>(null);
 
 	const getChatCompanion = React.useCallback((selectedChat: ApiChatExpand) => {
 		return selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
@@ -112,7 +114,223 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 		);
 
 	if (chatState === 'settings') {
-		if (selectedChannel)
+		if (selectedChannel) {
+
+			const MuteButton = ({ member }: { member: ApiChannelMember }) => {
+				const mute = (unbanDate: number | null) => {
+					const data = {
+						channelId: selectedChannel.id,
+						memberId: member.id,
+						unbanDate: unbanDate && moment(unbanDate).format('YYYY-MM-DD HH:mm:ss')
+					};
+					axios.post('/channels/muteMember', data, { headers: { Authorization: `Bearer ${getToken()}` } }).catch(() => {});
+					setShowMuteChoices(null);
+				};
+
+				if (currentUser.id === member.id || member.id === selectedChannel.ownerId || member.isAdmin)
+					return (
+						<div style={ { width: 34 } }/>
+					);
+
+				return (
+					<div
+						className='ban-button-wrapper'
+					>
+						<button
+							className='ban-button'
+							onClick={ () => {
+								setShowMuteChoices(prev => prev === member.id ? null : member.id);
+							} }
+						>
+							<FontAwesomeIcon icon={ faVolumeMute }/>
+						</button>
+						{
+							showMuteChoices === member.id &&
+							<div className='ban-button-choices-wrapper' onMouseLeave={ () => setShowMuteChoices(null) }>
+								<div className='ban-button-choices'>
+									<button className='ban-button-choices-mute-btn' onClick={ () => mute(Date.now() + 3600 * 1000) }>
+										Mute for 1 hour
+									</button>
+									<button className='ban-button-choices-mute-btn' onClick={ () => mute(Date.now() + 8 * 3600 * 1000) }>
+										Mute for 8 hours
+									</button>
+									<button className='ban-button-choices-mute-btn' onClick={ () => mute(null) }>
+										Mute forever
+									</button>
+									<button className='ban-button-choices-unmute-btn' onClick={ () => console.log('unmute') }>
+										Unmute
+									</button>
+								</div>
+							</div>
+						}
+					</div>
+				);
+			};
+
+			const MembersList = () => {
+				if (selectedChannel.ownerId === currentUser.id)
+					return (
+						<div className='messenger-chat-settings-members-list'>
+							{
+								selectedChannel.members.map(member => {
+									const ban = member.banLists.find(list =>
+										list.channelId === selectedChannel.id && new Date(list.unbanDate) >= new Date()
+									);
+
+									return (
+									<div key={ member.id } className='messenger-chat-settings-members-list__member'>
+										<span className='messenger-chat-settings-members-list__member-user'>
+											<span
+												className='messenger-chat-settings-members-list__member-img'
+												style={ { backgroundImage: `url(${member.url_avatar})` } }
+											/>
+											<span className='messenger-chat-settings-members-list__member-login'>
+												{ member.login }
+											</span>
+										</span>
+										{
+											ban
+												?	<span
+														className='messenger-chat-settings-members-list__member-mute'
+														data-muted-until={ `Muted until ${moment(ban.unbanDate).format('DD MMMM YYYY, HH:mm')}` }
+													>
+														<FontAwesomeIcon icon={ faCommentSlash }/>
+													</span>
+												:	<span className='messenger-chat-settings-members-list__member-mute'/>
+										}
+										<div className='messenger-chat-settings-members-list__member-status'>
+											{
+												selectedChannel.ownerId === member.id
+													?	<FontAwesomeIcon icon={ faCrown }/>
+													:	<button
+														className={ `toggle-btn ${member.isAdmin && 'toggle-btn-active'}` }
+														data-description={ member.isAdmin ? 'Switch to member' : 'Switch to admin' }
+														onClick={ () => {
+															const data = {
+																channelId: selectedChannel.id,
+																memberId: member.id,
+																status: ''
+															};
+															if (member.isAdmin) {
+																data.status = 'member';
+															} else {
+																data.status = 'admin';
+															}
+															axios.put('/channels/updateMemberStatus', data, { headers: { Authorization: `Bearer ${getToken()}` } })
+																.catch(() => {});
+														} }
+													/>
+											}
+										</div>
+										<MuteButton member={ member }/>
+									</div>
+									);
+								})
+							}
+						</div>
+					);
+
+				if (selectedChannel.members.find(m => m.id === currentUser.id)?.isAdmin)
+					return (
+						<div className='messenger-chat-settings-members-list'>
+							{
+								selectedChannel.members.map(member => {
+									const ban = member.banLists.find(list =>
+										list.channelId === selectedChannel.id && new Date(list.unbanDate) >= new Date()
+									);
+
+									return (
+										<div key={ member.id } className='messenger-chat-settings-members-list__member'>
+											<div className='messenger-chat-settings-members-list__member-user'>
+												<div
+													className='messenger-chat-settings-members-list__member-img'
+													style={ { backgroundImage: `url(${member.url_avatar})` } }
+												/>
+												<div className='messenger-chat-settings-members-list__member-login'>
+													{ member.login }
+												</div>
+											</div>
+											{
+												ban
+													?	<span
+															className='messenger-chat-settings-members-list__member-mute'
+															data-muted-until={ `Muted until ${moment(ban.unbanDate).format('DD MMMM YYYY, HH:mm')}` }
+														>
+															<FontAwesomeIcon icon={ faCommentSlash }/>
+														</span>
+													:	<span className='messenger-chat-settings-members-list__member-mute'/>
+											}
+											<div className='messenger-chat-settings-members-list__member-status'>
+												{
+													(() => {
+														if (selectedChannel.ownerId === member.id) {
+															return <FontAwesomeIcon icon={ faCrown }/>;
+														} else if (member.isAdmin) {
+															return 'admin';
+														} else {
+															return '';
+														}
+													})()
+												}
+											</div>
+											<MuteButton member={ member }/>
+										</div>
+									);
+								})
+							}
+						</div>
+					);
+
+				return (
+					<div className='messenger-chat-settings-members-list'>
+						{
+							selectedChannel.members.map(member => {
+								const ban = member.banLists.find(list =>
+									list.channelId === selectedChannel.id && new Date(list.unbanDate) >= new Date()
+								);
+
+								return (
+									<div key={ member.id } className='messenger-chat-settings-members-list__member'>
+										<div className='messenger-chat-settings-members-list__member-user'>
+											<div
+												className='messenger-chat-settings-members-list__member-img'
+												style={ { backgroundImage: `url(${member.url_avatar})` } }
+											/>
+											<div className='messenger-chat-settings-members-list__member-login'>
+												{ member.login }
+											</div>
+										</div>
+										{
+											ban
+												?	<span
+														className='messenger-chat-settings-members-list__member-mute'
+														data-muted-until={ `Muted until ${moment(ban.unbanDate).format('DD MMMM YYYY, HH:mm')}` }
+													>
+														<FontAwesomeIcon icon={ faCommentSlash }/>
+													</span>
+												:	<span className='messenger-chat-settings-members-list__member-mute'/>
+										}
+										<div className='messenger-chat-settings-members-list__member-status'>
+											{
+												(() => {
+													if (selectedChannel.ownerId === member.id) {
+														return <FontAwesomeIcon icon={ faCrown }/>;
+													} else if (member.isAdmin) {
+														return 'admin';
+													} else {
+														return '';
+													}
+												})()
+											}
+										</div>
+									</div>
+								);
+							})
+						}
+					</div>
+				);
+			};
+
 			return (
 				<div className='messenger-chat'>
 					<div className='messenger-chat-info'>
@@ -144,44 +362,11 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 									:	`${selectedChannel.members.length} subscribers`
 							}
 						</div>
-						<div className='messenger-chat-settings-members-list'>
-							{
-								selectedChannel.members.map(member =>
-									<div key={ member.id } className='messenger-chat-settings-members-list__member'>
-										<span
-											className='messenger-chat-settings-members-list__member-img'
-											style={ { backgroundImage: `url(${member.url_avatar})` } }
-										/>
-										<span className='messenger-chat-settings-members-list__member-login'>{ member.login }</span>
-										<div className='messenger-chat-settings-members-list__member-status'>
-											{
-												selectedChannel.ownerId === member.id
-													?	<FontAwesomeIcon icon={ faCrown }/>
-													:	<button
-															className={ `toggle-btn ${member.isAdmin && 'toggle-btn-active'}` }
-															onClick={ () => {
-																const data = {
-																	channelId: selectedChannel.id,
-																	memberId: member.id,
-																	status: ''
-																};
-																if (member.isAdmin) {
-																	data.status = 'member';
-																} else {
-																	data.status = 'admin';
-																}
-																axios.put('/channels/updateMemberStatus', data, { headers: { Authorization: `Bearer ${getToken()}` } }).then();
-															} }
-														/>
-											}
-										</div>
-									</div>
-								)
-							}
-						</div>
+						<MembersList/>
 					</div>
 				</div>
 			);
+		}
 	}
 
 	setTimeout(() => {
@@ -282,6 +467,13 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 	if (selectedChannel) {
 		const isMember = selectedChannel.members.find(member => member.id === currentUser.id);
 
+		let ban;
+		if (isMember && isMember.banLists) {
+			ban = isMember.banLists.find(list =>
+				list.channelId === selectedChannel.id && new Date(list.unbanDate) > new Date()
+			);
+		}
+
 		if (selectedChannel.isPrivate && !isMember)
 			return (
 				<div className='messenger-chat'>
@@ -379,16 +571,19 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 				{
 					isMember
 						?	<form className='messenger-chat-form' onSubmit={ sendMsg }>
-							<input
-								className='messenger-chat-input'
-								ref={ inputRef }
-								type='text'
-								placeholder='Write a message'
-							/>
-							<button type='submit' className='messenger-chat-send-btn'>
-								<FontAwesomeIcon icon={ faPaperPlane }/>
-							</button>
-						</form>
+								<input
+									disabled={ !!ban }
+									className='messenger-chat-input'
+									ref={ inputRef }
+									type='text'
+									placeholder={
+										!!ban ? `You are muted until ${moment(ban.unbanDate).format('DD MMMM YYYY, HH:mm')}` : 'Write a message'
+									}
+								/>
+								<button disabled={ !!ban } type='submit' className='messenger-chat-send-btn'>
+									<FontAwesomeIcon icon={ faPaperPlane }/>
+								</button>
+							</form>
 						:	<button
 							className='messenger-chat-join-btn'
 							onClick={ () => {

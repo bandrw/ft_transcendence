@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
+import { BanListsService } from "ban-lists/ban-lists.service";
 import * as bcryptjs from 'bcryptjs';
 import { ChannelEntity } from "channel/entities/channel.entity";
 import { ChannelMemberEntity } from "channel/entities/channelMember.entity";
@@ -17,6 +18,9 @@ export class ChannelService {
 
 	@Inject()
 	private usersService: UsersService;
+
+	@Inject()
+	private banListsService: BanListsService;
 
 	async createChannel(name: string, title: string, ownerId: number, isPrivate: boolean, password?: string): Promise<ChannelEntity> {
 		try {
@@ -66,7 +70,7 @@ export class ChannelService {
 
 	async getChannel(id: number, expand = false): Promise<ChannelEntity> {
 		if (expand) {
-			const r = await this.channelRepository.findOne({ where: { id: id }, relations: ['owner', 'members', 'messages', 'memberEntities', 'memberEntities.user'] });
+			const r = await this.channelRepository.findOne({ where: { id: id }, relations: ['owner', 'members', 'messages', 'memberEntities', 'memberEntities.user', 'members.banLists'] });
 			r.messages.sort((msg1, msg2) => msg1.date - msg2.date);
 			return r;
 		}
@@ -75,7 +79,7 @@ export class ChannelService {
 
 	async getChannels(userId: number, expand = false) {
 		if (expand) {
-			const r = await this.channelRepository.find({ relations: ['owner', 'members', 'messages', 'memberEntities', 'memberEntities.user'] });
+			const r = await this.channelRepository.find({ relations: ['owner', 'members', 'messages', 'memberEntities', 'memberEntities.user', 'members.banLists'] });
 			for (const channel of r) {
 				if (channel.isPrivate && !channel.members.find(member => member.id === userId)) {
 					channel.messages = [];
@@ -105,6 +109,19 @@ export class ChannelService {
 		else if (status === 'member')
 			member.isAdmin = false;
 		const r = await this.channelMemberRepository.save(member);
+		this.usersService.broadcastEventData('updateChannel', '');
+		return r;
+	}
+
+	async muteMember(initiatorId: number, channelId: number, memberId: number, unbanDate: string | null) {
+		const channel = await this.getChannel(channelId, true);
+		if (!channel)
+			throw new HttpException('Channel not found', HttpStatus.BAD_REQUEST);
+		const initiator = channel.memberEntities.find(m => m.id === initiatorId);
+		if (!initiator || !initiator.isAdmin)
+			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
+
+		const r = await this.banListsService.muteMember(channel.id, initiatorId, memberId, unbanDate);
 		this.usersService.broadcastEventData('updateChannel', '');
 		return r;
 	}

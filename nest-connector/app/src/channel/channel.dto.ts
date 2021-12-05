@@ -1,5 +1,5 @@
 import {
-	IsBoolean, IsIn,
+	IsBoolean, IsDate, IsIn,
 	IsNumber, IsOptional,
 	IsString,
 	MaxLength,
@@ -43,4 +43,16 @@ export class UpdateMemberStatusDTO {
 	@IsString()
 	@IsIn(['member', 'admin'])
 	status: string;
+}
+
+export class MuteMemberDTO {
+	@IsNumber()
+	channelId: number;
+
+	@IsNumber()
+	memberId: number;
+
+	@IsString()
+	@IsOptional()
+	unbanDate: string | null;
 }
