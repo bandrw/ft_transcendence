@@ -9,7 +9,13 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { ExpandDTO } from "app.dto";
-import { CreateChannelDTO, JoinChannelDTO, MuteMemberDTO, UpdateMemberStatusDTO } from "channel/channel.dto";
+import {
+	CreateChannelDTO,
+	JoinChannelDTO, LeaveChannelDTO,
+	MuteMemberDTO, UnmuteMemberDTO,
+	UpdateChannelDTO,
+	UpdateMemberStatusDTO
+} from "channel/channel.dto";
 import { ChannelService } from "channel/channel.service";
 import { isDefined } from "class-validator";
 
@@ -62,6 +68,36 @@ export class ChannelController {
 		const user = req.user;
 
 		return await this.channelService.muteMember(user.id, channelId, memberId, unbanDate);
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Post('unmuteMember')
+	async unmuteMember(@Req() req, @Body() { channelId, memberId }: UnmuteMemberDTO) {
+		const user = req.user;
+
+		return await this.channelService.unmuteMember(user.id, channelId, memberId);
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Put('update')
+	async update(@Req() req, @Body() { channelId, isPrivate, password }: UpdateChannelDTO) {
+		const user = req.user;
+
+		if (isDefined(password)) {
+			return await this.channelService.updateChannel(user.id, channelId, isPrivate, password);
+		}
+		return await this.channelService.updateChannel(user.id, channelId, isPrivate);
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Post('leave')
+	async leave(@Req() req, @Body() { channelId }: LeaveChannelDTO) {
+		const user = req.user;
+
+		return await this.channelService.leaveChannel(user.id, channelId);
 	}
 
 }

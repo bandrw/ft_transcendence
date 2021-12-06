@@ -32,6 +32,6 @@ export class BanListsEntity {
 	@ManyToOne(() => ChannelEntity, channel => channel.banLists)
 	channel: ChannelEntity;
 
-	@Column({ type: "timestamp" })
-	unbanDate: Date;
+	@Column({ type: "timestamp", nullable: true })
+	unbanDate: Date | null;
 }

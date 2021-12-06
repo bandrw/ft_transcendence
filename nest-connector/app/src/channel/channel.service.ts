@@ -98,9 +98,9 @@ export class ChannelService {
 
 	async updateMemberStatus(userId: number, channelId: number, memberId: number, status: string) {
 		const channel = await this.getChannel(channelId, true);
-		if (channel.ownerId !== userId)
+		if (!channel || channel.ownerId !== userId)
 			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
-		const member = channel.memberEntities.find(m => m.id === memberId);
+		const member = channel.memberEntities.find(m => m.userId === memberId);
 		if (!member)
 			throw new HttpException('No member', HttpStatus.BAD_REQUEST);
 
@@ -117,11 +117,52 @@ export class ChannelService {
 		const channel = await this.getChannel(channelId, true);
 		if (!channel)
 			throw new HttpException('Channel not found', HttpStatus.BAD_REQUEST);
-		const initiator = channel.memberEntities.find(m => m.id === initiatorId);
+		const initiator = channel.memberEntities.find(m => m.userId === initiatorId);
 		if (!initiator || !initiator.isAdmin)
 			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
 
-		const r = await this.banListsService.muteMember(channel.id, initiatorId, memberId, unbanDate);
+		const r = await this.banListsService.muteMember(null, channel.id, initiatorId, memberId, unbanDate);
+		this.usersService.broadcastEventData('updateChannel', '');
+		return r;
+	}
+
+	async unmuteMember(initiatorId: number, channelId: number, memberId: number) {
+		const channel = await this.getChannel(channelId, true);
+		if (!channel)
+			throw new HttpException('Channel not found', HttpStatus.BAD_REQUEST);
+		const initiator = channel.memberEntities.find(m => m.userId === initiatorId);
+		if (!initiator || !initiator.isAdmin)
+			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
+
+		const r = await this.banListsService.unmuteMember(null, channel.id, null, memberId);
+		this.usersService.broadcastEventData('updateChannel', '');
+		return r;
+	}
+
+	async updateChannel(userId: number, channelId: number, isPrivate: boolean, password: string | null = null) {
+		const channel = await this.getChannel(channelId, true);
+		if (!channel)
+			throw new HttpException('Channel not found', HttpStatus.BAD_REQUEST);
+		if (channel.ownerId !== userId)
+			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
+
+		channel.isPrivate = isPrivate;
+		if (isPrivate && password) {
+			channel.password = password;
+		}
+		const r = await this.channelRepository.save(channel);
+		this.usersService.broadcastEventData('updateChannel', '');
+		return r;
+	}
+
+	async leaveChannel(userId: number, channelId: number) {
+		const channel = await this.getChannel(channelId, true);
+		if (!channel)
+			throw new HttpException('Channel not found', HttpStatus.BAD_REQUEST);
+		if (channel.ownerId === userId)
+			throw new HttpException('Owner cannot leave his channel', HttpStatus.BAD_REQUEST);
+
+		const r = await this.channelMemberRepository.delete({ channelId, userId });
 		this.usersService.broadcastEventData('updateChannel', '');
 		return r;
 	}

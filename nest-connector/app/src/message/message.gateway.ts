@@ -27,8 +27,13 @@ export class MessageGateway {
 			return ;
 
 		if (msgData.chatId) {
-			const chat = await this.chatService.getChat(msgData.chatId);
+			const chat = await this.chatService.getChat(msgData.chatId, true);
 			if (sender.id !== chat.userOneId && sender.id !== chat.userTwoId)
+				return ;
+			const ban = chat.banLists.find(list =>
+				list.chatId === chat.id && (list.unbanDate === null || new Date(list.unbanDate) > new Date())
+			);
+			if (ban && ban.memberId === sender.id)
 				return ;
 
 			const msg = await this.messageService.createChatMessage(msgData.text, msgData.chatId, sender.id);
@@ -43,12 +48,15 @@ export class MessageGateway {
 			}
 		} else if (msgData.channelId) {
 			const channel = await this.channelService.getChannel(msgData.channelId, true);
-			if (!channel.members.find(member => member.id === sender.id))
+			if (!channel)
 				return ;
 			const member = channel.members.find(m => m.id === sender.id);
+			if (!member)
+				return ;
 			const ban = member.banLists.find(list =>
 				list.channelId === msgData.channelId &&
-				(list.unbanDate === null || new Date(list.unbanDate) > new Date()));
+				(list.unbanDate === null || new Date(list.unbanDate) > new Date())
+			);
 			if (ban) {
 				return ;
 			}

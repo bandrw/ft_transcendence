@@ -156,6 +156,16 @@ const Messenger = () => {
 		};
 	}, []);
 
+	// Updating selectedChat
+	React.useEffect(() => {
+		if (!selectedChat)
+			return ;
+
+		const chat = chats.find(ch => ch.id === selectedChat.id);
+		if (chat)
+			setSelectedChat(chat);
+	}, [chats, selectedChat]);
+
 	// Updating selectedChannel
 	React.useEffect(() => {
 		if (!selectedChannel)

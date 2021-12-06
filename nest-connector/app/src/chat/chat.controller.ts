@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { ExpandDTO } from "app.dto";
-import { CreateChatDTO } from "chat/chat.dto";
+import { CreateChatDTO, MuteChatMemberDTO, UnmuteChatMemberDTO } from "chat/chat.dto";
 import { ChatEntity } from "chat/chat.entity";
 import { ChatService } from "chat/chat.service";
 import { isDefined } from "class-validator";
@@ -37,6 +37,24 @@ export class ChatController {
 		const user = req.user;
 
 		return await this.chatService.getChats(user.id, isDefined(expand));
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Post('muteMember')
+	async muteMember(@Req() req, @Body() { chatId, memberId, unbanDate }: MuteChatMemberDTO) {
+		const user = req.user;
+
+		return await this.chatService.muteMember(user.id, chatId, memberId, unbanDate);
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Post('unmuteMember')
+	async unmuteMember(@Req() req, @Body() { chatId, memberId }: UnmuteChatMemberDTO) {
+		const user = req.user;
+
+		return await this.chatService.unmuteMember(user.id, chatId, memberId);
 	}
 
 }

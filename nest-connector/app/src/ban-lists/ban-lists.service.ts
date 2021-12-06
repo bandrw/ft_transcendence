@@ -9,16 +9,33 @@ export class BanListsService {
 	@InjectRepository(BanListsEntity)
 	private banListsRepository: Repository<BanListsEntity>;
 
-	async muteMember(channelId: number, initiatorId: number, memberId: number, unbanDate: string | null) {
+	async muteMember(chatId: number | null, channelId: number | null, initiatorId: number, memberId: number, unbanDate: string | null) {
 		try {
 			const ban = this.banListsRepository.create();
 			ban.initiatorId = initiatorId;
 			ban.memberId = memberId;
-			ban.channelId = channelId;
-			ban.unbanDate = new Date(unbanDate);
+			if (chatId !== null) {
+				ban.chatId = chatId;
+			} else if (channelId !== null) {
+				ban.channelId = channelId;
+			}
+			ban.unbanDate = unbanDate === null ? null : new Date(unbanDate);
 			return await this.banListsRepository.save(ban);
 		} catch (e) {
-			console.log('[muteMember error]', e, e.detail);
+			throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	async unmuteMember(chatId: number | null, channelId: number | null, initiatorId: number | null, memberId: number) {
+		try {
+			if (chatId !== null) {
+				const bans = await this.banListsRepository.find({ where: { initiatorId, memberId, chatId } });
+				return await this.banListsRepository.remove(bans);
+			} else if (channelId !== null) {
+				const bans = await this.banListsRepository.find({ where: { memberId, channelId } });
+				return await this.banListsRepository.remove(bans);
+			}
+		} catch (e) {
 			throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
 		}
 	}

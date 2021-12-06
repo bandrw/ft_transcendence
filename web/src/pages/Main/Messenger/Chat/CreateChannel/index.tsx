@@ -23,7 +23,7 @@ const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
 		const password = passwordRef.current?.value || '';
 
 		if (isPrivate && password.length < 6) {
-			setErrors('Password\'s length must be longer than 6');
+			setErrors('Password\'s length must be greater than 6');
 			return ;
 		}
 

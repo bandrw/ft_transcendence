@@ -160,7 +160,8 @@ type ApiChatExpand = {
 	userTwoId: number,
 	userOne: ApiUser,
 	userTwo: ApiUser,
-	messages: ApiMessage[]
+	messages: ApiMessage[],
+	banLists: ApiBanList[]
 }
 
 export type {

@@ -11,6 +11,82 @@
 		font-size: 1.2em;
 	}
 
+	.ban-button-wrapper {
+		position: relative;
+	}
+
+	.ban-button {
+		background: none;
+		font-size: 20px;
+		color: #e30000;
+		border: none;
+		outline: none;
+		cursor: pointer;
+		transition: all 0.1s ease-in-out;
+		padding: 4px 7px;
+		border-radius: 8px;
+
+		svg {
+			margin-top: 2px;
+		}
+
+		&:hover {
+			background-color: rgba(#777, 0.1);
+		}
+		&:active {
+			opacity: 0.8;
+		}
+	}
+
+	.ban-button-choices-wrapper {
+		position: absolute;
+		padding-left: 70px;
+		left: 0;
+		top: 100%;
+		transform: translateY(-50%);
+	}
+
+	.ban-button-choices {
+		width: 160px;
+		color: white;
+		display: flex;
+		flex-direction: column;
+		border-radius: 18px;
+		font-size: 16px;
+		background: #2c2f3a;
+		box-shadow: 0 0 20px #1a1a1a;
+
+		& > div {
+			font-size: 18px;
+			margin: 15px 0;
+		}
+
+		.ban-button-choices-mute-btn, .ban-button-choices-unmute-btn {
+			border: none;
+			outline: none;
+			background: none;
+			color: white;
+			height: 40px;
+			font-size: 14px;
+			cursor: pointer;
+			border-radius: 0;
+
+			&:last-child {
+				border-radius: 0 0 18px 18px;
+			}
+			&:first-child {
+				border-radius: 18px 18px 0 0;
+			}
+		}
+
+		.ban-button-choices-mute-btn:hover {
+			background: #e30000;
+		}
+		.ban-button-choices-unmute-btn:hover {
+			background: #29aa44;
+		}
+	}
+
 	.messenger-chat-info {
 		display: flex;
 		align-items: center;
@@ -31,6 +107,7 @@
 			padding: 5px 25px 5px 10px;
 			border-radius: 18px;
 			transition: all 0.1s ease-in-out;
+			height: 40px;
 
 			div {
 				font-size: 16px;
@@ -41,7 +118,48 @@
 			}
 		}
 
+		.ban-button-choices-wrapper {
+
+			.ban-button-choices {
+				.ban-button-choices-mute-btn {
+					white-space: nowrap;
+					font-size: 16px;
+					width: auto;
+				}
+			}
+		}
+
+		.messenger-chat-info-mute {
+			color: #aaa;
+			cursor: pointer;
+			transition: all 0.1s ease-in-out;
+			height: 40px;
+			width: 40px;
+			border-radius: 10px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-left: 15px;
+
+			.messenger-chat-info-mute__muted-icon {
+				color: #e30000;
+			}
+
+			svg {
+				font-size: 20px;
+				margin-bottom: 2px;
+			}
+
+			&:hover {
+				background: #2c2f3a;
+			}
+			&:active {
+				opacity: 0.8;
+			}
+		}
+
 		.messenger-chat-info-play-btn {
+			width: auto;
 			font-size: 1em;
 			height: 50px;
 			border: none;
@@ -54,7 +172,8 @@
 			justify-content: space-between;
 			align-items: center;
 			cursor: pointer;
-			margin-left: 25px;
+			margin-left: auto;
+			margin-right: 25px;
 
 			.messenger-chat-info-play-btn-text {
 				width: 150px;
@@ -78,6 +197,9 @@
 			&:hover {
 				.messenger-chat-info-play-btn-img {
 					background-color: #21b941;
+				}
+				.messenger-chat-info-play-btn-img-searching {
+					background-color: #e30000;
 				}
 			}
 			&:active {
@@ -133,15 +255,19 @@
 		}
 
 		.messenger-chat-info-img {
-			width: 50px;
-			height: 50px;
+			width: 40px;
+			height: 40px;
 			margin-right: 15px;
 			border-radius: 50%;
-			font-size: 26px;
+			font-size: 22px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			border: 1px solid #1a1b1f;
+			background-size: contain;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-color: #1a1b1f;
 		}
 
 		.messenger-chat-close-btn {
@@ -437,6 +563,23 @@
 
 		.messenger-chat-settings-title {
 			font-size: 26px;
+			display: flex;
+			align-items: center;
+			position: relative;
+
+			svg {
+				color: #29aa44;
+				font-size: 20px;
+				margin-bottom: 2px;
+				position: absolute;
+				right: calc(100% + 10px);
+			}
+		}
+
+		.messenger-chat-settings-name {
+			font-size: 16px;
+			color: #fff;
+			margin: 5px 0;
 		}
 
 		.messenger-chat-settings-subscribers {
@@ -444,11 +587,151 @@
 			color: #ccc;
 		}
 
+		.messenger-chat-settings-buttons {
+			margin-top: 25px;
+
+			button {
+				background: #2c2f3a;
+				border: none;
+				outline: none;
+				width: 100px;
+				height: 65px;
+				cursor: pointer;
+				border-radius: 18px;
+				font-size: 14px;
+				color: #ccc;
+				transition: all 0.1s ease-in-out;
+
+				svg {
+					font-size: 18px;
+					margin-bottom: 5px;
+				}
+
+				&:hover {
+					color: #29aa44;
+				}
+				&:active {
+					opacity: 0.8;
+				}
+			}
+
+			.messenger-chat-settings-buttons__leave {
+			}
+		}
+
+		.messenger-chat-settings-accessibility {
+			background: #2c2f3a;
+			width: 500px;
+			padding: 15px 25px;
+			box-sizing: border-box;
+			border-radius: 18px;
+			margin-top: 25px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+
+			#channel-is-private__checkbox {
+				display: none;
+
+				&:active + label {
+					.channel_is_private__checkbox {
+						border-color: #29aa44;
+					}
+				}
+
+				&:checked + label {
+					.channel_is_private__checkbox {
+						background-color: #29aa44;
+						border-color: #29aa44;
+						& > svg {
+							display: block;
+						}
+					}
+				}
+
+				& + label {
+					cursor: pointer;
+					position: relative;
+					display: flex;
+					align-items: center;
+
+					.channel_is_private__checkbox {
+						width: 22px;
+						height: 22px;
+						border-radius: 50%;
+						border: 1px solid #aaa;
+						margin-right: 15px;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+
+						& > svg {
+							font-size: 14px;
+							display: none;
+						}
+					}
+				}
+			}
+
+			.channel-is-private__password-input {
+				margin-top: 25px;
+				background: transparent;
+				border: 1px solid #777;
+				padding: 10px 25px;
+				font-size: 1em;
+				border-radius: 18px;
+				outline: none;
+				color: white;
+				transition: all 0.1s ease-in-out;
+
+				&::placeholder {
+					font-size: 0.9em;
+				}
+
+				&:focus {
+					border-color: rgba(#29aa44, 0.5);
+				}
+			}
+
+			button[type=submit] {
+				margin-bottom: 10px;
+				width: 160px;
+				background: #29aa44;
+				color: white;
+				border: none;
+				outline: none;
+				cursor: pointer;
+				height: 35px;
+				border-radius: 18px;
+				font-size: 1em;
+				transition: all 0.1s ease-in-out;
+
+				&:disabled {
+					opacity: 0.5;
+					cursor: not-allowed;
+				}
+			}
+
+			.channel-is-private__errors {
+				margin: 15px 0;
+				color: #e30000;
+			}
+
+			&:before {
+				content: 'Accessibility';
+				display: block;
+				width: 100%;
+				text-align: left;
+				margin-bottom: 15px;
+				color: #29aa44;
+			}
+		}
+
 		.messenger-chat-settings-members-list {
 			margin-top: 25px;
 			background: #2c2f3a;
-			width: 50%;
-			padding: 40px 25px 15px;
+			width: 500px;
+			padding: 15px 25px;
 			box-sizing: border-box;
 			border-radius: 18px;
 			position: relative;
@@ -496,6 +779,7 @@
 						top: calc(100% + 10px);
 						left: 50%;
 						transform: translateX(-50%);
+						font-size: 0.9em;
 					}
 
 					&:hover {
@@ -519,6 +803,13 @@
 
 				.messenger-chat-settings-members-list__member-login {
 					text-align: left;
+					color: white;
+					cursor: pointer;
+					transition: all 0.1s ease-in-out;
+
+					&:hover {
+						color: #29aa44;
+					}
 				}
 
 				.messenger-chat-settings-members-list__member-status {
@@ -594,88 +885,13 @@
 						}
 					}
 				}
-
-				.ban-button-wrapper {
-					position: relative;
-				}
-
-				.ban-button {
-					background: none;
-					font-size: 20px;
-					color: #e30000;
-					border: none;
-					outline: none;
-					cursor: pointer;
-					transition: all 0.1s ease-in-out;
-					padding: 4px 7px;
-					border-radius: 8px;
-
-					svg {
-						margin-top: 2px;
-					}
-
-					&:hover {
-						background-color: rgba(#777, 0.1);
-					}
-					&:active {
-						opacity: 0.8;
-					}
-				}
-
-				.ban-button-choices-wrapper {
-					position: absolute;
-					padding-left: 70px;
-					left: 0;
-					top: 100%;
-					transform: translateY(-50%);
-				}
-
-				.ban-button-choices {
-					width: 160px;
-					color: white;
-					display: flex;
-					flex-direction: column;
-					border-radius: 18px;
-					font-size: 16px;
-					background: #2c2f3a;
-					box-shadow: 0 0 20px #1a1a1a;
-
-					& > div {
-						font-size: 18px;
-						margin: 15px 0;
-					}
-
-					.ban-button-choices-mute-btn, .ban-button-choices-unmute-btn {
-						border: none;
-						outline: none;
-						background: none;
-						color: white;
-						height: 40px;
-						font-size: 14px;
-						cursor: pointer;
-
-						&:last-child {
-							border-radius: 0 0 18px 18px;
-						}
-						&:first-child {
-							border-radius: 18px 18px 0 0;
-						}
-					}
-
-					.ban-button-choices-mute-btn:hover {
-						background: #e30000;
-					}
-					.ban-button-choices-unmute-btn:hover {
-						background: #29aa44;
-					}
-				}
 			}
 
 			&:before {
+				text-align: left;
+				display: block;
+				margin-bottom: 15px;
 				content: 'Members';
-				position: absolute;
-				top: 10px;
-				left: 25px;
 				color: #29aa44;
 			}
 		}

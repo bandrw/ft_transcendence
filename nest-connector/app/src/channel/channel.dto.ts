@@ -1,5 +1,5 @@
 import {
-	IsBoolean, IsDate, IsIn,
+	IsBoolean, IsIn,
 	IsNumber, IsOptional,
 	IsString,
 	MaxLength,
@@ -21,6 +21,7 @@ export class CreateChannelDTO {
 
 	@ValidateIf(o => o.isPrivate)
 	@IsString()
+	@MinLength(6)
 	password: string;
 }
 
@@ -55,4 +56,30 @@ export class MuteMemberDTO {
 	@IsString()
 	@IsOptional()
 	unbanDate: string | null;
+}
+
+export class UnmuteMemberDTO {
+	@IsNumber()
+	channelId: number;
+
+	@IsNumber()
+	memberId: number;
+}
+
+export class UpdateChannelDTO {
+	@IsNumber()
+	channelId: number;
+
+	@IsBoolean()
+	isPrivate: boolean;
+
+	@ValidateIf(o => o.isPrivate)
+	@IsString()
+	@MinLength(6)
+	password: string;
+}
+
+export class LeaveChannelDTO {
+	@IsNumber()
+	channelId: number;
 }
