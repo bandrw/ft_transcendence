@@ -42,3 +42,8 @@ http://localhost:8080
 
 ### Demo
 > https://youtu.be/k_7NmJMGW9E
+
+### Database
+<p align="center">
+  <img src="./db/schema/relations.svg" height="600px">
+</p>
