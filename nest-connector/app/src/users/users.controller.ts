@@ -4,13 +4,22 @@ import {
 	Get, HttpException, HttpStatus,
 	Post,
 	Query,
-	Req, UseGuards, UsePipes, ValidationPipe,
+	Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { EmptyDTO } from "app.dto";
 import { AuthService } from "auth/auth.service";
 import { isDefined } from "class-validator";
-import { CreateUserDTO, GetUsersDTO, LoginDTO, SubscribeHandlerDTO } from "users/users.dto";
+import { saveImageToStorage } from "users/image-storage";
+import {
+	CreateUserDTO,
+	GetUsersDTO,
+	LoginDTO,
+	SubscribeHandlerDTO,
+	UpdateAvatarDTO,
+	UpdateUsernameDTO
+} from "users/users.dto";
 import { UsersService } from 'users/users.service';
 
 @Controller('users')
@@ -79,11 +88,35 @@ export class UsersController {
 		return await this.usersService.unsubscribeFromUser(user.id, target);
 	}
 
-	// @UseGuards(AuthGuard('jwt'))
-	// @Get('avatar')
-	// async updateAvatar(@Query('login') login): Promise<string> {
-	// 	return await this.usersService.updateAvatar(login);
-	// }
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Post('updateAvatar')
+	async updateAvatar(@Req() req, @Body() { urlAvatar }: UpdateAvatarDTO) {
+		const user = req.user;
+
+		return await this.usersService.updateAvatar(user.id, urlAvatar);
+	}
+
+	// @UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@UseInterceptors(FileInterceptor('picture', saveImageToStorage))
+	@Post('uploadAvatar')
+	async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+		const user = req.user;
+
+		if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpg' && file.mimetype !== 'image/jpeg')
+			throw new HttpException('Only png/jpg/jpeg allowed', HttpStatus.BAD_REQUEST);
+		return await this.usersService.uploadAvatar(user.id, `http://localhost:3000/images/${file.filename}`); // TODO move url to env
+	}
+
+	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
+	@UseGuards(AuthGuard('jwt'))
+	@Post('updateUsername')
+	async updateUsername(@Req() req, @Body() { username }: UpdateUsernameDTO) {
+		const user = req.user;
+
+		return await this.usersService.updateUsername(user.id, username);
+	}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))

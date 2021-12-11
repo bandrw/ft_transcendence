@@ -1,13 +1,5 @@
 # Ping-Pong Contest
 
-## TODO
-- двухфакторная авторизация
-- какая то кастомизация игры
-- выход из игры через header
-- загрузка аватарок
-
----
-
 > Soon you will know that you’ve already known things that you thought you didn’t know
 >
 > Summary: This is not C or C++ basic functions! To do something that you’ve never done before without a piscine.
@@ -44,5 +36,5 @@ http://localhost:8080
 
 ### Database
 <p align="center">
-  <img src="./db/schema/relations.svg" height="600px">
+  <img src="./db/schema/relations.svg" height="600px" alt="Database Schema">
 </p>

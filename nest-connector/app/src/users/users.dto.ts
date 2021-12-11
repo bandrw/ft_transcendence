@@ -38,3 +38,13 @@ export class LoginDTO {
 	@IsString()
 	socketId: string;
 }
+
+export class UpdateAvatarDTO {
+	@IsString()
+	urlAvatar: string;
+}
+
+export class UpdateUsernameDTO {
+	@IsString()
+	username: string;
+}

@@ -1,6 +1,13 @@
 import './styles.scss';
 
-import { faExternalLinkAlt, faGamepad, faUserCheck, faUserFriends, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+	faEdit,
+	faExternalLinkAlt,
+	faGamepad,
+	faUserCheck,
+	faUserFriends,
+	faUserPlus
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppSelector } from "app/hooks";
 import { getToken } from "app/token";
@@ -12,8 +19,10 @@ import { User } from "models/User";
 import { GameTime } from "pages/GamesHistory";
 import FriendsList from "pages/UserProfile/FriendsList";
 import ListSection from "pages/UserProfile/ListSection";
-import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { AvatarGenerator } from "random-avatar-generator";
+import React, { ChangeEvent, FormEvent, MouseEventHandler } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useHistory, useParams } from "react-router-dom";
 
 enum SubscribeBtnState {
 	Default,
@@ -30,7 +39,7 @@ interface GameItemProps {
 
 const GameItem = ({ enemy, game, user }: GameItemProps) => {
 	// const statusColor = enemy ? enemy.status : 'transparent';
-	const statusColor = 'pink';
+	// const statusColor = 'pink';
 
 	return (
 		<div className='games-history-game'>
@@ -39,7 +48,7 @@ const GameItem = ({ enemy, game, user }: GameItemProps) => {
 					style={ { backgroundImage: `url(${ enemy?.url_avatar })` } }
 					className='games-history-game-img'
 				>
-					<div className='games-history-user-status' style={ { backgroundColor: statusColor } }/>
+					{ /*<div className='games-history-user-status' style={ { backgroundColor: statusColor } }/>*/ }
 				</div>
 				<Link to={ `/users/${enemy?.login}` } className='games-history-user-login'>{ enemy?.login }</Link>
 			</div>
@@ -66,15 +75,6 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 		const currUser = allUsers.find(usr => usr.login === currentUser.username);
 		if (!currUser)
 			return ;
-
-		if (!currUser.subscriptions) {
-			console.log('[SubscribeBtn] subscriptions is undefined'); // todo: [remove if]
-			return;
-		}
-		if (!currUser.subscribers) {
-			console.log('[SubscribeBtn] subscribers is undefined');
-			return;
-		}
 
 		if (currUser.subscriptions.find(s => s.login === targetLogin)) {
 			if (currUser.subscribers.find(s => s.login === targetLogin))
@@ -185,11 +185,153 @@ const SubscribeBtn = ({ currentUser, targetLogin, allUsers }: { currentUser: Use
 	);
 };
 
+type ImageState = {
+	type: 'generated' | 'uploaded',
+	image: string | ArrayBuffer | null,
+	file: File | null
+}
+
+const updateAvatar = async (imageState: ImageState) => {
+	if (imageState.type === 'generated') {
+		const data = {
+			urlAvatar: imageState.image
+		};
+		return axios.post('/users/updateAvatar', data, {
+			headers: { Authorization: `Bearer ${getToken()}` }
+		});
+	} else if (imageState.type === 'uploaded') {
+		if (!imageState.file)
+			return ;
+
+		const formData = new FormData();
+		formData.append('picture', imageState.file);
+		return axios.post('/users/uploadAvatar', formData, {
+			headers: { Authorization: `Bearer ${getToken()}` }
+		});
+	}
+};
+
+const updateUsername = async (username: string) => {
+	const data = {
+		username
+	};
+	return axios.post('/users/updateUsername', data, {
+		headers: { Authorization: `Bearer ${getToken()}` }
+	});
+};
+
+interface IChangeUsername {
+	newUsername: string
+}
+
+const UserEditWindow = React.forwardRef<HTMLDivElement>(({}, ref) => {
+	const history = useHistory();
+	const { allUsers } = useAppSelector(state => state.allUsers);
+	const { currentUser } = useAppSelector(state => state.currentUser);
+	const [imageState, setImageState] = React.useState<ImageState>({ type: 'uploaded', image: currentUser.urlAvatar, file: null });
+	const [usernameInput, setUsernameInput] = React.useState<string>(currentUser.username);
+	const { register: registerUsername, handleSubmit: handleSubmitUsername } = useForm<IChangeUsername>();
+
+	const usernameIsValid = () => {
+		return !(usernameInput.length < 4 || usernameInput.length > 16 || allUsers.find(usr => usr.login === usernameInput));
+	};
+
+	const changeUsername = ({ newUsername }: IChangeUsername) => {
+		if (!usernameIsValid())
+			return ;
+
+		updateUsername(newUsername).then(() => history.push(`/users/${newUsername}`));
+	};
+
+	const saveNewPicture = (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		updateAvatar(imageState).then();
+	};
+
+	const previewPicture = (e: ChangeEvent<HTMLInputElement>) => {
+		const reader = new FileReader();
+		reader.onload = () => {
+			if (reader.readyState === 2) {
+				setImageState(prev => ({ type: 'uploaded', image: reader.result, file: prev.file }));
+			}
+		};
+		if (e.target.files) {
+			reader.readAsDataURL(e.target.files[0]);
+			setImageState(prev =>
+				({ type: prev.type, image: prev.image, file: e.target.files ? e.target.files[0] : null })
+			);
+		}
+	};
+
+	const generatePicture = () => {
+		const generator = new AvatarGenerator();
+		const avatar = generator.generateRandomAvatar();
+		setImageState({ type: 'generated', image: avatar, file: null });
+	};
+
+	const clickHandler = (e: any) => {
+		e.stopPropagation();
+	};
+
+	return (
+		<div onClick={ clickHandler } ref={ ref } className='user-profile-header__edit-window-wrapper'>
+			<div className='user-profile-header__edit-window'>
+				<form onSubmit={ handleSubmitUsername(changeUsername) }>
+					<p>Change username</p>
+					<input
+						type='text'
+						{ ...registerUsername('newUsername') }
+						placeholder='Enter new username'
+						defaultValue={ currentUser.username }
+						onChange={ e => setUsernameInput(e.target.value) }
+						required={ true }
+					/>
+					<button
+						className='edit-window-btn'
+						type='submit'
+						disabled={ !usernameIsValid() }
+					>
+						Save
+					</button>
+				</form>
+				<form onSubmit={ saveNewPicture }>
+					<p>Change Picture</p>
+					<section>
+						<div className='user-profile-header__edit-window-picture' style={ { backgroundImage: `url(${imageState.image})` } }/>
+						<div className='section-right'>
+							<button
+								className='edit-window-btn'
+								onClick={ generatePicture }
+								type='button'
+							>
+								Generate
+							</button>
+							<div>or</div>
+							<input
+								id='edit-window-upload'
+								name='picture'
+								type='file'
+								onChange={ previewPicture }
+								accept='.jpg, .jpeg, .png'
+							/>
+							<label className='edit-window-btn' htmlFor='edit-window-upload'>Upload</label>
+						</div>
+					</section>
+					<button className='edit-window-btn' type='submit'>Save</button>
+				</form>
+			</div>
+		</div>
+	);
+});
+
 const UserProfile = () => {
 	const params = useParams<{ login: string }>();
 	const [user, setUser] = React.useState<ApiUserExpand | null>(null);
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
+	const [showEditWindow, setShowEditWindow] = React.useState<boolean>(false);
+	const editWindowRef = React.useRef<HTMLDivElement>(null);
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { allUsers } = useAppSelector(state => state.allUsers);
 
@@ -205,30 +347,31 @@ const UserProfile = () => {
 	}, [allUsers, user]);
 
 	React.useEffect(() => {
-		let isMounted = true;
+		const usr = allUsers.find(usr => usr.login === params.login);
+		if (!usr)
+			return ;
 
-		axios.get<ApiUserExpand>('/users', {
-			params: { login: params.login, expand: '' },
-			headers: { Authorization: `Bearer ${getToken()}` }
-		})
-			.then(res => {
-				if (!isMounted)
-					return ;
-				setUser(res.data);
-				if (!res.data.wonGames || !res.data.lostGames)
-					return;
-				const games: ApiGame[] = [];
-				for (let game of res.data.wonGames)
-					games.push(game);
-				for (let game of res.data.lostGames)
-					games.push(game);
-				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
-			});
+		setUser(usr);
+		const games: ApiGame[] = [];
+		for (let game of usr.wonGames)
+			games.push(game);
+		for (let game of usr.lostGames)
+			games.push(game);
+		setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
 
-		return () => {
-			isMounted = false;
+	}, [allUsers, params.login]);
+
+	React.useEffect(() => {
+		const windowClickHandler = (e: MouseEvent) => {
+			if (showEditWindow)
+				setShowEditWindow(false);
 		};
-	}, [params.login]);
+
+		window.addEventListener('click', windowClickHandler);
+		return () => {
+			window.removeEventListener('click', windowClickHandler);
+		};
+	}, [showEditWindow]);
 
 	if (!currentUser.isAuthorized())
 		return (
@@ -263,6 +406,22 @@ const UserProfile = () => {
 								allUsers={ allUsers }
 							/>
 						}
+						{
+							(user && user.login === currentUser.username) &&
+								<div
+									className='user-profile-header__edit-wrapper'
+								>
+									<button
+										className='user-profile-header__edit-btn'
+										onClick={ () => setShowEditWindow(prev => !prev) }
+									>
+										<FontAwesomeIcon icon={ faEdit }/>
+									</button>
+									{
+										showEditWindow && <UserEditWindow ref={ editWindowRef }/>
+									}
+								</div>
+						}
 					</div>
 					<div className='user-profile-header'>
 						<div className='user-profile-header-section'>
@@ -281,7 +440,7 @@ const UserProfile = () => {
 							<div className='user-profile-header-section-content'>
 								{
 									user?.intraLogin
-										? <a
+										?	<a
 												target='_blank'
 												href={ `https://profile.intra.42.fr/users/${ user.intraLogin }` }
 												rel="noreferrer"
@@ -289,7 +448,7 @@ const UserProfile = () => {
 												{ user.intraLogin }
 												<FontAwesomeIcon icon={ faExternalLinkAlt }/>
 											</a>
-										: '-'
+										:	'-'
 								}
 							</div>
 							<div className='user-profile-header-section-label'>intra profile</div>

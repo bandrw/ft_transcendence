@@ -79,13 +79,15 @@ export class UsersService {
 			const onlineUser = this.onlineUsers.find(usr => usr.id === user.id);
 			if (onlineUser) {
 				onlineUser.subscriptions.push(target);
-				this.userEvent('updateUser', onlineUser);
+				// this.userEvent('updateUser', onlineUser);
+				this.updateUser();
 			}
 
 			const onlineTarget = this.onlineUsers.find(usr => usr.id === target.id);
 			if (onlineTarget) {
 				onlineTarget.subscribers.push(user);
-				this.userEvent('updateUser', onlineTarget);
+				// this.userEvent('updateUser', onlineTarget);
+				this.updateUser();
 			}
 		}
 		return r;
@@ -107,21 +109,23 @@ export class UsersService {
 			const onlineUser = this.onlineUsers.find(usr => usr.id === user.id);
 			if (onlineUser) {
 				onlineUser.subscriptions = onlineUser.subscriptions.filter(s => s.id !== target.id);
-				this.userEvent('updateUser', onlineUser);
+				// this.userEvent('updateUser', onlineUser);
+				this.updateUser();
 			}
 
 			const onlineTarget = this.onlineUsers.find(usr => usr.id === target.id);
 			if (onlineTarget) {
 				onlineTarget.subscribers = onlineTarget.subscribers.filter(s => s.id !== user.id);
-				this.userEvent('updateUser', onlineTarget);
+				// this.userEvent('updateUser', onlineTarget);
+				this.updateUser();
 			}
 		}
 		return r;
 	}
 
-	async remove(id: string): Promise<void> {
-		await this.usersRepository.delete(id);
-	}
+	// async remove(id: string): Promise<void> {
+	// 	await this.usersRepository.delete(id);
+	// }
 
 	async createLocal(login: string, password: string, urlAvatar: string | null) {
 		const user = this.usersRepository.create();
@@ -156,27 +160,6 @@ export class UsersService {
 		return await this.usersRepository.manager.save(user);
 	}
 
-	async updateAvatar(login: string) {
-		const user = await this.usersRepository.findOne({
-			where: { login: login },
-		});
-		const salt = Math.random().toString();
-		const generator = new AvatarGenerator();
-		const ret = generator.generateRandomAvatar(salt);
-		user.url_avatar = ret;
-		await this.usersRepository.manager.save(user);
-		let i = 0;
-		while (i < this.onlineUsers.length) {
-			if (this.onlineUsers[i].login == user.login) {
-				this.onlineUsers[i].id = user.id;
-				this.onlineUsers[i].url_avatar = ret;
-				this.userEvent('updateUser', this.onlineUsers[i]);
-			}
-			++i;
-		}
-		return ret;
-	}
-
 	userEvent(event: string, user: OnlineUser) {
 		if (!user)
 			return ;
@@ -188,9 +171,10 @@ export class UsersService {
 		}
 	}
 
-	userStatsEvent(stats) {
-		for (let i = 0; i < this.onlineUsers.length; ++i) {
-			this.onlineUsers[i].socket.emit('updateUsersStats', JSON.stringify(stats));
+	updateUser() {
+		const data = JSON.stringify(this.onlineUsers.map(usr => UsersService.onlineUserToJson(usr)));
+		for (const user of this.onlineUsers) {
+			user.socket.emit('updateUser', data);
 		}
 	}
 
@@ -224,7 +208,44 @@ export class UsersService {
 			this.onlineUsers.push(newUser);
 		else
 			this.onlineUsers[index] = newUser;
-		this.userEvent('updateUser', newUser);
+		// this.userEvent('updateUser', newUser);
+		this.updateUser();
+	}
+
+	async uploadAvatar(userId: number, urlAvatar: string) {
+		const user = await this.findOneById(userId, true);
+		user.url_avatar = urlAvatar;
+		const r = await this.usersRepository.save(user);
+
+		const onlineUser = this.onlineUsers.find(usr => usr.id === userId);
+		onlineUser.url_avatar = urlAvatar;
+		// this.userEvent('updateUser', onlineUser);
+		this.updateUser();
+		return r;
+	}
+
+	async updateAvatar(userId: number, urlAvatar: string) {
+		const user = await this.findOneById(userId, true);
+		user.url_avatar = urlAvatar;
+		const r = await this.usersRepository.save(user);
+
+		const onlineUser = this.onlineUsers.find(usr => usr.id === userId);
+		onlineUser.url_avatar = urlAvatar;
+		// this.userEvent('updateUser', onlineUser);
+		this.updateUser();
+		return r;
+	}
+
+	async updateUsername(userId: number, username: string) {
+		const user = await this.findOneById(userId, true);
+		user.login = username;
+		const r = await this.usersRepository.save(user);
+
+		const onlineUser = this.onlineUsers.find(usr => usr.id === userId);
+		onlineUser.login = username;
+		// this.userEvent('updateUser', onlineUser);
+		this.updateUser();
+		return r;
 	}
 
 	static onlineUserToJson(user) {

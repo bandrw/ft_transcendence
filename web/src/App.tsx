@@ -58,6 +58,14 @@ export const getCurrentUser = async (access_token: string, socketId: string, str
 	return null;
 };
 
+const fetchAllUsers = () => {
+	return axios.get<ApiUserExpand[]>('/users', {
+		params: { expand: '' },
+		headers: { Authorization: `Bearer ${getToken()}` }
+	})
+		.then(res => res.data);
+};
+
 const App = () => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
@@ -81,32 +89,6 @@ const App = () => {
 		onlineUsersRef.current = onlineUsers;
 	}, [onlineUsers, onlineUsersRef]);
 
-	// // Updating allUsers on onlineUsers change // todo
-	// React.useEffect(() => {
-	// 	const updated: ApiUserExpand[] = allUsers.map(usr => {
-	// 		const onlineUsr = onlineUsers.find(u => u.id === usr.id);
-	// 		if (!onlineUsr)
-	// 			return usr;
-	//
-	// 		return {
-	// 			id: usr.id,
-	// 			login: usr.login,
-	// 			url_avatar: usr.url_avatar,
-	// 			intraLogin: usr.intraLogin,
-	// 			wonGames: usr.wonGames,
-	// 			lostGames: usr.lostGames,
-	// 			subscriptions: onlineUsr.subscriptions,
-	// 			subscribers: onlineUsr.subscribers,
-	// 			createdChats: usr.createdChats,
-	// 			acceptedChats: usr.acceptedChats,
-	// 			messages: usr.messages,
-	// 			ownedChannels: usr.ownedChannels,
-	// 			channels: usr.channels
-	// 		};
-	// 	});
-	// 	dispatch(setAllUsers(updated));
-	// }, [dispatch, onlineUsers]);
-
 	// Fetching onlineUsers
 	React.useEffect(() => {
 		let isMounted = true;
@@ -128,28 +110,24 @@ const App = () => {
 		};
 	}, [currentUser, dispatch]);
 
-	// Fetching allUsers
+	// Fetching allUsers + updating on onlineUsers change
 	React.useEffect(() => {
 		let isMounted = true;
 
 		if (!currentUser.isAuthorized())
 			return ;
 
-		axios.get<ApiUserExpand[]>('/users', {
-			params: { expand: '' },
-			headers: { Authorization: `Bearer ${getToken()}` }
-		})
-			.then(res => {
+		fetchAllUsers()
+			.then(users => {
 				if (!isMounted)
 					return ;
-
-				dispatch(setAllUsers(res.data));
+				dispatch(setAllUsers(users));
 			});
 
 		return () => {
 			isMounted = false;
 		};
-	}, [currentUser, dispatch]);
+	}, [currentUser, dispatch, onlineUsers]);
 
 	// Getting user from access_token
 	React.useEffect(() => {
@@ -239,34 +217,31 @@ const App = () => {
 		};
 
 		const updateUserHandler = (data: string) => {
-			const updateUserData: ApiUpdateUser = JSON.parse(data);
+			const updateUserData: ApiUpdateUser[] = JSON.parse(data);
 
-			const updatedUsers: ApiUpdateUser[] = [];
-			// Edit user
-			for (let user of onlineUsers) {
-				if (user.login === updateUserData.login) {
-					updatedUsers.push(updateUserData);
-				} else {
-					updatedUsers.push(user);
-				}
+			dispatch(setOnlineUsers(updateUserData));
+
+			// Update currentUser
+			const currUsr = updateUserData.find(usr => usr.id === currentUser.id);
+			if (currUsr) {
+				currentUser.username = currUsr.login;
+				currentUser.urlAvatar = currUsr.url_avatar;
+				dispatch(setCurrentUser(currentUser));
 			}
-			// Add new user
-			if (!onlineUsers.find(usr => usr.login === updateUserData.login))
-				updatedUsers.push(updateUserData);
-			dispatch(setOnlineUsers(updatedUsers));
 
-			const enemyDeclined = enemy &&
-				updateUserData.login === enemy.login &&
-				(updateUserData.status === ApiUserStatus.Declined || updateUserData.status === ApiUserStatus.Regular);
-			const enemyAccepted = enemy &&
-				updateUserData.login === enemy.login &&
-				updateUserData.status === ApiUserStatus.Accepted;
+			if (enemy) {
+				const enemyData = updateUserData.find(usr => usr.id === enemy.id);
+				if (!enemyData)
+					return ;
+				const enemyDeclinedGame = enemyData.status === ApiUserStatus.Declined || enemyData.status === ApiUserStatus.Regular;
+				const enemyAcceptedGame = enemyData.status === ApiUserStatus.Accepted;
 
-			if (enemyDeclined) {
-				dispatch(setStatus(ApiUserStatus.Regular));
-				setEnemyIsReady(false);
-			} else if (enemyAccepted) {
-				setEnemyIsReady(true);
+				if (enemyDeclinedGame) {
+					dispatch(setStatus(ApiUserStatus.Regular));
+					setEnemyIsReady(false);
+				} else if (enemyAcceptedGame) {
+					setEnemyIsReady(true);
+				}
 			}
 		};
 

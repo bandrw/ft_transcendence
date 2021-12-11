@@ -19,6 +19,7 @@ import { MessageModule } from 'message/message.module';
 import { UserSubscription } from "users/entities/subscription.entity";
 import { User } from 'users/entities/user.entity';
 import { UsersModule } from 'users/users.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
 	imports: [
@@ -42,6 +43,7 @@ import { UsersModule } from 'users/users.module';
 		AuthModule,
 		ChannelModule,
 		BanListsModule,
+		ImagesModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

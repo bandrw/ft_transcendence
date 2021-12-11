@@ -31,6 +31,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 
 	const [gameResults, setGameResults] = React.useState<{ winner: string } | null>(null);
 
+	// Socket events
 	useEffect(() => {
 		const gameResultsHandler = (e: string) => {
 			const data: { winner: string } = JSON.parse(e);
@@ -93,6 +94,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 	const playerMargin = gameSettings.playerMargin;
 	const playerHeight = gameSettings.playerHeight;
 
+	// keydown, keyup handlers
 	useEffect(() => {
 		if (watchMode)
 			return ;
@@ -155,6 +157,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		};
 	}, [currentUser.username, gameSettings, leftPlayer, rightPlayer, socket, watchMode]);
 
+	// Game loop
 	useEffect(() => {
 		let gameRuns = true;
 

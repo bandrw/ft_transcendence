@@ -1,5 +1,4 @@
 .list-section-list {
-	//height: 300px;
 	display: flex;
 	flex-direction: column;
 	flex-wrap: wrap;
@@ -15,7 +14,7 @@
 		transition: all 0.1s ease-in-out;
 		border-radius: 15px;
 		padding: 5px 25px;
-		font-size: 20px;
+		font-size: 16px;
 		height: 75px;
 
 		.list-section-list-user-img {

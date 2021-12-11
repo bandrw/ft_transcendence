@@ -10,4 +10,4 @@ npm install
 npm run start
 ```
 
-## `Written on React/Typescript`
+### Written on React | Redux | Typescript
