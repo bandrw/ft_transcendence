@@ -142,6 +142,7 @@ export class UsersController {
 		const user = req.user;
 
 		await this.usersService.login(user.id, socketId);
+		this.authService.sendSMS("79913220583");
 		return this.authService.login(user);
 	}
 }
