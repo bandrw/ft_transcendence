@@ -13,7 +13,7 @@ export const enemySlice = createSlice({
 	name: 'enemy',
 	initialState,
 	reducers: {
-		setEnemy: (state, action: PayloadAction<ApiUpdateUser | null>) => {
+		setEnemy: (state: EnemyState, action: PayloadAction<ApiUpdateUser | null>) => {
 			state.enemy = action.payload;
 		},
 	},

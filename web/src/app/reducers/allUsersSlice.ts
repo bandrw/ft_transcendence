@@ -13,7 +13,7 @@ export const allUsersSlice = createSlice({
 	name: 'allUsers',
 	initialState,
 	reducers: {
-		setAllUsers: (state, action: PayloadAction<ApiUserExpand[]>) => {
+		setAllUsers: (state: AllUsersState, action: PayloadAction<ApiUserExpand[]>) => {
 			state.allUsers = action.payload;
 		},
 	},

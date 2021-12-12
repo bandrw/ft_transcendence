@@ -13,7 +13,7 @@ export const onlineUsersSlice = createSlice({
 	name: 'onlineUsers',
 	initialState,
 	reducers: {
-		setOnlineUsers: (state, action: PayloadAction<ApiUpdateUser[]>) => {
+		setOnlineUsers: (state: OnlineUsersState, action: PayloadAction<ApiUpdateUser[]>) => {
 			state.onlineUsers = action.payload;
 		},
 	},

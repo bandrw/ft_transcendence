@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ApiUserStatus } from "models/ApiTypes";
 
-interface statusState {
+interface StatusState {
 	status: ApiUserStatus
 }
 
-const initialState: statusState = {
+const initialState: StatusState = {
 	status: ApiUserStatus.Regular
 };
 
@@ -13,7 +13,7 @@ export const statusSlice = createSlice({
 	name: 'status',
 	initialState,
 	reducers: {
-		setStatus: (state, action: PayloadAction<ApiUserStatus>) => {
+		setStatus: (state: StatusState, action: PayloadAction<ApiUserStatus>) => {
 			state.status = action.payload;
 		},
 	},
