@@ -23,7 +23,7 @@ const FriendsList = ({ friends }: FriendsListProps) => {
 						<FontAwesomeIcon icon={faUserFriends} />
 					</div>
 				)}
-				{friends.map((friend, i) => {
+				{friends.map((friend) => {
 					const statusColor = 'transparent';
 					const statusDescription = 'Offline';
 

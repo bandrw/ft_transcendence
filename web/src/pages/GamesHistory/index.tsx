@@ -75,7 +75,7 @@ const GamesHistory = () => {
 									<FontAwesomeIcon icon={faGamepad} />
 								</div>
 							) : (
-								gamesHistory.map((game, i) => {
+								gamesHistory.map((game) => {
 									const loser = allUsers.find((usr) => usr.id === game.loserId);
 									const winner = allUsers.find((usr) => usr.id === game.winnerId);
 									const enemy = loser?.login === params.login ? winner : loser;

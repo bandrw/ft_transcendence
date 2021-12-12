@@ -21,8 +21,7 @@ const Header = ({ centerBlock }: HeaderProps) => {
 	// Click outside of UserMenu
 	React.useEffect(() => {
 		const windowClickHandler = () => {
-			if (showUserMenu)
-				setShowUserMenu(false);
+			if (showUserMenu) setShowUserMenu(false);
 		};
 
 		window.addEventListener('click', windowClickHandler);
@@ -51,10 +50,7 @@ const Header = ({ centerBlock }: HeaderProps) => {
 							<FontAwesomeIcon icon={faBell} />
 						</button>
 						{/* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */}
-						<button
-							className="user-btn"
-							onClick={ () => setShowUserMenu((prev) => !prev) }
-						>
+						<button className="user-btn" onClick={() => setShowUserMenu((prev) => !prev)}>
 							<div
 								className="user-btn-img"
 								style={{ backgroundImage: `url(${currentUser.urlAvatar})` }}
@@ -81,13 +77,10 @@ const Header = ({ centerBlock }: HeaderProps) => {
 						<FontAwesomeIcon icon={faBell} />
 					</button>
 					{/* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */}
-					<button
-						className='user-btn'
-						onClick={ () => setShowUserMenu((prev) => !prev) }
-					>
-						<div className="user-btn-img" style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }/>
-						<div className="user-status" style={ { backgroundColor: status } }/>
-						{ showUserMenu && <UserMenu/> }
+					<button className="user-btn" onClick={() => setShowUserMenu((prev) => !prev)}>
+						<div className="user-btn-img" style={{ backgroundImage: `url(${currentUser.urlAvatar})` }} />
+						<div className="user-status" style={{ backgroundColor: status }} />
+						{showUserMenu && <UserMenu />}
 					</button>
 				</div>
 			</div>

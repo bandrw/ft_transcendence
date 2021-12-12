@@ -287,7 +287,7 @@ const UserEditWindow = () => {
 	};
 
 	return (
-		<div onClick={e => e.stopPropagation()} className="user-profile-header__edit-window-wrapper">
+		<div onClick={(e) => e.stopPropagation()} className="user-profile-header__edit-window-wrapper">
 			<div className="user-profile-header__edit-window">
 				<form onSubmit={handleSubmitUsername(changeUsername)}>
 					<p>Change username</p>
@@ -357,7 +357,7 @@ const UserProfile = () => {
 	}, [allUsers, user]);
 
 	React.useEffect(() => {
-		const usr = allUsers.find((usr) => usr.login === params.login);
+		const usr = allUsers.find((u) => u.login === params.login);
 
 		if (!usr) return;
 
@@ -452,10 +452,14 @@ const UserProfile = () => {
 							list={gamesHistory.slice(0, 3).map((game) => {
 								const loser = allUsers.find((usr) => usr.id === game.loserId);
 								const winner = allUsers.find((usr) => usr.id === game.winnerId);
-								const enemy = loser?.login === params.login ? winner : loser;
-								const user = winner?.login === params.login ? winner : loser;
 
-								return <GameItem game={game} user={user} enemy={enemy} />;
+								return (
+									<GameItem
+										game={game}
+										user={winner?.login === params.login ? winner : loser}
+										enemy={loser?.login === params.login ? winner : loser}
+									/>
+								);
 							})}
 							emptyListSubstitute={
 								<div className="list-section-empty">

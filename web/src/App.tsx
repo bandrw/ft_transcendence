@@ -8,7 +8,7 @@ import { setEnemy } from 'app/reducers/enemySlice';
 import { setOnlineUsers } from 'app/reducers/onlineUsersSlice';
 import { setStatus } from 'app/reducers/statusSlice';
 import { getToken, removeToken, setToken } from 'app/token';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { SocketContext } from 'context/socket';
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
 import { User } from 'models/User';
@@ -20,6 +20,7 @@ import Register from 'pages/Register';
 import UserProfile from 'pages/UserProfile';
 import { useMediaQuery } from 'react-responsive';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
+import FullPageLoader from './components/FullPageLoader';
 
 export const getCurrentUser = async (accessToken: string, socketId: string, strategy: string): Promise<User | null> => {
 	if (strategy === 'local') {
@@ -50,7 +51,7 @@ export const getCurrentUser = async (accessToken: string, socketId: string, stra
 	if (strategy === 'intra') {
 		try {
 			const r = await axios
-				.post<any, any>('/auth/intra', {
+				.post<{ code: string }, AxiosResponse<{ access_token: string }>>('/auth/intra', {
 					code: accessToken,
 				})
 				.then((res) => res.data);
@@ -136,7 +137,6 @@ const App = () => {
 	// Getting user from access_token
 	React.useEffect(() => {
 		const accessToken = getToken();
-		const sockId = socketId || socket.id;
 
 		if (accessToken && sockId) {
 			getCurrentUser(accessToken, sockId, 'local').then((usr) => {
@@ -277,49 +277,28 @@ const App = () => {
 
 	return (
 		<Switch>
-
-			<Route exact path='/login'>
-				{ currentUser.isAuthorized() ? <Redirect to='/'/> : <Login socketId={ sockId }/> }
+			<Route exact path="/login">
+				{currentUser.isAuthorized() ? <Redirect to="/" /> : <Login socketId={sockId} />}
 			</Route>
 
-			<Route exact path='/register'>
-				{ currentUser.isAuthorized() ? <Redirect to='/'/> : <Register/> }
+			<Route exact path="/register">
+				{currentUser.isAuthorized() ? <Redirect to="/" /> : <Register />}
 			</Route>
 
-			<Route exact path='/game'>
-				{
-					currentUser.isAuthorized()
-						?	<Game
-								enemyInfo={ enemy }
-								gameSettingsRef={ gameSettingsRef }
-								gameRef={ gameRef }
-							/>
-						:	<FullPageLoader/>
-				}
+			<Route exact path="/game">
+				{currentUser.isAuthorized() ? (
+					<Game enemyInfo={enemy} gameSettingsRef={gameSettingsRef} gameRef={gameRef} />
+				) : (
+					<FullPageLoader />
+				)}
 			</Route>
 
-			<Route path='/games/:login'>
-				{
-					currentUser.isAuthorized()
-						?	<GamesHistory/>
-						:	<FullPageLoader/>
-				}
-			</Route>
+			<Route path="/games/:login">{currentUser.isAuthorized() ? <GamesHistory /> : <FullPageLoader />}</Route>
 
-			<Route path='/users/:login'>
-				{
-					currentUser.isAuthorized()
-						?	<UserProfile/>
-						:	<FullPageLoader/>
-				}
-			</Route>
+			<Route path="/users/:login">{currentUser.isAuthorized() ? <UserProfile /> : <FullPageLoader />}</Route>
 
-			<Route exact path='/'>
-				{
-					currentUser.isAuthorized()
-						?	<Main enemyIsReady={ enemyIsReady } />
-						:	<FullPageLoader/>
-				}
+			<Route exact path="/">
+				{currentUser.isAuthorized() ? <Main enemyIsReady={enemyIsReady} /> : <FullPageLoader />}
 			</Route>
 		</Switch>
 	);

@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { useAppDispatch } from 'app/hooks';
 import { setCurrentUser } from 'app/reducers/currentUserSlice';
 import { getToken } from 'app/token';
 import axios, { AxiosResponse } from 'axios';
@@ -58,6 +58,11 @@ const validateInput = (
 	return true;
 };
 
+interface ICreateUser {
+	login: string;
+	pass: string;
+}
+
 const Register = () => {
 	const socket = React.useContext(SocketContext);
 
@@ -96,7 +101,7 @@ const Register = () => {
 
 		const hashedPassword = await bcryptjs.hash(password, 10);
 		const usersCreateResponse = await axios
-			.post<any, AxiosResponse<ApiUserCreate>>('/users/create', {
+			.post<ICreateUser, AxiosResponse<ApiUserCreate>>('/users/create', {
 				login,
 				pass: hashedPassword,
 			})

@@ -186,8 +186,7 @@ const Messenger = () => {
 	// Hiding CreateMenu on click
 	React.useEffect(() => {
 		const clickHandler = () => {
-			if (showCreateMenu)
-				setShowCreateMenu(false);
+			if (showCreateMenu) setShowCreateMenu(false);
 		};
 
 		window.addEventListener('click', clickHandler);
@@ -197,9 +196,10 @@ const Messenger = () => {
 		};
 	}, [showCreateMenu]);
 
-	const matchedChannels: ApiChannelExpand[] = allChannels.filter(channel =>
-		searchPattern.length !== 0 &&
-			!channels.find(ch => ch.id === channel.id) &&
+	const matchedChannels: ApiChannelExpand[] = allChannels.filter(
+		(channel) =>
+			searchPattern.length !== 0 &&
+			!channels.find((ch) => ch.id === channel.id) &&
 			(channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
 				channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase())),
 	);
@@ -224,34 +224,29 @@ const Messenger = () => {
 							}`}
 							onClick={() => setShowCreateMenu((prev) => !prev)}
 						>
-							<FontAwesomeIcon icon={ faPlus }/>
-							{
-								showCreateMenu &&
-									<Fade
-										duration={ 300 }
-									>
-										<div
-											className='messenger-contacts-header-menu-wrapper'
-										>
-											<div className='messenger-contacts-header-menu'>
-												<div
-													className='messenger-contacts-header-menu-btn'
-													onClick={ () => setChatState('newChat') }
-												>
-													<FontAwesomeIcon icon={ faComment }/>
-													New Chat
-												</div>
-												<div
-													className='messenger-contacts-header-menu-btn'
-													onClick={ () => setChatState('newChannel') }
-												>
-													<FontAwesomeIcon icon={ faBullhorn }/>
-													New Channel
-												</div>
+							<FontAwesomeIcon icon={faPlus} />
+							{showCreateMenu && (
+								<Fade duration={300}>
+									<div className="messenger-contacts-header-menu-wrapper">
+										<div className="messenger-contacts-header-menu">
+											<div
+												className="messenger-contacts-header-menu-btn"
+												onClick={() => setChatState('newChat')}
+											>
+												<FontAwesomeIcon icon={faComment} />
+												New Chat
+											</div>
+											<div
+												className="messenger-contacts-header-menu-btn"
+												onClick={() => setChatState('newChannel')}
+											>
+												<FontAwesomeIcon icon={faBullhorn} />
+												New Channel
 											</div>
 										</div>
-									</Fade>
-							}
+									</div>
+								</Fade>
+							)}
 						</button>
 					</div>
 					<div className="messenger-contacts-scroll">
@@ -289,7 +284,7 @@ const Messenger = () => {
 									channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
 									channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()),
 							)
-							.map((channel, i) => (
+							.map((channel) => (
 								<LeftMenuChannel
 									key={channel.id}
 									title={channel.title}
@@ -303,7 +298,7 @@ const Messenger = () => {
 								/>
 							))}
 						{searchPattern && <div className="messenger-contacts-search-scope">global search</div>}
-						{matchedChannels.map((channel, i) => (
+						{matchedChannels.map((channel) => (
 							<LeftMenuChannel
 								key={channel.id}
 								title={channel.title}

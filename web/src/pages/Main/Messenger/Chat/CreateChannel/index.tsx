@@ -1,12 +1,19 @@
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getToken } from 'app/token';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import * as bcryptjs from 'bcryptjs';
 import React, { FormEvent } from 'react';
 
 interface CreateChannelProps {
 	setDefaultChatState: () => void;
+}
+
+interface ICreateChannel {
+	name: string;
+	title: string;
+	isPrivate: boolean;
+	password: string | null;
 }
 
 const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
@@ -35,11 +42,11 @@ const CreateChannel = ({ setDefaultChatState }: CreateChannelProps) => {
 			password: isPrivate ? await bcryptjs.hash(password, 10) : null,
 		};
 		axios
-			.post<any, any>('/channels/create', data, {
+			.post<ICreateChannel, AxiosResponse<null>>('/channels/create', data, {
 				headers: { Authorization: `Bearer ${getToken()}` },
 			})
 			.then(() => setDefaultChatState())
-			.catch((e) => setErrors(e.response?.data?.message || 'Error'));
+			.catch((err) => setErrors(err.response?.data?.message || 'Error'));
 	};
 
 	return (

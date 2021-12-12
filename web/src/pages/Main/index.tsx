@@ -2,8 +2,6 @@ import './styles.scss';
 
 import { useAppSelector } from 'app/hooks';
 import Header from 'components/Header';
-import { SocketContext } from 'context/socket';
-import { ApiUserStatus } from 'models/ApiTypes';
 import FindGame from 'pages/Main/FindGame';
 import Messenger from 'pages/Main/Messenger';
 import RecentGames from 'pages/Main/RecentGames';
@@ -11,6 +9,7 @@ import Social from 'pages/Main/Social';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { useHistory } from 'react-router-dom';
+import { ApiUserStatus } from 'models/ApiTypes';
 
 interface MainProps {
 	enemyIsReady: boolean;

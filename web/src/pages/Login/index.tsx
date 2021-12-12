@@ -1,7 +1,7 @@
 import './styles.scss';
 
 import { getCurrentUser } from 'App';
-import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { useAppDispatch } from 'app/hooks';
 import { setCurrentUser } from 'app/reducers/currentUserSlice';
 import { removeToken, setToken } from 'app/token';
 import axios, { AxiosResponse } from 'axios';
@@ -19,12 +19,12 @@ interface LoginProps {
 export const signIn = async (
 	login: string,
 	password: string,
-	setCurrentUser: (usr: User) => void,
+	setUser: (usr: User) => void,
 	setErrors: React.Dispatch<React.SetStateAction<string>>,
 	socketId: string,
 ): Promise<void> => {
 	const accessToken = await axios
-		.post<any, AxiosResponse<ApiUserLogin>>('/users/login', {
+		.post<{ username: string; password: string; socketId: string }, AxiosResponse<ApiUserLogin>>('/users/login', {
 			username: login,
 			password,
 			socketId,
@@ -40,7 +40,7 @@ export const signIn = async (
 		setToken(accessToken);
 		getCurrentUser(accessToken, socketId, 'local').then((usr) => {
 			if (usr) {
-				setCurrentUser(usr);
+				setUser(usr);
 			} else {
 				removeToken();
 			}

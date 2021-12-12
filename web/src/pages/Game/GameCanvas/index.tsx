@@ -207,14 +207,14 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 			const canvas = canvasRef.current;
 
 			if (!canvas) {
-				console.log('[render] cannot get canvas');
+				// console.log('[render] cannot get canvas');
 
 				return;
 			}
 			const ctx = canvas.getContext('2d');
 
 			if (!ctx) {
-				console.log('[render] cannot get ctx');
+				// console.log('[render] cannot get ctx');
 
 				return;
 			}
@@ -237,7 +237,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		};
 
 		const runGame = () => {
-			console.log('!!! [runGame] !!!');
+			// console.log('!!! [runGame] !!!');
 			let fpsInterval: number;
 			let now: number;
 			let then: number;

@@ -79,11 +79,11 @@ const Chat = ({
 	// Click outside of ChatMuteChoices
 	React.useEffect(() => {
 		const windowClickHandler = () => {
-			if (showChatMuteChoices)
-				setShowChatMuteChoices(false);
+			if (showChatMuteChoices) setShowChatMuteChoices(false);
 		};
 
 		window.addEventListener('click', windowClickHandler);
+
 		return () => {
 			window.removeEventListener('click', windowClickHandler);
 		};
@@ -92,20 +92,18 @@ const Chat = ({
 	// Click outside of MuteChoices (for channel settings)
 	React.useEffect(() => {
 		const windowClickHandler = () => {
-			if (showMuteChoices)
-				setShowMuteChoices(null);
+			if (showMuteChoices) setShowMuteChoices(null);
 		};
 
 		window.addEventListener('click', windowClickHandler);
+
 		return () => {
 			window.removeEventListener('click', windowClickHandler);
 		};
 	}, [showMuteChoices]);
 
 	const getChatCompanion = React.useCallback(
-		(selectedChat: ApiChatExpand) => {
-			return selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
-		},
+		(chat: ApiChatExpand) => (chat.userOne?.login === currentUser.username ? chat.userTwo : chat.userOne),
 		[currentUser.username],
 	);
 
@@ -138,8 +136,8 @@ const Chat = ({
 	};
 
 	React.useEffect(() => {
-		const duelStatusHandler = (duelStatus: string) => {
-			setDuelStatus(duelStatus);
+		const duelStatusHandler = (s: string) => {
+			setDuelStatus(s);
 		};
 
 		socket.on('duelStatus', duelStatusHandler);
@@ -194,10 +192,10 @@ const Chat = ({
 					<div className="ban-button-wrapper">
 						<button
 							className="ban-button"
-							onClick={ (e: React.MouseEvent<HTMLButtonElement>) => {
+							onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
 								e.stopPropagation();
-								setShowMuteChoices((prev) => prev === member.id ? null : member.id);
-							} }
+								setShowMuteChoices((prev) => (prev === member.id ? null : member.id));
+							}}
 						>
 							<FontAwesomeIcon icon={faVolumeMute} />
 						</button>
@@ -553,10 +551,10 @@ const Chat = ({
 					</Link>
 					<div className="ban-button-wrapper">
 						<button
-							className='ban-button messenger-chat-info-mute'
-							title='Mute'
-							disabled={ ban && !bannedByCurrentUser }
-							onClick={ () => setShowChatMuteChoices(prev => !prev) }
+							className="ban-button messenger-chat-info-mute"
+							title="Mute"
+							disabled={ban && !bannedByCurrentUser}
+							onClick={() => setShowChatMuteChoices((prev) => !prev)}
 						>
 							{ban ? (
 								<FontAwesomeIcon className="messenger-chat-info-mute__muted-icon" icon={faVolumeMute} />

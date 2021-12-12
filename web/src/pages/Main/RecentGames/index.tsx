@@ -68,16 +68,14 @@ const RecentGames = () => {
 				<div className="recent-games-legend-score">score</div>
 				<div className="recent-games-legend-date">date</div>
 			</div>
-			{gamesHistory.slice(0, 3).map((game, i) => {
+			{gamesHistory.slice(0, 3).map((game) => {
 				const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
 				const enemy = allUsers.find((user) => user.id === enemyId);
 
 				return (
 					<div className="recent-game" key={game.id}>
 						<div className="recent-game-enemy">
-							<div style={{ backgroundImage: `url(${enemy?.url_avatar})` }} className="recent-game-img">
-								{/* <div className='user-status' style={ { backgroundColor: enemyColor } }/>*/}
-							</div>
+							<div style={{ backgroundImage: `url(${enemy?.url_avatar})` }} className="recent-game-img" />
 							<Link to={`/users/${enemy?.login}`} className="user-login">
 								{enemy?.login}
 							</Link>
