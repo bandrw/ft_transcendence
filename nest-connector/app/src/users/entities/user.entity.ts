@@ -23,6 +23,9 @@ export class User {
 	@Column()
 	intraLogin: string;
 
+	@Column()
+	phoneNumber: string;
+
 	@OneToMany(() => GameEntity, game => game.winner)
 	wonGames: GameEntity[];
 

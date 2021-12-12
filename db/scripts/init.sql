@@ -4,7 +4,8 @@ CREATE TABLE "users"
 	"login" VARCHAR(16) UNIQUE,
 	"password" TEXT,
 	"url_avatar" TEXT,
-	"intraLogin" TEXT
+	"intraLogin" TEXT,
+	"phoneNumber" TEXT
 );
 
 CREATE TABLE "games_history"
