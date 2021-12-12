@@ -7,9 +7,9 @@ export default class GameBall {
 		this.angle = 2 * Math.PI * Math.random();
 	}
 
-	xPosition: number
-	yPosition: number
-	size: number
-	speed: number
-	angle: number
+	xPosition: number;
+	yPosition: number;
+	size: number;
+	speed: number;
+	angle: number;
 }
