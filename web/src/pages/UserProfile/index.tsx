@@ -224,7 +224,7 @@ interface IChangeUsername {
 	newUsername: string
 }
 
-const UserEditWindow = React.forwardRef<HTMLDivElement>(({}, ref) => {
+const UserEditWindow = () => {
 	const history = useHistory();
 	const { allUsers } = useAppSelector(state => state.allUsers);
 	const { currentUser } = useAppSelector(state => state.currentUser);
@@ -275,7 +275,7 @@ const UserEditWindow = React.forwardRef<HTMLDivElement>(({}, ref) => {
 	};
 
 	return (
-		<div onClick={ clickHandler } ref={ ref } className='user-profile-header__edit-window-wrapper'>
+		<div onClick={ clickHandler } className='user-profile-header__edit-window-wrapper'>
 			<div className='user-profile-header__edit-window'>
 				<form onSubmit={ handleSubmitUsername(changeUsername) }>
 					<p>Change username</p>
@@ -323,7 +323,7 @@ const UserEditWindow = React.forwardRef<HTMLDivElement>(({}, ref) => {
 			</div>
 		</div>
 	);
-});
+};
 
 const UserProfile = () => {
 	const params = useParams<{ login: string }>();
@@ -331,7 +331,6 @@ const UserProfile = () => {
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
 	const [showEditWindow, setShowEditWindow] = React.useState<boolean>(false);
-	const editWindowRef = React.useRef<HTMLDivElement>(null);
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { allUsers } = useAppSelector(state => state.allUsers);
 
@@ -362,7 +361,7 @@ const UserProfile = () => {
 	}, [allUsers, params.login]);
 
 	React.useEffect(() => {
-		const windowClickHandler = (e: MouseEvent) => {
+		const windowClickHandler = () => {
 			if (showEditWindow)
 				setShowEditWindow(false);
 		};
@@ -418,7 +417,7 @@ const UserProfile = () => {
 										<FontAwesomeIcon icon={ faEdit }/>
 									</button>
 									{
-										showEditWindow && <UserEditWindow ref={ editWindowRef }/>
+										showEditWindow && <UserEditWindow/>
 									}
 								</div>
 						}
