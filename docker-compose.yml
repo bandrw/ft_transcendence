@@ -8,9 +8,7 @@ services:
       - POSTGRES_PASSWORD=pfile
       - POSTGRES_DB=pfile
       - TZ=Europe/Moscow
-      - PGTZ=Europe/Moscow
-    ports:
-      - "5432:5432" # todo [remove]
+      - PGTZ=Europe/Moscow]
     volumes:
       - ./db/data:/var/lib/postgresql/data
       - ./db/scripts:/docker-entrypoint-initdb.d
@@ -22,6 +20,8 @@ services:
       context: nest-connector
     ports:
       - "3000:3000"
+    volumes:
+      - ./nest-connector/app:/app
     environment:
       - TZ=Europe/Moscow
       - DB_HOST=db

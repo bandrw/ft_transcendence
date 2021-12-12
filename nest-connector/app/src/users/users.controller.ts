@@ -140,9 +140,8 @@ export class UsersController {
 	@Post('login')
 	async login(@Req() req, @Body() { socketId }: LoginDTO) {
 		const user = req.user;
-
 		await this.usersService.login(user.id, socketId);
-		this.authService.sendSMS("79913220583");
+		// await this.authService.sendSMS("+7XXXXXXXXXXX");
 		return this.authService.login(user);
 	}
 }
