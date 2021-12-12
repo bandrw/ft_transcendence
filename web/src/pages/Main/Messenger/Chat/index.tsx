@@ -58,6 +58,32 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 			setChannelSettingsIsPrivate(selectedChannel.isPrivate);
 	}, [selectedChannel]);
 
+	// Click outside of ChatMuteChoices
+	React.useEffect(() => {
+		const windowClickHandler = () => {
+			if (showChatMuteChoices)
+				setShowChatMuteChoices(false);
+		};
+
+		window.addEventListener('click', windowClickHandler);
+		return () => {
+			window.removeEventListener('click', windowClickHandler);
+		};
+	}, [showChatMuteChoices]);
+
+	// Click outside of MuteChoices (for channel settings)
+	React.useEffect(() => {
+		const windowClickHandler = () => {
+			if (showMuteChoices)
+				setShowMuteChoices(null);
+		};
+
+		window.addEventListener('click', windowClickHandler);
+		return () => {
+			window.removeEventListener('click', windowClickHandler);
+		};
+	}, [showMuteChoices]);
+
 	const getChatCompanion = React.useCallback((selectedChat: ApiChatExpand) => {
 		return selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
 	}, [currentUser.username]);
@@ -156,7 +182,8 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 					>
 						<button
 							className='ban-button'
-							onClick={ () => {
+							onClick={ (e: React.MouseEvent<HTMLButtonElement>) => {
+								e.stopPropagation();
 								setShowMuteChoices(prev => prev === member.id ? null : member.id);
 							} }
 						>
@@ -164,7 +191,7 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 						</button>
 						{
 							showMuteChoices === member.id &&
-							<div className='ban-button-choices-wrapper' onMouseLeave={ () => setShowMuteChoices(null) }>
+							<div className='ban-button-choices-wrapper' onClick={ e => e.stopPropagation() }>
 								<div className='ban-button-choices'>
 									<button className='ban-button-choices-mute-btn' onClick={ () => mute(Date.now() + 3600 * 1000) }>
 										Mute for 1 hour
@@ -230,23 +257,23 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 												selectedChannel.ownerId === member.id
 													?	<FontAwesomeIcon icon={ faCrown }/>
 													:	<button
-														className={ `toggle-btn ${member.isAdmin && 'toggle-btn-active'}` }
-														data-description={ member.isAdmin ? 'Switch to member' : 'Switch to admin' }
-														onClick={ () => {
-															const data = {
-																channelId: selectedChannel.id,
-																memberId: member.id,
-																status: ''
-															};
-															if (member.isAdmin) {
-																data.status = 'member';
-															} else {
-																data.status = 'admin';
-															}
-															axios.put('/channels/updateMemberStatus', data, { headers: { Authorization: `Bearer ${getToken()}` } })
-																.catch(() => {});
-														} }
-													/>
+															className={ `toggle-btn ${member.isAdmin && 'toggle-btn-active'}` }
+															data-description={ member.isAdmin ? 'Switch to member' : 'Switch to admin' }
+															onClick={ () => {
+																const data = {
+																	channelId: selectedChannel.id,
+																	memberId: member.id,
+																	status: ''
+																};
+																if (member.isAdmin) {
+																	data.status = 'member';
+																} else {
+																	data.status = 'admin';
+																}
+																axios.put('/channels/updateMemberStatus', data, { headers: { Authorization: `Bearer ${getToken()}` } })
+																	.catch(() => {});
+															} }
+														/>
 											}
 										</div>
 										<MuteButton member={ member }/>
@@ -488,12 +515,12 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 						<div className='messenger-chat-info-img' style={ { backgroundImage: `url(${companion.url_avatar})` } }/>
 						<div>{ companion.login }</div>
 					</Link>
-					<div className='ban-button-wrapper' onMouseLeave={ () => setShowChatMuteChoices(false) }>
+					<div className='ban-button-wrapper'>
 						<button
 							className='ban-button messenger-chat-info-mute'
 							title='Mute'
 							disabled={ ban && !bannedByCurrentUser }
-							onClick={ () => setShowChatMuteChoices(true) }
+							onClick={ () => setShowChatMuteChoices(prev => !prev) }
 						>
 							{
 								ban
@@ -503,7 +530,7 @@ const Chat = ({ selectedChat, selectedChannel, closeSelectedChat,
 						</button>
 						{
 							showChatMuteChoices &&
-							<div className='ban-button-choices-wrapper'>
+							<div className='ban-button-choices-wrapper' onClick={ e => e.stopPropagation() }>
 								<div className='ban-button-choices'>
 									{
 										!bannedByCurrentUser &&

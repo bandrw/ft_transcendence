@@ -14,9 +14,23 @@ interface HeaderProps {
 
 const Header = ({ centerBlock }: HeaderProps) => {
 	const history = useHistory();
-	const [userMenuShown, setUserMenuShown] = React.useState(false);
+	const [showUserMenu, setShowUserMenu] = React.useState(false);
 	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { status } = useAppSelector(state => state.status);
+
+	// Click outside of UserMenu
+	React.useEffect(() => {
+		const windowClickHandler = () => {
+			if (showUserMenu)
+				setShowUserMenu(false);
+		};
+
+		window.addEventListener('click', windowClickHandler);
+
+		return () => {
+			window.removeEventListener('click', windowClickHandler);
+		};
+	}, [showUserMenu]);
 
 	if (history.location.pathname !== '/')
 		return (
@@ -42,14 +56,12 @@ const Header = ({ centerBlock }: HeaderProps) => {
 						</button>
 						<button
 							className='user-btn'
-							onClick={ () => setUserMenuShown(prev => !prev) }
-							onMouseOver={ () => setUserMenuShown(true) }
-							onMouseLeave={ () => setUserMenuShown(false) }
+							onClick={ () => setShowUserMenu(prev => !prev) }
 						>
 							<div className='user-btn-img' style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }/>
 							<div className='user-status' style={ { backgroundColor: status } }/>
 							{
-								userMenuShown &&
+								showUserMenu &&
 								<UserMenu/>
 							}
 						</button>
@@ -75,15 +87,11 @@ const Header = ({ centerBlock }: HeaderProps) => {
 					</button>
 					<button
 						className='user-btn'
-						onMouseOver={ () => setUserMenuShown(true) }
-						onMouseLeave={ () => setUserMenuShown(false) }
+						onClick={ () => setShowUserMenu(prev => !prev) }
 					>
 						<div className='user-btn-img' style={ { backgroundImage: `url(${currentUser.urlAvatar})` } }/>
 						<div className='user-status' style={ { backgroundColor: status } }/>
-						{
-							userMenuShown &&
-							<UserMenu/>
-						}
+						{ showUserMenu && <UserMenu/> }
 					</button>
 				</div>
 			</div>

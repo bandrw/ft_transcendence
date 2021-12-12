@@ -20,7 +20,7 @@ import { GameTime } from "pages/GamesHistory";
 import FriendsList from "pages/UserProfile/FriendsList";
 import ListSection from "pages/UserProfile/ListSection";
 import { AvatarGenerator } from "random-avatar-generator";
-import React, { ChangeEvent, FormEvent, MouseEventHandler } from "react";
+import React, { ChangeEvent, FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useHistory, useParams } from "react-router-dom";
 
@@ -270,12 +270,8 @@ const UserEditWindow = () => {
 		setImageState({ type: 'generated', image: avatar, file: null });
 	};
 
-	const clickHandler = (e: any) => {
-		e.stopPropagation();
-	};
-
 	return (
-		<div onClick={ clickHandler } className='user-profile-header__edit-window-wrapper'>
+		<div onClick={ e => e.stopPropagation() } className='user-profile-header__edit-window-wrapper'>
 			<div className='user-profile-header__edit-window'>
 				<form onSubmit={ handleSubmitUsername(changeUsername) }>
 					<p>Change username</p>
@@ -360,6 +356,7 @@ const UserProfile = () => {
 
 	}, [allUsers, params.login]);
 
+	// Click outside of EditWindow
 	React.useEffect(() => {
 		const windowClickHandler = () => {
 			if (showEditWindow)

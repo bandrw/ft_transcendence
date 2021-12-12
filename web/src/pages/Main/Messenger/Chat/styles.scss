@@ -40,10 +40,8 @@
 
 	.ban-button-choices-wrapper {
 		position: absolute;
-		padding-left: 70px;
-		left: 0;
-		top: 100%;
-		transform: translateY(-50%);
+		left: 70px;
+		top: 0;
 	}
 
 	.ban-button-choices {
@@ -66,7 +64,7 @@
 			outline: none;
 			background: none;
 			color: white;
-			height: 40px;
+			height: 45px;
 			font-size: 14px;
 			cursor: pointer;
 			border-radius: 0;
@@ -547,7 +545,7 @@
 	}
 
 	.messenger-chat-settings {
-		padding: 50px 0;
+		padding: 50px 0 180px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;

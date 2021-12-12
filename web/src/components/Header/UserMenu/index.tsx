@@ -30,17 +30,17 @@ const UserMenu = () => {
 			duration={ 250 }
 			className='user-menu-wrapper'
 		>
-			<div className='user-menu'>
+			<div className='user-menu' onClick={ e => e.stopPropagation() }>
 				<div className='user-menu-username'>
 					{ currentUser.username }
 				</div>
 				<Link to={ `/users/${currentUser.username}` } className='user-menu-btn'>
 					Profile
 				</Link>
-				<div className='user-menu-btn user-menu-sign-out' onClick={ logOut }>
+				<button type='button' className='user-menu-btn user-menu-sign-out' onClick={ logOut }>
 					Log out
 					<FontAwesomeIcon icon={ faSignOutAlt }/>
-				</div>
+				</button>
 			</div>
 		</Fade>
 	);

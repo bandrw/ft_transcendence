@@ -177,6 +177,20 @@ const Messenger = () => {
 
 	}, [allChannels, selectedChannel]);
 
+	// Hiding CreateMenu on click
+	React.useEffect(() => {
+		const clickHandler = () => {
+			if (showCreateMenu)
+				setShowCreateMenu(false);
+		};
+
+		window.addEventListener('click', clickHandler);
+
+		return () => {
+			window.removeEventListener('click', clickHandler);
+		};
+	}, [showCreateMenu]);
+
 	const matchedChannels: ApiChannelExpand[] = allChannels.filter(channel =>
 		searchPattern.length !== 0 &&
 			!channels.find(ch => ch.id === channel.id) &&
@@ -210,7 +224,6 @@ const Messenger = () => {
 									>
 										<div
 											className='messenger-contacts-header-menu-wrapper'
-											onMouseLeave={ () => setShowCreateMenu(false) }
 										>
 											<div className='messenger-contacts-header-menu'>
 												<div
@@ -239,12 +252,12 @@ const Messenger = () => {
 								const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
 
 								return companion.login.trim().toLowerCase().includes(searchPattern.trim().toLowerCase());
-							}).map((chat, i) => {
+							}).map(chat => {
 								const companion = chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
 
 								return (
 									<LeftMenuChat
-										key={ i }
+										key={ chat.id }
 										image={ companion.url_avatar }
 										title={ companion.login }
 										isSelected={ chat.id === selectedChat?.id }
@@ -261,9 +274,9 @@ const Messenger = () => {
 							channels.filter(channel =>
 								channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
 								channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase())
-							).map((channel, i) =>
+							).map(channel =>
 								<LeftMenuChannel
-									key={ i }
+									key={ channel.id }
 									title={ channel.title }
 									isSelected={ selectedChannel?.id === channel.id }
 									selectChannel={ () => {
