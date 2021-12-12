@@ -1,5 +1,4 @@
 export class User {
-
 	constructor() {
 		this.id = -1;
 		this.username = '';
@@ -16,6 +15,5 @@ export class User {
 	username: string;
 	loginDate: number;
 	urlAvatar: string;
-	intraLogin: string | null
-
+	intraLogin: string | null;
 }

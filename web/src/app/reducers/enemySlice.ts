@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiUpdateUser } from "models/ApiTypes";
+import { ApiUpdateUser } from 'models/ApiTypes';
 
 interface EnemyState {
-	enemy: ApiUpdateUser | null
+	enemy: ApiUpdateUser | null;
 }
 
 const initialState: EnemyState = {
-	enemy: null
+	enemy: null,
 };
 
 export const enemySlice = createSlice({

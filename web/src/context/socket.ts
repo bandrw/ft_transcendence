@@ -1,5 +1,5 @@
 import React from 'react';
-import { io, Socket } from "socket.io-client";
+import { io, Socket } from 'socket.io-client';
 
 export const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:3000');
 
