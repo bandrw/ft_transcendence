@@ -44,7 +44,9 @@
     "socket.io": "4.2.0",
     "typeorm": "0.2.37",
     "uuid": "8.3.2",
-    "webpack": "5.61.0"
+    "webpack": "5.61.0",
+    "twilio": "^3.71.3",
+    "nestjs-twilio": "^2.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",

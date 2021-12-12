@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const saveImageToStorage = {
 	storage: diskStorage({
-		destination: '../uploads',
+		destination: '/uploads',
 		filename: (req, file, callback) => {
 			const fileExtension = file.originalname.split('.').pop();
 			const fileName = uuidv4() + '.' + fileExtension;
