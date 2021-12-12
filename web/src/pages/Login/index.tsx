@@ -1,7 +1,7 @@
 import './styles.scss';
 
 import { getCurrentUser } from "App";
-import { useAppDispatch, useAppSelector } from "app/hooks";
+import { useAppDispatch } from "app/hooks";
 import { setCurrentUser } from "app/reducers/currentUserSlice";
 import { removeToken, setToken } from "app/token";
 import axios, { AxiosResponse } from "axios";
@@ -10,7 +10,7 @@ import { SocketContext } from "context/socket";
 import { ApiUserLogin } from "models/ApiTypes";
 import { User } from "models/User";
 import React from 'react';
-import { Link, Redirect, useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 interface LoginProps {
 	socketId: string
@@ -49,7 +49,6 @@ export const signIn = async (
 const Login = ({ socketId }: LoginProps) => {
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-	const { currentUser } = useAppSelector(state => state.currentUser);
 	const dispatch = useAppDispatch();
 
 	const loginRef = React.useRef<HTMLInputElement>(null);
@@ -74,9 +73,6 @@ const Login = ({ socketId }: LoginProps) => {
 				.finally(() => history.push('/login'));
 		}
 	}, [history, authCode, socketId, dispatch]);
-
-	if (currentUser.isAuthorized())
-		return <Redirect to='/'/>;
 
 	return (
 		<div className='login-container'>

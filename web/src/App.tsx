@@ -8,6 +8,7 @@ import { setOnlineUsers } from "app/reducers/onlineUsersSlice";
 import { setStatus } from "app/reducers/statusSlice";
 import { getToken, removeToken, setToken } from "app/token";
 import axios from "axios";
+import FullPageLoader from "components/FullPageLoader";
 import { SocketContext } from "context/socket";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from "models/ApiTypes";
 import { User } from "models/User";
@@ -19,7 +20,7 @@ import Register from "pages/Register";
 import UserProfile from "pages/UserProfile";
 import React from 'react';
 import { useMediaQuery } from "react-responsive";
-import { Route, Switch, useHistory } from "react-router-dom";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 
 export const getCurrentUser = async (access_token: string, socketId: string, strategy: string): Promise<User | null> => {
 	if (strategy === 'local') {
@@ -282,43 +283,47 @@ const App = () => {
 		<Switch>
 
 			<Route exact path='/login'>
-				{
-					sockId
-						?	<Login
-								socketId={ sockId }
-							/>
-						:	<div>
-								<div>[TMP] no socket id</div>
-								<div>{ `socketId: ${ socketId }` }</div>
-								<div>{ `socket.id: ${ socket.id }` }</div>
-							</div>
-				}
+				{ currentUser.isAuthorized() ? <Redirect to='/'/> : <Login socketId={ sockId }/> }
 			</Route>
 
 			<Route exact path='/register'>
-				<Register/>
+				{ currentUser.isAuthorized() ? <Redirect to='/'/> : <Register/> }
 			</Route>
 
 			<Route exact path='/game'>
-				<Game
-					enemyInfo={ enemy }
-					gameSettingsRef={ gameSettingsRef }
-					gameRef={ gameRef }
-				/>
+				{
+					currentUser.isAuthorized()
+						?	<Game
+								enemyInfo={ enemy }
+								gameSettingsRef={ gameSettingsRef }
+								gameRef={ gameRef }
+							/>
+						:	<FullPageLoader/>
+				}
 			</Route>
 
 			<Route path='/games/:login'>
-				<GamesHistory/>
+				{
+					currentUser.isAuthorized()
+						?	<GamesHistory/>
+						:	<FullPageLoader/>
+				}
 			</Route>
 
 			<Route path='/users/:login'>
-				<UserProfile/>
+				{
+					currentUser.isAuthorized()
+						?	<UserProfile/>
+						:	<FullPageLoader/>
+				}
 			</Route>
 
 			<Route exact path='/'>
-				<Main
-					enemyIsReady={ enemyIsReady }
-				/>
+				{
+					currentUser.isAuthorized()
+						?	<Main enemyIsReady={ enemyIsReady } />
+						:	<FullPageLoader/>
+				}
 			</Route>
 
 		</Switch>

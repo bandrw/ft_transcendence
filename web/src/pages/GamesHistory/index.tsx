@@ -67,13 +67,6 @@ const GamesHistory = () => {
 		};
 	}, [currentUser.username, params.login]);
 
-	if (!currentUser.isAuthorized())
-		return (
-			<div>
-				<Header/>
-			</div>
-		);
-
 	return (
 		<div>
 			<Header/>

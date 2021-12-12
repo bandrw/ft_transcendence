@@ -369,13 +369,6 @@ const UserProfile = () => {
 		};
 	}, [showEditWindow]);
 
-	if (!currentUser.isAuthorized())
-		return (
-			<div>
-				<Header/>
-			</div>
-		);
-
 	let winRate = '-';
 	let gamesCount = '0';
 

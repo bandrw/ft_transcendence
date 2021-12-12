@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { useAppDispatch, useAppSelector } from "app/hooks";
+import { useAppDispatch } from "app/hooks";
 import { setCurrentUser } from "app/reducers/currentUserSlice";
 import { getToken } from "app/token";
 import axios, { AxiosResponse } from "axios";
@@ -10,7 +10,7 @@ import { SocketContext } from "context/socket";
 import { ApiUser, ApiUserCreate } from "models/ApiTypes";
 import { signIn } from "pages/Login";
 import React from 'react';
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const validateInput = (
 	login: string,
@@ -55,11 +55,7 @@ const Register = () => {
 
 	const [errors, setErrors] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
-	const { currentUser } = useAppSelector(state => state.currentUser);
 	const dispatch = useAppDispatch();
-
-	if (currentUser.isAuthorized())
-		return <Redirect to='/'/>;
 
 	const register = async (e: React.FormEvent) => {
 		e.preventDefault();

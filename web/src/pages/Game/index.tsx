@@ -16,7 +16,6 @@ interface GameProps {
 
 const Game = ({ enemyInfo, gameSettingsRef, gameRef }: GameProps) => {
 	const history = useHistory();
-	const { currentUser } = useAppSelector(state => state.currentUser);
 	const { status } = useAppSelector(state => state.status);
 	const dispatch = useAppDispatch();
 
@@ -31,14 +30,7 @@ const Game = ({ enemyInfo, gameSettingsRef, gameRef }: GameProps) => {
 			dispatch(setStatus(ApiUserStatus.Regular));
 			history.push('/');
 		}
-	}, [history, enemyInfo, gameRef, watchMode, currentUser, dispatch]);
-
-	if (!currentUser.isAuthorized())
-		return (
-			<div>
-				<Header/>
-			</div>
-		);
+	}, [history, enemyInfo, gameRef, watchMode, dispatch]);
 
 	// todo [handle watcher exit buttons]
 	return (
