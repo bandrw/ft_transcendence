@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User } from "models/User";
+import { User } from 'models/User';
 
 interface CurrentUserState {
-	currentUser: User
+	currentUser: User;
 }
 
 const initialState: CurrentUserState = {
-	currentUser: new User()
+	currentUser: new User(),
 };
 
 export const currentUserSlice = createSlice({

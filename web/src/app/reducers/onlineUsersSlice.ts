@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiUpdateUser } from "models/ApiTypes";
+import { ApiUpdateUser } from 'models/ApiTypes';
 
 interface OnlineUsersState {
-	onlineUsers: ApiUpdateUser[]
+	onlineUsers: ApiUpdateUser[];
 }
 
 const initialState: OnlineUsersState = {
-	onlineUsers: []
+	onlineUsers: [],
 };
 
 export const onlineUsersSlice = createSlice({

@@ -1,19 +1,19 @@
 import './styles.scss';
 
-import { useAppSelector } from "app/hooks";
-import { SocketContext } from "context/socket";
-import { ApiGameLoop, ApiGameSettings } from "models/ApiTypes";
-import GameBall from "models/GameBall";
-import Player from "models/Player";
-import GameResults from "pages/Game/GameResults";
-import React, { useEffect, useMemo } from "react";
-import { Fade } from "react-awesome-reveal";
+import { useAppSelector } from 'app/hooks';
+import { SocketContext } from 'context/socket';
+import { ApiGameLoop, ApiGameSettings } from 'models/ApiTypes';
+import GameBall from 'models/GameBall';
+import Player from 'models/Player';
+import GameResults from 'pages/Game/GameResults';
+import React, { useEffect, useMemo } from 'react';
+import { Fade } from 'react-awesome-reveal';
 import { Link } from 'react-router-dom';
 
 interface GameCanvasProps {
-	watchMode: boolean,
-	gameSettings: ApiGameSettings,
-	gameRef: React.MutableRefObject<{ runs: boolean, interval: null | NodeJS.Timeout }>,
+	watchMode: boolean;
+	gameSettings: ApiGameSettings;
+	gameRef: React.MutableRefObject<{ runs: boolean; interval: null | NodeJS.Timeout }>;
 }
 
 const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
@@ -22,12 +22,15 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 	const leftPlayer = useMemo(() => new Player(), []);
 	const rightPlayer = useMemo(() => new Player(), []);
 	const ball = useMemo(() => new GameBall(), []);
-	const { currentUser } = useAppSelector(state => state.currentUser);
+	const { currentUser } = useAppSelector((state) => state.currentUser);
 
-	const score = useMemo(() => ({
-		leftPlayer: gameSettings.score.leftPlayer,
-		rightPlayer: gameSettings.score.rightPlayer
-	}), [gameSettings.score.leftPlayer, gameSettings.score.rightPlayer]);
+	const score = useMemo(
+		() => ({
+			leftPlayer: gameSettings.score.leftPlayer,
+			rightPlayer: gameSettings.score.rightPlayer,
+		}),
+		[gameSettings.score.leftPlayer, gameSettings.score.rightPlayer],
+	);
 
 	const [gameResults, setGameResults] = React.useState<{ winner: string } | null>(null);
 
@@ -45,10 +48,10 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 				ball.xPosition = data.b.x;
 				ball.yPosition = data.b.y;
 			}
-			if (data.lP)
-				leftPlayer.yPosition = data.lP.y;
-			if (data.rP)
-				rightPlayer.yPosition = data.rP.y;
+
+			if (data.lP) leftPlayer.yPosition = data.lP.y;
+
+			if (data.rP) rightPlayer.yPosition = data.rP.y;
 		};
 
 		const gameScoreHandler = (e: string) => {
@@ -59,6 +62,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 
 		const playSoundHandler = (e: string) => {
 			let a: HTMLAudioElement | null = null;
+
 			if (e === 'pong-sound-1') {
 				a = new Audio('/audio/pong-sound-1.wav');
 				a.volume = 0.17;
@@ -69,6 +73,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 				a = new Audio('/audio/pong-sound-3.wav');
 				a.volume = 0.1;
 			}
+
 			if (a) {
 				a.play()
 					.then()
@@ -87,70 +92,62 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 			socket.off('gameScore', gameScoreHandler);
 			socket.off('playSound', playSoundHandler);
 		};
-
 	}, [ball, leftPlayer, rightPlayer, score, socket]);
 
-	const playerWidth = gameSettings.playerWidth;
-	const playerMargin = gameSettings.playerMargin;
-	const playerHeight = gameSettings.playerHeight;
+	const { playerWidth } = gameSettings;
+	const { playerMargin } = gameSettings;
+	const { playerHeight } = gameSettings;
 
 	// keydown, keyup handlers
 	useEffect(() => {
-		if (watchMode)
-			return ;
+		if (watchMode) return;
 
 		const keyDownHandler = (e: KeyboardEvent) => {
 			let currentPlayer;
-			if (currentUser.username === leftPlayer.username)
-				currentPlayer = leftPlayer;
-			else if (currentUser.username === rightPlayer.username)
-				currentPlayer = rightPlayer;
-			else
-				return ;
+
+			if (currentUser.username === leftPlayer.username) currentPlayer = leftPlayer;
+			else if (currentUser.username === rightPlayer.username) currentPlayer = rightPlayer;
+			else return;
 
 			if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
-				if (e.key === 'ArrowDown' && currentPlayer.controls.arrowDown)
-					return ;
-				if (e.key === 'ArrowUp' && currentPlayer.controls.arrowUp)
-					return ;
+				if (e.key === 'ArrowDown' && currentPlayer.controls.arrowDown) return;
+
+				if (e.key === 'ArrowUp' && currentPlayer.controls.arrowUp) return;
 				const data = {
 					login: currentUser.username,
 					gameId: gameSettings.id,
-					key: e.key
+					key: e.key,
 				};
 				socket.emit('keyDown', JSON.stringify(data));
-				if (e.key === 'ArrowDown')
-					currentPlayer.controls.arrowDown = true;
-				else if (e.key === 'ArrowUp')
-					currentPlayer.controls.arrowUp = true;
+
+				if (e.key === 'ArrowDown') currentPlayer.controls.arrowDown = true;
+				else if (e.key === 'ArrowUp') currentPlayer.controls.arrowUp = true;
 			}
 		};
 
 		const keyUpHandler = (e: KeyboardEvent) => {
 			let currentPlayer;
-			if (currentUser.username === leftPlayer.username)
-				currentPlayer = leftPlayer;
-			else if (currentUser.username === rightPlayer.username)
-				currentPlayer = rightPlayer;
-			else
-				return ;
+
+			if (currentUser.username === leftPlayer.username) currentPlayer = leftPlayer;
+			else if (currentUser.username === rightPlayer.username) currentPlayer = rightPlayer;
+			else return;
 
 			if (['ArrowDown', 'ArrowUp'].indexOf(e.key) !== -1) {
 				const data = {
 					login: currentUser.username,
 					gameId: gameSettings.id,
-					key: e.key
+					key: e.key,
 				};
 				socket.emit('keyUp', JSON.stringify(data));
-				if (e.key === 'ArrowDown')
-					currentPlayer.controls.arrowDown = false;
-				else if (e.key === 'ArrowUp')
-					currentPlayer.controls.arrowUp = false;
+
+				if (e.key === 'ArrowDown') currentPlayer.controls.arrowDown = false;
+				else if (e.key === 'ArrowUp') currentPlayer.controls.arrowUp = false;
 			}
 		};
 
 		document.addEventListener('keydown', keyDownHandler);
 		document.addEventListener('keyup', keyUpHandler);
+
 		return () => {
 			document.removeEventListener('keydown', keyDownHandler);
 			document.removeEventListener('keyup', keyUpHandler);
@@ -188,7 +185,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		const putScore = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
 			ctx.beginPath();
 			ctx.fillStyle = '#fff';
-			ctx.font = '42px \'Press Start 2P\', cursive';
+			ctx.font = "42px 'Press Start 2P', cursive";
 			ctx.textAlign = 'right';
 			ctx.fillText(`${score.leftPlayer}`, canvas.width / 2 - 50, 70, 100);
 			ctx.textAlign = 'left';
@@ -208,14 +205,18 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 
 		const render = () => {
 			const canvas = canvasRef.current;
+
 			if (!canvas) {
 				console.log('[render] cannot get canvas');
-				return ;
+
+				return;
 			}
 			const ctx = canvas.getContext('2d');
+
 			if (!ctx) {
 				console.log('[render] cannot get ctx');
-				return ;
+
+				return;
 			}
 
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -237,16 +238,19 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 
 		const runGame = () => {
 			console.log('!!! [runGame] !!!');
-			let fpsInterval: number, now: number, then: number, elapsed: number;
+			let fpsInterval: number;
+			let now: number;
+			let then: number;
+			let elapsed: number;
 			const fps = 60;
 
 			const animate = () => {
-				if (!gameRuns)
-					return ;
+				if (!gameRuns) return;
 
 				requestAnimationFrame(animate);
 				now = Date.now();
 				elapsed = now - then;
+
 				if (elapsed > fpsInterval) {
 					then = now - (elapsed % fpsInterval);
 					render();
@@ -260,8 +264,8 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 
 		const prepareGame = () => {
 			const canvas = canvasRef.current;
-			if (!canvas)
-				return ;
+
+			if (!canvas) return;
 
 			ball.angle = 0;
 			ball.speed = gameSettings.ballSpeed;
@@ -283,49 +287,50 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		return () => {
 			gameRuns = false;
 		};
-	}, [ball, gameSettings, leftPlayer, playerHeight, playerMargin, playerWidth, rightPlayer, score.leftPlayer, score.rightPlayer]);
+	}, [
+		ball,
+		gameSettings,
+		leftPlayer,
+		playerHeight,
+		playerMargin,
+		playerWidth,
+		rightPlayer,
+		score.leftPlayer,
+		score.rightPlayer,
+	]);
 
 	return (
-		<div className='game-container'>
-			<div className='info-board'>
-				<Link to={ `/users/${gameSettings.leftPlayer.login}` } className='info-board-user info-board-left-user'>
+		<div className="game-container">
+			<div className="info-board">
+				<Link to={`/users/${gameSettings.leftPlayer.login}`} className="info-board-user info-board-left-user">
 					<div
-						className='info-board-user-img'
-						style={ { backgroundImage: `url(${ gameSettings.leftPlayer.url_avatar })` } }
+						className="info-board-user-img"
+						style={{ backgroundImage: `url(${gameSettings.leftPlayer.url_avatar})` }}
 					/>
-					<div className='info-board-user-name'>{ gameSettings.leftPlayer.login }</div>
+					<div className="info-board-user-name">{gameSettings.leftPlayer.login}</div>
 				</Link>
-				<Link to={ `/users/${gameSettings.rightPlayer.login}` } className='info-board-user info-board-right-user'>
-					<div className='info-board-user-name'>{ gameSettings.rightPlayer.login }</div>
+				<Link to={`/users/${gameSettings.rightPlayer.login}`} className="info-board-user info-board-right-user">
+					<div className="info-board-user-name">{gameSettings.rightPlayer.login}</div>
 					<div
-						className='info-board-user-img'
-						style={ { backgroundImage: `url(${ gameSettings.rightPlayer.url_avatar })` } }
+						className="info-board-user-img"
+						style={{ backgroundImage: `url(${gameSettings.rightPlayer.url_avatar})` }}
 					/>
 				</Link>
 			</div>
-			<canvas
-				id="game-canvas"
-				width="1024px"
-				height="600px"
-				ref={ canvasRef }
-			/>
-			{
-				gameResults &&
-					<Fade
-						className='game-results-wrapper'
-						duration={ 500 }
-					>
-						<GameResults
-							winner={ gameResults.winner }
-							loser={
-								gameResults.winner === gameSettings.leftPlayer.login
+			<canvas id="game-canvas" width="1024px" height="600px" ref={canvasRef} />
+			{gameResults && (
+				<Fade className="game-results-wrapper" duration={500}>
+					<GameResults
+						winner={gameResults.winner}
+						loser={
+							gameResults.winner === gameSettings.leftPlayer.login
 								? gameSettings.rightPlayer.login
 								: gameSettings.leftPlayer.login
-							}
-							gameRef={ gameRef }
-						/>
-					</Fade>
-			}
+						}
+						gameRef={gameRef}
+					/>
+				</Fade>
+			)}
 		</div>
 	);
 };

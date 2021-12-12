@@ -3,15 +3,15 @@ export default class Player {
 		this.yPosition = 0;
 		this.controls = {
 			arrowUp: false,
-			arrowDown: false
+			arrowDown: false,
 		};
 		this.username = '';
 	}
 
-	yPosition: number
+	yPosition: number;
 	controls: {
-		arrowUp: boolean,
-		arrowDown: boolean
-	}
-	username: string
+		arrowUp: boolean;
+		arrowDown: boolean;
+	};
+	username: string;
 }
