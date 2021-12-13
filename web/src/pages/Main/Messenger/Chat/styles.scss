@@ -250,6 +250,10 @@
 		.messenger-chat-info-settings-btn {
 			position: absolute;
 			right: 75px;
+
+			svg {
+				margin-top: 3px;
+			}
 		}
 
 		.messenger-chat-info-img {

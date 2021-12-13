@@ -13,13 +13,13 @@ import { ChatEntity } from "chat/chat.entity";
 import { ChatModule } from 'chat/chat.module';
 import { GameEntity } from "game/game.entity";
 import { GameModule } from 'game/game.module';
+import { ImagesModule } from 'images/images.module';
 import { LadderModule } from 'ladder/ladder.module';
 import { MessageEntity } from "message/message.entity";
 import { MessageModule } from 'message/message.module';
 import { UserSubscription } from "users/entities/subscription.entity";
 import { User } from 'users/entities/user.entity';
 import { UsersModule } from 'users/users.module';
-import { ImagesModule } from './images/images.module';
 
 @Module({
 	imports: [
