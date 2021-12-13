@@ -1,5 +1,5 @@
 import { ExpandDTO } from "app.dto";
-import { IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsNumberString, IsOptional, IsString, Length, MaxLength, MinLength } from "class-validator";
 
 export class CreateUserDTO {
 	@IsString()
@@ -37,6 +37,12 @@ export class LoginDTO {
 
 	@IsString()
 	socketId: string;
+
+	@IsString()
+	@IsOptional()
+	@IsNumberString()
+	@Length(4, 4)
+	code: string;
 }
 
 export class UpdateAvatarDTO {
@@ -48,8 +54,3 @@ export class UpdateUsernameDTO {
 	@IsString()
 	username: string;
 }
-
-//	@IsString()
-//	@IsNotEmpty()
-//	@Matches(/^\+[1-9]\d{1,14}$/)
-//	phoneNumber: string;

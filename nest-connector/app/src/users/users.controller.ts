@@ -138,10 +138,18 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('local'))
 	@Post('login')
-	async login(@Req() req, @Body() { socketId }: LoginDTO) {
+	async login(@Req() req, @Body() { socketId, code }: LoginDTO) {
 		const user = req.user;
+
+		const usr = await this.usersService.findOneById(user.id);
+		if (usr.phoneNumber !== null && !isDefined(code)) {
+			await this.authService.sendSMS(usr.phoneNumber);
+			return { access_token: null, twoFactorAuthentication: true };
+		}
+		if (usr.phoneNumber !== null && isDefined(code) && !await this.authService.verifySMS(user.id, usr.phoneNumber, code)) {
+			throw new HttpException('Access Denied', HttpStatus.BAD_REQUEST);
+		}
 		await this.usersService.login(user.id, socketId);
-		// await this.authService.sendSMS("+79196890142");
 		return this.authService.login(user);
 	}
 }

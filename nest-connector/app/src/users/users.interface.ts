@@ -5,6 +5,7 @@ export interface OnlineUser {
 	id: number;
 	login: string;
 	url_avatar: string;
+	phoneNumber: string | null;
 	socket: Socket
 	status: string;
 	subscriptions: User[];

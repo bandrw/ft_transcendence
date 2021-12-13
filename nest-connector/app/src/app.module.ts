@@ -17,6 +17,7 @@ import { ImagesModule } from 'images/images.module';
 import { LadderModule } from 'ladder/ladder.module';
 import { MessageEntity } from "message/message.entity";
 import { MessageModule } from 'message/message.module';
+import { TwilioModule } from "nestjs-twilio";
 import { UserSubscription } from "users/entities/subscription.entity";
 import { User } from 'users/entities/user.entity';
 import { UsersModule } from 'users/users.module';
@@ -33,6 +34,10 @@ import { UsersModule } from 'users/users.module';
 			entities: [User, GameEntity, UserSubscription, ChatEntity, MessageEntity, ChannelEntity, ChannelMemberEntity, BanListsEntity],
 			retryAttempts: 50,
 			retryDelay: 5000
+		}),
+		TwilioModule.forRoot({
+			accountSid: process.env.TWILIO_ACCOUNT_SID,
+			authToken: process.env.TWILIO_AUTH_TOKEN,
 		}),
 		UsersModule,
 		LadderModule,

@@ -108,9 +108,18 @@ const Register = () => {
 			.then((res) => res.data);
 
 		if (usersCreateResponse.ok) {
-			await signIn(login, password, (usr) => dispatch(setCurrentUser(usr)), setErrors, socket.id).catch((err) =>
-				setErrors(err.toString()),
-			);
+			try {
+				await signIn(
+					login,
+					password,
+					(usr) => dispatch(setCurrentUser(usr)),
+					setErrors, socket.id,
+					null,
+					null,
+				);
+			} catch (err) {
+				setErrors(`${err}`);
+			}
 		} else {
 			setErrors(usersCreateResponse.msg);
 		}

@@ -19,10 +19,9 @@ import { User } from 'models/User';
 import { GameTime } from 'pages/GamesHistory';
 import FriendsList from 'pages/UserProfile/FriendsList';
 import ListSection from 'pages/UserProfile/ListSection';
-import { AvatarGenerator } from 'random-avatar-generator';
-import React, { ChangeEvent, FormEvent } from 'react';
-import { useForm } from 'react-hook-form';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import UserEditWindow from 'pages/UserProfile/UserEditWindow';
+import React from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 enum SubscribeBtnState {
 	Default,
@@ -184,155 +183,6 @@ const SubscribeBtn = ({
 			Friend
 			<FontAwesomeIcon icon={faUserFriends} />
 		</button>
-	);
-};
-
-type ImageState = {
-	type: 'generated' | 'uploaded';
-	image: string | ArrayBuffer | null;
-	file: File | null;
-};
-
-const updateAvatar = async (imageState: ImageState) => {
-	if (imageState.type === 'generated') {
-		const data = {
-			urlAvatar: imageState.image,
-		};
-
-		return axios.post('/users/updateAvatar', data, {
-			headers: { Authorization: `Bearer ${getToken()}` },
-		});
-	}
-
-	if (imageState.type === 'uploaded') {
-		if (!imageState.file) return;
-
-		const formData = new FormData();
-		formData.append('picture', imageState.file);
-
-		return axios.post('/users/uploadAvatar', formData, {
-			headers: { Authorization: `Bearer ${getToken()}` },
-		});
-	}
-};
-
-const updateUsername = async (username: string) => {
-	const data = {
-		username,
-	};
-
-	return axios.post('/users/updateUsername', data, {
-		headers: { Authorization: `Bearer ${getToken()}` },
-	});
-};
-
-interface IChangeUsername {
-	newUsername: string;
-}
-
-const UserEditWindow = () => {
-	const history = useHistory();
-	const { allUsers } = useAppSelector((state) => state.allUsers);
-	const { currentUser } = useAppSelector((state) => state.currentUser);
-	const [imageState, setImageState] = React.useState<ImageState>({
-		type: 'uploaded',
-		image: currentUser.urlAvatar,
-		file: null,
-	});
-	const [usernameInput, setUsernameInput] = React.useState<string>(currentUser.username);
-	const { register: registerUsername, handleSubmit: handleSubmitUsername } = useForm<IChangeUsername>();
-
-	const usernameIsValid = () => {
-		return !(
-			usernameInput.length < 4 ||
-			usernameInput.length > 16 ||
-			allUsers.find((usr) => usr.login === usernameInput)
-		);
-	};
-
-	const changeUsername = ({ newUsername }: IChangeUsername) => {
-		if (!usernameIsValid()) return;
-
-		updateUsername(newUsername).then(() => history.push(`/users/${newUsername}`));
-	};
-
-	const saveNewPicture = (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-
-		updateAvatar(imageState).then();
-	};
-
-	const previewPicture = (e: ChangeEvent<HTMLInputElement>) => {
-		const reader = new FileReader();
-		reader.onload = () => {
-			if (reader.readyState === 2) {
-				setImageState((prev) => ({ type: 'uploaded', image: reader.result, file: prev.file }));
-			}
-		};
-
-		if (e.target.files) {
-			reader.readAsDataURL(e.target.files[0]);
-			setImageState((prev) => ({
-				type: prev.type,
-				image: prev.image,
-				file: e.target.files ? e.target.files[0] : null,
-			}));
-		}
-	};
-
-	const generatePicture = () => {
-		const generator = new AvatarGenerator();
-		const avatar = generator.generateRandomAvatar();
-		setImageState({ type: 'generated', image: avatar, file: null });
-	};
-
-	return (
-		<div onClick={(e) => e.stopPropagation()} className="user-profile-header__edit-window-wrapper">
-			<div className="user-profile-header__edit-window">
-				<form onSubmit={handleSubmitUsername(changeUsername)}>
-					<p>Change username</p>
-					<input
-						type="text"
-						{...registerUsername('newUsername')}
-						placeholder="Enter new username"
-						defaultValue={currentUser.username}
-						onChange={(e) => setUsernameInput(e.target.value)}
-						required
-					/>
-					<button className="edit-window-btn" type="submit" disabled={!usernameIsValid()}>
-						Save
-					</button>
-				</form>
-				<form onSubmit={saveNewPicture}>
-					<p>Change Picture</p>
-					<section>
-						<div
-							className="user-profile-header__edit-window-picture"
-							style={{ backgroundImage: `url(${imageState.image})` }}
-						/>
-						<div className="section-right">
-							<button className="edit-window-btn" onClick={generatePicture} type="button">
-								Generate
-							</button>
-							<div>or</div>
-							<label className="edit-window-btn" htmlFor="edit-window-upload">
-								<input
-									id="edit-window-upload"
-									name="picture"
-									type="file"
-									onChange={previewPicture}
-									accept=".jpg, .jpeg, .png"
-								/>
-								Upload
-							</label>
-						</div>
-					</section>
-					<button className="edit-window-btn" type="submit">
-						Save
-					</button>
-				</form>
-			</div>
-		</div>
 	);
 };
 

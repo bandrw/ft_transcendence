@@ -1,0 +1,281 @@
+.user-profile-header__edit-window-wrapper {
+	position: absolute;
+	left: 80px;
+	top: -25px;
+	border-radius: 18px;
+
+	.user-profile-header__edit-window {
+		background: #2c2f3a;
+		padding: 20px 40px;
+		box-sizing: border-box;
+		width: 450px;
+		border-radius: 18px;
+		box-shadow: 0 0 20px #1a1b1f;
+
+		form {
+			margin-top: 10px;
+			margin-bottom: 40px;
+			display: flex;
+			flex-direction: column;
+			position: relative;
+
+			p {
+				text-align: left;
+				font-size: 20px;
+				margin-bottom: 15px;
+				font-weight: bold;
+				position: relative;
+				width: fit-content;
+
+				&::selection {
+					background-color: #29aa44;
+				}
+			}
+
+			.edit-window-note {
+				right: 0;
+				top: 0;
+				position: absolute;
+				font-size: 14px;
+				color: #aaa;
+				line-height: 27px;
+			}
+
+			.edit-window-phone-input {
+				display: flex;
+				width: 100%;
+				justify-content: center;
+
+				button {
+					margin-left: 15px;
+					border: none;
+					color: #e30000;
+					background: none;
+					outline: none;
+					font-size: 20px;
+					cursor: pointer;
+					position: relative;
+
+					&:after {
+						visibility: hidden;
+						content: 'Disable Two-Factor Authentication';
+						display: flex;
+						align-items: center;
+						position: absolute;
+						font-size: 14px;
+						white-space: nowrap;
+						top: 50%;
+						transform: translate(10px, -50%);
+						left: calc(100% + 15px);
+						transition: all 0.15s ease-in-out;
+						background: #2c3e50;
+						padding: 12px 15px;
+						border-radius: 18px;
+						opacity: 0;
+					}
+
+					&:hover {
+						color: red;
+
+						&:after {
+							visibility: visible;
+							opacity: 1;
+							transform: translate(0, -50%);
+						}
+					}
+
+					&:active {
+						svg {
+							color: rgba(#e30000, 0.8);
+						}
+					}
+				}
+			}
+
+			input[type=text] {
+				margin: 10px 0;
+				font-size: 1em;
+				background: none;
+				outline: none;
+				color: white;
+				padding: 10px 25px;
+				border: 1px solid #2c3e50;
+				border-radius: 15px;
+				transition: all 0.1s ease-in;
+
+				&::selection {
+					background: #29aa44;
+				}
+
+				&:focus {
+					border-color: #29aa44;
+				}
+			}
+
+			.edit-window-btn {
+				font-size: 1em;
+				padding: 10px 0;
+				border-radius: 15px;
+				cursor: pointer;
+				font-weight: bold;
+				background: #29aa44;
+				border: none;
+				outline: none;
+				color: white;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				transition: all 0.05s ease-in;
+
+				&::selection {
+					background: #2c3e50;
+				}
+
+				&:hover {
+					background: #21b941;
+				}
+				&:active {
+					opacity: 0.8;
+				}
+				&:disabled {
+					opacity: 0.8;
+					cursor: not-allowed;
+
+					&:hover {
+						background: #29aa44;
+					}
+				}
+			}
+
+			button[type=submit] {
+				margin-top: 10px;
+			}
+
+			&:last-child {
+				margin-bottom: 10px;
+			}
+
+			section {
+				display: flex;
+				width: 100%;
+				height: fit-content;
+				margin-bottom: 20px;
+
+				.section-right {
+					margin-left: auto;
+					display: flex;
+					flex-direction: column;
+					justify-content: space-between;
+
+					button, label {
+						background: transparent;
+						border: 2px solid rgba(#29aa44, 0.8);
+						color: #29aa44;
+
+						&:hover {
+							border: 2px solid #29aa44;
+							color: white;
+						}
+					}
+
+					div {
+						width: 200px;
+						color: #ccc;
+					}
+
+					button {
+						height: 38px;
+						width: 200px;
+					}
+
+					input {
+						display: none;
+					}
+
+					label {
+						height: 18px;
+						width: 200px;
+					}
+				}
+			}
+
+		}
+
+		.two-factor-authentication-form {
+			height: 150px;
+
+			button {
+				width: 230px;
+				margin: 10px auto 0;
+			}
+
+			.react-tel-input {
+				width: 230px;
+				margin: 10px auto;
+
+				.telephone-number__input {
+					width: auto;
+					background: transparent;
+					color: white;
+					padding-left: 55px;
+					font-size: 1em;
+					height: 40px;
+					border-radius: 15px;
+					background: none;
+					outline: none;
+					border: 1px solid #2c3e50;
+					transition: all 0.1s ease-in;
+
+					&::selection {
+						background: #29aa44;
+					}
+
+					&:focus {
+						border-color: #29aa44;
+					}
+				}
+
+				.flag-dropdown {
+					background-color: transparent;
+					border: none;
+					margin-left: 15px;
+					* {
+						background-color: transparent;
+						border: none;
+					}
+				}
+			}
+
+			.two-factor-authentication-form__code-sent {
+				margin: 10px 0;
+			}
+
+			.two-factor-authentication-form__phone-number {
+				margin-top: 10px;
+			}
+
+			.two-factor-authentication-form__disable-btn {
+				background-color: transparent;
+				border: 2px solid #e30000;
+				color: #e30000;
+				margin-top: 20px;
+
+				&:hover {
+					background-color: #e30000;
+					color: white;
+				}
+			}
+		}
+
+		.user-profile-header__edit-window-picture {
+			width: 120px;
+			height: 120px;
+			border: 1px solid #444;
+			border-radius: 50%;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: contain;
+		}
+
+	}
+}

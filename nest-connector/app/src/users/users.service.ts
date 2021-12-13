@@ -31,7 +31,7 @@ export class UsersService {
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
 		@InjectRepository(UserSubscription)
-		private userSubscriptionRepository: Repository<UserSubscription>
+		private userSubscriptionRepository: Repository<UserSubscription>,
 	) {}
 
 	async findAll(expand = false): Promise<User[]> {
@@ -135,10 +135,6 @@ export class UsersService {
 		return r;
 	}
 
-	// async remove(id: string): Promise<void> {
-	// 	await this.usersRepository.delete(id);
-	// }
-
 	async createLocal(login: string, password: string, urlAvatar: string | null) {
 		const user = this.usersRepository.create();
 		user.password = password;
@@ -207,6 +203,7 @@ export class UsersService {
 			login: user.login,
 			socket: this.sockets.get(socketId),
 			url_avatar: user.url_avatar,
+			phoneNumber: user.phoneNumber,
 			status: 'green',
 			subscribers: [],
 			subscriptions: []
@@ -220,7 +217,6 @@ export class UsersService {
 			this.onlineUsers.push(newUser);
 		else
 			this.onlineUsers[index] = newUser;
-		// this.userEvent('updateUser', newUser);
 		this.updateUser();
 	}
 
@@ -255,7 +251,21 @@ export class UsersService {
 
 		const onlineUser = this.onlineUsers.find(usr => usr.id === userId);
 		onlineUser.login = username;
-		// this.userEvent('updateUser', onlineUser);
+		this.updateUser();
+		return r;
+	}
+
+	async savePhoneNumber(user: User, phoneNumber: string) {
+		user.phoneNumber = phoneNumber;
+		const r = await this.usersRepository.save(user);
+		this.updateUser();
+		return r;
+	}
+
+	async disable2FA(userId: number) {
+		const user = await this.findOneById(userId);
+		user.phoneNumber = null;
+		const r = await this.usersRepository.save(user);
 		this.updateUser();
 		return r;
 	}

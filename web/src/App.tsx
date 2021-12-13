@@ -1,4 +1,3 @@
-import React from 'react';
 import './App.scss';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
@@ -9,6 +8,7 @@ import { setOnlineUsers } from 'app/reducers/onlineUsersSlice';
 import { setStatus } from 'app/reducers/statusSlice';
 import { getToken, removeToken, setToken } from 'app/token';
 import axios, { AxiosResponse } from 'axios';
+import FullPageLoader from 'components/FullPageLoader';
 import { SocketContext } from 'context/socket';
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
 import { User } from 'models/User';
@@ -18,9 +18,9 @@ import Login from 'pages/Login';
 import Main from 'pages/Main';
 import Register from 'pages/Register';
 import UserProfile from 'pages/UserProfile';
+import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
-import FullPageLoader from './components/FullPageLoader';
 
 export const getCurrentUser = async (accessToken: string, socketId: string, strategy: string): Promise<User | null> => {
 	if (strategy === 'local') {
@@ -148,7 +148,7 @@ const App = () => {
 				}
 			});
 		}
-	}, [dispatch, socket.id, socketId]);
+	}, [dispatch, sockId, socket.id, socketId]);
 
 	// Saving socketId in state
 	React.useEffect(() => {

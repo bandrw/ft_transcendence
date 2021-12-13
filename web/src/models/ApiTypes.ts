@@ -17,6 +17,7 @@ type ApiUser = {
 	id: number;
 	login: string;
 	url_avatar: string;
+	phoneNumber: string | null;
 };
 
 type ApiGame = {
@@ -87,6 +88,7 @@ type ApiUserExpand = {
 	login: string;
 	url_avatar: string;
 	intraLogin?: string;
+	phoneNumber: string | null;
 	wonGames: ApiGame[];
 	lostGames: ApiGame[];
 	subscriptions: ApiUser[];
@@ -99,13 +101,15 @@ type ApiUserExpand = {
 };
 
 type ApiUserLogin = {
-	access_token: string;
+	access_token: string | null;
+	twoFactorAuthentication: boolean
 };
 
 type ApiUpdateUser = {
 	id: number;
 	login: string;
 	url_avatar: string;
+	phoneNumber: string | null;
 	status: ApiUserStatus;
 	subscriptions: ApiUser[];
 	subscribers: ApiUser[];

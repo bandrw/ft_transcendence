@@ -13,7 +13,9 @@
   "plugins": [
     "react",
     "prettier",
-    "import"
+    "import",
+    "simple-import-sort",
+    "react-hooks"
   ],
   "rules": {
     "@typescript-eslint/no-empty-function": "off",
@@ -72,7 +74,7 @@
     "react/jsx-indent-props": ["error", "tab"],
 
     "arrow-body-style": "off",
-    "prettier/prettier": "error",
+    "prettier/prettier": "off",
 
     "import/extensions": "off",
     "import/no-unresolved": "off",
@@ -87,6 +89,11 @@
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-static-element-interactions": "off",
     "camelcase": "off",
-    "react/require-default-props": "off"
+    "react/require-default-props": "off",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "semi": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
