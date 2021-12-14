@@ -256,6 +256,10 @@ export class UsersService {
 	}
 
 	async savePhoneNumber(user: User, phoneNumber: string) {
+		if ((await this.usersRepository.find({ where: { phoneNumber: phoneNumber } })).length !== 0) {
+			throw new HttpException('Phone number is busy', HttpStatus.BAD_REQUEST);
+		}
+
 		user.phoneNumber = phoneNumber;
 		const r = await this.usersRepository.save(user);
 		this.updateUser();

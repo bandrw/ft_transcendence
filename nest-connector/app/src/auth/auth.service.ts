@@ -6,14 +6,13 @@ import { UsersService } from "users/users.service";
 
 @Injectable()
 export class AuthService {
-	private twilioClient: Twilio;
+	// private twilioClient: Twilio;
 
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
-		// @InjectTwilio() private readonly twilioClient: TwilioClient
 	) {
-		this.twilioClient = new Twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+		// this.twilioClient = new Twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 	}
 
 	async validateUser(username: string, pass: string): Promise<any> {
@@ -32,30 +31,38 @@ export class AuthService {
 	}
 
 	async sendSMS(phoneNumber: string) {
-		const TWILIO_SERVICE_SID = 'VA2ddf93cac730c8ac66eb7ebd4749589d';
-
-		return await this.twilioClient.verify.services(TWILIO_SERVICE_SID)
-			.verifications
-			.create({ to: phoneNumber, channel: 'sms' });
+		return 'All ok'; // TODO remove this
+		// return await this.twilioClient.verify.services(process.env.TWILIO_SERVICE_SID)
+		// 	.verifications
+		// 	.create({ to: phoneNumber, channel: 'sms' });
 	}
 
 	async verifySMS(userId: number, phoneNumber: string, code: string) {
-		const TWILIO_SERVICE_SID = 'VA2ddf93cac730c8ac66eb7ebd4749589d';
 
 		const user = await this.usersService.findOneById(userId);
-		if (!user) return;
+		if (!user) throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 
-		return await this.twilioClient.verify.services(TWILIO_SERVICE_SID)
-			.verificationChecks
-			.create({
-				to: phoneNumber,
-				code: code
-			})
-			.then(check => {
-				if (check.status === "approved") {
-					return this.usersService.savePhoneNumber(user, phoneNumber);
-				}
-				throw new HttpException('Wrong code', HttpStatus.BAD_REQUEST);
-			});
+		// TODO remove this
+		if (code === '1234') {
+			if (!user.phoneNumber)
+				return await this.usersService.savePhoneNumber(user, phoneNumber);
+			return user;
+		}
+		throw new HttpException('Wrong code', HttpStatus.BAD_REQUEST);
+
+		// return await this.twilioClient.verify.services(process.env.TWILIO_SERVICE_SID)
+		// 	.verificationChecks
+		// 	.create({
+		// 		to: phoneNumber,
+		// 		code: code
+		// 	})
+		// 	.then(check => {
+		// 		if (check.status === "approved") {
+		// 			if (!user.phoneNumber)
+		// 				return this.usersService.savePhoneNumber(user, phoneNumber);
+		// 			return user;
+		// 		}
+		// 		throw new HttpException('Wrong code', HttpStatus.BAD_REQUEST);
+		// 	});
 	}
 }

@@ -13,6 +13,7 @@ import { EmptyDTO } from "app.dto";
 import { AuthDTO, AuthIntraDTO, SendSmsDTO, VerifySmsDTO } from "auth/auth.dto";
 import { AuthService } from "auth/auth.service";
 import axios from "axios";
+import { isDefined } from "class-validator";
 import { UsersService } from "users/users.service";
 
 @Controller('auth')
@@ -32,34 +33,46 @@ export class AuthController {
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Post('/intra')
-	async authIntra(@Body() { code }: AuthIntraDTO) {
-		const data = {
-			grant_type: 'authorization_code',
-			client_id: process.env.INTRA_UID,
-			client_secret: process.env.INTRA_SECRET,
-			code: code,
-			redirect_uri: process.env.INTRA_REDIRECT
-		};
-		const r = await axios.post('https://api.intra.42.fr/oauth/token', data)
-			.then(res => res.data)
-			.catch(() => null);
-		if (!r)
-			throw new UnauthorizedException();
+	async authIntra(@Body() { code, smsCode, intraToken }: AuthIntraDTO) {
+		let access_token_intra = intraToken;
+
+		if (!isDefined(intraToken)) {
+			const data = {
+				grant_type: 'authorization_code',
+				client_id: process.env.INTRA_UID,
+				client_secret: process.env.INTRA_SECRET,
+				code,
+				redirect_uri: process.env.INTRA_REDIRECT
+			};
+			const r = await axios.post('https://api.intra.42.fr/oauth/token', data)
+				.then(res => res.data)
+				.catch(() => null);
+			if (!r)
+				throw new UnauthorizedException();
+			access_token_intra = r.access_token;
+		}
 
 		const me = await axios.get('https://api.intra.42.fr/v2/me', {
-			headers: { Authorization: `Bearer ${r.access_token}` }
+			headers: { Authorization: `Bearer ${access_token_intra}` }
 		})
 			.then(res => res.data)
 			.catch(() => null);
 		if (!me)
 			throw new UnauthorizedException();
 
-		const intraLogin = me.login;
-		const intraImage = me.image_url;
+		const { login: intraLogin, image_url: intraImage } = me;
 
 		const foundUser = await this.usersService.findOneByIntraLogin(intraLogin);
-		if (foundUser)
+		if (foundUser) {
+			if (foundUser.phoneNumber && !isDefined(smsCode)) {
+				await this.authService.sendSMS(foundUser.phoneNumber);
+				return { access_token: access_token_intra, twoFactorAuthentication: true };
+			}
+			if (foundUser.phoneNumber && isDefined(smsCode) && !await this.authService.verifySMS(foundUser.id, foundUser.phoneNumber, smsCode)) {
+				throw new HttpException('Access Denied', HttpStatus.BAD_REQUEST);
+			}
 			return this.authService.login(foundUser);
+		}
 
 		const newUser = await this.usersService.createIntra(intraLogin, intraImage);
 		return this.authService.login(newUser);

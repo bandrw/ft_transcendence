@@ -179,7 +179,8 @@ const TwoFactorAuthenticationForm = () => {
 			params: { code, phoneNumber },
 			headers: { Authorization: `Bearer ${getToken()}` },
 		})
-			.then(() => setState('enabled'));
+			.then(() => setState('enabled'))
+			.catch(() => {});
 	};
 
 	const disabledSubmitHandler = (e: FormEvent) => {
@@ -227,7 +228,7 @@ const TwoFactorAuthenticationForm = () => {
 				<p>Two-Factor Authentication</p>
 				<span className="edit-window-note">Disabled</span>
 				<div className='two-factor-authentication-form__code-sent'>{`Code sent to ${phoneNumber}`}</div>
-				<CodeVerification submit={verifyCode}/>
+				<CodeVerification submit={verifyCode} />
 			</form>
 		);
 

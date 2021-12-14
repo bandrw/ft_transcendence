@@ -6,8 +6,8 @@ import { setCurrentUser } from 'app/reducers/currentUserSlice';
 import { setEnemy } from 'app/reducers/enemySlice';
 import { setOnlineUsers } from 'app/reducers/onlineUsersSlice';
 import { setStatus } from 'app/reducers/statusSlice';
-import { getToken, removeToken, setToken } from 'app/token';
-import axios, { AxiosResponse } from 'axios';
+import { getToken, removeToken } from 'app/token';
+import axios from 'axios';
 import FullPageLoader from 'components/FullPageLoader';
 import { SocketContext } from 'context/socket';
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
@@ -22,48 +22,28 @@ import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 
-export const getCurrentUser = async (accessToken: string, socketId: string, strategy: string): Promise<User | null> => {
-	if (strategy === 'local') {
-		try {
-			const usr = await axios
-				.get<ApiUser | null>('/auth', {
-					params: { socketId },
+export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
+	try {
+		const usr = await axios
+			.get<ApiUser | null>('/auth', {
+				params: { socketId },
+				headers: { Authorization: `Bearer ${accessToken}` },
+			})
+			.then((res) => res.data);
 
-					headers: { Authorization: `Bearer ${accessToken}` },
-				})
-				.then((res) => res.data);
+		if (usr) {
+			const user = new User();
+			user.id = usr.id;
+			user.username = usr.login;
+			user.urlAvatar = usr.url_avatar;
 
-			if (usr) {
-				const user = new User();
-				user.id = usr.id;
-				user.username = usr.login;
-				user.urlAvatar = usr.url_avatar;
-
-				return user;
-			}
-
-			return null;
-		} catch {
-			return null;
+			return user;
 		}
+
+		return null;
+	} catch {
+		return null;
 	}
-
-	if (strategy === 'intra') {
-		try {
-			const r = await axios
-				.post<{ code: string }, AxiosResponse<{ access_token: string }>>('/auth/intra', {
-					code: accessToken,
-				})
-				.then((res) => res.data);
-			setToken(r.access_token);
-
-			return await getCurrentUser(r.access_token, socketId, 'local');
-		} catch {
-			return null;
-		}
-	}
-
-	return null;
 };
 
 const fetchAllUsers = () => {
@@ -139,7 +119,7 @@ const App = () => {
 		const accessToken = getToken();
 
 		if (accessToken && sockId) {
-			getCurrentUser(accessToken, sockId, 'local').then((usr) => {
+			getCurrentUser(accessToken, sockId).then((usr) => {
 				if (usr) {
 					dispatch(setCurrentUser(usr));
 				} else {

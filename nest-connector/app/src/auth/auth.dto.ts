@@ -1,8 +1,18 @@
-import { IsNotEmpty, IsNumberString, IsString, Length, Matches } from "class-validator";
+import { IsNotEmpty, IsNumberString, IsOptional, IsString, Length, Matches } from "class-validator";
 
 export class AuthIntraDTO {
 	@IsString()
 	code: string;
+
+	@IsString()
+	@IsOptional()
+	@IsNumberString()
+	@Length(4, 4)
+	smsCode: string;
+
+	@IsString()
+	@IsOptional()
+	intraToken: string;
 }
 
 export class AuthDTO {

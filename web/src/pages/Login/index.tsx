@@ -24,14 +24,14 @@ export const signIn = async (
 	setErrors: React.Dispatch<React.SetStateAction<string>>,
 	socketId: string,
 	setState: React.Dispatch<React.SetStateAction<"default" | "verification">> | null,
-	code: string | null,
+	smsCode: string | null,
 ): Promise<void> => {
 	const r = await axios
 		.post<{ username: string; password: string; socketId: string, code: string | null }, AxiosResponse<ApiUserLogin>>("/users/login", {
 			username: login,
 			password,
 			socketId,
-			code,
+			code: smsCode,
 		})
 		.then((res) => res.data)
 		.catch(() => {
@@ -51,13 +51,51 @@ export const signIn = async (
 
 	if (accessToken) {
 		setToken(accessToken);
-		getCurrentUser(accessToken, socketId, "local").then((usr) => {
-			if (usr) {
-				setUser(usr);
-			} else {
-				removeToken();
-			}
-		});
+		getCurrentUser(accessToken, socketId)
+			.then((usr) => {
+				if (usr) {
+					setUser(usr);
+				} else {
+					removeToken();
+				}
+			});
+	}
+};
+
+interface IAuthIntraReq {
+	code: string;
+	smsCode: string | null;
+	intraToken: string | null;
+}
+
+interface IAuthIntraRes {
+	access_token: string | null;
+	twoFactorAuthentication: boolean;
+}
+
+const getUserFromIntra = async (
+	authCode: string,
+	socketId: string,
+	smsCode: string | null = null,
+	intraToken: string | null = null,
+) => {
+	const r = await axios
+		.post<IAuthIntraReq , AxiosResponse<IAuthIntraRes>>('/auth/intra', {
+			code: authCode || '',
+			smsCode,
+			intraToken,
+		})
+		.then((res) => res.data);
+
+	if (r.twoFactorAuthentication)
+		return { user: null, twoFactorAuthentication: true, access_token_intra: r.access_token };
+
+	if (r.access_token) {
+		setToken(r.access_token);
+
+		const user = await getCurrentUser(r.access_token, socketId);
+
+		return { user, twoFactorAuthentication: r.twoFactorAuthentication };
 	}
 };
 
@@ -72,22 +110,45 @@ const Login = ({ socketId }: LoginProps) => {
 	const [loginErrors, setLoginErrors] = React.useState<string>("");
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 	const [state, setState] = React.useState<"default" | "verification">("default");
-
-	const params = new URLSearchParams(window.location.search);
-	const authCode = params.get("code");
+	const [intraToken, setIntraToken] = React.useState<string | null>(null);
+	const [authCode, setAuthCode] = React.useState<string | null>(null);
 
 	React.useEffect(() => {
-		if (authCode) {
-			getCurrentUser(authCode, socketId, "intra")
-				.then((user) => {
-					if (user) {
-						dispatch(setCurrentUser(user));
-					} else {
-						removeToken();
-					}
-				})
-				.finally(() => history.push("/login"));
-		}
+		const params = new URLSearchParams(window.location.search);
+		const code = params.get("code");
+
+		if (code)
+			setAuthCode(code);
+	}, []);
+
+	React.useEffect(() => {
+		if (!(authCode && socketId)) return ;
+
+		let isMounted = true;
+		getUserFromIntra(authCode, socketId)
+			.then((res) => {
+				if (!isMounted) return;
+
+				if (!res) {
+					return ;
+				}
+
+				if (res.twoFactorAuthentication) {
+					setState('verification');
+					setIntraToken(res.access_token_intra);
+				} else if (res.user) {
+					dispatch(setCurrentUser(res.user));
+				} else {
+					setLoginErrors("Login Error");
+					setIsLoading(false);
+					removeToken();
+				}
+			})
+			.finally(() => history.push("/login"));
+
+		return () => {
+			isMounted = false;
+		};
 	}, [history, authCode, socketId, dispatch]);
 
 	const loginSubmit = async (e: FormEvent) => {
@@ -108,7 +169,7 @@ const Login = ({ socketId }: LoginProps) => {
 	};
 
 	const verifyCode = (code: string) => {
-
+		setIsLoading(true);
 		signIn(
 			loginInput,
 			passwordInput,
@@ -118,7 +179,23 @@ const Login = ({ socketId }: LoginProps) => {
 			setState,
 			code,
 		)
-			.then();
+			.then(() => setIsLoading(false));
+	};
+
+	const verifyCodeIntra = (code: string) => {
+		if (!authCode) return ;
+
+		setIsLoading(true);
+		getUserFromIntra(authCode, socketId, code, intraToken)
+			.then((res) => {
+				if (res?.user) {
+					dispatch(setCurrentUser(res.user));
+				} else {
+					removeToken();
+				}
+			})
+			.catch(() => setLoginErrors('Error'))
+			.finally(() => setIsLoading(false));
 	};
 
 	return (
@@ -184,11 +261,21 @@ const Login = ({ socketId }: LoginProps) => {
 					<>
 						<h1>Enter verification code</h1>
 						<form onSubmit={(e) => e.preventDefault()}>
-							<CodeVerification submit={verifyCode}/>
+							<CodeVerification submit={authCode ? verifyCodeIntra : verifyCode}/>
 							<div style={{height: 25}}/>
 							<span className="login-errors">{loginErrors}</span>
-							<div style={{height: 25}}/>
-							<button onClick={() => setState('default')} type='button' className='login-btn'>Back</button>
+							<div style={{height: 15}}/>
+							{
+								isLoading ? (
+									<div className="login-service login-btn">
+										<CircleLoading bgColor="#fff" width="35px" height="35px" />
+									</div>
+								) : (
+									<button onClick={() => setState('default')} type='button' className='login-btn'>
+										Back
+									</button>
+								)
+							}
 						</form>
 					</>
 			}
