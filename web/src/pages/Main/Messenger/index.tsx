@@ -201,7 +201,7 @@ const Messenger = () => {
 			searchPattern.length !== 0 &&
 			!channels.find((ch) => ch.id === channel.id) &&
 			(channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
-				channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase())),
+			channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase())),
 	);
 
 	return (

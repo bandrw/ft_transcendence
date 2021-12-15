@@ -142,7 +142,7 @@ const App = () => {
 			if (reason === 'io server disconnect') socket.connect();
 		};
 
-		// todo [можно придумать что-то получше]
+		// TODO можно придумать что-то получше
 		const sockInterval = setInterval(() => {
 			if (sockId) {
 				clearInterval(sockInterval);

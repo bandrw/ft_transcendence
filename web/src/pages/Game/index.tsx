@@ -31,13 +31,14 @@ const Game = ({ enemyInfo, gameSettingsRef, gameRef }: GameProps) => {
 		}
 	}, [history, enemyInfo, gameRef, watchMode, dispatch]);
 
-	// todo [handle watcher exit buttons]
 	return (
 		<div>
 			<Header />
-			{gameSettingsRef.current && (
-				<GameCanvas watchMode={watchMode} gameSettings={gameSettingsRef.current} gameRef={gameRef} />
-			)}
+			{
+				gameSettingsRef.current && (
+					<GameCanvas watchMode={watchMode} gameSettings={gameSettingsRef.current} gameRef={gameRef} />
+				)
+			}
 		</div>
 	);
 };

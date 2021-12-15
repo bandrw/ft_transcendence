@@ -119,19 +119,22 @@ const Login = ({ socketId }: LoginProps) => {
 
 		if (code)
 			setAuthCode(code);
+
+		return () => {
+			setAuthCode(null);
+		};
 	}, []);
 
 	React.useEffect(() => {
+		let isMounted = true;
+
 		if (!(authCode && socketId)) return ;
 
-		let isMounted = true;
 		getUserFromIntra(authCode, socketId)
 			.then((res) => {
 				if (!isMounted) return;
 
-				if (!res) {
-					return ;
-				}
+				if (!res) return;
 
 				if (res.twoFactorAuthentication) {
 					setState('verification');
@@ -144,7 +147,10 @@ const Login = ({ socketId }: LoginProps) => {
 					removeToken();
 				}
 			})
-			.finally(() => history.push("/login"));
+			.finally(() => {
+				if (!isMounted) return;
+				history.push("/login");
+			});
 
 		return () => {
 			isMounted = false;

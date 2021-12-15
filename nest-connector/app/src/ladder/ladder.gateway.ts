@@ -13,7 +13,7 @@ export class LadderGateway {
 
 	@SubscribeMessage('requestDuel')
 	async requestGameHandler(client: Socket, data: string): Promise<void> {
-		const requestGameData: { enemyId: number } = JSON.parse(data);
+		const requestGameData: { enemyId: number, chatId: number } = JSON.parse(data);
 		const senderLogin = this.usersService.usersSocketIds.get(client.id);
 		const sender = await this.usersService.onlineUsers.find(usr => usr.login === senderLogin);
 		const enemy = await this.usersService.onlineUsers.find(usr => usr.id === requestGameData.enemyId);
@@ -21,18 +21,21 @@ export class LadderGateway {
 		if (!sender || !enemy)
 			return;
 
-		this.ladderService.addToDuel(sender, enemy);
-		sender.socket.emit('duelStatus', 'yellow');
-		enemy.socket.emit('duelStatus', 'yellow');
+		this.ladderService.addToDuel(sender, enemy, requestGameData.chatId);
+		sender.socket.emit('duelStatus', JSON.stringify({ status: 'yellow', chatId: requestGameData.chatId }));
+		enemy.socket.emit('duelStatus', JSON.stringify({ status: 'yellow', chatId: requestGameData.chatId }));
+		console.log(this.ladderService.duelLobby);
 	}
 
 	@SubscribeMessage('cancelDuel')
 	async cancelDuelHandler(client: Socket, data: string): Promise<void> {
-		const cancelDuelData: { enemyId: number } = JSON.parse(data);
+		const cancelDuelData: { enemyId: number, chatId: number } = JSON.parse(data);
 		const senderLogin = this.usersService.usersSocketIds.get(client.id);
-		const sender = await this.usersService.onlineUsers.find(usr => usr.login === senderLogin);
-		const enemy = await this.usersService.onlineUsers.find(usr => usr.id === cancelDuelData.enemyId);
+		const sender = this.usersService.onlineUsers.find(usr => usr.login === senderLogin);
+		const enemy = this.usersService.onlineUsers.find(usr => usr.id === cancelDuelData.enemyId);
 
-		this.ladderService.cancelDuel(sender, enemy);
+		console.log('[cancelDuel]', sender?.login, enemy?.login);
+		this.ladderService.cancelDuel(sender, enemy, cancelDuelData.chatId);
+		console.log(this.ladderService.duelLobby);
 	}
 }

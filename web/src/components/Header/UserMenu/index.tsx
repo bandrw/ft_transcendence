@@ -31,7 +31,7 @@ const UserMenu = () => {
 	};
 
 	return (
-		<Fade duration={250} className="user-menu-wrapper">
+		<Fade duration={250}>
 			<div className="user-menu" onClick={(e) => e.stopPropagation()}>
 				<div className="user-menu-username">{currentUser.username}</div>
 				<Link to={`/users/${currentUser.username}`} className="user-menu-btn">

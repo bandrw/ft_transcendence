@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Game } from 'game/Game';
 import { Gamer } from 'game/game.interface';
 import { GameService } from 'game/game.service';
-import { Ladder } from 'ladder/ladder.interface';
+import { Duel, Ladder } from 'ladder/ladder.interface';
 import { OnlineUser } from 'users/users.interface';
 import { UsersService } from 'users/users.service';
 
@@ -10,7 +10,7 @@ import { UsersService } from 'users/users.service';
 export class LadderService {
 	public lobby: Ladder[] = [];
 	public lobbyId = 0;
-	private duelLobby: Ladder[] = [];
+	public duelLobby: Duel[] = []; // TODO private
 
 	constructor(
 		@Inject(UsersService)
@@ -252,7 +252,7 @@ export class LadderService {
 		return false;
 	}
 
-	addToDuel(user: OnlineUser, enemy: OnlineUser): Ladder {
+	addToDuel(user: OnlineUser, enemy: OnlineUser, chatId: number): Ladder {
 		const duel = this.duelLobby.find(d =>
 			d.first?.id === user.id || d.second?.id === user.id || d.first?.id === enemy.id || d.second?.id === enemy.id
 		);
@@ -269,6 +269,7 @@ export class LadderService {
 			return duel;
 		}
 		const newDuel = {
+			chatId,
 			first: this.usersService.onlineUsers.find(usr => usr.id === user.id),
 			second: null
 		};
@@ -276,11 +277,11 @@ export class LadderService {
 		return newDuel;
 	}
 
-	cancelDuel(user: OnlineUser, enemy: OnlineUser) {
+	cancelDuel(user: OnlineUser, enemy: OnlineUser, chatId: number) {
 		if (user)
-			user.socket.emit('duelStatus', 'green');
+			user.socket.emit('duelStatus', JSON.stringify({ status: 'green', chatId: chatId }));
 		if (enemy)
-			enemy.socket.emit('duelStatus', 'green');
-		this.duelLobby = this.duelLobby.filter(d => d.first?.id !== user.id && d.second?.id !== user.id);
+			enemy.socket.emit('duelStatus', JSON.stringify({ status: 'green', chatId: chatId }));
+		this.duelLobby = this.duelLobby.filter(d => d.chatId !== chatId);
 	}
 }

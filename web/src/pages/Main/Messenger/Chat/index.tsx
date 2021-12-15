@@ -135,9 +135,13 @@ const Chat = ({
 		}
 	};
 
+	// socket events handlers
 	React.useEffect(() => {
-		const duelStatusHandler = (s: string) => {
-			setDuelStatus(s);
+		const duelStatusHandler = (data: string) => {
+			const duelStatusData: { status: string, chatId: number } = JSON.parse(data);
+
+			if (selectedChat?.id === duelStatusData.chatId)
+				setDuelStatus(duelStatusData.status);
 		};
 
 		socket.on('duelStatus', duelStatusHandler);
@@ -147,10 +151,22 @@ const Chat = ({
 
 			if (selectedChat) {
 				const companion = getChatCompanion(selectedChat);
-				socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id }));
+
+				if (localDuelStatus === 'yellow')
+					socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
+				setDuelStatus('green');
 			}
 		};
-	}, [currentUser.username, getChatCompanion, selectedChat, socket]);
+	}, [currentUser.username, getChatCompanion, localDuelStatus, selectedChat, socket]);
+
+	// Scroll to the newest messages
+	React.useEffect(() => {
+		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
+
+		if (chatMessages.length > 0) {
+			chatMessages[0].scrollTop = chatMessages[0].scrollHeight;
+		}
+	});
 
 	if (chatState === 'newChat')
 		return (
@@ -408,24 +424,27 @@ const Chat = ({
 								? `1 subscriber`
 								: `${selectedChannel.members.length} subscribers`}
 						</div>
-						<div className="messenger-chat-settings-buttons">
-							<button
-								className="messenger-chat-settings-buttons__leave"
-								onClick={() => {
-									const data = { channelId: selectedChannel.id };
-									axios
-										.post('/channels/leave', data, {
-											headers: { Authorization: `Bearer ${getToken()}` },
-										})
-										.catch(() => {});
-								}}
-							>
-								<div>
-									<FontAwesomeIcon icon={faSignOutAlt} />
+						{
+							selectedChannel.members.find((m) => m.id === currentUser.id) &&
+								<div className="messenger-chat-settings-buttons">
+									<button
+										className="messenger-chat-settings-buttons__leave"
+										onClick={() => {
+											const data = { channelId: selectedChannel.id };
+											axios
+												.post('/channels/leave', data, {
+													headers: { Authorization: `Bearer ${getToken()}` },
+												})
+												.catch(() => {});
+										}}
+									>
+										<div>
+											<FontAwesomeIcon icon={faSignOutAlt} />
+										</div>
+										<div>Leave</div>
+									</button>
 								</div>
-								<div>Leave</div>
-							</button>
-						</div>
+						}
 						{selectedChannel.ownerId === currentUser.id && (
 							<form
 								className="messenger-chat-settings-accessibility"
@@ -500,12 +519,6 @@ const Chat = ({
 			);
 		}
 	}
-
-	setTimeout(() => {
-		const chatMessages = document.getElementsByClassName('messenger-chat-messages');
-
-		if (chatMessages.length > 0) chatMessages[0].scrollTop = chatMessages[0].scrollHeight;
-	}, 0);
 
 	if (selectedChat) {
 		const companion = getChatCompanion(selectedChat);
@@ -597,11 +610,13 @@ const Chat = ({
 							</div>
 						)}
 					</div>
+					{duelStatus}
+					{localDuelStatus}
 					{duelStatus === 'yellow' && localDuelStatus === 'green' && (
 						<button
 							className="messenger-chat-info-play-btn"
 							onClick={() => {
-								socket.emit('requestDuel', JSON.stringify({ enemyId: companion.id }));
+								socket.emit('requestDuel', JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
 								setLocalDuelStatus('yellow');
 							}}
 						>
@@ -615,7 +630,7 @@ const Chat = ({
 						<button
 							className="messenger-chat-info-play-btn"
 							onClick={() => {
-								socket.emit('requestDuel', JSON.stringify({ enemyId: companion.id }));
+								socket.emit('requestDuel', JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
 								setLocalDuelStatus('yellow');
 							}}
 						>
@@ -629,7 +644,7 @@ const Chat = ({
 						<button
 							className="messenger-chat-info-play-btn"
 							onClick={() => {
-								socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id }));
+								socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
 								setLocalDuelStatus('green');
 							}}
 						>
@@ -639,7 +654,12 @@ const Chat = ({
 							</span>
 						</button>
 					)}
-					<button className="messenger-chat-close-btn" onClick={closeSelectedChat} title="Close">
+					<button className="messenger-chat-close-btn" onClick={() => {
+						if (localDuelStatus === 'yellow')
+							socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
+						setLocalDuelStatus('green');
+						closeSelectedChat();
+					}} title="Close">
 						<FontAwesomeIcon icon={faTimes} />
 					</button>
 				</div>
