@@ -22,6 +22,9 @@ import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 
+import {PrivateRoute} from "./components/PrivateRoute";
+import {useAuth} from "./hook/useAuth";
+
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {
 		const usr = await axios
@@ -58,7 +61,6 @@ const fetchAllUsers = () => {
 const App = () => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
-	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const gameRef = React.useRef<{ runs: boolean; interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
@@ -66,6 +68,8 @@ const App = () => {
 	const [socketId, setSocketId] = React.useState<string | null>(null);
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
 	const sockId = socketId || socket.id;
+
+	const isAuth = useAuth();
 
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { onlineUsers } = useAppSelector((state) => state.onlineUsers);
@@ -82,7 +86,9 @@ const App = () => {
 	React.useEffect(() => {
 		let isMounted = true;
 
-		if (!currentUser.isAuthorized()) return;
+		if (!isAuth) {
+			return;
+		}
 
 		axios
 			.get<ApiUpdateUser[]>('/users/online', {
@@ -96,13 +102,15 @@ const App = () => {
 		return () => {
 			isMounted = false;
 		};
-	}, [currentUser, dispatch]);
+	}, [isAuth, dispatch]);
 
 	// Fetching allUsers + updating on onlineUsers change
 	React.useEffect(() => {
 		let isMounted = true;
 
-		if (!currentUser.isAuthorized()) return;
+		if (!isAuth) {
+			return;
+		}
 
 		fetchAllUsers().then((users) => {
 			if (!isMounted) return;
@@ -112,7 +120,7 @@ const App = () => {
 		return () => {
 			isMounted = false;
 		};
-	}, [currentUser, dispatch, onlineUsers]);
+	}, [isAuth, dispatch, onlineUsers]);
 
 	// Getting user from access_token
 	React.useEffect(() => {
@@ -163,16 +171,11 @@ const App = () => {
 		};
 	}, [sockId, socket]);
 
-	// Redirect to /login
-	React.useEffect(() => {
-		if (history.location.pathname !== '/login' && history.location.pathname !== '/register' && !getToken()) {
-			history.push('/login');
-		}
-	}, [currentUser, history]);
-
 	// Event handlers
 	React.useEffect(() => {
-		if (!currentUser.isAuthorized()) return;
+		if (!isAuth) {
+			return;
+		}
 
 		const logoutHandler = (data: string) => {
 			const logoutData: ApiUpdateUser = JSON.parse(data);
@@ -187,8 +190,9 @@ const App = () => {
 			if (
 				gameSettings.leftPlayer.login !== currentUser.username &&
 				gameSettings.rightPlayer.login !== currentUser.username
-			)
+			) {
 				return;
+			}
 
 			const data = {
 				login: currentUser.username,
@@ -251,35 +255,35 @@ const App = () => {
 			socket.off('gameIsReady', gameIsReadyHandler);
 			socket.off('gameSettings', gameSettingsHandler);
 		};
-	}, [currentUser, socket, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch, status, enemy]);
+	}, [isAuth, currentUser, socket, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch, status, enemy]);
 
 	if (!isDesktop) return <div style={{ fontSize: '2em', marginTop: '100px' }}>Window is too small :(</div>;
 
 	return (
 		<Switch>
 			<Route exact path="/login">
-				{currentUser.isAuthorized() ? <Redirect to="/" /> : <Login socketId={sockId} />}
+				{isAuth ? <Redirect to="/" /> : <Login socketId={sockId} />}
 			</Route>
 
 			<Route exact path="/register">
-				{currentUser.isAuthorized() ? <Redirect to="/" /> : <Register />}
+				{isAuth ? <Redirect to="/" /> : <Register />}
 			</Route>
 
-			<Route exact path="/game">
-				{currentUser.isAuthorized() ? (
-					<Game enemyInfo={enemy} gameSettingsRef={gameSettingsRef} gameRef={gameRef} />
-				) : (
-					<FullPageLoader />
-				)}
-			</Route>
+			<PrivateRoute exact path="/game">
+				<Game enemyInfo={enemy} gameSettingsRef={gameSettingsRef} gameRef={gameRef} />
+			</PrivateRoute>
 
-			<Route path="/games/:login">{currentUser.isAuthorized() ? <GamesHistory /> : <FullPageLoader />}</Route>
+			<PrivateRoute path="/games/:login">
+				<GamesHistory />
+			</PrivateRoute>
 
-			<Route path="/users/:login">{currentUser.isAuthorized() ? <UserProfile /> : <FullPageLoader />}</Route>
+			<PrivateRoute path="/users/:login">
+				<UserProfile />
+			</PrivateRoute>
 
-			<Route exact path="/">
-				{currentUser.isAuthorized() ? <Main enemyIsReady={enemyIsReady} /> : <FullPageLoader />}
-			</Route>
+			<PrivateRoute exact path="/">
+				<Main enemyIsReady={enemyIsReady} />
+			</PrivateRoute>
 		</Switch>
 	);
 };

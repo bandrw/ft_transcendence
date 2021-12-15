@@ -10,6 +10,8 @@ interface CircleLoadingProps {
 
 const CircleLoading = ({ bgColor = '#000', width = '50px', height = '50px' }: CircleLoadingProps) => {
 	const divArray = [];
+
+	// TODO переписать на обычную верстку, т.к. каждый раз генерирует новый массив
 	for (let i = 0; i < 12; ++i) divArray.push(<div />);
 
 	return (
