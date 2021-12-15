@@ -228,6 +228,7 @@ const App = () => {
 				const enemyData = updateUserData.find((usr) => usr.id === enemy.id);
 
 				if (!enemyData) return;
+
 				const enemyDeclinedGame =
 					enemyData.status === ApiUserStatus.Declined || enemyData.status === ApiUserStatus.Regular;
 				const enemyAcceptedGame = enemyData.status === ApiUserStatus.Accepted;

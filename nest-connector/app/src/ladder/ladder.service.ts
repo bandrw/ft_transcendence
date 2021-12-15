@@ -10,7 +10,7 @@ import { UsersService } from 'users/users.service';
 export class LadderService {
 	public lobby: Ladder[] = [];
 	public lobbyId = 0;
-	public duelLobby: Duel[] = []; // TODO private
+	private duelLobby: Duel[] = [];
 
 	constructor(
 		@Inject(UsersService)
@@ -253,15 +253,15 @@ export class LadderService {
 	}
 
 	addToDuel(user: OnlineUser, enemy: OnlineUser, chatId: number): Ladder {
-		const duel = this.duelLobby.find(d =>
-			d.first?.id === user.id || d.second?.id === user.id || d.first?.id === enemy.id || d.second?.id === enemy.id
-		);
+		const duel = this.duelLobby.find(d => d.chatId === chatId);
 		if (duel) {
 			duel.first = user;
 			duel.second = enemy;
 			if (duel.first && duel.second) {
-				duel.first.socket.emit('enemy', JSON.stringify(UsersService.onlineUserToJson(duel.first)));
-				duel.second.socket.emit('enemy', JSON.stringify(UsersService.onlineUserToJson(duel.second)));
+				this.updateStatus(duel.first.id, 'inGame');
+				this.updateStatus(duel.second.id, 'inGame');
+				duel.first.socket.emit('enemy', JSON.stringify(UsersService.onlineUserToJson(duel.second)));
+				duel.second.socket.emit('enemy', JSON.stringify(UsersService.onlineUserToJson(duel.first)));
 				duel.first.socket.emit('gameIsReady', '');
 				duel.second.socket.emit('gameIsReady', '');
 				this.gameService.startGame(this.buildGame(duel.first, duel.second));
@@ -270,7 +270,7 @@ export class LadderService {
 		}
 		const newDuel = {
 			chatId,
-			first: this.usersService.onlineUsers.find(usr => usr.id === user.id),
+			first: user,
 			second: null
 		};
 		this.duelLobby.push(newDuel);

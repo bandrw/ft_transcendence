@@ -31,7 +31,7 @@ export class AuthService {
 	}
 
 	async sendSMS(phoneNumber: string) {
-		return 'All ok'; // TODO remove this
+		return 'All ok'; // TODO Enable Twilio
 		// return await this.twilioClient.verify.services(process.env.TWILIO_SERVICE_SID)
 		// 	.verifications
 		// 	.create({ to: phoneNumber, channel: 'sms' });
@@ -42,7 +42,7 @@ export class AuthService {
 		const user = await this.usersService.findOneById(userId);
 		if (!user) throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
 
-		// TODO remove this
+		// TODO Enable Twilio
 		if (code === '1234') {
 			if (!user.phoneNumber)
 				return await this.usersService.savePhoneNumber(user, phoneNumber);

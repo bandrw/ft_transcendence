@@ -22,8 +22,9 @@ export class LadderGateway {
 			return;
 
 		this.ladderService.addToDuel(sender, enemy, requestGameData.chatId);
-		sender.socket.emit('duelStatus', JSON.stringify({ status: 'yellow', chatId: requestGameData.chatId }));
-		enemy.socket.emit('duelStatus', JSON.stringify({ status: 'yellow', chatId: requestGameData.chatId }));
+		const dataStr = JSON.stringify({ status: 'yellow', chatId: requestGameData.chatId });
+		sender.socket.emit('duelStatus', dataStr);
+		enemy.socket.emit('duelStatus', dataStr);
 	}
 
 	@SubscribeMessage('cancelDuel')

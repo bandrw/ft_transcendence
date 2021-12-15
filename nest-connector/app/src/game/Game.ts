@@ -75,9 +75,8 @@ export class Game {
 	}
 
 	public sendMsg(event: string, data: string) {
-		// removing disconnected watchers
-		for (let i = 0; i < this.watchers.length; ++i)
-			this.watchers = this.watchers.filter(watcher => this.usersService.usersSocketIds.get(watcher.socket.id));
+		// // TODO работает на каждом рендере, так себе решение
+		// this.watchers = this.watchers.filter(watcher => this.usersService.usersSocketIds.get(watcher.socket.id));
 
 		this.leftPlayer.user.socket.emit(event, data);
 		this.rightPlayer.user.socket.emit(event, data);
