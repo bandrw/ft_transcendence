@@ -45,10 +45,10 @@ const CodeVerification = ({ submit }: CodeVerificationProps) => {
 	};
 
 	React.useEffect(() => {
-		const field1 = document.getElementById('code-confirmation-field-1');
-		const field2 = document.getElementById('code-confirmation-field-2');
-		const field3 = document.getElementById('code-confirmation-field-3');
-		const field4 = document.getElementById('code-confirmation-field-4');
+		const field1 = document.getElementById('code-verification-field-1');
+		const field2 = document.getElementById('code-verification-field-2');
+		const field3 = document.getElementById('code-verification-field-3');
+		const field4 = document.getElementById('code-verification-field-4');
 
 		if (!(field1 && field2 && field3 && field4)) return ;
 
