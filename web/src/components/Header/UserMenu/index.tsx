@@ -3,7 +3,7 @@ import './styles.scss';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
-import {resetCurrentUser, setCurrentUser} from 'app/reducers/currentUserSlice';
+import {resetCurrentUser} from 'app/reducers/currentUserSlice';
 import { getToken, removeToken } from 'app/token';
 import axios from 'axios';
 import React from 'react';

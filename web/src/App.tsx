@@ -2,7 +2,7 @@ import './App.scss';
 
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { setAllUsers } from 'app/reducers/allUsersSlice';
-import { setCurrentUser } from 'app/reducers/currentUserSlice';
+import { resetCurrentUser, setCurrentUser } from "app/reducers/currentUserSlice";
 import { setEnemy } from 'app/reducers/enemySlice';
 import { setOnlineUsers } from 'app/reducers/onlineUsersSlice';
 import { setStatus } from 'app/reducers/statusSlice';
@@ -13,7 +13,7 @@ import {PrivateRoute} from "components/PrivateRoute";
 import { SocketContext } from 'context/socket';
 import {useAuth} from "hook/useAuth";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
-import { User } from 'models/User';
+import { User } from "models/User";
 import Game from 'pages/Game';
 import GamesHistory from 'pages/GamesHistory';
 import Login from 'pages/Login';
@@ -22,7 +22,7 @@ import Register from 'pages/Register';
 import UserProfile from 'pages/UserProfile';
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { Switch } from 'react-router-dom';
+import { Switch, useHistory } from "react-router-dom";
 
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {
@@ -60,6 +60,7 @@ const fetchAllUsers = () => {
 const App = () => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
+	const history = useHistory();
 	const socket = React.useContext(SocketContext);
 	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
 	const gameRef = React.useRef<{ runs: boolean; interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
@@ -123,19 +124,28 @@ const App = () => {
 
 	// Getting user from access_token
 	React.useEffect(() => {
+		const failAuthHandler = () => {
+			removeToken();
+			dispatch(resetCurrentUser());
+			history.push('/login'); // TODO tmp
+		};
+
 		const accessToken = getToken();
+
+		if (!accessToken) {
+			failAuthHandler();
+		}
 
 		if (accessToken && sockId) {
 			getCurrentUser(accessToken, sockId).then((usr) => {
 				if (usr) {
 					dispatch(setCurrentUser(usr));
 				} else {
-					removeToken();
-					dispatch(setCurrentUser(new User()));
+					failAuthHandler();
 				}
 			});
 		}
-	}, [dispatch, sockId, socket.id, socketId]);
+	}, [dispatch, history, sockId, socket.id, socketId, isAuth]);
 
 	// Saving socketId in state
 	React.useEffect(() => {

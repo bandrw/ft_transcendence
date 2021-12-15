@@ -1,5 +1,3 @@
-import {getToken} from "../app/token";
-
 export interface IUser {
 	id: number;
 	username: string;
@@ -9,14 +7,14 @@ export interface IUser {
 	isAuthorized: boolean;
 }
 
-export class User {
+export class User implements IUser{
 	constructor() {
 		this.id = -1;
 		this.username = '';
 		this.urlAvatar = '';
 		this.loginDate = 0;
 		this.intraLogin = null;
-		this.isAuthorized = !!getToken();
+		this.isAuthorized = false;
 	}
 
 	id: number;

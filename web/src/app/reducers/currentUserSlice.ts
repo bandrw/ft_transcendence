@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IUser, User } from 'models/User';
-
-import { getToken } from "../token";
+import { IUser } from 'models/User';
 
 interface CurrentUserState {
 	currentUser: IUser;
@@ -14,7 +12,7 @@ const initialState: CurrentUserState = {
 		urlAvatar: '',
 		loginDate: 0,
 		intraLogin: null,
-		isAuthorized: !!getToken(),
+		isAuthorized: false,
 	},
 };
 
@@ -22,7 +20,7 @@ export const currentUserSlice = createSlice({
 	name: 'currentUser',
 	initialState,
 	reducers: {
-		setCurrentUser: (state: CurrentUserState, action: PayloadAction<User>) => {
+		setCurrentUser: (state: CurrentUserState, action: PayloadAction<IUser>) => {
 			state.currentUser = action.payload;
 			state.currentUser.isAuthorized = true;
 		},
