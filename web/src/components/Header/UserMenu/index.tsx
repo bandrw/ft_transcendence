@@ -3,10 +3,9 @@ import './styles.scss';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
-import { setCurrentUser } from 'app/reducers/currentUserSlice';
+import {resetCurrentUser, setCurrentUser} from 'app/reducers/currentUserSlice';
 import { getToken, removeToken } from 'app/token';
 import axios from 'axios';
-import { User } from 'models/User';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Link } from 'react-router-dom';
@@ -25,7 +24,7 @@ const UserMenu = () => {
 				},
 			)
 			.then(() => {
-				dispatch(setCurrentUser(new User()));
+				dispatch(resetCurrentUser());
 				removeToken();
 			});
 	};

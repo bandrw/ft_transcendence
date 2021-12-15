@@ -1,7 +1,7 @@
 import React from "react";
-import {Redirect, Route, RouteProps} from "react-router-dom";
+import { Redirect, Route, RouteProps } from "react-router-dom";
 
-import {useAuth} from "../../hook/useAuth";
+import { useAuth } from "../../hook/useAuth";
 
 export const AuthRoute = ({ children, ...rest }: RouteProps) => {
 	const isAuth = useAuth();

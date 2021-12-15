@@ -1,3 +1,14 @@
+import {getToken} from "../app/token";
+
+export interface IUser {
+	id: number;
+	username: string;
+	loginDate: number;
+	urlAvatar: string;
+	intraLogin: string | null;
+	isAuthorized: boolean;
+}
+
 export class User {
 	constructor() {
 		this.id = -1;
@@ -5,10 +16,7 @@ export class User {
 		this.urlAvatar = '';
 		this.loginDate = 0;
 		this.intraLogin = null;
-	}
-
-	isAuthorized() {
-		return this.username !== '';
+		this.isAuthorized = !!getToken();
 	}
 
 	id: number;
@@ -16,4 +24,5 @@ export class User {
 	loginDate: number;
 	urlAvatar: string;
 	intraLogin: string | null;
+	isAuthorized: boolean;
 }

@@ -103,7 +103,7 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 	React.useEffect(() => {
 		let isMounted = true;
 
-		if (!currentUser.isAuthorized()) return;
+		if (!currentUser.isAuthorized) return;
 
 		if (status === ApiUserStatus.FoundEnemy) {
 			if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
