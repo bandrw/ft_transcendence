@@ -1,6 +1,6 @@
-import './styles.scss';
-
 import React, { ChangeEvent } from "react";
+
+import styles from './CodeVerification.module.scss';
 
 interface CodeVerificationProps {
 	submit: (code: string) => void
@@ -68,47 +68,25 @@ const CodeVerification = ({ submit }: CodeVerificationProps) => {
 	}, [fields, submit]);
 
 	return (
-		<div className="code-confirmation">
-			<label htmlFor='code-confirmation-field-1'>
-				<input
-					id='code-confirmation-field-1'
-					className="code-confirmation-field"
-					type="text"
-					placeholder="•"
-					onChange={ (e) => fieldChange(e, 0) }
-					value={fields[0]}
-				/>
-			</label>
-			<label htmlFor='code-confirmation-field-2'>
-				<input
-					id='code-confirmation-field-2'
-					className="code-confirmation-field"
-					type="text"
-					placeholder="•"
-					onChange={ (e) => fieldChange(e, 1) }
-					value={fields[1]}
-				/>
-			</label>
-			<label htmlFor='field-3' className="box">
-				<input
-					id='code-confirmation-field-3'
-					className="code-confirmation-field"
-					type="text"
-					placeholder="•"
-					onChange={ (e) => fieldChange(e, 2) }
-					value={fields[2]}
-				/>
-			</label>
-			<label htmlFor='code-confirmation-field-4' className="box">
-				<input
-					id='code-confirmation-field-4'
-					className="code-confirmation-field"
-					type="text"
-					placeholder="•"
-					onChange={ (e) => fieldChange(e, 3) }
-					value={fields[3]}
-				/>
-			</label>
+		<div className={styles.verification}>
+			{
+				fields.map((field, index) =>
+					<label
+						// eslint-disable-next-line react/no-array-index-key
+						key={index}
+						htmlFor={`code-verification-field-${index + 1}`}
+					>
+						<input
+							// className={styles.field}
+							id={`code-verification-field-${index + 1}`}
+							type="text"
+							placeholder="•"
+							onChange={ (e) => fieldChange(e, index) }
+							value={field}
+						/>
+					</label>,
+				)
+			}
 		</div>
 	);
 };

@@ -8,8 +8,10 @@ import { setOnlineUsers } from 'app/reducers/onlineUsersSlice';
 import { setStatus } from 'app/reducers/statusSlice';
 import { getToken, removeToken } from 'app/token';
 import axios from 'axios';
-import FullPageLoader from 'components/FullPageLoader';
+import {AuthRoute} from "components/AuthRoute";
+import {PrivateRoute} from "components/PrivateRoute";
 import { SocketContext } from 'context/socket';
+import {useAuth} from "hook/useAuth";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
 import { User } from 'models/User';
 import Game from 'pages/Game';
@@ -20,11 +22,7 @@ import Register from 'pages/Register';
 import UserProfile from 'pages/UserProfile';
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
-
-import {AuthRoute} from "./components/AuthRoute";
-import {PrivateRoute} from "./components/PrivateRoute";
-import {useAuth} from "./hook/useAuth";
+import { Switch } from 'react-router-dom';
 
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {
