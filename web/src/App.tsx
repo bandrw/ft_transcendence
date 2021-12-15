@@ -22,6 +22,7 @@ import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 
+import {AuthRoute} from "./components/AuthRoute";
 import {PrivateRoute} from "./components/PrivateRoute";
 import {useAuth} from "./hook/useAuth";
 
@@ -261,13 +262,13 @@ const App = () => {
 
 	return (
 		<Switch>
-			<Route exact path="/login">
-				{isAuth ? <Redirect to="/" /> : <Login socketId={sockId} />}
-			</Route>
+			<AuthRoute exact path="/login">
+				<Login socketId={sockId} />
+			</AuthRoute>
 
-			<Route exact path="/register">
-				{isAuth ? <Redirect to="/" /> : <Register />}
-			</Route>
+			<AuthRoute exact path="/register">
+				<Register />
+			</AuthRoute>
 
 			<PrivateRoute exact path="/game">
 				<Game enemyInfo={enemy} gameSettingsRef={gameSettingsRef} gameRef={gameRef} />
