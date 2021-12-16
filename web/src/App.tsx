@@ -227,6 +227,9 @@ const App = () => {
 			if (enemy) {
 				const enemyData = updateUserData.find((usr) => usr.id === enemy.id);
 
+				if (enemyData)
+					dispatch(setEnemy(enemyData));
+
 				if (!enemyData) return;
 
 				const enemyDeclinedGame =
@@ -236,6 +239,7 @@ const App = () => {
 				if (enemyDeclinedGame) {
 					dispatch(setStatus(ApiUserStatus.Regular));
 					setEnemyIsReady(false);
+					dispatch(setEnemy(null));
 				} else if (enemyAcceptedGame) {
 					setEnemyIsReady(true);
 				}
@@ -243,7 +247,7 @@ const App = () => {
 		};
 
 		const enemyHandler = (e: string) => {
-			const enemyData: ApiUpdateUser | null = JSON.parse(e);
+			const enemyData: ApiUpdateUser = JSON.parse(e);
 			dispatch(setEnemy(enemyData));
 			dispatch(setStatus(ApiUserStatus.FoundEnemy));
 		};
