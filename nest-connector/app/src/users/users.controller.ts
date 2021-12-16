@@ -24,7 +24,10 @@ import { UsersService } from 'users/users.service';
 
 @Controller('users')
 export class UsersController {
-	constructor(private usersService: UsersService, private authService: AuthService) {}
+	constructor(
+		private usersService: UsersService,
+		private authService: AuthService,
+	) {}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Post('create')
@@ -112,10 +115,10 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@UseGuards(AuthGuard('jwt'))
 	@Post('updateUsername')
-	async updateUsername(@Req() req, @Body() { username }: UpdateUsernameDTO) {
+	async updateUsername(@Req() req, @Body() { username, socketId }: UpdateUsernameDTO) {
 		const user = req.user;
 
-		return await this.usersService.updateUsername(user.id, username);
+		return await this.usersService.updateUsername(user.id, username, socketId);
 	}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))

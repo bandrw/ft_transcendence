@@ -147,8 +147,10 @@ const Login = ({ socketId }: LoginProps) => {
 					removeToken();
 				}
 			})
+			.catch(() => setLoginErrors('Login Error'))
 			.finally(() => {
 				if (!isMounted) return;
+				setIsLoading(false);
 				history.push("/login");
 			});
 

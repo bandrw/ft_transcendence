@@ -20,7 +20,7 @@ export class MessageGateway {
 	@SubscribeMessage('sendMessage')
 	async sendMessageHandler(client: Socket, data: string): Promise<void> {
 		const msgData: { text: string, chatId?: number, channelId?: number } = JSON.parse(data);
-		const senderLogin = this.usersService.usersSocketIds.get(client.id);
+		const senderLogin = this.usersService.getUsernameBySocketId(client.id);
 		const sender = await this.usersService.onlineUsers.find(usr => usr.login === senderLogin);
 
 		if (!sender)

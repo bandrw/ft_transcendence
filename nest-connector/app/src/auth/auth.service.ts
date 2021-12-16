@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from "@nestjs/jwt";
 import * as bcryptjs from 'bcryptjs';
-import { Twilio } from "twilio";
+// import { Twilio } from "twilio";
 import { UsersService } from "users/users.service";
 
 @Injectable()
@@ -16,6 +16,9 @@ export class AuthService {
 	}
 
 	async validateUser(username: string, pass: string): Promise<any> {
+		if (this.usersService.onlineUsers.find(usr => usr.login === username))
+			return null;
+
 		const user = await this.usersService.findOneByLogin(username);
 		if (user && bcryptjs.compareSync(pass, user.password)) {
 			const { password, ...result } = user;

@@ -5,6 +5,7 @@ import { useAppSelector } from 'app/hooks';
 import { getToken } from 'app/token';
 import axios from 'axios';
 import CodeVerification from "components/CodeVerification";
+import { SocketContext } from "context/socket";
 import { AvatarGenerator } from 'random-avatar-generator';
 import React, { ChangeEvent, FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
@@ -40,9 +41,10 @@ const updateAvatar = async (imageState: ImageState) => {
 	}
 };
 
-const updateUsername = async (username: string) => {
+const updateUsername = async (username: string, socketId: string) => {
 	const data = {
 		username,
+		socketId,
 	};
 
 	return axios.post('/users/updateUsername', data, {
@@ -56,6 +58,7 @@ interface IChangeUsername {
 
 const ChangeUsernameForm = () => {
 	const history = useHistory();
+	const socket = React.useContext(SocketContext);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { register, handleSubmit } = useForm<IChangeUsername>();
@@ -72,7 +75,8 @@ const ChangeUsernameForm = () => {
 	const changeUsername = ({ newUsername }: IChangeUsername) => {
 		if (!usernameIsValid()) return;
 
-		updateUsername(newUsername).then(() => history.push(`/users/${newUsername}`));
+		updateUsername(newUsername, socket.id)
+			.then(() => history.push(`/users/${newUsername}`));
 	};
 
 	return (

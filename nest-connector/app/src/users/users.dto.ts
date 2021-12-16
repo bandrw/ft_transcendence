@@ -53,4 +53,7 @@ export class UpdateAvatarDTO {
 export class UpdateUsernameDTO {
 	@IsString()
 	username: string;
+
+	@IsString()
+	socketId: string;
 }

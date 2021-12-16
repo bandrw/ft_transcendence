@@ -9,9 +9,25 @@ import { OnlineUser } from 'users/users.interface';
 
 @Injectable()
 export class UsersService {
-	onlineUsers: OnlineUser[] = [];
-	public usersSocketIds = new Map<string, string>();
-	public sockets = new Map<string, Socket>();
+	public onlineUsers: OnlineUser[];
+
+	/**
+	 * UsersService usersSocketIds Map
+	 *
+	 * key - socket id
+	 *
+	 * value - username
+	 */
+	private usersSocketIds: Map<string, string>;
+
+	/**
+	 * UsersService sockets Map
+	 *
+	 * key - socket id
+	 *
+	 * value - Socket
+	 */
+	private sockets: Map<string, Socket>;
 
 	private readonly allRelations = [
 		'wonGames',
@@ -32,7 +48,11 @@ export class UsersService {
 		private usersRepository: Repository<User>,
 		@InjectRepository(UserSubscription)
 		private userSubscriptionRepository: Repository<UserSubscription>,
-	) {}
+	) {
+		this.onlineUsers = [];
+		this.usersSocketIds = new Map<string, string>();
+		this.sockets = new Map<string, Socket>();
+	}
 
 	async findAll(expand = false): Promise<User[]> {
 		if (!expand)
@@ -244,14 +264,16 @@ export class UsersService {
 		return r;
 	}
 
-	async updateUsername(userId: number, username: string) {
+	async updateUsername(userId: number, username: string, socketId: string) {
 		const user = await this.findOneById(userId, true);
 		user.login = username;
 		const r = await this.usersRepository.save(user);
 
+		this.usersSocketIds.set(socketId, r.login);
 		const onlineUser = this.onlineUsers.find(usr => usr.id === userId);
-		onlineUser.login = username;
+		onlineUser.login = r.login;
 		this.updateUser();
+		console.log(this.usersSocketIds);
 		return r;
 	}
 
@@ -272,6 +294,25 @@ export class UsersService {
 		const r = await this.usersRepository.save(user);
 		this.updateUser();
 		return r;
+	}
+
+	handleConnection(socket: Socket) {
+		this.usersSocketIds.set(socket.id, '');
+		this.sockets.set(socket.id, socket);
+	}
+
+	handleDisconnect(socket: Socket) {
+		if (this.usersSocketIds.get(socket.id)) {
+			const disconnectedLogin = this.usersSocketIds.get(socket.id);
+			this.userEvent('logout', this.onlineUsers.find(usr => usr.login === disconnectedLogin));
+			this.onlineUsers = this.onlineUsers.filter(usr => usr.login !== disconnectedLogin);
+		}
+		this.usersSocketIds.delete(socket.id);
+		this.sockets.delete(socket.id);
+	}
+
+	getUsernameBySocketId(socketId: string): string {
+		return this.usersSocketIds.get(socketId);
 	}
 
 	static onlineUserToJson(user) {

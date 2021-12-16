@@ -64,6 +64,9 @@ export class AuthController {
 
 		const foundUser = await this.usersService.findOneByIntraLogin(intraLogin);
 		if (foundUser) {
+			if (this.usersService.onlineUsers.find(usr => usr.id === foundUser.id))
+				throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
+
 			if (foundUser.phoneNumber && !isDefined(smsCode)) {
 				await this.authService.sendSMS(foundUser.phoneNumber);
 				return { access_token: access_token_intra, twoFactorAuthentication: true };
