@@ -1,5 +1,3 @@
-import './styles.scss';
-
 import { useAppSelector } from 'app/hooks';
 import { SocketContext } from 'context/socket';
 import { ApiGameLoop, ApiGameSettings } from 'models/ApiTypes';
@@ -94,9 +92,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		};
 	}, [ball, leftPlayer, rightPlayer, score, socket]);
 
-	const { playerWidth } = gameSettings;
-	const { playerMargin } = gameSettings;
-	const { playerHeight } = gameSettings;
+	const { playerWidth, playerMargin, playerHeight } = gameSettings;
 
 	// keydown, keyup handlers
 	useEffect(() => {

@@ -1,11 +1,12 @@
 import './styles.scss';
 
-import { faCheck, faPlay, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCog, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { setStatus } from 'app/reducers/statusSlice';
 import { getToken } from 'app/token';
 import axios from 'axios';
+import GameSettings from "components/GameSettings";
 import { ApiUpdateUser, ApiUserStatus } from 'models/ApiTypes';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
@@ -94,6 +95,7 @@ interface FindGameProps {
 
 const FindGame = ({ enemyIsReady }: FindGameProps) => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);
+	const [showSettings, setShowSettings] = React.useState(true);
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { status } = useAppSelector((state) => state.status);
@@ -141,6 +143,18 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 		};
 	}, [status, currentUser]);
 
+	React.useEffect(() => {
+		const clickHandler = () => {
+			if (showSettings)
+				setShowSettings(false);
+		};
+		window.addEventListener('click', clickHandler);
+
+		return () => {
+			window.removeEventListener('click', clickHandler);
+		};
+	}, [showSettings]);
+
 	if (status === ApiUserStatus.Searching)
 		return (
 			<div className="find-game main-block">
@@ -184,6 +198,12 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 				<button onClick={() => dispatch(setStatus(ApiUserStatus.Searching))} className="find-game-btn">
 					<FontAwesomeIcon icon={faPlay} />
 				</button>
+				<button type='button' className="find-game-settings__button" onClick={() => setShowSettings((prev) => !prev)}>
+					<FontAwesomeIcon icon={faCog}/>
+				</button>
+				{showSettings && (
+					<GameSettings/>
+				)}
 			</div>
 		</div>
 	);
