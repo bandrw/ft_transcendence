@@ -1,7 +1,18 @@
 .social {
+	box-sizing: border-box;
 	padding: 30px 0;
-	height: calc(100% - 61px + 25px);
-	max-height: 638px;
+	height: 100%;
+	max-height: 700px;
+
+	.social-scroll {
+		overflow-y: scroll;
+		max-height: calc(700px - 60px);
+
+		&::-webkit-scrollbar {
+			width: 8px;
+			background: transparent;
+		}
+	}
 
 	.social-title {
 		padding: 0 40px;

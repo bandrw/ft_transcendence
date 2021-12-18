@@ -1,10 +1,11 @@
 .list-section {
-	width: calc(100% - 50px);
+	width: 100%;
 	border: 3px solid #1a1b1f;
-	padding: 25px;
+	padding: 25px 0;
 	border-radius: 18px;
 
 	.list-section-title {
+		padding: 0 25px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -22,6 +23,7 @@
 	}
 
 	.list-section-list {
+		padding: 0 25px;
 
 		.list-section-empty {
 			display: flex;
@@ -48,6 +50,13 @@
 			justify-content: space-between;
 			transition: all 0.1s ease-in-out;
 			border-radius: 15px;
+
+			&:first-child {
+				margin-top: 0;
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
 
 			.games-history-enemy {
 				display: flex;

@@ -97,36 +97,38 @@ const Social = () => {
 
 	return (
 		<Fade cascade triggerOnce damping={0.3}>
-			<div className="main-block-title social-title">
-				<span>People</span>
-			</div>
-			<div className="social-block">
-				<div className="social-block-title">
-					<span>friends</span>
-					<FontAwesomeIcon icon={faCircle} />
-					<span>{friends.length}</span>
+			<div className='social-scroll'>
+				<div className="main-block-title social-title">
+					<span>People</span>
 				</div>
-				<ul>
-					{friends.map((user) => {
-						const userInOnline = onlineUsers.find((usr) => usr.id === user.id);
+				<div className="social-block">
+					<div className="social-block-title">
+						<span>friends</span>
+						<FontAwesomeIcon icon={faCircle} />
+						<span>{friends.length}</span>
+					</div>
+					<ul>
+						{friends.map((user) => {
+							const userInOnline = onlineUsers.find((usr) => usr.id === user.id);
 
-						if (userInOnline) return <SocialBlockOnlineUser key={user.id} user={userInOnline} />;
+							if (userInOnline) return <SocialBlockOnlineUser key={user.id} user={userInOnline} />;
 
-						return <SocialBlockFriend key={user.id} user={user} />;
-					})}
-				</ul>
-			</div>
-			<div className="social-block">
-				<div className="social-block-title">
-					<span>online</span>
-					<FontAwesomeIcon icon={faCircle} />
-					<span>{onlineUsersDisplay.length}</span>
+							return <SocialBlockFriend key={user.id} user={user} />;
+						})}
+					</ul>
 				</div>
-				<ul>
-					{onlineUsersDisplay.map((user) => (
-						<SocialBlockOnlineUser key={user.id} user={user} />
-					))}
-				</ul>
+				<div className="social-block">
+					<div className="social-block-title">
+						<span>online</span>
+						<FontAwesomeIcon icon={faCircle} />
+						<span>{onlineUsersDisplay.length}</span>
+					</div>
+					<ul>
+						{onlineUsersDisplay.map((user) => (
+							<SocialBlockOnlineUser key={user.id} user={user} />
+						))}
+					</ul>
+				</div>
 			</div>
 		</Fade>
 	);
