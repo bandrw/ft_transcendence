@@ -60,7 +60,7 @@ const GamesHistory = () => {
 			<Header />
 			<div className="games-history-wrapper">
 				<Fade className="games-history">
-					<div>
+					<>
 						<h1>{`Games history with ${params.login}`}</h1>
 						<div className="games-history-games main-block">
 							<div className="games-history-legend">
@@ -115,7 +115,7 @@ const GamesHistory = () => {
 								})
 							)}
 						</div>
-					</div>
+					</>
 				</Fade>
 			</div>
 		</div>

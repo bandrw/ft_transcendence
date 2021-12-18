@@ -158,6 +158,12 @@
 					background: #29aa44;
 				}
 			}
+
+			time {
+				&::selection {
+					background: #29aa44;
+				}
+			}
 		}
 
 		&:hover {

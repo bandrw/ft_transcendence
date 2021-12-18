@@ -42,6 +42,10 @@
 .companions-message {
 	background: #2c2f3a;
 	margin-right: auto;
+
+	div::selection, time::selection {
+		background: #29aa44;
+	}
 }
 
 .companions-message-channel {
@@ -69,12 +73,21 @@
 		font-size: 0.8em;
 		font-weight: 500;
 		height: 18px;
+
+		&::selection {
+			background: #29aa44;
+			color: #1a1b1f;
+		}
 	}
 }
 
 .users-message {
 	background: #29aa44;
 	margin-left: auto;
+
+	&::selection, time::selection {
+		background: #2c3e50;
+	}
 
 	&:after {
 		left: initial;

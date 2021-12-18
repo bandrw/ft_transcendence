@@ -80,6 +80,10 @@
 		color: white;
 		border-radius: 10px;
 
+		span::selection {
+			background-color: #29aa44;
+		}
+
 		.find-game-searching-time {
 			display: flex;
 			flex-direction: column;
@@ -128,6 +132,10 @@
 		justify-content: space-between;
 		align-items: center;
 
+		p::selection {
+			background-color: #29aa44;
+		}
+
 		& > p {
 			font-size: 2em;
 			font-weight: bold;
@@ -154,6 +162,10 @@
 
 			.accept-window-info-username {
 				margin: 15px 0 10px;
+
+				&::selection {
+					background-color: #29aa44;
+				}
 			}
 		}
 
@@ -191,6 +203,10 @@
 				&:active {
 					opacity: 0.8;
 				}
+
+				&::selection {
+					background-color: #2c3e50;
+				}
 			}
 
 			.accept-btn-accepted {
@@ -216,10 +232,18 @@
 				&:hover {
 					text-decoration: underline;
 				}
+
+				&::selection {
+					background-color: #29aa44;
+				}
 			}
 
 			& > span {
 				margin-top: 25px;
+
+				&::selection {
+					background-color: #29aa44;
+				}
 			}
 		}
 	}

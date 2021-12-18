@@ -4,6 +4,10 @@
 
 	.main-block-title {
 		margin-bottom: 30px;
+
+		span::selection {
+			background: #29aa44;
+		}
 	}
 
 	.messenger-container {
@@ -36,6 +40,10 @@
 
 					&:focus {
 						border: 1px solid rgba(#29aa44, 0.5);
+					}
+
+					&::selection {
+						background: #29aa44;
 					}
 				}
 
@@ -98,6 +106,10 @@
 							border: none;
 							cursor: pointer;
 							padding: 12px 20px;
+
+							&::selection {
+								background: #29aa44;
+							}
 
 							svg {
 								width: 20px;

@@ -95,6 +95,10 @@
 			.games-history-win {
 				width: 70px;
 				color: #3cb768;
+
+				&::selection {
+					color: #2c3e50;
+				}
 			}
 
 			.games-history-game-score {

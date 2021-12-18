@@ -63,5 +63,9 @@
 			color: #ccc;
 			font-size: 0.8em;
 		}
+
+		&::selection {
+			background: #29aa44;
+		}
 	}
 }

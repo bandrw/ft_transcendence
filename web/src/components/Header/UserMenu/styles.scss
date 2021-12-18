@@ -20,6 +20,10 @@
 		justify-content: center;
 		font-weight: 600;
 		text-transform: uppercase;
+
+		&::selection {
+			background-color: #29aa44;
+		}
 	}
 
 	.user-menu-btn {
