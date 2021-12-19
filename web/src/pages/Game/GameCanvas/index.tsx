@@ -1,4 +1,5 @@
 import { useAppSelector } from 'app/hooks';
+import { BallType, getBallColor, getBallType, getEnemyColor, getUserColor } from "components/GameSettings";
 import { SocketContext } from 'context/socket';
 import { ApiGameLoop, ApiGameSettings } from 'models/ApiTypes';
 import GameBall from 'models/GameBall';
@@ -21,6 +22,11 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 	const rightPlayer = useMemo(() => new Player(), []);
 	const ball = useMemo(() => new GameBall(), []);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
+
+	const userColor = getUserColor();
+	const enemyColor = getEnemyColor();
+	const ballColor = getBallColor();
+	const ballType = getBallType();
 
 	const score = useMemo(
 		() => ({
@@ -195,8 +201,13 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		};
 
 		const drawBall = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-			ctx.rect(ball.xPosition, ball.yPosition, ball.size, ball.size);
-			ctx.fill();
+			if (ballType === BallType.Square) {
+				ctx.rect(ball.xPosition, ball.yPosition, ball.size, ball.size);
+				ctx.fill();
+			} else if (ballType === BallType.Circle) {
+				ctx.arc(ball.xPosition + ball.size / 2, ball.yPosition + ball.size / 2, ball.size / 2, 0, Math.PI * 2);
+				ctx.fill();
+			}
 		};
 
 		const render = () => {
@@ -220,14 +231,28 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 			drawBackground(canvas, ctx);
 			putScore(canvas, ctx);
 
-			ctx.beginPath();
-			ctx.fillStyle = '#29aa44';
-			drawLeftRectangle(canvas, ctx);
-			drawRightRectangle(canvas, ctx);
-			ctx.closePath();
+			if (leftPlayer.username === currentUser.username) {
+				ctx.beginPath();
+				ctx.fillStyle = userColor;
+				drawLeftRectangle(canvas, ctx);
+				ctx.closePath();
+				ctx.beginPath();
+				ctx.fillStyle = enemyColor;
+				drawRightRectangle(canvas, ctx);
+				ctx.closePath();
+			} else {
+				ctx.beginPath();
+				ctx.fillStyle = enemyColor;
+				drawLeftRectangle(canvas, ctx);
+				ctx.closePath();
+				ctx.beginPath();
+				ctx.fillStyle = userColor;
+				drawRightRectangle(canvas, ctx);
+				ctx.closePath();
+			}
 
 			ctx.beginPath();
-			ctx.fillStyle = '#fff';
+			ctx.fillStyle = ballColor;
 			drawBall(canvas, ctx);
 			ctx.closePath();
 		};
@@ -285,6 +310,7 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		};
 	}, [
 		ball,
+		currentUser.username,
 		gameSettings,
 		leftPlayer,
 		playerHeight,
@@ -293,6 +319,10 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 		rightPlayer,
 		score.leftPlayer,
 		score.rightPlayer,
+		ballColor,
+		ballType,
+		enemyColor,
+		userColor,
 	]);
 
 	return (

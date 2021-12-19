@@ -95,7 +95,7 @@ interface FindGameProps {
 
 const FindGame = ({ enemyIsReady }: FindGameProps) => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);
-	const [showSettings, setShowSettings] = React.useState(true);
+	const [showSettings, setShowSettings] = React.useState(false);
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { status } = useAppSelector((state) => state.status);
@@ -143,6 +143,7 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 		};
 	}, [status, currentUser]);
 
+	// Click outside game settings
 	React.useEffect(() => {
 		const clickHandler = () => {
 			if (showSettings)
@@ -167,6 +168,12 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 					<button onClick={() => dispatch(setStatus(ApiUserStatus.Regular))} className="find-game-cancel">
 						<FontAwesomeIcon icon={faTimesCircle} />
 					</button>
+					<button type='button' className="find-game-settings__button" onClick={() => setShowSettings((prev) => !prev)}>
+						<FontAwesomeIcon icon={faCog}/>
+					</button>
+					{showSettings && (
+						<GameSettings/>
+					)}
 				</div>
 			</div>
 		);
