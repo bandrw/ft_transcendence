@@ -3,25 +3,16 @@ import './styles.scss';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
-import {resetCurrentUser} from 'app/reducers/currentUserSlice';
-import { removeToken } from 'app/token';
+import { logoutAction } from 'app/reducers/currentUserSlice';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Link } from 'react-router-dom';
-
-import { logout } from "../../../api/auth";
 
 const UserMenu = () => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const dispatch = useAppDispatch();
 
-	const logOut = () => {
-		logout()
-			.then(() => {
-				dispatch(resetCurrentUser());
-				removeToken();
-			});
-	};
+	const logOut = () => dispatch(logoutAction());
 
 	return (
 		<Fade duration={250}>

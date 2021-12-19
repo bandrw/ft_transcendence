@@ -1,5 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import { IUser } from 'models/User';
+
+import {logout} from "../../api/auth";
+import {removeToken} from "../token";
 
 interface CurrentUserState {
 	currentUser: IUser;
@@ -16,6 +19,13 @@ const initialState: CurrentUserState = {
 	},
 };
 
+export const logoutAction = createAsyncThunk(
+	'currentUser/logout',
+	async () => {
+		await logout();
+	},
+);
+
 export const currentUserSlice = createSlice({
 	name: 'currentUser',
 	initialState,
@@ -27,6 +37,12 @@ export const currentUserSlice = createSlice({
 		resetCurrentUser: (state: CurrentUserState) => {
 			state.currentUser = initialState.currentUser;
 		},
+	},
+	extraReducers: (builder) => {
+		builder.addCase(logoutAction.fulfilled, (state) => {
+			state.currentUser = initialState.currentUser;
+			removeToken();
+		});
 	},
 });
 
