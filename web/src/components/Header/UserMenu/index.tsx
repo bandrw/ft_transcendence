@@ -4,25 +4,19 @@ import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import {resetCurrentUser} from 'app/reducers/currentUserSlice';
-import { getToken, removeToken } from 'app/token';
-import axios from 'axios';
+import { removeToken } from 'app/token';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Link } from 'react-router-dom';
+
+import { logout } from "../../../api/auth";
 
 const UserMenu = () => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const dispatch = useAppDispatch();
 
 	const logOut = () => {
-		axios
-			.post(
-				'/users/logout',
-				{},
-				{
-					headers: { Authorization: `Bearer ${getToken()}` },
-				},
-			)
+		logout()
 			.then(() => {
 				dispatch(resetCurrentUser());
 				removeToken();
