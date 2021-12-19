@@ -3,7 +3,8 @@ import './App.scss';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { setAllUsers } from 'app/reducers/allUsersSlice';
 import { resetCurrentUser, setCurrentUser } from "app/reducers/currentUserSlice";
-import { setEnemy } from 'app/reducers/enemySlice';
+import { setEnemy, setEnemyIsReady } from 'app/reducers/enemySlice';
+import {setGameSettings} from "app/reducers/gameSlice";
 import { setOnlineUsers } from 'app/reducers/onlineUsersSlice';
 import { setStatus } from 'app/reducers/statusSlice';
 import { getToken, removeToken } from 'app/token';
@@ -23,8 +24,6 @@ import UserProfile from 'pages/UserProfile';
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Switch, useHistory } from "react-router-dom";
-
-import {setGameSettings} from "./app/reducers/gameSlice";
 
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {
@@ -66,7 +65,7 @@ const App = () => {
 	const socket = React.useContext(SocketContext);
 	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
 	const [socketId, setSocketId] = React.useState<string | null>(null);
-	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
+	// const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
 	const sockId = socketId || socket.id;
 
 	const isAuth = useAuth();
@@ -238,10 +237,10 @@ const App = () => {
 
 				if (enemyDeclinedGame) {
 					dispatch(setStatus(ApiUserStatus.Regular));
-					setEnemyIsReady(false);
+					dispatch(setEnemyIsReady(false));
 					dispatch(setEnemy(null));
 				} else if (enemyAcceptedGame) {
-					setEnemyIsReady(true);
+					dispatch(setEnemyIsReady(true));
 				}
 			}
 		};
@@ -296,7 +295,7 @@ const App = () => {
 			</PrivateRoute>
 
 			<PrivateRoute exact path="/">
-				<Main enemyIsReady={enemyIsReady} />
+				<Main />
 			</PrivateRoute>
 		</Switch>
 	);

@@ -3,10 +3,12 @@ import { ApiUpdateUser } from 'models/ApiTypes';
 
 interface EnemyState {
 	enemy: ApiUpdateUser | null;
+	enemyIsReady: boolean;
 }
 
 const initialState: EnemyState = {
 	enemy: null,
+	enemyIsReady: false,
 };
 
 export const enemySlice = createSlice({
@@ -16,9 +18,12 @@ export const enemySlice = createSlice({
 		setEnemy: (state: EnemyState, action: PayloadAction<ApiUpdateUser | null>) => {
 			state.enemy = action.payload;
 		},
+		setEnemyIsReady: (state: EnemyState, action: PayloadAction<boolean>) => {
+			state.enemyIsReady = action.payload;
+		},
 	},
 });
 
-export const { setEnemy } = enemySlice.actions;
+export const { setEnemy, setEnemyIsReady } = enemySlice.actions;
 
 export default enemySlice.reducer;

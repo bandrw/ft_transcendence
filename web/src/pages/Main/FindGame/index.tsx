@@ -14,14 +14,14 @@ import { clearInterval, setInterval } from 'timers';
 
 interface AcceptWindowProps {
 	enemy: ApiUpdateUser;
-	enemyIsReady: boolean;
 }
 
-const AcceptWindow = ({ enemy, enemyIsReady }: AcceptWindowProps) => {
+const AcceptWindow = ({ enemy }: AcceptWindowProps) => {
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 	const [timeLeft, setTimeLeft] = React.useState<number>(20);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { status } = useAppSelector((state) => state.status);
+	const { enemyIsReady } = useAppSelector((state) => state.enemy);
 	const dispatch = useAppDispatch();
 
 	const declineGame = () => {
@@ -89,11 +89,7 @@ const AcceptWindow = ({ enemy, enemyIsReady }: AcceptWindowProps) => {
 	);
 };
 
-interface FindGameProps {
-	enemyIsReady: boolean;
-}
-
-const FindGame = ({ enemyIsReady }: FindGameProps) => {
+const FindGame = () => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);
 	const [showSettings, setShowSettings] = React.useState(false);
 	const timerIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -102,6 +98,7 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 	const { enemy } = useAppSelector((state) => state.enemy);
 	const dispatch = useAppDispatch();
 
+	// /ladder/setStatus
 	React.useEffect(() => {
 		let isMounted = true;
 
@@ -192,7 +189,7 @@ const FindGame = ({ enemyIsReady }: FindGameProps) => {
 					</button>
 				</div>
 				<Fade duration={500} triggerOnce style={{ position: 'fixed' }}>
-					{enemy && <AcceptWindow enemy={enemy} enemyIsReady={enemyIsReady} />}
+					{enemy && <AcceptWindow enemy={enemy} />}
 				</Fade>
 			</div>
 		);

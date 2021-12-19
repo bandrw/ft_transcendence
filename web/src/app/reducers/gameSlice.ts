@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {ApiGameSettings, ApiUpdateUser} from 'models/ApiTypes';
+import {ApiGameSettings} from 'models/ApiTypes';
 
 interface GameState {
 	settings: ApiGameSettings | null;

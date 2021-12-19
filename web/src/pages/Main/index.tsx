@@ -11,11 +11,7 @@ import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { useHistory } from 'react-router-dom';
 
-interface MainProps {
-	enemyIsReady: boolean;
-}
-
-const Main: React.FC<MainProps> = ({ enemyIsReady }) => {
+const Main = () => {
 	const history = useHistory();
 	const { status } = useAppSelector((state) => state.status);
 
@@ -31,7 +27,7 @@ const Main: React.FC<MainProps> = ({ enemyIsReady }) => {
 				<div className="main-top">
 					<div className="main-center">
 						<Fade triggerOnce style={{ position: 'relative', zIndex: 9 }}>
-							<FindGame enemyIsReady={enemyIsReady} />
+							<FindGame />
 						</Fade>
 						<Fade delay={100} triggerOnce style={{ position: 'relative', zIndex: 8 }}>
 							<RecentGames />
