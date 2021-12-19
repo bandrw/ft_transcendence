@@ -2,11 +2,11 @@ import './styles.scss';
 
 import { faChevronLeft, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppDispatch } from 'app/hooks';
-import { setStatus } from 'app/reducers/statusSlice';
+import { useAppDispatch } from 'hook/reduxHooks';
 import { ApiUserStatus } from 'models/ApiTypes';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { setStatus } from 'store/reducers/statusSlice';
 
 interface GameResultsProps {
 	winner: string;

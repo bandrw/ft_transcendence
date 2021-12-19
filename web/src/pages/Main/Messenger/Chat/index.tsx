@@ -17,11 +17,10 @@ import {
 	faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/hooks';
-import { getToken } from 'app/token';
 import axios from 'axios';
 import * as bcryptjs from 'bcryptjs';
 import { SocketContext } from 'context/socket';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiChannelExpand, ApiChannelMember, ApiChatExpand, ApiMessage, ApiUserExpand } from 'models/ApiTypes';
 import moment from 'moment';
 import CreateChannel from 'pages/Main/Messenger/Chat/CreateChannel';
@@ -29,6 +28,7 @@ import CreateChat from 'pages/Main/Messenger/Chat/CreateChat';
 import Message from 'pages/Main/Messenger/Chat/Message';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getToken } from 'utils/token';
 
 interface ChatProps {
 	selectedChat: ApiChatExpand | null;

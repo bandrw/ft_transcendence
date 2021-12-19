@@ -2,15 +2,15 @@ import './styles.scss';
 
 import { faCheck, faCog, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppDispatch, useAppSelector } from 'app/hooks';
-import { setStatus } from 'app/reducers/statusSlice';
-import { getToken } from 'app/token';
 import axios from 'axios';
 import GameSettings from "components/GameSettings";
+import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
 import { ApiUpdateUser, ApiUserStatus } from 'models/ApiTypes';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
+import { setStatus } from 'store/reducers/statusSlice';
 import { clearInterval, setInterval } from 'timers';
+import { getToken } from 'utils/token';
 
 interface AcceptWindowProps {
 	enemy: ApiUpdateUser;

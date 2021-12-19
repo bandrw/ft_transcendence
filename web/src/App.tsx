@@ -1,17 +1,10 @@
 import './App.scss';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
-import { setAllUsers } from 'app/reducers/allUsersSlice';
-import { resetCurrentUser, setCurrentUser } from "app/reducers/currentUserSlice";
-import { setEnemy, setEnemyIsReady } from 'app/reducers/enemySlice';
-import {setGameSettings} from "app/reducers/gameSlice";
-import { setOnlineUsers } from 'app/reducers/onlineUsersSlice';
-import { setStatus } from 'app/reducers/statusSlice';
-import { getToken, removeToken } from 'app/token';
 import axios from 'axios';
 import { AuthRoute } from "components/AuthRoute";
 import { PrivateRoute } from "components/PrivateRoute";
 import { SocketContext } from 'context/socket';
+import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
 import {useAuth} from "hook/useAuth";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
 import { User } from "models/User";
@@ -24,6 +17,13 @@ import UserProfile from 'pages/UserProfile';
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Switch, useHistory } from "react-router-dom";
+import { setAllUsers } from 'store/reducers/allUsersSlice';
+import { resetCurrentUser, setCurrentUser } from "store/reducers/currentUserSlice";
+import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
+import {setGameSettings} from "store/reducers/gameSlice";
+import { setOnlineUsers } from 'store/reducers/onlineUsersSlice';
+import { setStatus } from 'store/reducers/statusSlice';
+import { getToken, removeToken } from 'utils/token';
 
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {

@@ -1,16 +1,16 @@
 import './styles.scss';
 
-import { useAppDispatch } from 'app/hooks';
-import { setCurrentUser } from 'app/reducers/currentUserSlice';
-import { getToken } from 'app/token';
 import axios, { AxiosResponse } from 'axios';
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from 'components/CircleLoading';
 import { SocketContext } from 'context/socket';
+import { useAppDispatch } from 'hook/reduxHooks';
 import { ApiUser, ApiUserCreate } from 'models/ApiTypes';
 import { signIn } from 'pages/Login';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { setCurrentUser } from 'store/reducers/currentUserSlice';
+import { getToken } from 'utils/token';
 
 const validateInput = (
 	login: string,

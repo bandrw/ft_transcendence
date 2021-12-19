@@ -1,9 +1,9 @@
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getToken } from 'app/token';
 import axios, { AxiosResponse } from 'axios';
 import * as bcryptjs from 'bcryptjs';
 import React, { FormEvent } from 'react';
+import { getToken } from 'utils/token';
 
 interface CreateChannelProps {
 	setDefaultChatState: () => void;

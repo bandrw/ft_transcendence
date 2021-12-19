@@ -9,11 +9,10 @@ import {
 	faUserPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/hooks';
-import { getToken } from 'app/token';
 import axios from 'axios';
 import CircleLoading from 'components/CircleLoading';
 import Header from 'components/Header';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame, ApiUser, ApiUserExpand } from 'models/ApiTypes';
 import { User } from 'models/User';
 import { GameTime } from 'pages/GamesHistory';
@@ -22,6 +21,7 @@ import ListSection from 'pages/UserProfile/ListSection';
 import UserEditWindow from 'pages/UserProfile/UserEditWindow';
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { getToken } from 'utils/token';
 
 enum SubscribeBtnState {
 	Default,

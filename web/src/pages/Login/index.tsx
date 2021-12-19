@@ -1,17 +1,17 @@
 import "./styles.scss";
 
 import { getCurrentUser } from "App";
-import { useAppDispatch } from "app/hooks";
-import { setCurrentUser } from "app/reducers/currentUserSlice";
-import { removeToken, setToken } from "app/token";
 import axios, { AxiosResponse } from "axios";
 import CircleLoading from "components/CircleLoading";
 import CodeVerification from "components/CodeVerification";
 import { SocketContext } from "context/socket";
+import { useAppDispatch } from "hook/reduxHooks";
 import { ApiUserLogin } from "models/ApiTypes";
 import { User } from "models/User";
 import React, { FormEvent } from "react";
 import { Link, useHistory } from "react-router-dom";
+import { setCurrentUser } from "store/reducers/currentUserSlice";
+import { removeToken, setToken } from "utils/token";
 
 interface LoginProps {
 	socketId: string;

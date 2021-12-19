@@ -1,12 +1,12 @@
 import './styles.scss';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
-import { setStatus } from 'app/reducers/statusSlice';
 import Header from 'components/Header';
+import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
 import { ApiUserStatus } from 'models/ApiTypes';
 import GameCanvas from 'pages/Game/GameCanvas';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { setStatus } from 'store/reducers/statusSlice';
 
 const Game = () => {
 	const history = useHistory();

@@ -3,8 +3,8 @@ import './styles.scss';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { faBell } from '@fortawesome/free-solid-svg-icons/faBell';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/hooks';
 import UserMenu from 'components/Header/UserMenu';
+import { useAppSelector } from 'hook/reduxHooks';
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 

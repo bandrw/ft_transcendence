@@ -2,13 +2,13 @@ import './styles.scss';
 
 import { faArrowRight, faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/hooks';
-import { getToken } from 'app/token';
 import axios from 'axios';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
 import { GameTime } from 'pages/GamesHistory';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getToken } from 'utils/token';
 
 const RecentGames = () => {
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);

@@ -1,5 +1,5 @@
-import { getToken } from 'app/token';
 import axios from 'axios';
+import { getToken } from 'utils/token';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 

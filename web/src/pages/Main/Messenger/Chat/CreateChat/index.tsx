@@ -1,9 +1,9 @@
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getToken } from 'app/token';
 import axios from 'axios';
 import { ApiUserExpand } from 'models/ApiTypes';
 import React from 'react';
+import { getToken } from 'utils/token';
 
 interface CreateChatProps {
 	setDefaultChatState: () => void;

@@ -1,16 +1,16 @@
 import './styles.scss';
 import 'react-phone-input-2/lib/style.css';
 
-import { useAppSelector } from 'app/hooks';
-import { getToken } from 'app/token';
 import axios from 'axios';
 import CodeVerification from "components/CodeVerification";
 import { SocketContext } from "context/socket";
+import { useAppSelector } from 'hook/reduxHooks';
 import { AvatarGenerator } from 'random-avatar-generator';
 import React, { ChangeEvent, FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import PhoneInput from 'react-phone-input-2';
 import { useHistory } from 'react-router-dom';
+import { getToken } from 'utils/token';
 
 type ImageState = {
 	type: 'generated' | 'uploaded';

@@ -2,16 +2,16 @@ import './styles.scss';
 
 import { faBullhorn, faComment, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/hooks';
-import { getToken } from 'app/token';
 import axios from 'axios';
 import { SocketContext } from 'context/socket';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from 'models/ApiTypes';
 import Chat from 'pages/Main/Messenger/Chat';
 import LeftMenuChannel from 'pages/Main/Messenger/LeftMenuChannel';
 import LeftMenuChat from 'pages/Main/Messenger/LeftMenuChat';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
+import { getToken } from 'utils/token';
 
 const Messenger = () => {
 	const socket = React.useContext(SocketContext);

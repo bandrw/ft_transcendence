@@ -2,11 +2,11 @@ import './styles.scss';
 
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppDispatch, useAppSelector } from 'app/hooks';
-import { logoutAction } from 'app/reducers/currentUserSlice';
+import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Link } from 'react-router-dom';
+import { logoutAction } from 'store/reducers/currentUserSlice';
 
 const UserMenu = () => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);

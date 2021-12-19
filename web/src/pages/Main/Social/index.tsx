@@ -2,13 +2,13 @@ import './styles.scss';
 
 import { faCircle, faTv } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/hooks';
-import { getToken } from 'app/token';
 import axios from 'axios';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiUpdateUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Link, useHistory } from 'react-router-dom';
+import { getToken } from 'utils/token';
 
 interface SocialBlockOnlineUserProps {
 	user: ApiUpdateUser;

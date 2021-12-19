@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import * as AuthApi from "api/auth";
-import { removeToken } from "app/token";
 import { IUser } from 'models/User';
+import { removeToken } from "utils/token";
 
 interface CurrentUserState {
 	currentUser: IUser;

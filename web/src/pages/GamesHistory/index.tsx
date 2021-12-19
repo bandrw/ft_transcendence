@@ -2,16 +2,16 @@ import './styles.scss';
 
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAppSelector } from 'app/hooks';
-import { getToken } from 'app/token';
 import axios from 'axios';
 import Header from 'components/Header';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
 import moment from 'moment';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
+import { getToken } from 'utils/token';
 
 export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');

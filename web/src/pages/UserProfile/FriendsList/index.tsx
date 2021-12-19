@@ -2,7 +2,7 @@ import "./styles.scss";
 
 import { faUserFriends } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useAppSelector } from "app/hooks";
+import { useAppSelector } from "hook/reduxHooks";
 import { ApiUserExpand, ApiUserStatus } from "models/ApiTypes";
 import React from "react";
 import { Link } from "react-router-dom";

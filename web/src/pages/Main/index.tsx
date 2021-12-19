@@ -1,7 +1,7 @@
 import './styles.scss';
 
-import { useAppSelector } from 'app/hooks';
 import Header from 'components/Header';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiUserStatus } from 'models/ApiTypes';
 import FindGame from 'pages/Main/FindGame';
 import Messenger from 'pages/Main/Messenger';

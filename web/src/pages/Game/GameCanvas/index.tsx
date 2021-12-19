@@ -1,6 +1,6 @@
-import { useAppSelector } from 'app/hooks';
 import { BallType, getBallColor, getBallType, getEnemyColor, getUserColor } from "components/GameSettings";
 import { SocketContext } from 'context/socket';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGameLoop, ApiGameSettings } from 'models/ApiTypes';
 import GameBall from 'models/GameBall';
 import Player from 'models/Player';
