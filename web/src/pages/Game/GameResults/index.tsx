@@ -11,10 +11,9 @@ import { useHistory } from 'react-router-dom';
 interface GameResultsProps {
 	winner: string;
 	loser: string;
-	gameRef: React.MutableRefObject<{ runs: boolean; interval: null | NodeJS.Timeout }>;
 }
 
-const GameResults = ({ winner, loser, gameRef }: GameResultsProps) => {
+const GameResults = ({ winner, loser }: GameResultsProps) => {
 	const history = useHistory();
 	const dispatch = useAppDispatch();
 
@@ -37,7 +36,6 @@ const GameResults = ({ winner, loser, gameRef }: GameResultsProps) => {
 					className="game-results-back-btn"
 					onClick={() => {
 						dispatch(setStatus(ApiUserStatus.Regular));
-						gameRef.current.runs = false;
 						history.push('/');
 					}}
 				>

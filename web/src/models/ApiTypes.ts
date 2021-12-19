@@ -115,6 +115,13 @@ type ApiUpdateUser = {
 	subscribers: ApiUser[];
 };
 
+type GamePlayerType = {
+	id: number;
+	login: string;
+	url_avatar: string;
+	status: string;
+}
+
 type ApiGameSettings = {
 	id: string;
 	canvasWidth: number;
@@ -127,18 +134,8 @@ type ApiGameSettings = {
 	ballAngle: number;
 	ballSpeed: number;
 	fps: number;
-	leftPlayer: {
-		id: number;
-		login: string;
-		url_avatar: string;
-		status: string;
-	};
-	rightPlayer: {
-		id: number;
-		login: string;
-		url_avatar: string;
-		status: string;
-	};
+	leftPlayer: GamePlayerType;
+	rightPlayer: GamePlayerType;
 	score: {
 		leftPlayer: number;
 		rightPlayer: number;

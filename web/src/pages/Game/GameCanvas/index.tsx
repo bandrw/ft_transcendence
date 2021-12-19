@@ -12,10 +12,9 @@ import { Link } from 'react-router-dom';
 interface GameCanvasProps {
 	watchMode: boolean;
 	gameSettings: ApiGameSettings;
-	gameRef: React.MutableRefObject<{ runs: boolean; interval: null | NodeJS.Timeout }>;
 }
 
-const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
+const GameCanvas = ({ watchMode, gameSettings }: GameCanvasProps) => {
 	const socket = React.useContext(SocketContext);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const leftPlayer = useMemo(() => new Player(), []);
@@ -353,7 +352,6 @@ const GameCanvas = ({ watchMode, gameSettings, gameRef }: GameCanvasProps) => {
 								? gameSettings.rightPlayer.login
 								: gameSettings.leftPlayer.login
 						}
-						gameRef={gameRef}
 					/>
 				</Fade>
 			)}

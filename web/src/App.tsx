@@ -24,6 +24,8 @@ import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Switch, useHistory } from "react-router-dom";
 
+import {setGameSettings} from "./app/reducers/gameSlice";
+
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {
 		const usr = await axios
@@ -62,8 +64,6 @@ const App = () => {
 
 	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-	const gameSettingsRef = React.useRef<ApiGameSettings | null>(null);
-	const gameRef = React.useRef<{ runs: boolean; interval: null | NodeJS.Timeout }>({ runs: false, interval: null });
 	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
 	const [socketId, setSocketId] = React.useState<string | null>(null);
 	const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
@@ -193,7 +193,7 @@ const App = () => {
 
 		const gameSettingsHandler = (e: string) => {
 			const gameSettings: ApiGameSettings = JSON.parse(e);
-			gameSettingsRef.current = gameSettings;
+			dispatch(setGameSettings(gameSettings));
 
 			// If watch mode is on, don't send start
 			if (
@@ -269,7 +269,7 @@ const App = () => {
 			socket.off('gameIsReady', gameIsReadyHandler);
 			socket.off('gameSettings', gameSettingsHandler);
 		};
-	}, [isAuth, currentUser, socket, gameSettingsRef, onlineUsersRef, onlineUsers, dispatch, status, enemy]);
+	}, [isAuth, currentUser, socket, onlineUsersRef, onlineUsers, dispatch, status, enemy]);
 
 	if (!isDesktop) return <div style={{ fontSize: '2em', marginTop: '100px' }}>Window is too small :(</div>;
 
@@ -284,7 +284,7 @@ const App = () => {
 			</AuthRoute>
 
 			<PrivateRoute exact path="/game">
-				<Game enemyInfo={enemy} gameSettingsRef={gameSettingsRef} gameRef={gameRef} />
+				<Game />
 			</PrivateRoute>
 
 			<PrivateRoute path="/games/:login">

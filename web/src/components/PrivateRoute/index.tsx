@@ -1,7 +1,9 @@
 import FullPageLoader from "components/FullPageLoader";
 import { useAuth } from "hook/useAuth";
 import React from "react";
-import { Route, RouteProps } from "react-router-dom";
+import { Redirect, Route, RouteProps} from "react-router-dom";
+
+import { AppDataLayout } from "../../Layout/AppDataLayout";
 
 export const PrivateRoute = ({ children, ...rest }: RouteProps) => {
 	const isAuth = useAuth();
@@ -9,8 +11,9 @@ export const PrivateRoute = ({ children, ...rest }: RouteProps) => {
 	return (
 		<Route
 			{...rest}
-			render={() =>
+			render={({ location }) =>
 				isAuth ? (
+					// <AppDataLayout>{children}</AppDataLayout>
 					children
 				) : (
 					<FullPageLoader/> // TODO tmp
