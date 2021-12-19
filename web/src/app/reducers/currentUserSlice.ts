@@ -1,8 +1,8 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import { IUser } from 'models/User';
 
-import {logout} from "../../api/auth";
-import {removeToken} from "../token";
+import * as AuthApi from "../../api/auth";
+import { removeToken } from "../token";
 
 interface CurrentUserState {
 	currentUser: IUser;
@@ -22,7 +22,30 @@ const initialState: CurrentUserState = {
 export const logoutAction = createAsyncThunk(
 	'currentUser/logout',
 	async () => {
-		await logout();
+		await AuthApi.logout();
+	},
+);
+
+export const getCurrentUserAction = createAsyncThunk(
+	'currentUser/getCurrentUser',
+	async (sockId: string, { rejectWithValue }) => {
+		try {
+			const user = await AuthApi.getCurrentUser(sockId);
+
+			if (user) {
+				const { id, login, url_avatar } = user;
+
+				return {
+					id,
+					login,
+					url_avatar,
+				};
+			}
+
+			return rejectWithValue('');
+		} catch {
+			return rejectWithValue('');
+		}
 	},
 );
 
@@ -38,11 +61,19 @@ export const currentUserSlice = createSlice({
 			state.currentUser = initialState.currentUser;
 		},
 	},
-	extraReducers: (builder) => {
-		builder.addCase(logoutAction.fulfilled, (state) => {
-			state.currentUser = initialState.currentUser;
+	extraReducers: {
+		[logoutAction.fulfilled.type]: (state) => {
 			removeToken();
-		});
+			state.currentUser = initialState.currentUser;
+		},
+		[getCurrentUserAction.fulfilled.type]: (state: CurrentUserState, action: PayloadAction<IUser>) => {
+			state.currentUser = action.payload;
+			state.currentUser.isAuthorized = true;
+		},
+		[getCurrentUserAction.rejected.type]: (state) => {
+			removeToken();
+			state.currentUser = initialState.currentUser;
+		},
 	},
 });
 

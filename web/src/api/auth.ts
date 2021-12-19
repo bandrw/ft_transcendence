@@ -10,3 +10,7 @@ export const logout = () => {
 };
 
 export const registry = () => {};
+
+export const getCurrentUser = (socketId: string) => {
+	return api.get<ApiUser | null>('/auth', { params: { socketId } }).then((res) => res.data);
+};
