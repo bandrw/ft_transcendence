@@ -323,7 +323,6 @@ const Messenger = () => {
 						setSelectedChat(null);
 						setSelectedChannel(null);
 					}}
-					messages={selectedChat?.messages || []}
 					chatState={chatState}
 					setDefaultChatState={() => {
 						setChatState('default');

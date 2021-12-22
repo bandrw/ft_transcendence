@@ -1,26 +1,26 @@
 export enum ApiUserStatus {
-	Regular = 'green',
-	Searching = 'yellow',
-	FoundEnemy = 'orange',
-	Accepted = 'red',
-	InGame = 'inGame',
-	Declined = 'blue',
-	Offline = 'offline',
+	Regular = "green",
+	Searching = "yellow",
+	FoundEnemy = "orange",
+	Accepted = "red",
+	InGame = "inGame",
+	Declined = "blue",
+	Offline = "offline",
 }
 
-type ApiUserCreate = {
+export interface ApiUserCreate {
 	ok: boolean;
 	msg: string;
-};
+}
 
-type ApiUser = {
+export interface ApiUser {
 	id: number;
 	login: string;
 	url_avatar: string;
 	phoneNumber: string | null;
-};
+}
 
-type ApiGame = {
+export interface ApiGame {
 	id: number;
 	winnerId?: number;
 	loserId?: number;
@@ -29,50 +29,50 @@ type ApiGame = {
 	leftScore: number;
 	rightScore: number;
 	date: string;
-};
+}
 
-type ApiChat = {
+export interface ApiChat {
 	id: number;
 	userOneId: number;
 	userTwoId: number;
-};
+}
 
-type ApiMessage = {
+export interface ApiMessage {
 	id: number;
 	chatId: number;
 	channelId: number;
 	fromUserId: number;
 	text: string;
 	date: number;
-};
+}
 
-type ApiBanList = {
+export interface ApiBanList {
 	id: number;
 	initiatorId: number;
 	memberId: number;
 	chatId: number;
 	channelId: number;
 	unbanDate: string;
-};
+}
 
-type ApiChannelMember = {
+export interface ApiChannelMember {
 	id: number;
 	login: string;
 	url_avatar: string;
 	isAdmin: boolean;
 	banLists: ApiBanList[];
-};
+}
 
-type ApiChannel = {
+export interface ApiChannel {
 	id: number;
 	name: string;
 	title: string;
 	isPrivate: boolean;
 	password?: string;
 	ownerId: number;
-};
+}
 
-type ApiChannelExpand = {
+export interface ApiChannelExpand {
 	id: number;
 	name: string;
 	title: string;
@@ -81,9 +81,9 @@ type ApiChannelExpand = {
 	ownerId: number;
 	members: ApiChannelMember[];
 	messages: ApiMessage[];
-};
+}
 
-type ApiUserExpand = {
+export interface ApiUserExpand {
 	id: number;
 	login: string;
 	url_avatar: string;
@@ -98,14 +98,14 @@ type ApiUserExpand = {
 	messages: ApiMessage[];
 	ownedChannels: ApiChannel[];
 	channels: ApiChannelExpand[];
-};
+}
 
-type ApiUserLogin = {
+export interface ApiUserLogin {
 	access_token: string | null;
-	twoFactorAuthentication: boolean
-};
+	twoFactorAuthentication: boolean;
+}
 
-type ApiUpdateUser = {
+export interface ApiUpdateUser {
 	id: number;
 	login: string;
 	url_avatar: string;
@@ -113,16 +113,16 @@ type ApiUpdateUser = {
 	status: ApiUserStatus;
 	subscriptions: ApiUser[];
 	subscribers: ApiUser[];
-};
+}
 
-type GamePlayerType = {
+export interface GamePlayerType {
 	id: number;
 	login: string;
 	url_avatar: string;
 	status: string;
 }
 
-type ApiGameSettings = {
+export interface ApiGameSettings {
 	id: string;
 	canvasWidth: number;
 	canvasHeight: number;
@@ -140,9 +140,9 @@ type ApiGameSettings = {
 		leftPlayer: number;
 		rightPlayer: number;
 	};
-};
+}
 
-type ApiGameLoop = {
+export interface ApiGameLoop {
 	b: {
 		x: number;
 		y: number;
@@ -153,9 +153,9 @@ type ApiGameLoop = {
 	rP: {
 		y: number;
 	};
-};
+}
 
-type ApiChatExpand = {
+export interface ApiChatExpand {
 	id: number;
 	userOneId: number;
 	userTwoId: number;
@@ -163,21 +163,4 @@ type ApiChatExpand = {
 	userTwo: ApiUser;
 	messages: ApiMessage[];
 	banLists: ApiBanList[];
-};
-
-export type {
-	ApiChannel,
-	ApiChannelExpand,
-	ApiChannelMember,
-	ApiChat,
-	ApiChatExpand,
-	ApiGame,
-	ApiGameLoop,
-	ApiGameSettings,
-	ApiMessage,
-	ApiUpdateUser,
-	ApiUser,
-	ApiUserCreate,
-	ApiUserExpand,
-	ApiUserLogin,
-};
+}
