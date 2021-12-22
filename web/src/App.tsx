@@ -12,6 +12,7 @@ import Game from 'pages/Game';
 import GamesHistory from 'pages/GamesHistory';
 import Login from 'pages/Login';
 import Main from 'pages/Main';
+import NotFound from "pages/NotFound";
 import Register from 'pages/Register';
 import UserProfile from 'pages/UserProfile';
 import React from 'react';
@@ -296,6 +297,10 @@ const App = () => {
 
 			<PrivateRoute exact path="/">
 				<Main />
+			</PrivateRoute>
+
+			<PrivateRoute>
+				<NotFound/>
 			</PrivateRoute>
 		</Switch>
 	);
