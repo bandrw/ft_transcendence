@@ -100,7 +100,7 @@ export class LadderService {
 			},
 		};
 		++this.lobbyId;
-		return new Game(gamer1, gamer2, this.usersService);
+		return new Game(gamer1, gamer2);
 	}
 
 	awayFromKeyboard(userIndex) {

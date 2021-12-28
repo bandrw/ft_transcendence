@@ -1,6 +1,5 @@
 import { Gamer } from 'game/game.interface';
 import { OnlineUser } from "users/users.interface";
-import { UsersService } from "users/users.service";
 import { v4 as uuidv4 } from 'uuid';
 
 export class Game {
@@ -30,7 +29,7 @@ export class Game {
 		playerStep: 8,
 		ballSize: 15,
 		ballAngle: 0,
-		ballSpeed: 10,
+		ballSpeed: 11,
 		fps: this.fps,
 		leftPlayer: {
 			id: this.leftPlayer.user.id,
@@ -54,7 +53,7 @@ export class Game {
 	constructor(
 		public leftPlayer: Gamer,
 		public rightPlayer: Gamer,
-		private usersService: UsersService
+		// usersService: UsersService
 	) {
 		this.sendMsg('gameSettings', JSON.stringify(this.gameSettings));
 		this.leftPlayer.gamePoints = 0;

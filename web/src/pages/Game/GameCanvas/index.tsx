@@ -5,7 +5,7 @@ import { ApiGameLoop, ApiGameSettings } from 'models/ApiTypes';
 import GameBall from 'models/GameBall';
 import Player from 'models/Player';
 import GameResults from 'pages/Game/GameResults';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Fade } from 'react-awesome-reveal';
 import { Link } from 'react-router-dom';
 
@@ -22,10 +22,10 @@ const GameCanvas = ({ watchMode, gameSettings }: GameCanvasProps) => {
 	const ball = useMemo(() => new GameBall(), []);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 
-	const userColor = getUserColor();
-	const enemyColor = getEnemyColor();
-	const ballColor = getBallColor();
-	const ballType = getBallType();
+	const userColor = useMemo(() => getUserColor(), []);
+	const enemyColor = useMemo(() => getEnemyColor(), []);
+	const ballColor = useMemo(() => getBallColor(), []);
+	const ballType = useMemo(() => getBallType(), []);
 
 	const score = useMemo(
 		() => ({
@@ -37,53 +37,64 @@ const GameCanvas = ({ watchMode, gameSettings }: GameCanvasProps) => {
 
 	const [gameResults, setGameResults] = React.useState<{ winner: string } | null>(null);
 
+	const pongSound1 = useMemo(() => {
+		const audio = new Audio('/audio/pong-sound-1.wav');
+		audio.volume = 0.17;
+
+		return audio;
+	}, []);
+	const pongSound2 = useMemo(() => {
+		const audio = new Audio('/audio/pong-sound-2.wav');
+		audio.volume = 0.17;
+
+		return audio;
+	}, []);
+	const pongSound3 = useMemo(() => {
+		const audio = new Audio('/audio/pong-sound-3.wav');
+		audio.volume = 0.1;
+
+		return audio;
+	}, []);
+
+	const gameLoopHandler = useCallback((e: string) => {
+		const data: ApiGameLoop = JSON.parse(e);
+
+		if (data.b) {
+			ball.xPosition = data.b.x;
+			ball.yPosition = data.b.y;
+		}
+
+		if (data.lP) leftPlayer.yPosition = data.lP.y;
+
+		if (data.rP) rightPlayer.yPosition = data.rP.y;
+	}, [ball, leftPlayer, rightPlayer]);
+
+	const gameResultsHandler = useCallback((e: string) => {
+		const data: { winner: string } = JSON.parse(e);
+		setGameResults(data);
+	}, []);
+
+	const gameScoreHandler = useCallback((e: string) => {
+		const data = JSON.parse(e);
+		score.leftPlayer = data.leftPlayer;
+		score.rightPlayer = data.rightPlayer;
+	}, [score]);
+
+	const playSoundHandler = useCallback((e: string) => {
+		if (e === 'pong-sound-1') {
+			pongSound1.play()
+				.catch(() => {});
+		} else if (e === 'pong-sound-2') {
+			pongSound2.play()
+				.catch(() => {});
+		} else if (e === 'pong-sound-3') {
+			pongSound3.play()
+				.catch(() => {});
+		}
+	}, [pongSound1, pongSound2, pongSound3]);
+
 	// Socket events
 	useEffect(() => {
-		const gameResultsHandler = (e: string) => {
-			const data: { winner: string } = JSON.parse(e);
-			setGameResults(data);
-		};
-
-		const gameLoopHandler = (e: string) => {
-			const data: ApiGameLoop = JSON.parse(e);
-
-			if (data.b) {
-				ball.xPosition = data.b.x;
-				ball.yPosition = data.b.y;
-			}
-
-			if (data.lP) leftPlayer.yPosition = data.lP.y;
-
-			if (data.rP) rightPlayer.yPosition = data.rP.y;
-		};
-
-		const gameScoreHandler = (e: string) => {
-			const data = JSON.parse(e);
-			score.leftPlayer = data.leftPlayer;
-			score.rightPlayer = data.rightPlayer;
-		};
-
-		const playSoundHandler = (e: string) => {
-			let a: HTMLAudioElement | null = null;
-
-			if (e === 'pong-sound-1') {
-				a = new Audio('/audio/pong-sound-1.wav');
-				a.volume = 0.17;
-			} else if (e === 'pong-sound-2') {
-				a = new Audio('/audio/pong-sound-2.wav');
-				a.volume = 0.17;
-			} else if (e === 'pong-sound-3') {
-				a = new Audio('/audio/pong-sound-3.wav');
-				a.volume = 0.1;
-			}
-
-			if (a) {
-				a.play()
-					.then()
-					.catch(() => {});
-			}
-		};
-
 		socket.on('gameResults', gameResultsHandler);
 		socket.on('gameLoop', gameLoopHandler);
 		socket.on('gameScore', gameScoreHandler);
@@ -95,7 +106,17 @@ const GameCanvas = ({ watchMode, gameSettings }: GameCanvasProps) => {
 			socket.off('gameScore', gameScoreHandler);
 			socket.off('playSound', playSoundHandler);
 		};
-	}, [ball, leftPlayer, rightPlayer, score, socket]);
+	}, [
+		ball,
+		gameLoopHandler,
+		gameResultsHandler,
+		gameScoreHandler,
+		leftPlayer,
+		playSoundHandler,
+		rightPlayer,
+		score,
+		socket,
+	]);
 
 	const { playerWidth, playerMargin, playerHeight } = gameSettings;
 
