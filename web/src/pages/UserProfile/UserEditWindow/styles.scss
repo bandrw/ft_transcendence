@@ -92,26 +92,6 @@
 				}
 			}
 
-			input[type=text] {
-				margin: 10px 0;
-				font-size: 1em;
-				background: none;
-				outline: none;
-				color: white;
-				padding: 10px 25px;
-				border: 1px solid #2c3e50;
-				border-radius: 15px;
-				transition: all 0.1s ease-in;
-
-				&::selection {
-					background: #29aa44;
-				}
-
-				&:focus {
-					border-color: #29aa44;
-				}
-			}
-
 			.edit-window-btn {
 				font-size: 1em;
 				padding: 10px 0;

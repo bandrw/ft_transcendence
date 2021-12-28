@@ -10,7 +10,28 @@ import React, { ChangeEvent, FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import PhoneInput from 'react-phone-input-2';
 import { useHistory } from 'react-router-dom';
+import styled from "styled-components";
 import { getToken } from 'utils/token';
+
+const TextInput = styled.input`
+	margin: 10px 0;
+	font-size: 1em;
+	background: none;
+	outline: none;
+	color: white;
+	padding: 10px 25px;
+	border: 1px solid #2c3e50;
+	border-radius: 15px;
+	transition: all 0.1s ease-in;
+
+	&::selection {
+		background: #29aa44;
+	}
+
+	&:focus {
+		border-color: #29aa44;
+	}
+`;
 
 type ImageState = {
 	type: 'generated' | 'uploaded';
@@ -82,7 +103,7 @@ const ChangeUsernameForm = () => {
 	return (
 		<form onSubmit={handleSubmit(changeUsername)}>
 			<p>Change username</p>
-			<input
+			<TextInput
 				type="text"
 				{...register('newUsername')}
 				placeholder="Enter new username"
@@ -168,22 +189,31 @@ const ChangePictureForm = () => {
 };
 
 const TwoFactorAuthenticationForm = () => {
+	enum TwoFactorAuthenticationState {
+		Disabled = 'disabled',
+		Confirmation = 'confirmation',
+		Enabled = 'enabled'
+	}
+
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 	const user = allUsers.find((usr) => usr.id === currentUser.id);
+
 	const [phoneNumber, setPhoneNumber] = React.useState(user?.phoneNumber || '');
+	const twoFactorAuthenticationIsDisabled = user?.phoneNumber === null;
+	const [state, setState] = React.useState<TwoFactorAuthenticationState>(
+		twoFactorAuthenticationIsDisabled ? TwoFactorAuthenticationState.Disabled : TwoFactorAuthenticationState.Enabled,
+	);
 
-	if (!user) throw new Error('[TwoFactorAuthenticationForm] No user');
+	if (!user) return <div>No user</div>;
 
-	const twoFactorAuthenticationIsDisabled = user.phoneNumber === null;
-	const [state, setState] = React.useState<'disabled' | 'confirmation' | 'enabled'>(twoFactorAuthenticationIsDisabled ? 'disabled' : 'enabled');
 
 	const verifyCode = (code: string) => {
 		axios.get('/auth/verifySms', {
 			params: { code, phoneNumber },
 			headers: { Authorization: `Bearer ${getToken()}` },
 		})
-			.then(() => setState('enabled'))
+			.then(() => setState(TwoFactorAuthenticationState.Enabled))
 			.catch(() => {});
 	};
 
@@ -193,7 +223,7 @@ const TwoFactorAuthenticationForm = () => {
 			params: { phoneNumber },
 			headers: { Authorization: `Bearer ${getToken()}` },
 		})
-			.then(() => setState('confirmation'));
+			.then(() => setState(TwoFactorAuthenticationState.Confirmation));
 	};
 
 	const disableTwoFactorAuthentication = (e: FormEvent) => {
@@ -201,7 +231,7 @@ const TwoFactorAuthenticationForm = () => {
 		axios.post('/auth/disable2FA', null, {
 			headers: { Authorization: `Bearer ${getToken()}` },
 		})
-			.then(() => setState('disabled'));
+			.then(() => setState(TwoFactorAuthenticationState.Disabled));
 	};
 
 	if (state === 'disabled')

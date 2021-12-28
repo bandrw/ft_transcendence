@@ -1,6 +1,36 @@
 import React, { ChangeEvent } from "react";
+import styled from "styled-components";
 
-import styles from './CodeVerification.module.scss';
+const Wrapper = styled.div`
+	display: flex;
+	justify-content: center;
+	margin-top: 10px;
+	width: 370px;
+`;
+
+const Field = styled.input`
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	text-align: center;
+	margin: 0 5px;
+	border-radius: 10px;
+	box-shadow: 0 0 6px 1px #1a1b1f;
+	font-size: 1em;
+	background: none;
+	outline: none;
+	color: white;
+	border: 1px solid #2c3e50;
+	transition: all 0.1s ease-in;
+
+	&::selection {
+		background: #29aa44;
+	}
+
+	&:focus {
+		border-color: #29aa44;
+	}
+`;
 
 interface CodeVerificationProps {
 	submit: (code: string) => void
@@ -68,26 +98,21 @@ const CodeVerification = ({ submit }: CodeVerificationProps) => {
 	}, [fields, submit]);
 
 	return (
-		<div className={styles.verification}>
+		<Wrapper>
 			{
 				fields.map((field, index) =>
-					<label
+					<Field
 						// eslint-disable-next-line react/no-array-index-key
 						key={index}
-						htmlFor={`code-verification-field-${index + 1}`}
-					>
-						<input
-							// className={styles.field}
-							id={`code-verification-field-${index + 1}`}
-							type="text"
-							placeholder="•"
-							onChange={ (e) => fieldChange(e, index) }
-							value={field}
-						/>
-					</label>,
+						id={`code-verification-field-${index + 1}`}
+						type="text"
+						placeholder="•"
+						onChange={ (e) => fieldChange(e, index) }
+						value={field}
+					/>,
 				)
 			}
-		</div>
+		</Wrapper>
 	);
 };
 

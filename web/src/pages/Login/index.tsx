@@ -11,7 +11,34 @@ import { User } from "models/User";
 import React, { FormEvent } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { setCurrentUser } from "store/reducers/currentUserSlice";
+import styled from "styled-components";
 import { removeToken, setToken } from "utils/token";
+
+const LoginInput = styled.input`
+	border-radius: 15px;
+	width: calc(400px - 52px);
+	border: 1px solid #2c3e50;
+	outline: none;
+	font-size: 20px;
+	padding: 16px 26px;
+	margin-bottom: 15px;
+	transition: all 0.1s ease-in;
+	background: transparent;
+	color: white;
+
+	&::selection {
+		background: #29aa44;
+	}
+
+	&:focus {
+		border-color: #29aa44;
+	}
+`;
+
+enum LoginState {
+	Default = 'default',
+	Verification = 'verification',
+}
 
 interface LoginProps {
 	socketId: string;
@@ -23,7 +50,7 @@ export const signIn = async (
 	setUser: (usr: User) => void,
 	setErrors: React.Dispatch<React.SetStateAction<string>>,
 	socketId: string,
-	setState: React.Dispatch<React.SetStateAction<"default" | "verification">> | null,
+	setState: React.Dispatch<React.SetStateAction<LoginState>> | null,
 	smsCode: string | null,
 ): Promise<void> => {
 	const r = await axios
@@ -44,7 +71,7 @@ export const signIn = async (
 	const { access_token: accessToken, twoFactorAuthentication } = r;
 
 	if (twoFactorAuthentication && setState) {
-		setState('verification');
+		setState(LoginState.Verification);
 
 		return;
 	}
@@ -109,7 +136,7 @@ const Login = ({ socketId }: LoginProps) => {
 
 	const [loginErrors, setLoginErrors] = React.useState<string>("");
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
-	const [state, setState] = React.useState<"default" | "verification">("default");
+	const [state, setState] = React.useState<LoginState>(LoginState.Default);
 	const [intraToken, setIntraToken] = React.useState<string | null>(null);
 	const [authCode, setAuthCode] = React.useState<string | null>(null);
 
@@ -137,7 +164,7 @@ const Login = ({ socketId }: LoginProps) => {
 				if (!res) return;
 
 				if (res.twoFactorAuthentication) {
-					setState('verification');
+					setState(LoginState.Verification);
 					setIntraToken(res.access_token_intra);
 				} else if (res.user) {
 					dispatch(setCurrentUser(res.user));
@@ -209,18 +236,18 @@ const Login = ({ socketId }: LoginProps) => {
 	return (
 		<div className="login-container">
 			{
-				state === "default" &&
+				state === LoginState.Default &&
 				<>
 					<h1>Login page</h1>
 					<form onSubmit={loginSubmit}>
-						<input
+						<LoginInput
 							name="login"
 							type="text"
 							placeholder="Login"
 							autoComplete="username"
 							onChange={(e) => setLoginInput(e.target.value)}
 						/>
-						<input
+						<LoginInput
 							name="password"
 							type="password"
 							placeholder="Password"
@@ -265,7 +292,7 @@ const Login = ({ socketId }: LoginProps) => {
 				</>
 			}
 			{
-				state === 'verification' &&
+				state === LoginState.Verification &&
 					<>
 						<h1>Enter verification code</h1>
 						<form onSubmit={(e) => e.preventDefault()}>
@@ -279,7 +306,7 @@ const Login = ({ socketId }: LoginProps) => {
 										<CircleLoading bgColor="#fff" width="35px" height="35px" />
 									</div>
 								) : (
-									<button onClick={() => setState('default')} type='button' className='login-btn'>
+									<button onClick={() => setState(LoginState.Default)} type='button' className='login-btn'>
 										Back
 									</button>
 								)
