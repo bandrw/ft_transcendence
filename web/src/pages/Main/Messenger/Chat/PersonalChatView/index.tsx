@@ -41,6 +41,16 @@ const PersonalChatView = ({
 	const socket = React.useContext(SocketContext);
 	const companion = selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
 
+	const sendDuelEvent = React.useCallback((event: string) => {
+		socket.emit(event, JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
+
+		if (event === 'requestDuel') {
+			setLocalDuelStatus('yellow');
+		} else if (event === 'cancelDuel') {
+			setLocalDuelStatus('green');
+		}
+	}, [companion.id, selectedChat.id, setLocalDuelStatus, socket]);
+
 	// Click outside of ChatMuteChoices
 	React.useEffect(() => {
 		const windowClickHandler = () => {
@@ -53,6 +63,10 @@ const PersonalChatView = ({
 			window.removeEventListener('click', windowClickHandler);
 		};
 	}, [showChatMuteChoices]);
+
+	React.useEffect(() => {
+		sendDuelEvent('cancelDuel');
+	}, [setLocalDuelStatus, selectedChat, sendDuelEvent]);
 
 	const mute = (unbanDate: number | null) => {
 		const data = {
@@ -168,13 +182,7 @@ const PersonalChatView = ({
 				{duelStatus === 'yellow' && localDuelStatus === 'green' && (
 					<button
 						className="messenger-chat-info-play-btn"
-						onClick={() => {
-							socket.emit(
-								'requestDuel',
-								JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }),
-							);
-							setLocalDuelStatus('yellow');
-						}}
+						onClick={() => sendDuelEvent('requestDuel')}
 					>
 						<span className="messenger-chat-info-play-btn-text">Accept</span>
 						<span className="messenger-chat-info-play-btn-img">
@@ -185,13 +193,7 @@ const PersonalChatView = ({
 				{duelStatus === 'green' && localDuelStatus === 'green' && (
 					<button
 						className="messenger-chat-info-play-btn"
-						onClick={() => {
-							socket.emit(
-								'requestDuel',
-								JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }),
-							);
-							setLocalDuelStatus('yellow');
-						}}
+						onClick={() => sendDuelEvent('requestDuel')}
 					>
 						<span className="messenger-chat-info-play-btn-text">Play pong</span>
 						<span className="messenger-chat-info-play-btn-img">
@@ -199,16 +201,10 @@ const PersonalChatView = ({
 						</span>
 					</button>
 				)}
-				{duelStatus === 'yellow' && localDuelStatus === 'yellow' && (
+				{localDuelStatus === 'yellow' && (
 					<button
 						className="messenger-chat-info-play-btn"
-						onClick={() => {
-							socket.emit(
-								'cancelDuel',
-								JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }),
-							);
-							setLocalDuelStatus('green');
-						}}
+						onClick={() => sendDuelEvent('cancelDuel')}
 					>
 						<span className="messenger-chat-info-play-btn-text">Waiting...</span>
 						<span className="messenger-chat-info-play-btn-img messenger-chat-info-play-btn-img-searching">
@@ -219,12 +215,9 @@ const PersonalChatView = ({
 				<button
 					className="messenger-chat-close-btn"
 					onClick={() => {
-						if (localDuelStatus === 'yellow')
-							socket.emit(
-								'cancelDuel',
-								JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }),
-							);
-						setLocalDuelStatus('green');
+						if (localDuelStatus === 'yellow') {
+							sendDuelEvent('cancelDuel');
+						}
 						closeSelectedChat();
 					}}
 					title="Close"
@@ -239,14 +232,14 @@ const PersonalChatView = ({
 			</div>
 			<form className="messenger-chat-form" onSubmit={handleSubmit(sendMsg)}>
 				<input
-					disabled={!bannedByCurrentUser}
+					disabled={ban && !bannedByCurrentUser}
 					className="messenger-chat-input"
 					type="text"
 					{...register('message')}
 					placeholder={sendMsgPlaceholder}
 				/>
 				<button
-					disabled={!bannedByCurrentUser}
+					disabled={ban && !bannedByCurrentUser}
 					type="submit"
 					className="messenger-chat-send-btn"
 				>
