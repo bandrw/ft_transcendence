@@ -66,37 +66,22 @@ const App = () => {
 
 	// Fetching onlineUsers
 	useEffect(() => {
-		let isMounted = true;
-
-		if (!isAuth || !isMounted) {
+		if (!isAuth) {
 			return;
 		}
 
 		dispatch(getOnlineUsersAction());
-
-		return () => {
-			isMounted = false;
-		};
 	}, [isAuth, dispatch]);
 
 	// Fetching allUsers + updating on onlineUsers change
 	useEffect(() => {
-		let isMounted = true;
-
-		if (!isAuth || !isMounted) {
+		if (!isAuth) {
 			return;
 		}
 
 		getAllUsers().then((data) => {
-			if (!isMounted) {
-				return;
-			}
 			dispatch(setAllUsers(data));
 		});
-
-		return () => {
-			isMounted = false;
-		};
 	}, [isAuth, dispatch, onlineUsers]);
 
 	// Getting user from access_token
