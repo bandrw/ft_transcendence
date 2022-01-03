@@ -1,6 +1,5 @@
 import './App.scss';
 
-import {getAllUsers} from "api/user";
 import axios from 'axios';
 import { AuthRoute } from "components/AuthRoute";
 import { PrivateRoute } from "components/PrivateRoute";

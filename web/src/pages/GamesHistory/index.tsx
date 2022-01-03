@@ -2,16 +2,14 @@ import './styles.scss';
 
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 import Header from 'components/Header';
 import { useAppSelector } from 'hook/reduxHooks';
-import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
+import { ApiGame } from 'models/ApiTypes';
 import moment from 'moment';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
-import { getToken } from 'utils/token';
 
 export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');
@@ -33,27 +31,15 @@ const GamesHistory = () => {
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 
 	React.useEffect(() => {
-		let isMounted = true;
+		const user = allUsers.find((usr) => usr.login === params.login);
 
-		axios
-			.get<ApiUserExpand>('/users', {
-				params: { login: params.login, expand: '' },
-				headers: { Authorization: `Bearer ${getToken()}` },
-			})
-			.then((res) => {
-				if (!isMounted) return;
-
-				if (!res.data.wonGames || !res.data.lostGames) return;
-				const games: ApiGame[] = [];
-				for (const game of res.data.wonGames) games.push(game);
-				for (const game of res.data.lostGames) games.push(game);
-				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
-			});
-
-		return () => {
-			isMounted = false;
-		};
-	}, [currentUser.username, params.login]);
+		if (user) {
+			const games: ApiGame[] = [];
+			for (const game of user.wonGames) games.push(game);
+			for (const game of user.lostGames) games.push(game);
+			setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
+		}
+	}, [allUsers, currentUser.id, params.login]);
 
 	return (
 		<div>
