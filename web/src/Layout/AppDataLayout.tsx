@@ -5,7 +5,7 @@ import FullPageLoader from "../components/FullPageLoader";
 import {useAppDispatch, useAppSelector} from "../hook/reduxHooks";
 import {useAuth} from "../hook/useAuth";
 import {ApiGameSettings, ApiUpdateUser, ApiUserStatus} from "../models/ApiTypes";
-import {setAllUsers} from "../store/reducers/allUsersSlice";
+import {getAllUsersAction, setAllUsers} from "../store/reducers/allUsersSlice";
 import {getCurrentUserAction, setCurrentUser} from "../store/reducers/currentUserSlice";
 import {setEnemy, setEnemyIsReady} from "../store/reducers/enemySlice";
 import {setGameSettings} from "../store/reducers/gameSlice";
@@ -32,9 +32,7 @@ export const AppDataLayout: FC<AppDataLayoutProps> = ({ children }) => {
 
 	// Fetching allUsers + updating on onlineUsers change
 	useEffect(() => {
-		getAllUsers().then((data) => {
-			dispatch(setAllUsers(data));
-		});
+		dispatch(getAllUsersAction());
 	}, [dispatch, onlineUsers]);
 
 	// Getting user from access_token

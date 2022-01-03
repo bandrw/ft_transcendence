@@ -45,7 +45,6 @@ const App = React.memo(() => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
 	const {socket, socket: { id }} = useAppSelector((state) => state.socket);
-	// const { currentUser } = useAppSelector((state) => state.currentUser);
 	const [socketId, setSocketId] = React.useState<string>(id);
 	// Saving socketId in state
 	useEffect(() => {
