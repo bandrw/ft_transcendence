@@ -1,5 +1,6 @@
 import './App.scss';
 
+import {getAllUsers} from "api/user";
 import axios from 'axios';
 import { AuthRoute } from "components/AuthRoute";
 import { PrivateRoute } from "components/PrivateRoute";
@@ -23,8 +24,6 @@ import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
 import { setGameSettings } from "store/reducers/gameSlice";
 import { getOnlineUsersAction, removeOnlineUser, setOnlineUsers } from 'store/reducers/onlineUsersSlice';
 import { setStatus } from 'store/reducers/statusSlice';
-
-import {getAllUsers} from "./api/user";
 
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {

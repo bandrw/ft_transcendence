@@ -5,7 +5,8 @@ import CircleLoading from "components/CircleLoading";
 import CodeVerification from "components/CodeVerification";
 import {useAppDispatch, useAppSelector} from "hook/reduxHooks";
 import { User } from "models/User";
-import React, {FormEvent, useMemo} from "react";
+import React, {useMemo} from "react";
+import {useForm} from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
 import { setCurrentUser } from "store/reducers/currentUserSlice";
 import styled from "styled-components";
@@ -32,19 +33,27 @@ const LoginInput = styled.input`
 	}
 `;
 
+interface ILoginInput {
+	login: string;
+	password: string;
+	code?: string
+}
+
 const Login = () => {
 	const history = useHistory();
 	const {socket, socket: { id: socketId }} = useAppSelector((state) => state.socket);
 	const dispatch = useAppDispatch();
 
-	const [loginInput, setLoginInput] = React.useState<string>('');
-	const [passwordInput, setPasswordInput] = React.useState<string>('');
+	// const [loginInput, setLoginInput] = React.useState<string>('');
+	// const [passwordInput, setPasswordInput] = React.useState<string>('');
 
 	const [loginErrors, setLoginErrors] = React.useState<string>("");
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 	const [state, setState] = React.useState<LoginState>(LoginState.Default);
 	const [intraToken, setIntraToken] = React.useState<string | null>(null);
 	const [authCode, setAuthCode] = React.useState<string | null>(null);
+
+	const { register, handleSubmit, getValues } = useForm();
 
 	React.useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -92,13 +101,11 @@ const Login = () => {
 		};
 	}, [history, authCode, socketId, dispatch]);
 
-	const loginSubmit = useMemo(() => async (e: FormEvent) => {
-		e.preventDefault();
-
+	const loginSubmit = useMemo(() => async ({ login, password }: ILoginInput) => {
 		setIsLoading(true);
 		signIn(
-			loginInput,
-			passwordInput,
+			login,
+			password,
 			(usr: User) => dispatch(setCurrentUser(usr)),
 			setLoginErrors,
 			socket.id,
@@ -106,21 +113,21 @@ const Login = () => {
 			null,
 		)
 			.finally(() => setIsLoading(false));
-	}, [dispatch, loginInput, passwordInput, socket.id]);
+	}, [dispatch, socket.id]);
 
-	const verifyCode = useMemo(() => (code: string) => {
+	const verifyCode = useMemo(() => ({ login, password, code }: ILoginInput) => {
 		setIsLoading(true);
 		signIn(
-			loginInput,
-			passwordInput,
+			login,
+			password,
 			(usr: User) => dispatch(setCurrentUser(usr)),
 			setLoginErrors,
 			socket.id,
 			setState,
-			code,
+			code || '',
 		)
 			.finally(() => setIsLoading(false));
-	}, [dispatch, loginInput, passwordInput, socket.id]);
+	}, [dispatch, socket.id]);
 
 	const verifyCodeIntra = useMemo(() => (code: string) => {
 		if (!authCode) return ;
@@ -144,20 +151,18 @@ const Login = () => {
 				state === LoginState.Default &&
 				<>
 					<h1>Login page</h1>
-					<form onSubmit={loginSubmit}>
+					<form onSubmit={handleSubmit(loginSubmit)}>
 						<LoginInput
-							name="login"
 							type="text"
 							placeholder="Login"
 							autoComplete="username"
-							onChange={(e) => setLoginInput(e.target.value)}
+							{...register('login')}
 						/>
 						<LoginInput
-							name="password"
 							type="password"
 							placeholder="Password"
 							autoComplete="current-password"
-							onChange={(e) => setPasswordInput(e.target.value)}
+							{...register('password')}
 						/>
 						<span className="login-errors">{loginErrors}</span>
 						<button type="submit" className="login-btn">
@@ -201,7 +206,13 @@ const Login = () => {
 					<>
 						<h1>Enter verification code</h1>
 						<form onSubmit={(e) => e.preventDefault()}>
-							<CodeVerification submit={authCode ? verifyCodeIntra : verifyCode}/>
+							<CodeVerification submit={authCode ?
+									verifyCodeIntra :
+									(code: string) => verifyCode({
+										login: getValues<string>('login'), password: getValues<string>('password'), code,
+									})
+								}
+							/>
 							<div style={{height: 25}}/>
 							<span className="login-errors">{loginErrors}</span>
 							<div style={{height: 15}}/>
