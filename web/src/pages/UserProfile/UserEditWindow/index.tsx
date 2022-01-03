@@ -13,6 +13,8 @@ import { useHistory } from 'react-router-dom';
 import styled from "styled-components";
 import { getToken } from 'utils/token';
 
+import {getTargetUser} from "../../../utils/getTargetUser";
+
 const TextInput = styled.input`
 	margin: 10px 0;
 	font-size: 1em;
@@ -70,7 +72,8 @@ const ChangeUsernameForm = () => {
 		return !(
 			usernameInput.length < 4 ||
 			usernameInput.length > 16 ||
-			allUsers.find((usr) => usr.login === usernameInput)
+			getTargetUser(allUsers, usernameInput, 'login')
+			// allUsers.find((usr) => usr.login === usernameInput)
 		);
 	};
 
@@ -178,7 +181,7 @@ const TwoFactorAuthenticationForm = () => {
 
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
-	const user = allUsers.find((usr) => usr.id === currentUser.id);
+	const user = getTargetUser(allUsers, currentUser.id, 'id'); // allUsers.find((usr) => usr.id === currentUser.id);
 
 	const [phoneNumber, setPhoneNumber] = React.useState(user?.phoneNumber || '');
 	const twoFactorAuthenticationIsDisabled = user?.phoneNumber === null;

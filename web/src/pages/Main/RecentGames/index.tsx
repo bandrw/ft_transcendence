@@ -10,6 +10,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { getToken } from 'utils/token';
 
+import {getTargetUser} from "../../../utils/getTargetUser";
+
 const RecentGames = () => {
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
@@ -70,7 +72,7 @@ const RecentGames = () => {
 			</div>
 			{gamesHistory.slice(0, 3).map((game) => {
 				const enemyId = game.winnerId === currentUser.id ? game.loserId : game.winnerId;
-				const enemy = allUsers.find((user) => user.id === enemyId);
+				const enemy = getTargetUser(allUsers, enemyId, 'id');
 
 				return (
 					<div className="recent-game" key={game.id}>

@@ -9,6 +9,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { getToken } from "utils/token";
 
+import {getTargetUser} from "../../../../../utils/getTargetUser";
 import { ISendMessage } from "../index";
 
 const joinChannel = (channelId: number) => {
@@ -152,7 +153,7 @@ const ChannelView = ({ selectedChannel, closeSelectedChat, setSettingsChatState 
 			</div>
 			<div className="messenger-chat-messages">
 				{selectedChannel.messages.map((msg) => {
-					const author = allUsers.find((usr) => usr.id === msg.fromUserId);
+					const author = getTargetUser(allUsers, msg.fromUserId, 'id'); // allUsers.find((usr) => usr.id === msg.fromUserId);
 
 					return (
 						<Message

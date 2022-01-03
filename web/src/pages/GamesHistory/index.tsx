@@ -11,6 +11,8 @@ import { Fade } from 'react-awesome-reveal';
 import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
 
+import {getTargetUser} from "../../utils/getTargetUser";
+
 export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');
 	const gameDateDay = moment(date).format('DD.MM.YYYY');
@@ -31,7 +33,7 @@ const GamesHistory = () => {
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 
 	React.useEffect(() => {
-		const user = allUsers.find((usr) => usr.login === params.login);
+		const user = getTargetUser(allUsers, params.login, 'login'); // allUsers.find((usr) => usr.login === params.login);
 
 		if (user) {
 			const games: ApiGame[] = [];
@@ -62,8 +64,8 @@ const GamesHistory = () => {
 								</div>
 							) : (
 								gamesHistory.map((game) => {
-									const loser = allUsers.find((usr) => usr.id === game.loserId);
-									const winner = allUsers.find((usr) => usr.id === game.winnerId);
+									const loser = getTargetUser(allUsers, game.loserId, 'id'); // allUsers.find((usr) => usr.id === game.loserId);
+									const winner = getTargetUser(allUsers, game.winnerId, 'id'); // allUsers.find((usr) => usr.id === game.winnerId);
 									const enemy = loser?.login === params.login ? winner : loser;
 									const user = winner?.login === params.login ? winner : loser;
 

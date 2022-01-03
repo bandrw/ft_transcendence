@@ -9,6 +9,7 @@ import { Fade } from 'react-awesome-reveal';
 
 import { SocialBlockFriend } from '../../../components/SocialBlockFriend';
 import { SocialBlockOnlineUser } from "../../../components/SocialBlockOnlineUser/SocialBlockOnlineUser";
+import {getTargetUser} from "../../../utils/getTargetUser";
 
 const Social = () => {
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
@@ -20,7 +21,7 @@ const Social = () => {
 
 	React.useEffect(() => {
 		const friendsLogins: string[] = [];
-		const u = allUsers.find((usr) => usr.login === currentUser.username);
+		const u = getTargetUser(allUsers, currentUser.username, 'login'); // allUsers.find((usr) => usr.login === currentUser.username);
 
 		if (u) {
 			for (const subscriber of u.subscribers)

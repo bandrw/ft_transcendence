@@ -23,6 +23,8 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getToken } from 'utils/token';
 
+import {getTargetUser} from "../../utils/getTargetUser";
+
 enum SubscribeBtnState {
 	Default,
 	Subscribed,
@@ -76,7 +78,7 @@ const SubscribeBtn = ({
 	const [subscribeBtnLoading, setSubscribeBtnLoading] = React.useState(false);
 
 	React.useEffect(() => {
-		const currUser = allUsers.find((usr) => usr.login === currentUser.username);
+		const currUser = getTargetUser(allUsers, currentUser.username, 'login'); // allUsers.find((usr) => usr.login === currentUser.username);
 
 		if (!currUser) return;
 
@@ -197,7 +199,7 @@ const UserProfile = () => {
 
 	React.useEffect(() => {
 		const friendsLogins: string[] = [];
-		const u = allUsers.find((usr) => usr.login === user?.login);
+		const u = getTargetUser(allUsers, user?.login, 'login'); // allUsers.find((usr) => usr.login === user?.login);
 
 		if (u) {
 			for (const subscriber of u.subscribers)
@@ -207,7 +209,7 @@ const UserProfile = () => {
 	}, [allUsers, user]);
 
 	React.useEffect(() => {
-		const usr = allUsers.find((u) => u.login === params.login);
+		const usr = getTargetUser(allUsers, params.login, 'login'); // allUsers.find((u) => u.login === params.login);
 
 		if (!usr) return;
 
@@ -300,8 +302,8 @@ const UserProfile = () => {
 							title="Latest games"
 							linkTo={`/games/${user?.login}`}
 							list={gamesHistory.slice(0, 3).map((game) => {
-								const loser = allUsers.find((usr) => usr.id === game.loserId);
-								const winner = allUsers.find((usr) => usr.id === game.winnerId);
+								const loser = getTargetUser(allUsers, game.loserId, 'id'); // allUsers.find((usr) => usr.id === game.loserId);
+								const winner = getTargetUser(allUsers, game.winnerId, 'id'); // allUsers.find((usr) => usr.id === game.winnerId);
 
 								return (
 									<GameItem
