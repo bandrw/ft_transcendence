@@ -26,6 +26,9 @@ export const onlineUsersSlice = createSlice({
 		setOnlineUsers: (state: OnlineUsersState, action: PayloadAction<ApiUpdateUser[]>) => {
 			state.onlineUsers = action.payload;
 		},
+		removeOnlineUser: (state: OnlineUsersState, action: PayloadAction<ApiUpdateUser>) => {
+			state.onlineUsers = state.onlineUsers.filter((user) => user.login !== action.payload.login);
+		},
 	},
 	extraReducers: {
 		[getOnlineUsersAction.fulfilled.type]: (state: OnlineUsersState, action: PayloadAction<ApiUpdateUser[]>) => {
@@ -34,6 +37,6 @@ export const onlineUsersSlice = createSlice({
 	},
 });
 
-export const { setOnlineUsers } = onlineUsersSlice.actions;
+export const { setOnlineUsers, removeOnlineUser } = onlineUsersSlice.actions;
 
 export default onlineUsersSlice.reducer;

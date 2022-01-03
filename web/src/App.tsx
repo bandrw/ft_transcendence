@@ -22,7 +22,7 @@ import { getAllUsersAction } from 'store/reducers/allUsersSlice';
 import { getCurrentUserAction, resetCurrentUser, setCurrentUser } from "store/reducers/currentUserSlice";
 import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
 import {setGameSettings} from "store/reducers/gameSlice";
-import {getOnlineUsersAction, setOnlineUsers} from 'store/reducers/onlineUsersSlice';
+import {getOnlineUsersAction, removeOnlineUser, setOnlineUsers} from 'store/reducers/onlineUsersSlice';
 import { setStatus } from 'store/reducers/statusSlice';
 import { getToken, removeToken } from 'utils/token';
 
@@ -105,22 +105,10 @@ const App = () => {
 
 	// Getting user from access_token
 	React.useEffect(() => {
-		const failAuthHandler = () => {
-			removeToken();
-			dispatch(resetCurrentUser());
-			history.push('/login'); // TODO tmp
-		};
-
-		const accessToken = getToken();
-
-		if (!accessToken) {
-			failAuthHandler();
-		}
-
 		if (sockId) {
 			dispatch(getCurrentUserAction(sockId));
 		}
-	}, [dispatch, history, sockId, socket.id, socketId, isAuth]);
+	}, [dispatch, sockId]);
 
 	// Saving socketId in state
 	React.useEffect(() => {
@@ -163,7 +151,7 @@ const App = () => {
 
 		const logoutHandler = (data: string) => {
 			const logoutData: ApiUpdateUser = JSON.parse(data);
-			dispatch(setOnlineUsers(onlineUsersRef.current.filter((usr) => usr.login !== logoutData.login)));
+			dispatch(removeOnlineUser(logoutData));
 		};
 
 		const gameSettingsHandler = (e: string) => {
