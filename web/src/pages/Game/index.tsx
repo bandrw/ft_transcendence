@@ -28,7 +28,6 @@ const Game = () => {
 
 	return (
 		<div>
-			<Header />
 			{settings && <GameCanvas watchMode={watchMode} gameSettings={settings}/>}
 		</div>
 	);

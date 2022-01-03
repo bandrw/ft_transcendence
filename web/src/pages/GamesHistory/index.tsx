@@ -45,7 +45,6 @@ const GamesHistory = () => {
 
 	return (
 		<div>
-			<Header />
 			<div className="games-history-wrapper">
 				<Fade className="games-history">
 					<>

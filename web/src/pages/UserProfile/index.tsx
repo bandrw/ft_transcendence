@@ -245,7 +245,6 @@ const UserProfile = () => {
 
 	return (
 		<div>
-			<Header />
 			<div className="user-profile-wrapper">
 				<div className="user-profile">
 					<div className="user-profile-info-img" style={{ backgroundImage: `url(${user?.url_avatar})` }} />

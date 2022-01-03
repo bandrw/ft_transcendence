@@ -9,7 +9,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { getToken } from "utils/token";
 
-import {getTargetUser} from "../../../../../utils/getTargetUser";
+import { getTargetUser } from '../../../../../utils/getTargetUser';
 import { ISendMessage } from "../index";
 
 const joinChannel = (channelId: number) => {

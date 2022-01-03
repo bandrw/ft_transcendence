@@ -13,7 +13,7 @@ import { useHistory } from 'react-router-dom';
 import styled from "styled-components";
 import { getToken } from 'utils/token';
 
-import {getTargetUser} from "../../../utils/getTargetUser";
+import {getTargetUser} from '../../../utils/getTargetUser';
 
 const TextInput = styled.input`
 	margin: 10px 0;

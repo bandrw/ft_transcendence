@@ -23,7 +23,6 @@ const Main = () => {
 	return (
 		<div className="main">
 			<div className="main-container">
-				<Header />
 				<div className="main-top">
 					<div className="main-center">
 						<Fade triggerOnce style={{ position: 'relative', zIndex: 9 }}>

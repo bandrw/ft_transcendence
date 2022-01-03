@@ -9,9 +9,14 @@ import {setGameSettings} from "store/reducers/gameSlice";
 import {getOnlineUsersAction, removeOnlineUser, setOnlineUsers} from "store/reducers/onlineUsersSlice";
 import {setStatus} from "store/reducers/statusSlice";
 
-interface AppDataLayoutProps {
+import MainLayout from "./MainLayout";
+
+export interface LayoutProps {
 	children: React.ReactNode;
 }
+
+type AppDataLayoutProps = LayoutProps
+
 
 export const AppDataLayout: FC<AppDataLayoutProps> = ({ children }) => {
 	const {socket, socket: { id: socketId }} = useAppSelector((state) => state.socket);
@@ -128,6 +133,6 @@ export const AppDataLayout: FC<AppDataLayoutProps> = ({ children }) => {
 	}, [currentUser, socket, onlineUsers, dispatch, status, enemy]);
 
 	return (
-		<>{currentUser.username ? children : <FullPageLoader />}</>
+		<>{currentUser.username ? <MainLayout>{children}</MainLayout> : <FullPageLoader />}</>
 	);
 };
