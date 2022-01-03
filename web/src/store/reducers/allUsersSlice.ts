@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import { ApiUserExpand } from 'models/ApiTypes';
+
+import * as AuthApi from "../../api/auth";
 
 interface AllUsersState {
 	allUsers: ApiUserExpand[];
@@ -8,6 +10,13 @@ interface AllUsersState {
 const initialState: AllUsersState = {
 	allUsers: [],
 };
+
+export const fetchAllUsersAction = createAsyncThunk(
+	'allUsers/fetchAllUsers',
+	async () => {
+
+	},
+);
 
 export const allUsersSlice = createSlice({
 	name: 'allUsers',

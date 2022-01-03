@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import * as AuthApi from "api/auth";
+import { getCurrentUser } from 'api/user';
 import {IUser, User} from 'models/User';
 import { removeToken } from "utils/token";
 
@@ -29,7 +30,7 @@ export const getCurrentUserAction = createAsyncThunk(
 	'currentUser/getCurrentUser',
 	async (sockId: string, { rejectWithValue }) => {
 		try {
-			const user = await AuthApi.getCurrentUser(sockId);
+			const user = await getCurrentUser(sockId);
 
 			if (user) {
 				const { id, login, url_avatar } = user;
