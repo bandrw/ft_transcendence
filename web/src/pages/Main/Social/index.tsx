@@ -1,82 +1,14 @@
 import './styles.scss';
 
-import { faCircle, faTv } from '@fortawesome/free-solid-svg-icons';
+import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'hook/reduxHooks';
-import { ApiUpdateUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
+import { ApiUserExpand } from 'models/ApiTypes';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
-import { Link, useHistory } from 'react-router-dom';
 
-import { getWatchGame } from "../../../api/social";
-
-interface SocialBlockOnlineUserProps {
-	user: ApiUpdateUser;
-}
-
-const SocialBlockOnlineUser = ({ user }: SocialBlockOnlineUserProps) => {
-	const history = useHistory();
-	let statusDescription: string | JSX.Element;
-	let statusColor: string;
-
-	if (user.status === ApiUserStatus.Regular) statusDescription = 'In main menu';
-	else if (user.status === ApiUserStatus.InGame)
-		statusDescription = (
-			<div>
-				<span>In game</span>
-				<button
-					title="Watch game"
-					className="social-block-user-watch-btn"
-					onClick={async () => {
-						await getWatchGame(user.login).
-						finally(() => history.push('/game'));
-						// await axios.get('/games/watchGame', {
-						// 	params: { gamerLogin: user.login },
-						// 	headers: { Authorization: `Bearer ${getToken()}` },
-						// });
-						// history.push('/game');
-					}}
-				>
-					<FontAwesomeIcon icon={faTv} />
-				</button>
-			</div>
-		);
-	else if (user.status === ApiUserStatus.Offline) statusDescription = 'Offline';
-	else statusDescription = 'Searching game';
-
-	if (user.status === ApiUserStatus.InGame) statusColor = 'purple';
-	else if (user.status === ApiUserStatus.Offline) statusColor = 'transparent';
-	else statusColor = user.status;
-
-	return (
-		<li className="social-block-user">
-			<div className="social-block-user-img" style={{ backgroundImage: `url(${user.url_avatar})` }}>
-				<div className="user-status" style={{ backgroundColor: statusColor }} />
-			</div>
-			<Link to={`/users/${user.login}`} className="social-block-user-username">
-				{user.login}
-			</Link>
-			<div className="social-block-user-status-description">{statusDescription}</div>
-		</li>
-	);
-};
-
-const SocialBlockFriend = ({ user }: { user: ApiUserExpand }) => {
-	const statusDescription = 'Offline';
-	const statusColor = 'transparent';
-
-	return (
-		<li className="social-block-user">
-			<div className="social-block-user-img" style={{ backgroundImage: `url(${user.url_avatar})` }}>
-				<div className="user-status" style={{ backgroundColor: statusColor }} />
-			</div>
-			<Link to={`/users/${user.login}`} className="social-block-user-username">
-				{user.login}
-			</Link>
-			<div className="social-block-user-status-description">{statusDescription}</div>
-		</li>
-	);
-};
+import { SocialBlockFriend } from '../../../components/SocialBlockFriend';
+import { SocialBlockOnlineUser } from "../../../components/SocialBlockOnlineUser/SocialBlockOnlineUser";
 
 const Social = () => {
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);
