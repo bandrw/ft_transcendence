@@ -100,8 +100,6 @@ const FindGame = () => {
 
 	// /ladder/setStatus
 	React.useEffect(() => {
-		let isMounted = true;
-
 		if (!currentUser.isAuthorized) return;
 
 		if (status === ApiUserStatus.FoundEnemy) {
@@ -116,8 +114,6 @@ const FindGame = () => {
 				headers: { Authorization: `Bearer ${getToken()}` },
 			})
 			.then(() => {
-				if (!isMounted) return;
-
 				switch (status) {
 					case ApiUserStatus.Regular: {
 						if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
@@ -134,10 +130,6 @@ const FindGame = () => {
 				}
 			})
 			.catch(() => {});
-
-		return () => {
-			isMounted = false;
-		};
 	}, [status, currentUser]);
 
 	// Click outside game settings

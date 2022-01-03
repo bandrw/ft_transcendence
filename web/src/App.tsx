@@ -3,9 +3,8 @@ import './App.scss';
 import axios from 'axios';
 import { AuthRoute } from "components/AuthRoute";
 import { PrivateRoute } from "components/PrivateRoute";
-import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
-import { useAuth } from "hook/useAuth";
-import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserStatus } from 'models/ApiTypes';
+import { useAppSelector } from 'hook/reduxHooks';
+import { ApiUser } from 'models/ApiTypes';
 import { User } from "models/User";
 import Game from 'pages/Game';
 import GamesHistory from 'pages/GamesHistory';
@@ -17,14 +16,6 @@ import UserProfile from 'pages/UserProfile';
 import React, { useEffect } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Switch } from "react-router-dom";
-import { setAllUsers } from 'store/reducers/allUsersSlice';
-import { getCurrentUserAction, setCurrentUser } from "store/reducers/currentUserSlice";
-import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
-import { setGameSettings } from "store/reducers/gameSlice";
-import { getOnlineUsersAction, removeOnlineUser, setOnlineUsers } from 'store/reducers/onlineUsersSlice';
-import { setStatus } from 'store/reducers/statusSlice';
-
-import {getAllUsers} from "./api/user";
 
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {
@@ -50,47 +41,12 @@ export const getCurrentUser = async (accessToken: string, socketId: string): Pro
 	}
 };
 
-const App = () => {
+const App = React.memo(() => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
 	const {socket, socket: { id }} = useAppSelector((state) => state.socket);
+	// const { currentUser } = useAppSelector((state) => state.currentUser);
 	const [socketId, setSocketId] = React.useState<string>(id);
-
-	const isAuth = useAuth();
-
-	const { currentUser } = useAppSelector((state) => state.currentUser);
-	const { onlineUsers } = useAppSelector((state) => state.onlineUsers);
-	const { status } = useAppSelector((state) => state.status);
-	const { enemy } = useAppSelector((state) => state.enemy);
-	const dispatch = useAppDispatch();
-
-	// Fetching onlineUsers
-	useEffect(() => {
-		if (!isAuth) {
-			return;
-		}
-
-		dispatch(getOnlineUsersAction());
-	}, [isAuth, dispatch]);
-
-	// Fetching allUsers + updating on onlineUsers change
-	useEffect(() => {
-		if (!isAuth) {
-			return;
-		}
-
-		getAllUsers().then((data) => {
-			dispatch(setAllUsers(data));
-		});
-	}, [isAuth, dispatch, onlineUsers]);
-
-	// Getting user from access_token
-	useEffect(() => {
-		if (socketId) {
-			dispatch(getCurrentUserAction(socketId));
-		}
-	}, [dispatch, socketId]);
-
 	// Saving socketId in state
 	useEffect(() => {
 		const connectHandler = () => {
@@ -111,97 +67,6 @@ const App = () => {
 			socket.off('disconnect', disconnectHandler);
 		};
 	}, [socketId, socket]);
-
-	// Event handlers
-	useEffect(() => {
-		if (!isAuth) {
-			return;
-		}
-
-		const logoutHandler = (data: string) => {
-			const logoutData: ApiUpdateUser = JSON.parse(data);
-			dispatch(removeOnlineUser(logoutData));
-		};
-
-		const gameSettingsHandler = (e: string) => {
-			const gameSettings: ApiGameSettings = JSON.parse(e);
-			dispatch(setGameSettings(gameSettings));
-
-			// If watch mode is on, don't send start
-			if (
-				gameSettings.leftPlayer.login !== currentUser.username &&
-				gameSettings.rightPlayer.login !== currentUser.username
-			) {
-				return;
-			}
-
-			const data = {
-				login: currentUser.username,
-				id: gameSettings.id,
-			};
-			setTimeout(() => socket.emit('start', JSON.stringify(data)), 3000);
-		};
-
-		const updateUserHandler = (data: string) => {
-			const updateUserData: ApiUpdateUser[] = JSON.parse(data);
-
-			dispatch(setOnlineUsers(updateUserData));
-
-			// Update currentUser
-			const currUsr = updateUserData.find((usr) => usr.id === currentUser.id);
-
-			if (currUsr) {
-				currentUser.username = currUsr.login;
-				currentUser.urlAvatar = currUsr.url_avatar;
-				dispatch(setCurrentUser(currentUser));
-			}
-
-			if (enemy) {
-				const enemyData = updateUserData.find((usr) => usr.id === enemy.id);
-
-				if (enemyData)
-					dispatch(setEnemy(enemyData));
-
-				if (!enemyData) return;
-
-				const enemyDeclinedGame =
-					enemyData.status === ApiUserStatus.Declined || enemyData.status === ApiUserStatus.Regular;
-				const enemyAcceptedGame = enemyData.status === ApiUserStatus.Accepted;
-
-				if (enemyDeclinedGame) {
-					dispatch(setStatus(ApiUserStatus.Regular));
-					dispatch(setEnemyIsReady(false));
-					dispatch(setEnemy(null));
-				} else if (enemyAcceptedGame) {
-					dispatch(setEnemyIsReady(true));
-				}
-			}
-		};
-
-		const enemyHandler = (e: string) => {
-			const enemyData: ApiUpdateUser = JSON.parse(e);
-			dispatch(setEnemy(enemyData));
-			dispatch(setStatus(ApiUserStatus.FoundEnemy));
-		};
-
-		const gameIsReadyHandler = () => {
-			dispatch(setStatus(ApiUserStatus.InGame));
-		};
-
-		socket.on('logout', logoutHandler);
-		socket.on('updateUser', updateUserHandler);
-		socket.on('enemy', enemyHandler);
-		socket.on('gameIsReady', gameIsReadyHandler);
-		socket.on('gameSettings', gameSettingsHandler);
-
-		return () => {
-			socket.off('logout', logoutHandler);
-			socket.off('updateUser', updateUserHandler);
-			socket.off('enemy', enemyHandler);
-			socket.off('gameIsReady', gameIsReadyHandler);
-			socket.off('gameSettings', gameSettingsHandler);
-		};
-	}, [isAuth, currentUser, socket, onlineUsers, dispatch, status, enemy]);
 
 	if (!isDesktop) return <div style={{ fontSize: '2em', marginTop: '100px' }}>Window is too small :(</div>;
 
@@ -236,6 +101,6 @@ const App = () => {
 			</PrivateRoute>
 		</Switch>
 	);
-};
+});
 
 export default App;

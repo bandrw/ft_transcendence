@@ -1,7 +1,8 @@
 import { useAuth } from "hook/useAuth";
-// import { AppDataLayout } from "Layout/AppDataLayout";
 import React from "react";
 import { Redirect, Route, RouteProps } from "react-router-dom";
+
+import { AppDataLayout } from "../../Layout/AppDataLayout";
 
 export const PrivateRoute = ({ children, ...rest }: RouteProps) => {
 	const isAuth = useAuth();
@@ -11,8 +12,7 @@ export const PrivateRoute = ({ children, ...rest }: RouteProps) => {
 			{...rest}
 			render={({ location }) =>
 				isAuth ? (
-					// <AppDataLayout>{children}</AppDataLayout>
-					children
+					<AppDataLayout>{children}</AppDataLayout>
 				) : (
 					<Redirect
 						to={{

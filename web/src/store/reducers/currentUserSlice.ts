@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import * as AuthApi from "api/auth";
 import { getCurrentUser } from 'api/user';
 import {IUser, User} from 'models/User';
-import { removeToken } from "utils/token";
+import {getToken, removeToken} from "utils/token";
 
 interface CurrentUserState {
 	currentUser: IUser;
@@ -15,7 +15,7 @@ const initialState: CurrentUserState = {
 		urlAvatar: '',
 		loginDate: 0,
 		intraLogin: null,
-		isAuthorized: false,
+		isAuthorized: !!getToken(),
 	},
 };
 
@@ -58,13 +58,14 @@ export const currentUserSlice = createSlice({
 			state.currentUser.isAuthorized = true;
 		},
 		resetCurrentUser: (state: CurrentUserState) => {
-			state.currentUser = initialState.currentUser;
+			state.currentUser = {...initialState.currentUser};
 		},
 	},
 	extraReducers: {
 		[logoutAction.fulfilled.type]: (state) => {
 			removeToken();
-			state.currentUser = initialState.currentUser;
+			state.currentUser = {...initialState.currentUser};
+			state.currentUser.isAuthorized = false;
 		},
 		[getCurrentUserAction.fulfilled.type]: (state: CurrentUserState, action: PayloadAction<IUser>) => {
 			state.currentUser = action.payload;

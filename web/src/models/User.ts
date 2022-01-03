@@ -7,7 +7,7 @@ export interface IUser {
 	isAuthorized: boolean;
 }
 
-export class User implements IUser{
+export class User implements IUser {
 	constructor() {
 		this.id = -1;
 		this.username = '';
