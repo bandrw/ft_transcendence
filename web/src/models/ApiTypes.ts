@@ -84,6 +84,7 @@ export interface ApiChannelExpand {
 }
 
 export interface ApiUserExpand {
+	[key: string]: any;
 	id: number;
 	login: string;
 	url_avatar: string;
