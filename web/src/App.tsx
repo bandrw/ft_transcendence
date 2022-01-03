@@ -53,9 +53,7 @@ export const getCurrentUser = async (accessToken: string, socketId: string): Pro
 const App = () => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
-	const history = useHistory();
 	const socket = React.useContext(SocketContext);
-	const onlineUsersRef = React.useRef<ApiUpdateUser[]>([]);
 	const [socketId, setSocketId] = React.useState<string | null>(null);
 	// const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
 	const sockId = socketId || socket.id;
@@ -67,11 +65,6 @@ const App = () => {
 	const { status } = useAppSelector((state) => state.status);
 	const { enemy } = useAppSelector((state) => state.enemy);
 	const dispatch = useAppDispatch();
-
-	// Saving onlineUsers in onlineUsersRef
-	React.useEffect(() => {
-		onlineUsersRef.current = onlineUsers;
-	}, [onlineUsers, onlineUsersRef]);
 
 	// Fetching onlineUsers
 	React.useEffect(() => {
@@ -232,7 +225,7 @@ const App = () => {
 			socket.off('gameIsReady', gameIsReadyHandler);
 			socket.off('gameSettings', gameSettingsHandler);
 		};
-	}, [isAuth, currentUser, socket, onlineUsersRef, onlineUsers, dispatch, status, enemy]);
+	}, [isAuth, currentUser, socket, onlineUsers, dispatch, status, enemy]);
 
 	if (!isDesktop) return <div style={{ fontSize: '2em', marginTop: '100px' }}>Window is too small :(</div>;
 
