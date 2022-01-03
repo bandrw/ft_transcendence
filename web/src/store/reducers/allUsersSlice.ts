@@ -13,7 +13,7 @@ const initialState: AllUsersState = {
 };
 
 export const getAllUsersAction = createAsyncThunk(
-	'allUsers/fetchAllUsers',
+	'allUsers/getAllUsers',
 	async () => {
 		// eslint-disable-next-line no-return-await
 		return await getAllUsers();

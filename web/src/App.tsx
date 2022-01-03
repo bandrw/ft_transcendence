@@ -5,8 +5,8 @@ import { AuthRoute } from "components/AuthRoute";
 import { PrivateRoute } from "components/PrivateRoute";
 import { SocketContext } from 'context/socket';
 import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
-import {useAuth} from "hook/useAuth";
-import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
+import { useAuth } from "hook/useAuth";
+import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserStatus } from 'models/ApiTypes';
 import { User } from "models/User";
 import Game from 'pages/Game';
 import GamesHistory from 'pages/GamesHistory';
@@ -15,16 +15,17 @@ import Main from 'pages/Main';
 import NotFound from "pages/NotFound";
 import Register from 'pages/Register';
 import UserProfile from 'pages/UserProfile';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { Switch, useHistory } from "react-router-dom";
-import { getAllUsersAction } from 'store/reducers/allUsersSlice';
-import { getCurrentUserAction, resetCurrentUser, setCurrentUser } from "store/reducers/currentUserSlice";
+import { Switch } from "react-router-dom";
+import {getAllUsersAction, setAllUsers} from 'store/reducers/allUsersSlice';
+import { getCurrentUserAction, setCurrentUser } from "store/reducers/currentUserSlice";
 import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
-import {setGameSettings} from "store/reducers/gameSlice";
-import {getOnlineUsersAction, removeOnlineUser, setOnlineUsers} from 'store/reducers/onlineUsersSlice';
+import { setGameSettings } from "store/reducers/gameSlice";
+import { getOnlineUsersAction, removeOnlineUser, setOnlineUsers } from 'store/reducers/onlineUsersSlice';
 import { setStatus } from 'store/reducers/statusSlice';
-import { getToken, removeToken } from 'utils/token';
+
+import {getAllUsers} from "./api/user";
 
 export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
 	try {
@@ -67,7 +68,7 @@ const App = () => {
 	const dispatch = useAppDispatch();
 
 	// Fetching onlineUsers
-	React.useEffect(() => {
+	useEffect(() => {
 		let isMounted = true;
 
 		if (!isAuth || !isMounted) {
@@ -82,14 +83,19 @@ const App = () => {
 	}, [isAuth, dispatch]);
 
 	// Fetching allUsers + updating on onlineUsers change
-	React.useEffect(() => {
+	useEffect(() => {
 		let isMounted = true;
 
 		if (!isAuth || !isMounted) {
 			return;
 		}
 
-		dispatch(getAllUsersAction());
+		getAllUsers().then((data) => {
+			if (!isMounted) {
+				return;
+			}
+			dispatch(setAllUsers(data));
+		});
 
 		return () => {
 			isMounted = false;
@@ -97,14 +103,14 @@ const App = () => {
 	}, [isAuth, dispatch, onlineUsers]);
 
 	// Getting user from access_token
-	React.useEffect(() => {
+	useEffect(() => {
 		if (sockId) {
 			dispatch(getCurrentUserAction(sockId));
 		}
 	}, [dispatch, sockId]);
 
 	// Saving socketId in state
-	React.useEffect(() => {
+	useEffect(() => {
 		const connectHandler = () => {
 			setSocketId(socket.id);
 		};
@@ -137,7 +143,7 @@ const App = () => {
 	}, [sockId, socket]);
 
 	// Event handlers
-	React.useEffect(() => {
+	useEffect(() => {
 		if (!isAuth) {
 			return;
 		}
@@ -169,7 +175,7 @@ const App = () => {
 		const updateUserHandler = (data: string) => {
 			const updateUserData: ApiUpdateUser[] = JSON.parse(data);
 
-			dispatch(setOnlineUsers(updateUserData));
+			dispatch(setOnlineUsers(updateUserData)); // TODO add user to allUsers
 
 			// Update currentUser
 			const currUsr = updateUserData.find((usr) => usr.id === currentUser.id);
