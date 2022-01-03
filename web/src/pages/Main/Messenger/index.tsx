@@ -3,7 +3,6 @@ import './styles.scss';
 import { faBullhorn, faComment, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
-import { SocketContext } from 'context/socket';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from 'models/ApiTypes';
 import Chat from 'pages/Main/Messenger/Chat';
@@ -14,7 +13,7 @@ import { Fade } from 'react-awesome-reveal';
 import { getToken } from 'utils/token';
 
 const Messenger = () => {
-	const socket = React.useContext(SocketContext);
+	const { socket } = useAppSelector((state) => state.socket);
 	const [chats, setChats] = React.useState<ApiChatExpand[]>([]);
 	const [channels, setChannels] = React.useState<ApiChannelExpand[]>([]);
 	const [selectedChat, setSelectedChat] = React.useState<ApiChatExpand | null>(null);

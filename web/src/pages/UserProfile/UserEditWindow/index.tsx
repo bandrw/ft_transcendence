@@ -3,7 +3,6 @@ import 'react-phone-input-2/lib/style.css';
 
 import axios from 'axios';
 import CodeVerification from "components/CodeVerification";
-import { SocketContext } from "context/socket";
 import { useAppSelector } from 'hook/reduxHooks';
 import { AvatarGenerator } from 'random-avatar-generator';
 import React, { ChangeEvent, FormEvent } from 'react';
@@ -79,7 +78,7 @@ interface IChangeUsername {
 
 const ChangeUsernameForm = () => {
 	const history = useHistory();
-	const socket = React.useContext(SocketContext);
+	const { socket } = useAppSelector((state) => state.socket);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { register, handleSubmit } = useForm<IChangeUsername>();

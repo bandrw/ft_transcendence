@@ -4,8 +4,7 @@ import { getCurrentUser } from "App";
 import axios, { AxiosResponse } from "axios";
 import CircleLoading from "components/CircleLoading";
 import CodeVerification from "components/CodeVerification";
-import { SocketContext } from "context/socket";
-import { useAppDispatch } from "hook/reduxHooks";
+import {useAppDispatch, useAppSelector} from "hook/reduxHooks";
 import { ApiUserLogin } from "models/ApiTypes";
 import { User } from "models/User";
 import React, { FormEvent } from "react";
@@ -38,10 +37,6 @@ const LoginInput = styled.input`
 enum LoginState {
 	Default = 'default',
 	Verification = 'verification',
-}
-
-interface LoginProps {
-	socketId: string;
 }
 
 export const signIn = async (
@@ -126,9 +121,9 @@ const getUserFromIntra = async (
 	}
 };
 
-const Login = ({ socketId }: LoginProps) => {
+const Login = () => {
 	const history = useHistory();
-	const socket = React.useContext(SocketContext);
+	const {socket, socket: { id: socketId }} = useAppSelector((state) => state.socket);
 	const dispatch = useAppDispatch();
 
 	const [loginInput, setLoginInput] = React.useState<string>('');

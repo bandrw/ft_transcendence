@@ -8,7 +8,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { SocketContext } from "context/socket";
 import { useAppSelector } from "hook/reduxHooks";
 import { ApiChatExpand } from "models/ApiTypes";
 import moment from "moment";
@@ -38,7 +37,7 @@ const PersonalChatView = ({
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const [showChatMuteChoices, setShowChatMuteChoices] = React.useState<boolean>(false);
 	const { register, handleSubmit, reset } = useForm<ISendMessage>();
-	const socket = React.useContext(SocketContext);
+	const { socket } = useAppSelector((state) => state.socket);
 	const companion = selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
 
 	const sendDuelEvent = React.useCallback((event: string) => {

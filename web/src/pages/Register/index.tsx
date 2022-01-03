@@ -3,8 +3,7 @@ import './styles.scss';
 import axios, { AxiosResponse } from 'axios';
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from 'components/CircleLoading';
-import { SocketContext } from 'context/socket';
-import { useAppDispatch } from 'hook/reduxHooks';
+import {useAppDispatch, useAppSelector} from 'hook/reduxHooks';
 import { ApiUser, ApiUserCreate } from 'models/ApiTypes';
 import { signIn } from 'pages/Login';
 import React from 'react';
@@ -64,7 +63,7 @@ interface ICreateUser {
 }
 
 const Register = () => {
-	const socket = React.useContext(SocketContext);
+	const { socket } = useAppSelector((state) => state.socket);
 
 	const loginRef = React.useRef<HTMLInputElement>(null);
 	const passwordRef = React.useRef<HTMLInputElement>(null);

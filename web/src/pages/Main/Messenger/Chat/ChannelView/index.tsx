@@ -1,7 +1,6 @@
 import { faBullhorn, faLock, faPaperPlane, faSlidersH, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { SocketContext } from "context/socket";
 import { useAppSelector } from "hook/reduxHooks";
 import { ApiBanList, ApiChannelExpand } from "models/ApiTypes";
 import moment from "moment";
@@ -36,7 +35,7 @@ const ChannelView = ({ selectedChannel, closeSelectedChat, setSettingsChatState 
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 	const [joinError, setJoinError] = React.useState<string>('');
-	const socket = React.useContext(SocketContext);
+	const { socket } = useAppSelector((state) => state.socket);
 	const { register: sendMsgRegister, handleSubmit: sendMsgHandleSubmit, reset: sendMsgReset } = useForm<ISendMessage>();
 	const {
 		register: joinPrivateRegister,

@@ -1,5 +1,4 @@
 import { BallType, getBallColor, getBallType, getEnemyColor, getUserColor } from "components/GameSettings";
-import { SocketContext } from 'context/socket';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGameLoop, ApiGameSettings } from 'models/ApiTypes';
 import GameBall from 'models/GameBall';
@@ -15,7 +14,7 @@ interface GameCanvasProps {
 }
 
 const GameCanvas = ({ watchMode, gameSettings }: GameCanvasProps) => {
-	const socket = React.useContext(SocketContext);
+	const { socket } = useAppSelector((state) => state.socket);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const leftPlayer = useMemo(() => new Player(), []);
 	const rightPlayer = useMemo(() => new Player(), []);

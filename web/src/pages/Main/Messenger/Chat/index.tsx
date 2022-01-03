@@ -1,6 +1,5 @@
 import './styles.scss';
 
-import { SocketContext } from 'context/socket';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiChannelExpand, ApiChatExpand, ApiUserExpand } from 'models/ApiTypes';
 import CreateChannel from 'pages/Main/Messenger/Chat/CreateChannel';
@@ -38,7 +37,7 @@ const Chat = ({
 }: ChatProps) => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
-	const socket = React.useContext(SocketContext);
+	const { socket } = useAppSelector((state) => state.socket);
 	const chatsToCreate: ApiUserExpand[] = allUsers.filter(
 		(usr) =>
 			!chats.find((chat) => chat.userOne.id === usr.id || chat.userTwo.id === usr.id) &&

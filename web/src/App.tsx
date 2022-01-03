@@ -3,7 +3,6 @@ import './App.scss';
 import axios from 'axios';
 import { AuthRoute } from "components/AuthRoute";
 import { PrivateRoute } from "components/PrivateRoute";
-import { SocketContext } from 'context/socket';
 import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
 import { useAuth } from "hook/useAuth";
 import { ApiGameSettings, ApiUpdateUser, ApiUser, ApiUserStatus } from 'models/ApiTypes';
@@ -18,7 +17,7 @@ import UserProfile from 'pages/UserProfile';
 import React, { useEffect } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Switch } from "react-router-dom";
-import {getAllUsersAction, setAllUsers} from 'store/reducers/allUsersSlice';
+import { setAllUsers } from 'store/reducers/allUsersSlice';
 import { getCurrentUserAction, setCurrentUser } from "store/reducers/currentUserSlice";
 import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
 import { setGameSettings } from "store/reducers/gameSlice";
@@ -54,10 +53,8 @@ export const getCurrentUser = async (accessToken: string, socketId: string): Pro
 const App = () => {
 	const isDesktop = useMediaQuery({ query: '(min-width: 1024px)' });
 
-	const socket = React.useContext(SocketContext);
-	const [socketId, setSocketId] = React.useState<string | null>(null);
-	// const [enemyIsReady, setEnemyIsReady] = React.useState<boolean>(false);
-	const sockId = socketId || socket.id;
+	const {socket, socket: { id }} = useAppSelector((state) => state.socket);
+	const [socketId, setSocketId] = React.useState<string>(id);
 
 	const isAuth = useAuth();
 
@@ -104,10 +101,10 @@ const App = () => {
 
 	// Getting user from access_token
 	useEffect(() => {
-		if (sockId) {
-			dispatch(getCurrentUserAction(sockId));
+		if (socketId) {
+			dispatch(getCurrentUserAction(socketId));
 		}
-	}, [dispatch, sockId]);
+	}, [dispatch, socketId]);
 
 	// Saving socketId in state
 	useEffect(() => {
@@ -116,22 +113,10 @@ const App = () => {
 		};
 
 		const disconnectHandler = (reason: string) => {
-			setSocketId(null);
+			setSocketId('');
 
 			if (reason === 'io server disconnect') socket.connect();
 		};
-
-		// TODO можно придумать что-то получше
-		const sockInterval = setInterval(() => {
-			if (sockId) {
-				clearInterval(sockInterval);
-			}
-
-			if (socket.id) {
-				setSocketId(socket.id);
-				clearInterval(sockInterval);
-			}
-		}, 100);
 
 		socket.on('connect', connectHandler);
 		socket.on('disconnect', disconnectHandler);
@@ -140,7 +125,7 @@ const App = () => {
 			socket.off('connect', connectHandler);
 			socket.off('disconnect', disconnectHandler);
 		};
-	}, [sockId, socket]);
+	}, [socketId, socket]);
 
 	// Event handlers
 	useEffect(() => {
@@ -175,7 +160,7 @@ const App = () => {
 		const updateUserHandler = (data: string) => {
 			const updateUserData: ApiUpdateUser[] = JSON.parse(data);
 
-			dispatch(setOnlineUsers(updateUserData)); // TODO add user to allUsers
+			dispatch(setOnlineUsers(updateUserData));
 
 			// Update currentUser
 			const currUsr = updateUserData.find((usr) => usr.id === currentUser.id);
@@ -238,7 +223,7 @@ const App = () => {
 	return (
 		<Switch>
 			<AuthRoute exact path="/login">
-				<Login socketId={sockId} />
+				<Login/>
 			</AuthRoute>
 
 			<AuthRoute exact path="/register">
