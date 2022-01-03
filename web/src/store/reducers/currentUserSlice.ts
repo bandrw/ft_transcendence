@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import * as AuthApi from "api/auth";
-import { IUser } from 'models/User';
+import {IUser, User} from 'models/User';
 import { removeToken } from "utils/token";
 
 interface CurrentUserState {
@@ -33,12 +33,12 @@ export const getCurrentUserAction = createAsyncThunk(
 
 			if (user) {
 				const { id, login, url_avatar } = user;
+				const newUser = new User();
+				newUser.id = id;
+				newUser.username = login;
+				newUser.urlAvatar = url_avatar;
 
-				return {
-					id,
-					login,
-					url_avatar,
-				};
+				return newUser;
 			}
 
 			return rejectWithValue('');

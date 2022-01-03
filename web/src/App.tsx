@@ -19,7 +19,7 @@ import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Switch, useHistory } from "react-router-dom";
 import { setAllUsers } from 'store/reducers/allUsersSlice';
-import { resetCurrentUser, setCurrentUser } from "store/reducers/currentUserSlice";
+import {getCurrentUserAction, resetCurrentUser, setCurrentUser} from "store/reducers/currentUserSlice";
 import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
 import {setGameSettings} from "store/reducers/gameSlice";
 import { setOnlineUsers } from 'store/reducers/onlineUsersSlice';
@@ -136,14 +136,8 @@ const App = () => {
 			failAuthHandler();
 		}
 
-		if (accessToken && sockId) {
-			getCurrentUser(accessToken, sockId).then((usr) => {
-				if (usr) {
-					dispatch(setCurrentUser(usr));
-				} else {
-					failAuthHandler();
-				}
-			});
+		if (sockId) {
+			dispatch(getCurrentUserAction(sockId));
 		}
 	}, [dispatch, history, sockId, socket.id, socketId, isAuth]);
 
@@ -217,6 +211,9 @@ const App = () => {
 
 			// Update currentUser
 			const currUsr = updateUserData.find((usr) => usr.id === currentUser.id);
+
+			// eslint-disable-next-line no-debugger
+			debugger;
 
 			if (currUsr) {
 				currentUser.username = currUsr.login;
