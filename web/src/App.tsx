@@ -18,7 +18,7 @@ import UserProfile from 'pages/UserProfile';
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { Switch, useHistory } from "react-router-dom";
-import { setAllUsers } from 'store/reducers/allUsersSlice';
+import { fetchAllUsersAction } from 'store/reducers/allUsersSlice';
 import { getCurrentUserAction, resetCurrentUser, setCurrentUser } from "store/reducers/currentUserSlice";
 import { setEnemy, setEnemyIsReady } from 'store/reducers/enemySlice';
 import {setGameSettings} from "store/reducers/gameSlice";
@@ -48,15 +48,6 @@ export const getCurrentUser = async (accessToken: string, socketId: string): Pro
 	} catch {
 		return null;
 	}
-};
-
-const fetchAllUsers = () => {
-	return axios
-		.get<ApiUserExpand[]>('/users', {
-			params: { expand: '' },
-			headers: { Authorization: `Bearer ${getToken()}` },
-		})
-		.then((res) => res.data);
 };
 
 const App = () => {
@@ -108,14 +99,11 @@ const App = () => {
 	React.useEffect(() => {
 		let isMounted = true;
 
-		if (!isAuth) {
+		if (!isAuth || !isMounted) {
 			return;
 		}
 
-		fetchAllUsers().then((users) => {
-			if (!isMounted) return;
-			dispatch(setAllUsers(users));
-		});
+		dispatch(fetchAllUsersAction());
 
 		return () => {
 			isMounted = false;
