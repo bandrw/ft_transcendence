@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getOnlineUsers } from "api/user";
 import { ApiUpdateUser } from 'models/ApiTypes';
-
-import { getOnlineUsers } from "../../api/user";
 
 interface OnlineUsersState {
 	onlineUsers: ApiUpdateUser[];

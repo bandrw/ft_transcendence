@@ -1,6 +1,7 @@
 import './styles.scss';
 import 'react-phone-input-2/lib/style.css';
 
+import * as EditUser from "api/editUser";
 import axios from 'axios';
 import CodeVerification from "components/CodeVerification";
 import { useAppSelector } from 'hook/reduxHooks';
@@ -10,10 +11,7 @@ import { useForm } from 'react-hook-form';
 import PhoneInput from 'react-phone-input-2';
 import { useHistory } from 'react-router-dom';
 import styled from "styled-components";
-import {log} from "util";
 import { getToken } from 'utils/token';
-
-import * as EditUser from "../../../api/editUser";
 
 const TextInput = styled.input`
 	margin: 10px 0;
@@ -54,17 +52,6 @@ const updateAvatar = async (imageState: ImageState) => {
 
 		return EditUser.uploadAvatar(formData);
 	}
-};
-
-const updateUsername = async (username: string, socketId: string) => {
-	const data = {
-		username,
-		socketId,
-	};
-
-	return axios.post('/users/updateUsername', data, {
-		headers: { Authorization: `Bearer ${getToken()}` },
-	});
 };
 
 interface IChangeUsername {

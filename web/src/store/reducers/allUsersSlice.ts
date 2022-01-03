@@ -1,8 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {getAllUsers} from "api/user";
 import { ApiUserExpand } from 'models/ApiTypes';
-
-import * as AuthApi from "../../api/auth";
-import {getAllUsers} from "../../api/user";
 
 interface AllUsersState {
 	allUsers: ApiUserExpand[];

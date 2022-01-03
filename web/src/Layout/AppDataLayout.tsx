@@ -1,16 +1,13 @@
+import FullPageLoader from "components/FullPageLoader";
+import {useAppDispatch, useAppSelector} from "hook/reduxHooks";
+import {ApiGameSettings, ApiUpdateUser, ApiUserStatus} from "models/ApiTypes";
 import React, {FC, useEffect} from 'react';
-
-import {getAllUsers} from "../api/user";
-import FullPageLoader from "../components/FullPageLoader";
-import {useAppDispatch, useAppSelector} from "../hook/reduxHooks";
-import {useAuth} from "../hook/useAuth";
-import {ApiGameSettings, ApiUpdateUser, ApiUserStatus} from "../models/ApiTypes";
-import {getAllUsersAction, setAllUsers} from "../store/reducers/allUsersSlice";
-import {getCurrentUserAction, setCurrentUser} from "../store/reducers/currentUserSlice";
-import {setEnemy, setEnemyIsReady} from "../store/reducers/enemySlice";
-import {setGameSettings} from "../store/reducers/gameSlice";
-import {getOnlineUsersAction, removeOnlineUser, setOnlineUsers} from "../store/reducers/onlineUsersSlice";
-import {setStatus} from "../store/reducers/statusSlice";
+import {getAllUsersAction} from "store/reducers/allUsersSlice";
+import {getCurrentUserAction, setCurrentUser} from "store/reducers/currentUserSlice";
+import {setEnemy, setEnemyIsReady} from "store/reducers/enemySlice";
+import {setGameSettings} from "store/reducers/gameSlice";
+import {getOnlineUsersAction, removeOnlineUser, setOnlineUsers} from "store/reducers/onlineUsersSlice";
+import {setStatus} from "store/reducers/statusSlice";
 
 interface AppDataLayoutProps {
 	children: React.ReactNode;

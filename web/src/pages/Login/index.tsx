@@ -6,7 +6,7 @@ import CodeVerification from "components/CodeVerification";
 import {useAppDispatch, useAppSelector} from "hook/reduxHooks";
 import { User } from "models/User";
 import React, {useMemo} from "react";
-import {useForm} from "react-hook-form";
+import {SubmitHandler, useForm} from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
 import { setCurrentUser } from "store/reducers/currentUserSlice";
 import styled from "styled-components";
@@ -98,7 +98,7 @@ const Login = () => {
 		};
 	}, [history, authCode, socketId, dispatch]);
 
-	const loginSubmit = useMemo(() => async ({ login, password }: ILoginInput) => {
+	const loginSubmit: SubmitHandler<ILoginInput> = useMemo(() => async ({ login, password }) => {
 		setIsLoading(true);
 		signIn(
 			login,
@@ -153,13 +153,13 @@ const Login = () => {
 							type="text"
 							placeholder="Login"
 							autoComplete="username"
-							{...register('login')}
+							{...register('login', { required: true })}
 						/>
 						<LoginInput
 							type="password"
 							placeholder="Password"
 							autoComplete="current-password"
-							{...register('password')}
+							{...register('password', { required: true })}
 						/>
 						<span className="login-errors">{loginErrors}</span>
 						<button type="submit" className="login-btn">

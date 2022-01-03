@@ -1,110 +1,70 @@
 import './styles.scss';
 
 import { signIn } from 'api/auth';
-import axios, { AxiosResponse } from 'axios';
+import {createUser, getUserByLogin} from "api/user";
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from 'components/CircleLoading';
 import {useAppDispatch, useAppSelector} from 'hook/reduxHooks';
-import { ApiUser, ApiUserCreate } from 'models/ApiTypes';
-import React from 'react';
+import React, {useEffect} from 'react';
+import {SubmitHandler, useForm} from "react-hook-form";
 import { Link } from 'react-router-dom';
 import { setCurrentUser } from 'store/reducers/currentUserSlice';
-import { getToken } from 'utils/token';
 
-const validateInput = (
-	login: string,
-	password: string,
-	passwordConfirmation: string,
-	setErrors: React.Dispatch<React.SetStateAction<string>>,
-): boolean => {
-	if (!login) {
-		setErrors('Enter login');
-
-		return false;
-	}
-
-	if (!password) {
-		setErrors('Enter password');
-
-		return false;
-	}
-
-	if (login.length < 4) {
-		setErrors('Login is too short');
-
-		return false;
-	}
-
-	if (login.length > 16) {
-		setErrors('Login is too long');
-
-		return false;
-	}
-
-	if (password.length < 6) {
-		setErrors('Password is too short');
-
-		return false;
-	}
-
-	if (password !== passwordConfirmation) {
-		setErrors('Passwords are not equal');
-
-		return false;
-	}
-	setErrors('');
-
-	return true;
-};
-
-interface ICreateUser {
+interface IRegisterForm {
 	login: string;
-	pass: string;
+	password: string;
+	passwordConfirm: string;
 }
 
 const Register = () => {
 	const { socket } = useAppSelector((state) => state.socket);
 
-	const loginRef = React.useRef<HTMLInputElement>(null);
-	const passwordRef = React.useRef<HTMLInputElement>(null);
-	const passwordConfirmRef = React.useRef<HTMLInputElement>(null);
-
-	const [errors, setErrors] = React.useState<string>('');
+	const [errorMessage, setErrorMessage] = React.useState<string>('');
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+	const { register, handleSubmit, setError, formState: { errors } } = useForm<IRegisterForm>();
 	const dispatch = useAppDispatch();
 
-	const register = async (e: React.FormEvent) => {
-		e.preventDefault();
+	useEffect(() => {
+		if (errors.login) {
+			return setErrorMessage(errors.login.message || '');
+		}
 
-		const login = loginRef.current?.value.trim().toLowerCase() || '';
-		const password = passwordRef.current?.value.trim().toLowerCase() || '';
-		const passwordConfirm = passwordConfirmRef.current?.value.trim().toLowerCase() || '';
+		if (errors.password) {
+			return setErrorMessage(errors.password.message || '');
+		}
 
-		if (!validateInput(login, password, passwordConfirm, setErrors)) return;
+		if (errors.passwordConfirm) {
+			return setErrorMessage(errors.passwordConfirm.message || '');
+		}
+	}, [errors]);
+
+	const onSubmit: SubmitHandler<IRegisterForm> = async ({ login, password, passwordConfirm }) => {
+		login = login.trim().toLowerCase();
+
+		if (login.length < 4)
+			return setError('login', { type: 'manual', message: 'Login is too short' });
+
+		if (login.length > 16)
+			return setError('login', { type: 'manual', message: 'Login is too long' });
+
+		if (password.length < 6)
+			return setError('password', { type: 'manual', message: 'Password is too short' });
+
+		if (password !== passwordConfirm)
+			return setError('passwordConfirm', { type: 'manual', message: 'Passwords are not equal' });
 
 		setIsLoading(true);
-		setErrors('');
-		const user = await axios
-			.get<ApiUser | null>('/users', {
-				params: { login },
-				headers: { Authorization: `Bearer ${getToken()}` },
-			})
-			.then((res) => res.data);
+		const user = await getUserByLogin(login);
 
 		if (user) {
-			setErrors('User with this login already exists');
+			setErrorMessage('User with this login already exists');
 			setIsLoading(false);
 
 			return;
 		}
 
 		const hashedPassword = await bcryptjs.hash(password, 10);
-		const usersCreateResponse = await axios
-			.post<ICreateUser, AxiosResponse<ApiUserCreate>>('/users/create', {
-				login,
-				pass: hashedPassword,
-			})
-			.then((res) => res.data);
+		const usersCreateResponse = await createUser(login, hashedPassword);
 
 		if (usersCreateResponse.ok) {
 			try {
@@ -112,15 +72,16 @@ const Register = () => {
 					login,
 					password,
 					(usr) => dispatch(setCurrentUser(usr)),
-					setErrors, socket.id,
+					setErrorMessage,
+					socket.id,
 					null,
 					null,
 				);
 			} catch (err) {
-				setErrors(`${err}`);
+				setErrorMessage(`${err}`);
 			}
 		} else {
-			setErrors(usersCreateResponse.msg);
+			setErrorMessage(usersCreateResponse.msg);
 		}
 		setIsLoading(false);
 	};
@@ -129,23 +90,26 @@ const Register = () => {
 		<div className="register-container">
 			<h1>Registration</h1>
 
-			<form onSubmit={register}>
-				<input name="login" type="text" placeholder="Login" ref={loginRef} autoComplete="username" />
+			<form onSubmit={handleSubmit(onSubmit)}>
 				<input
-					name="password"
+					type="text"
+					placeholder="Login"
+					autoComplete="username"
+					{...register('login', { required: true })}
+				/>
+				<input
 					type="password"
 					placeholder="Password"
-					ref={passwordRef}
 					autoComplete="new-password"
+					{...register('password', { required: true })}
 				/>
 				<input
-					name="password-confirm"
 					type="password"
 					placeholder="Confirm password"
-					ref={passwordConfirmRef}
 					autoComplete="new-password"
+					{...register('passwordConfirm', { required: true })}
 				/>
-				<span className="errors">{errors}</span>
+				{ errorMessage && <span className="errors">{errorMessage}</span> }
 				<button type="submit" className="register-btn">
 					{isLoading ? <CircleLoading bgColor="#fff" width="35px" height="35px" /> : 'Register'}
 				</button>
