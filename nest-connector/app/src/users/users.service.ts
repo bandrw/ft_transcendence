@@ -273,7 +273,6 @@ export class UsersService {
 		const onlineUser = this.onlineUsers.find(usr => usr.id === userId);
 		onlineUser.login = r.login;
 		this.updateUser();
-		console.log(this.usersSocketIds);
 		return r;
 	}
 

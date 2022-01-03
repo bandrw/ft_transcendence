@@ -164,3 +164,14 @@ export interface ApiChatExpand {
 	messages: ApiMessage[];
 	banLists: ApiBanList[];
 }
+
+export interface IAuthIntraReq {
+	code: string;
+	smsCode: string | null;
+	intraToken: string | null;
+}
+
+export interface IAuthIntraRes {
+	access_token: string | null;
+	twoFactorAuthentication: boolean;
+}

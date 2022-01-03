@@ -1,11 +1,11 @@
 import './styles.scss';
 
+import { signIn } from 'api/auth';
 import axios, { AxiosResponse } from 'axios';
 import * as bcryptjs from 'bcryptjs';
 import CircleLoading from 'components/CircleLoading';
 import {useAppDispatch, useAppSelector} from 'hook/reduxHooks';
 import { ApiUser, ApiUserCreate } from 'models/ApiTypes';
-import { signIn } from 'pages/Login';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { setCurrentUser } from 'store/reducers/currentUserSlice';

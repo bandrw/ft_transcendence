@@ -1,7 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {io, Socket} from "socket.io-client";
 
-
 interface SocketState {
 	socket: Socket;
 }

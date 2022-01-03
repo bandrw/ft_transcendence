@@ -1,17 +1,15 @@
 import "./styles.scss";
 
-import { getCurrentUser } from "App";
-import axios, { AxiosResponse } from "axios";
+import {getUserFromIntra, LoginState, signIn} from "api/auth";
 import CircleLoading from "components/CircleLoading";
 import CodeVerification from "components/CodeVerification";
 import {useAppDispatch, useAppSelector} from "hook/reduxHooks";
-import { ApiUserLogin } from "models/ApiTypes";
 import { User } from "models/User";
-import React, { FormEvent } from "react";
+import React, {FormEvent, useMemo} from "react";
 import { Link, useHistory } from "react-router-dom";
 import { setCurrentUser } from "store/reducers/currentUserSlice";
 import styled from "styled-components";
-import { removeToken, setToken } from "utils/token";
+import { removeToken } from "utils/token";
 
 const LoginInput = styled.input`
 	border-radius: 15px;
@@ -33,93 +31,6 @@ const LoginInput = styled.input`
 		border-color: #29aa44;
 	}
 `;
-
-enum LoginState {
-	Default = 'default',
-	Verification = 'verification',
-}
-
-export const signIn = async (
-	login: string,
-	password: string,
-	setUser: (usr: User) => void,
-	setErrors: React.Dispatch<React.SetStateAction<string>>,
-	socketId: string,
-	setState: React.Dispatch<React.SetStateAction<LoginState>> | null,
-	smsCode: string | null,
-): Promise<void> => {
-	const r = await axios
-		.post<{ username: string; password: string; socketId: string, code: string | null }, AxiosResponse<ApiUserLogin>>("/users/login", {
-			username: login,
-			password,
-			socketId,
-			code: smsCode,
-		})
-		.then((res) => res.data)
-		.catch(() => {
-			setErrors("Login Error");
-
-			return null;
-		});
-
-	if (!r) return;
-	const { access_token: accessToken, twoFactorAuthentication } = r;
-
-	if (twoFactorAuthentication && setState) {
-		setState(LoginState.Verification);
-
-		return;
-	}
-
-	if (accessToken) {
-		setToken(accessToken);
-		getCurrentUser(accessToken, socketId)
-			.then((usr) => {
-				if (usr) {
-					setUser(usr);
-				} else {
-					removeToken();
-				}
-			});
-	}
-};
-
-interface IAuthIntraReq {
-	code: string;
-	smsCode: string | null;
-	intraToken: string | null;
-}
-
-interface IAuthIntraRes {
-	access_token: string | null;
-	twoFactorAuthentication: boolean;
-}
-
-const getUserFromIntra = async (
-	authCode: string,
-	socketId: string,
-	smsCode: string | null = null,
-	intraToken: string | null = null,
-) => {
-	const r = await axios
-		.post<IAuthIntraReq , AxiosResponse<IAuthIntraRes>>('/auth/intra', {
-			code: authCode || '',
-			smsCode,
-			intraToken,
-		})
-		.then((res) => res.data);
-
-	if (r.twoFactorAuthentication)
-		return { user: null, twoFactorAuthentication: true, access_token_intra: r.access_token };
-
-	if (r.access_token) {
-		setToken(r.access_token);
-
-		const user = await getCurrentUser(r.access_token, socketId);
-
-		return { user, twoFactorAuthentication: r.twoFactorAuthentication };
-	}
-};
 
 const Login = () => {
 	const history = useHistory();
@@ -181,12 +92,11 @@ const Login = () => {
 		};
 	}, [history, authCode, socketId, dispatch]);
 
-	const loginSubmit = async (e: FormEvent) => {
+	const loginSubmit = useMemo(() => async (e: FormEvent) => {
 		e.preventDefault();
 
 		setIsLoading(true);
-
-		await signIn(
+		signIn(
 			loginInput,
 			passwordInput,
 			(usr: User) => dispatch(setCurrentUser(usr)),
@@ -194,11 +104,11 @@ const Login = () => {
 			socket.id,
 			setState,
 			null,
-		);
-		setIsLoading(false);
-	};
+		)
+			.finally(() => setIsLoading(false));
+	}, [dispatch, loginInput, passwordInput, socket.id]);
 
-	const verifyCode = (code: string) => {
+	const verifyCode = useMemo(() => (code: string) => {
 		setIsLoading(true);
 		signIn(
 			loginInput,
@@ -209,10 +119,10 @@ const Login = () => {
 			setState,
 			code,
 		)
-			.then(() => setIsLoading(false));
-	};
+			.finally(() => setIsLoading(false));
+	}, [dispatch, loginInput, passwordInput, socket.id]);
 
-	const verifyCodeIntra = (code: string) => {
+	const verifyCodeIntra = useMemo(() => (code: string) => {
 		if (!authCode) return ;
 
 		setIsLoading(true);
@@ -226,7 +136,7 @@ const Login = () => {
 			})
 			.catch(() => setLoginErrors('Error'))
 			.finally(() => setIsLoading(false));
-	};
+	}, [authCode, dispatch, intraToken, socketId]);
 
 	return (
 		<div className="login-container">
