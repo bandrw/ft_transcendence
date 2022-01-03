@@ -10,7 +10,10 @@ import { useForm } from 'react-hook-form';
 import PhoneInput from 'react-phone-input-2';
 import { useHistory } from 'react-router-dom';
 import styled from "styled-components";
+import {log} from "util";
 import { getToken } from 'utils/token';
+
+import * as EditUser from "../../../api/editUser";
 
 const TextInput = styled.input`
 	margin: 10px 0;
@@ -40,13 +43,7 @@ type ImageState = {
 
 const updateAvatar = async (imageState: ImageState) => {
 	if (imageState.type === 'generated') {
-		const data = {
-			urlAvatar: imageState.image,
-		};
-
-		return axios.post('/users/updateAvatar', data, {
-			headers: { Authorization: `Bearer ${getToken()}` },
-		});
+		return EditUser.updateAvatar({urlAvatar: imageState.image});
 	}
 
 	if (imageState.type === 'uploaded') {
@@ -55,9 +52,7 @@ const updateAvatar = async (imageState: ImageState) => {
 		const formData = new FormData();
 		formData.append('picture', imageState.file);
 
-		return axios.post('/users/uploadAvatar', formData, {
-			headers: { Authorization: `Bearer ${getToken()}` },
-		});
+		return EditUser.uploadAvatar(formData);
 	}
 };
 
@@ -95,7 +90,7 @@ const ChangeUsernameForm = () => {
 	const changeUsername = ({ newUsername }: IChangeUsername) => {
 		if (!usernameIsValid()) return;
 
-		updateUsername(newUsername, socket.id)
+		EditUser.updateUserName(newUsername, socket.id)
 			.then(() => history.push(`/users/${newUsername}`));
 	};
 
