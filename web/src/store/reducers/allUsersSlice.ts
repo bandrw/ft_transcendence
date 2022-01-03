@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import { ApiUserExpand } from 'models/ApiTypes';
 
 import * as AuthApi from "../../api/auth";
-import {fetchAllUsers} from "../../api/user";
+import {getAllUsers} from "../../api/user";
 
 interface AllUsersState {
 	allUsers: ApiUserExpand[];
@@ -12,11 +12,11 @@ const initialState: AllUsersState = {
 	allUsers: [],
 };
 
-export const fetchAllUsersAction = createAsyncThunk(
+export const getAllUsersAction = createAsyncThunk(
 	'allUsers/fetchAllUsers',
 	async () => {
 		// eslint-disable-next-line no-return-await
-		return await fetchAllUsers();
+		return await getAllUsers();
 	},
 );
 
@@ -29,7 +29,7 @@ export const allUsersSlice = createSlice({
 		},
 	},
 	extraReducers: {
-		[fetchAllUsersAction.fulfilled.type]: (state: AllUsersState, action: PayloadAction<ApiUserExpand[]>) => {
+		[getAllUsersAction.fulfilled.type]: (state: AllUsersState, action: PayloadAction<ApiUserExpand[]>) => {
 			state.allUsers = action.payload;
 		},
 	},
