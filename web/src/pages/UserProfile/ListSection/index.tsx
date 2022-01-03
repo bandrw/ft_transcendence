@@ -7,12 +7,11 @@ import { Link } from 'react-router-dom';
 
 interface ListSectionProps {
 	title: string;
-	list: JSX.Element[];
+	list: JSX.Element;
 	linkTo?: string;
-	emptyListSubstitute?: JSX.Element;
 }
 
-const ListSection = ({ title, list, linkTo, emptyListSubstitute }: ListSectionProps) => {
+const ListSection = ({ title, list, linkTo }: ListSectionProps) => {
 	return (
 		<div className="list-section">
 			<div className="list-section-title">
@@ -24,8 +23,7 @@ const ListSection = ({ title, list, linkTo, emptyListSubstitute }: ListSectionPr
 				)}
 			</div>
 			<div className="list-section-list">
-				{/* eslint-disable-next-line react/no-array-index-key */}
-				{list.length === 0 ? emptyListSubstitute : list.map((item, i) => React.cloneElement(item, { key: i }))}
+				{list}
 			</div>
 		</div>
 	);

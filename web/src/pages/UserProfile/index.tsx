@@ -23,6 +23,7 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getToken } from 'utils/token';
 
+import GameList from "../../components/GameList";
 import {getTargetUser} from "../../utils/getTargetUser";
 
 enum SubscribeBtnState {
@@ -31,39 +32,6 @@ enum SubscribeBtnState {
 	AcceptFriendship,
 	InFriendship,
 }
-
-interface GameItemProps {
-	game: ApiGame;
-	enemy?: ApiUser;
-	user?: ApiUser;
-}
-
-const GameItem = ({ enemy, game, user }: GameItemProps) => {
-	// const statusColor = enemy ? enemy.status : 'transparent';
-	// const statusColor = 'pink';
-
-	return (
-		<div className="games-history-game">
-			<div className="games-history-enemy">
-				<div style={{ backgroundImage: `url(${enemy?.url_avatar})` }} className="games-history-game-img">
-					{/* <div className='games-history-user-status' style={ { backgroundColor: statusColor } }/>*/}
-				</div>
-				<Link to={`/users/${enemy?.login}`} className="games-history-user-login">
-					{enemy?.login}
-				</Link>
-			</div>
-			{game.winnerId === user?.id ? (
-				<div className="games-history-win">Win</div>
-			) : (
-				<div className="games-history-lose">Lose</div>
-			)}
-			<div className="games-history-game-score">{`${game.leftScore} : ${game.rightScore}`}</div>
-			<div className="games-history-game-date">
-				<GameTime date={game.date} />
-			</div>
-		</div>
-	);
-};
 
 const SubscribeBtn = ({
 	currentUser,
@@ -243,6 +211,8 @@ const UserProfile = () => {
 		gamesCount = `${user.lostGames.length + user.wonGames.length}`;
 	}
 
+	const GameListComponent = <GameList gamesHistory={gamesHistory}/>;
+
 	return (
 		<div>
 			<div className="user-profile-wrapper">
@@ -300,24 +270,7 @@ const UserProfile = () => {
 						<ListSection
 							title="Latest games"
 							linkTo={`/games/${user?.login}`}
-							list={gamesHistory.slice(0, 3).map((game) => {
-								const loser = getTargetUser(allUsers, game.loserId, 'id'); // allUsers.find((usr) => usr.id === game.loserId);
-								const winner = getTargetUser(allUsers, game.winnerId, 'id'); // allUsers.find((usr) => usr.id === game.winnerId);
-
-								return (
-									<GameItem
-										game={game}
-										user={winner?.login === params.login ? winner : loser}
-										enemy={loser?.login === params.login ? winner : loser}
-									/>
-								);
-							})}
-							emptyListSubstitute={
-								<div className="list-section-empty">
-									No games yet
-									<FontAwesomeIcon icon={faGamepad} />
-								</div>
-							}
+							list={GameListComponent}
 						/>
 						<div style={{ height: '50px' }} />
 						<FriendsList friends={friends} />
