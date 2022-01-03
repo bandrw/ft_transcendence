@@ -44,9 +44,6 @@ const Login = () => {
 	const {socket, socket: { id: socketId }} = useAppSelector((state) => state.socket);
 	const dispatch = useAppDispatch();
 
-	// const [loginInput, setLoginInput] = React.useState<string>('');
-	// const [passwordInput, setPasswordInput] = React.useState<string>('');
-
 	const [loginErrors, setLoginErrors] = React.useState<string>("");
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 	const [state, setState] = React.useState<LoginState>(LoginState.Default);
