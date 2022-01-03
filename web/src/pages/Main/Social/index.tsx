@@ -2,13 +2,13 @@ import './styles.scss';
 
 import { faCircle, faTv } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiUpdateUser, ApiUserExpand, ApiUserStatus } from 'models/ApiTypes';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Link, useHistory } from 'react-router-dom';
-import { getToken } from 'utils/token';
+
+import { getWatchGame } from "../../../api/social";
 
 interface SocialBlockOnlineUserProps {
 	user: ApiUpdateUser;
@@ -28,11 +28,13 @@ const SocialBlockOnlineUser = ({ user }: SocialBlockOnlineUserProps) => {
 					title="Watch game"
 					className="social-block-user-watch-btn"
 					onClick={async () => {
-						await axios.get('/games/watchGame', {
-							params: { gamerLogin: user.login },
-							headers: { Authorization: `Bearer ${getToken()}` },
-						});
-						history.push('/game');
+						await getWatchGame(user.login).
+						finally(() => history.push('/game'));
+						// await axios.get('/games/watchGame', {
+						// 	params: { gamerLogin: user.login },
+						// 	headers: { Authorization: `Bearer ${getToken()}` },
+						// });
+						// history.push('/game');
 					}}
 				>
 					<FontAwesomeIcon icon={faTv} />
