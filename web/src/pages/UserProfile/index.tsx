@@ -1,160 +1,18 @@
 import './styles.scss';
 
-import {
-	faEdit,
-	faExternalLinkAlt,
-	faGamepad,
-	faUserCheck,
-	faUserFriends,
-	faUserPlus,
-} from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
-import CircleLoading from 'components/CircleLoading';
-import Header from 'components/Header';
 import { useAppSelector } from 'hook/reduxHooks';
-import { ApiGame, ApiUser, ApiUserExpand } from 'models/ApiTypes';
-import { User } from 'models/User';
-import { GameTime } from 'pages/GamesHistory';
+import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
 import FriendsList from 'pages/UserProfile/FriendsList';
 import ListSection from 'pages/UserProfile/ListSection';
 import UserEditWindow from 'pages/UserProfile/UserEditWindow';
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { getToken } from 'utils/token';
+import { useParams } from 'react-router-dom';
 
 import GameList from "../../components/GameList";
-import {getTargetUser} from "../../utils/getTargetUser";
-
-enum SubscribeBtnState {
-	Default,
-	Subscribed,
-	AcceptFriendship,
-	InFriendship,
-}
-
-const SubscribeBtn = ({
-	currentUser,
-	targetLogin,
-	allUsers,
-}: {
-	currentUser: User;
-	targetLogin: string;
-	allUsers: ApiUserExpand[];
-}) => {
-	const [subscribeBtnState, setSubscribeBtnState] = React.useState(SubscribeBtnState.Default);
-	const [subscribeBtnLoading, setSubscribeBtnLoading] = React.useState(false);
-
-	React.useEffect(() => {
-		const currUser = getTargetUser(allUsers, currentUser.username, 'login'); // allUsers.find((usr) => usr.login === currentUser.username);
-
-		if (!currUser) return;
-
-		if (currUser.subscriptions.find((s) => s.login === targetLogin)) {
-			if (currUser.subscribers.find((s) => s.login === targetLogin))
-				setSubscribeBtnState(SubscribeBtnState.InFriendship);
-			else setSubscribeBtnState(SubscribeBtnState.Subscribed);
-		} else if (currUser.subscribers.find((s) => s.login === targetLogin)) {
-			setSubscribeBtnState(SubscribeBtnState.AcceptFriendship);
-		} else {
-			setSubscribeBtnState(SubscribeBtnState.Default);
-		}
-	}, [allUsers, currentUser.username, targetLogin]);
-
-	if (subscribeBtnLoading)
-		return (
-			<button className="user-profile-header-subscribe-btn">
-				<CircleLoading bgColor="#fff" width="35px" height="35px" />
-			</button>
-		);
-
-	if (subscribeBtnState === SubscribeBtnState.Default)
-		return (
-			<button
-				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-default"
-				onClick={() => {
-					setSubscribeBtnLoading(true);
-					axios
-						.get('/users/subscribe', {
-							params: { target: targetLogin },
-							headers: { Authorization: `Bearer ${getToken()}` },
-						})
-						.then(() => setSubscribeBtnState(SubscribeBtnState.Subscribed))
-						.catch(() => {})
-						.finally(() => setSubscribeBtnLoading(false));
-				}}
-				title="Subscribe"
-			>
-				Subscribe
-				<FontAwesomeIcon icon={faUserPlus} />
-			</button>
-		);
-
-	if (subscribeBtnState === SubscribeBtnState.Subscribed)
-		return (
-			<button
-				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-subscribed"
-				onClick={() => {
-					setSubscribeBtnLoading(true);
-					axios
-						.get('/users/unsubscribe', {
-							params: { target: targetLogin },
-							headers: { Authorization: `Bearer ${getToken()}` },
-						})
-						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
-						.catch(() => {})
-						.finally(() => setSubscribeBtnLoading(false));
-				}}
-				title="Unsubscribe"
-			>
-				Subscribed
-				<FontAwesomeIcon icon={faUserCheck} />
-			</button>
-		);
-
-	if (subscribeBtnState === SubscribeBtnState.AcceptFriendship)
-		return (
-			<button
-				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-accept"
-				onClick={() => {
-					setSubscribeBtnLoading(true);
-					axios
-						.get('/users/subscribe', {
-							params: { target: targetLogin },
-							headers: { Authorization: `Bearer ${getToken()}` },
-						})
-						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
-						.catch(() => {})
-						.finally(() => setSubscribeBtnLoading(false));
-				}}
-				title="Subscribe"
-			>
-				Accept
-				<FontAwesomeIcon icon={faUserCheck} />
-			</button>
-		);
-
-	return (
-		<button
-			className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-friends"
-			onClick={() => {
-				setSubscribeBtnLoading(true);
-				axios
-					.get('/users/unsubscribe', {
-						params: { target: targetLogin },
-						headers: { Authorization: `Bearer ${getToken()}` },
-					})
-					.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
-					.catch(() => {})
-					.finally(() => setSubscribeBtnLoading(false));
-			}}
-			title="Unsubscribe"
-		>
-			Friend
-			<FontAwesomeIcon icon={faUserFriends} />
-		</button>
-	);
-};
+import { SubscribeBtn } from "../../components/SubscribeBtn";
+import { getTargetUser } from "../../utils/getTargetUser";
 
 const UserProfile = () => {
 	const params = useParams<{ login: string }>();
