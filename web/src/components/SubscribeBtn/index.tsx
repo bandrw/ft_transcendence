@@ -27,8 +27,19 @@ export const SubscribeBtn = ({currentUser, targetLogin, allUsers}: SubscribeBtnP
 	const [subscribeBtnState, setSubscribeBtnState] = React.useState(SubscribeBtnState.Default);
 	const [subscribeBtnLoading, setSubscribeBtnLoading] = React.useState(false);
 
+	const clickHandler = (
+		action: typeof subscribe | typeof unsubscribe,
+		btnState: SubscribeBtnState = SubscribeBtnState.Default) => () => {
+		setSubscribeBtnLoading(true);
+		action(targetLogin)
+			.then(() => setSubscribeBtnState(btnState))
+			.catch(() => {})
+			.finally(() => setSubscribeBtnLoading(false));
+	};
+
 	React.useEffect(() => {
-		const currUser = getTargetUser(allUsers, currentUser.username, 'login'); // allUsers.find((usr) => usr.login === currentUser.username);
+		const currUser = getTargetUser(allUsers, currentUser.username, 'login');
+		// allUsers.find((usr) => usr.login === currentUser.username);
 
 		if (!currUser) return;
 
@@ -54,13 +65,7 @@ export const SubscribeBtn = ({currentUser, targetLogin, allUsers}: SubscribeBtnP
 		return (
 			<button
 				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-default"
-				onClick={() => {
-					setSubscribeBtnLoading(true);
-					subscribe(targetLogin)
-						.then(() => setSubscribeBtnState(SubscribeBtnState.Subscribed))
-						.catch(() => {})
-						.finally(() => setSubscribeBtnLoading(false));
-				}}
+				onClick={clickHandler(subscribe, SubscribeBtnState.Subscribed)}
 				title="Subscribe"
 			>
 				Subscribe
@@ -72,13 +77,7 @@ export const SubscribeBtn = ({currentUser, targetLogin, allUsers}: SubscribeBtnP
 		return (
 			<button
 				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-subscribed"
-				onClick={() => {
-					setSubscribeBtnLoading(true);
-					unsubscribe(targetLogin)
-						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
-						.catch(() => {})
-						.finally(() => setSubscribeBtnLoading(false));
-				}}
+				onClick={clickHandler(unsubscribe)}
 				title="Unsubscribe"
 			>
 				Subscribed
@@ -90,13 +89,7 @@ export const SubscribeBtn = ({currentUser, targetLogin, allUsers}: SubscribeBtnP
 		return (
 			<button
 				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-accept"
-				onClick={() => {
-					setSubscribeBtnLoading(true);
-					subscribe(targetLogin)
-						.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
-						.catch(() => {})
-						.finally(() => setSubscribeBtnLoading(false));
-				}}
+				onClick={clickHandler(subscribe)}
 				title="Subscribe"
 			>
 				Accept
@@ -107,13 +100,7 @@ export const SubscribeBtn = ({currentUser, targetLogin, allUsers}: SubscribeBtnP
 	return (
 		<button
 			className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-friends"
-			onClick={() => {
-				setSubscribeBtnLoading(true);
-				unsubscribe(targetLogin)
-					.then(() => setSubscribeBtnState(SubscribeBtnState.Default))
-					.catch(() => {})
-					.finally(() => setSubscribeBtnLoading(false));
-			}}
+			onClick={clickHandler(unsubscribe)}
 			title="Unsubscribe"
 		>
 			Friend
