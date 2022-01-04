@@ -21,11 +21,14 @@ const Social = () => {
 
 	React.useEffect(() => {
 		const friendsLogins: string[] = [];
-		const u = getTargetUser(allUsers, currentUser.username, 'login'); // allUsers.find((usr) => usr.login === currentUser.username);
+		const user = getTargetUser(allUsers, currentUser.username, 'login'); // allUsers.find((usr) => usr.login === currentUser.username);
 
-		if (u) {
-			for (const subscriber of u.subscribers)
-				if (u.subscriptions.find((usr) => usr.login === subscriber.login)) friendsLogins.push(subscriber.login);
+		if (user) {
+			for (const subscriber of user.subscribers) {
+				if (user.subscriptions.find((usr) => usr.login === subscriber.login)) {
+					friendsLogins.push(subscriber.login);
+				}
+			}
 		}
 		setFriends(allUsers.filter((usr) => friendsLogins.indexOf(usr.login) !== -1));
 	}, [allUsers, currentUser.username, onlineUsers]);
