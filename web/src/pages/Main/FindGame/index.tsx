@@ -12,6 +12,7 @@ import { setStatus } from 'store/reducers/statusSlice';
 import { clearInterval, setInterval } from 'timers';
 import { getToken } from 'utils/token';
 
+import {setLadderStatus} from "../../../api/findGame";
 import { AcceptWindow } from "../../../components/AcceptWindow";
 
 const FindGame = () => {
@@ -33,15 +34,14 @@ const FindGame = () => {
 
 			return;
 		}
-		axios
-			.get('/ladder/setStatus', {
-				params: { status },
-				headers: { Authorization: `Bearer ${getToken()}` },
-			})
+
+		setLadderStatus(status)
 			.then(() => {
 				switch (status) {
 					case ApiUserStatus.Regular: {
-						if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+						if (timerIntervalRef.current) {
+							clearInterval(timerIntervalRef.current);
+						}
 						setPassedTime(0);
 						break;
 					}
