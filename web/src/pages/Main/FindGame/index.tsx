@@ -10,7 +10,7 @@ import { Fade } from 'react-awesome-reveal';
 import { setStatus } from 'store/reducers/statusSlice';
 import { clearInterval, setInterval } from 'timers';
 
-import {setLadderStatus} from "../../../api/findGame";
+import {setLadderStatus} from "../../../api/game";
 import { AcceptWindow } from "../../../components/AcceptWindow";
 import AcceptedGame from "../../../components/FindGameStatus/AcceptedGame";
 import RegularGame from "../../../components/FindGameStatus/RegularGame";

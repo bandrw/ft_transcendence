@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import { faArrowRight, faGamepad } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { useAppSelector } from 'hook/reduxHooks';
@@ -10,6 +10,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { getToken } from 'utils/token';
 
+import EmptyGameHistory from "../../../components/EmptyGameHistory";
 import {getTargetUser} from "../../../utils/getTargetUser";
 
 const RecentGames = () => {
@@ -40,21 +41,9 @@ const RecentGames = () => {
 		};
 	}, [currentUser.username]);
 
-	if (gamesHistory.length === 0)
-		return (
-			<div className="main-block recent-games">
-				<div className="main-block-title">
-					<span>Recent games</span>
-					<Link className="recent-games-link" to={`/games/${currentUser.username}`}>
-						<FontAwesomeIcon icon={faArrowRight} />
-					</Link>
-				</div>
-				<div className="recent-games-empty">
-					You have no games yet
-					<FontAwesomeIcon icon={faGamepad} />
-				</div>
-			</div>
-		);
+	if (gamesHistory.length === 0) {
+		return <EmptyGameHistory />;
+	}
 
 	return (
 		<div className="main-block recent-games">
