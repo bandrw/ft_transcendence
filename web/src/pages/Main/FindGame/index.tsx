@@ -12,6 +12,7 @@ import { clearInterval, setInterval } from 'timers';
 
 import {setLadderStatus} from "../../../api/findGame";
 import { AcceptWindow } from "../../../components/AcceptWindow";
+import AcceptedGame from "../../../components/FindGameStatus/AcceptedGame";
 import SearchingGame from "../../../components/FindGameStatus/SearchingGame";
 
 const FindGame = () => {
@@ -73,23 +74,7 @@ const FindGame = () => {
 		return <SearchingGame passedTime={passedTime} setShowSettings={setShowSettings} showSettings={showSettings} />;
 
 	if (status === ApiUserStatus.FoundEnemy || status === ApiUserStatus.Accepted)
-		return (
-			<div className="find-game main-block">
-				<div className="find-game-img" />
-				<div className="find-game-back">
-					<div className="find-game-searching">
-						<span>Searching</span>
-						<span className="find-game-searching-time">{`${passedTime} s`}</span>
-					</div>
-					<button onClick={() => dispatch(setStatus(ApiUserStatus.Regular))} className="find-game-cancel">
-						<FontAwesomeIcon icon={faTimesCircle} />
-					</button>
-				</div>
-				<Fade duration={500} triggerOnce style={{ position: 'fixed' }}>
-					{enemy && <AcceptWindow enemy={enemy} />}
-				</Fade>
-			</div>
-		);
+		return <AcceptedGame passedTime={passedTime} enemy={enemy} />;
 
 	return (
 		<div className="find-game main-block">
