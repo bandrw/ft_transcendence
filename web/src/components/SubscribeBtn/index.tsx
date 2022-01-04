@@ -61,50 +61,47 @@ export const SubscribeBtn = ({currentUser, targetLogin, allUsers}: SubscribeBtnP
 			</button>
 		);
 
-	if (subscribeBtnState === SubscribeBtnState.Default)
-		return (
-			<button
-				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-default"
-				onClick={clickHandler(subscribe, SubscribeBtnState.Subscribed)}
-				title="Subscribe"
-			>
-				Subscribe
-				<FontAwesomeIcon icon={faUserPlus} />
-			</button>
-		);
+	const statusToProps = {
+		[SubscribeBtnState.Default]: {
+			className: 'user-profile-header-subscribe-btn-default',
+			onClick: clickHandler(subscribe, SubscribeBtnState.Subscribed),
+			title: 'Subscribe',
+			text: 'Subscribe',
+			icon: faUserPlus,
+		},
+		[SubscribeBtnState.Subscribed]: {
+			className: 'user-profile-header-subscribe-btn-subscribed',
+			onClick: clickHandler(unsubscribe),
+			title: 'Unsubscribe',
+			text: 'Subscribed',
+			icon: faUserCheck,
+		},
+		[SubscribeBtnState.AcceptFriendship]: {
+			className: 'user-profile-header-subscribe-btn-accept',
+			onClick: clickHandler(subscribe),
+			title: 'Subscribe',
+			text: 'Accept',
+			icon: faUserCheck,
+		},
+		[SubscribeBtnState.InFriendship]: {
+			className: 'user-profile-header-subscribe-btn-friends',
+			onClick: clickHandler(unsubscribe),
+			title: 'Unsubscribe',
+			text: 'Friend',
+			icon: faUserFriends,
+		},
+	};
 
-	if (subscribeBtnState === SubscribeBtnState.Subscribed)
-		return (
-			<button
-				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-subscribed"
-				onClick={clickHandler(unsubscribe)}
-				title="Unsubscribe"
-			>
-				Subscribed
-				<FontAwesomeIcon icon={faUserCheck} />
-			</button>
-		);
-
-	if (subscribeBtnState === SubscribeBtnState.AcceptFriendship)
-		return (
-			<button
-				className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-accept"
-				onClick={clickHandler(subscribe)}
-				title="Subscribe"
-			>
-				Accept
-				<FontAwesomeIcon icon={faUserCheck} />
-			</button>
-		);
+	const { className, onClick, title, text, icon } = statusToProps[subscribeBtnState];
 
 	return (
 		<button
-			className="user-profile-header-subscribe-btn user-profile-header-subscribe-btn-friends"
-			onClick={clickHandler(unsubscribe)}
-			title="Unsubscribe"
+			className={`user-profile-header-subscribe-btn ${className}`}
+			onClick={onClick}
+			title={title}
 		>
-			Friend
-			<FontAwesomeIcon icon={faUserFriends} />
+			{text}
+			<FontAwesomeIcon icon={icon} />
 		</button>
 	);
 };
