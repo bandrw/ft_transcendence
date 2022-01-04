@@ -130,8 +130,8 @@ const UserProfile = () => {
 							linkTo={`/games/${user?.login}`}
 							list={GameListComponent}
 						/>
-						<div style={{ height: '50px' }} />
-						<FriendsList friends={friends} />
+						 <div style={{ height: '50px' }} />
+						 <FriendsList friends={friends} />
 					</div>
 				</div>
 			</div>

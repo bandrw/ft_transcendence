@@ -27,13 +27,14 @@ export const GameList = ({ gamesHistory }: GameListProps) => {
 
 	return (
 		<>
-			{gamesHistory.slice(0, 3).map((game) => {
+			{gamesHistory.slice(0, 3).map((game, i) => {
 				const loser = getTargetUser(allUsers, game.loserId, 'id'); // allUsers.find((usr) => usr.id === game.loserId);
 				const winner = getTargetUser(allUsers, game.winnerId, 'id'); // allUsers.find((usr) => usr.id === game.winnerId);
 
 				return (
 					<GameItem
-						key={game.loserId}
+						/* eslint-disable-next-line react/no-array-index-key */
+						key={i}
 						game={game}
 						user={winner?.login === params.login ? winner : loser}
 						enemy={loser?.login === params.login ? winner : loser}
