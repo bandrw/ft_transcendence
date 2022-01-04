@@ -2,7 +2,6 @@ import './styles.scss';
 
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Header from 'components/Header';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame } from 'models/ApiTypes';
 import moment from 'moment';
@@ -11,7 +10,8 @@ import { Fade } from 'react-awesome-reveal';
 import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
 
-import {getTargetUser} from "../../utils/getTargetUser";
+import { getGameHistory } from "../../utils/getGameHistory";
+import { getTargetUser } from "../../utils/getTargetUser";
 
 export const GameTime = ({ date }: { date: string }) => {
 	const now = moment().format('DD.MM.YYYY');
@@ -36,10 +36,7 @@ const GamesHistory = () => {
 		const user = getTargetUser(allUsers, params.login, 'login'); // allUsers.find((usr) => usr.login === params.login);
 
 		if (user) {
-			const games: ApiGame[] = [];
-			for (const game of user.wonGames) games.push(game);
-			for (const game of user.lostGames) games.push(game);
-			setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
+			setGamesHistory(getGameHistory(user.wonGames, user.lostGames));
 		}
 	}, [allUsers, currentUser.id, params.login]);
 

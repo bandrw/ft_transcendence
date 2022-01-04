@@ -2,16 +2,15 @@ import './styles.scss';
 
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
 import { GameTime } from 'pages/GamesHistory';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getToken } from 'utils/token';
 
 import EmptyGameHistory from "../../../components/EmptyGameHistory";
-import {getTargetUser} from "../../../utils/getTargetUser";
+import { getGameHistory } from "../../../utils/getGameHistory";
+import { getTargetUser } from "../../../utils/getTargetUser";
 
 const RecentGames = () => {
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
@@ -19,27 +18,10 @@ const RecentGames = () => {
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 
 	React.useEffect(() => {
-		let isMounted = true;
+		const { lostGames, wonGames } = getTargetUser(allUsers, currentUser.username, 'login') || {} as ApiUserExpand;
 
-		axios
-			.get<ApiUserExpand>('/users', {
-				params: { login: currentUser.username, expand: '' },
-				headers: { Authorization: `Bearer ${getToken()}` },
-			})
-			.then((res) => {
-				if (!isMounted) return;
-
-				if (!res.data.wonGames || !res.data.lostGames) return;
-				const games: ApiGame[] = [];
-				for (const game of res.data.wonGames) games.push(game);
-				for (const game of res.data.lostGames) games.push(game);
-				setGamesHistory(games.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
-			});
-
-		return () => {
-			isMounted = false;
-		};
-	}, [currentUser.username]);
+		setGamesHistory(getGameHistory(wonGames, lostGames));
+	}, [allUsers, currentUser.username]);
 
 	if (gamesHistory.length === 0) {
 		return <EmptyGameHistory />;
