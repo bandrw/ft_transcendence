@@ -1,13 +1,11 @@
 import {faUserCheck, faUserFriends, faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import React from "react";
 
 import {subscribe, unsubscribe} from "../../api/subscribe";
 import {ApiUserExpand} from "../../models/ApiTypes";
 import {User} from "../../models/User";
 import {getTargetUser} from "../../utils/getTargetUser";
-import {getToken} from "../../utils/token";
 import CircleLoading from "../CircleLoading";
 
 enum SubscribeBtnState {
