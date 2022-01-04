@@ -2,7 +2,6 @@ import './styles.scss';
 
 import { faCog, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
 import GameSettings from "components/GameSettings";
 import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
 import { ApiUserStatus } from 'models/ApiTypes';
@@ -10,10 +9,10 @@ import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { setStatus } from 'store/reducers/statusSlice';
 import { clearInterval, setInterval } from 'timers';
-import { getToken } from 'utils/token';
 
 import {setLadderStatus} from "../../../api/findGame";
 import { AcceptWindow } from "../../../components/AcceptWindow";
+import SearchingGame from "../../../components/FindGameStatus/SearchingGame";
 
 const FindGame = () => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);
@@ -71,26 +70,7 @@ const FindGame = () => {
 	}, [showSettings]);
 
 	if (status === ApiUserStatus.Searching)
-		return (
-			<div className="find-game main-block">
-				<div className="find-game-img" />
-				<div className="find-game-back">
-					<div className="find-game-searching">
-						<span>Searching</span>
-						<span className="find-game-searching-time">{`${passedTime} s`}</span>
-					</div>
-					<button onClick={() => dispatch(setStatus(ApiUserStatus.Regular))} className="find-game-cancel">
-						<FontAwesomeIcon icon={faTimesCircle} />
-					</button>
-					<button type='button' className="find-game-settings__button" onClick={() => setShowSettings((prev) => !prev)}>
-						<FontAwesomeIcon icon={faCog}/>
-					</button>
-					{showSettings && (
-						<GameSettings/>
-					)}
-				</div>
-			</div>
-		);
+		return <SearchingGame passedTime={passedTime} setShowSettings={setShowSettings} showSettings={showSettings} />;
 
 	if (status === ApiUserStatus.FoundEnemy || status === ApiUserStatus.Accepted)
 		return (
