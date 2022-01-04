@@ -48,14 +48,16 @@ export class UsersController {
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
 	@Get()
 	async getUsers(@Query() { login, expand }: GetUsersDTO) {
-
 		if (login) {
 			const user = await this.usersService.findOneByLogin(login, isDefined(expand));
 			if (!user)
 				return null;
+			delete user.password;
 			return user;
 		}
-		return await this.usersService.findAll(isDefined(expand));
+		const users = await this.usersService.findAll(isDefined(expand));
+		for (const user of users) delete user.password;
+		return users;
 	}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
@@ -63,14 +65,7 @@ export class UsersController {
 	@Get('online')
 	getOnline(@Query() {  }: EmptyDTO) {
 		// excluding socket property
-		return this.usersService.onlineUsers.map(usr => ({
-			id: usr.id,
-			login: usr.login,
-			url_avatar: usr.url_avatar,
-			status: usr.status,
-			subscriptions: usr.subscriptions,
-			subscribers: usr.subscribers
-		}));
+		return this.usersService.onlineUsers.map(usr => UsersService.onlineUserToJson(usr));
 	}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))

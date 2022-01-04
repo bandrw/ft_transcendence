@@ -13,19 +13,15 @@ export class UsersService {
 
 	/**
 	 * UsersService usersSocketIds Map
-	 *
-	 * key - socket id
-	 *
-	 * value - username
+	 * - key - socket id
+	 * - value - username
 	 */
 	private usersSocketIds: Map<string, string>;
 
 	/**
 	 * UsersService sockets Map
-	 *
-	 * key - socket id
-	 *
-	 * value - Socket
+	 * - key - socket id
+	 * - value - Socket
 	 */
 	private sockets: Map<string, Socket>;
 
@@ -314,7 +310,7 @@ export class UsersService {
 		return this.usersSocketIds.get(socketId);
 	}
 
-	static onlineUserToJson(user) {
+	public static onlineUserToJson(user) {
 		return {
 			id: user.id,
 			login: user.login,
