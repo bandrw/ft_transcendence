@@ -13,6 +13,7 @@ import { clearInterval, setInterval } from 'timers';
 import {setLadderStatus} from "../../../api/findGame";
 import { AcceptWindow } from "../../../components/AcceptWindow";
 import AcceptedGame from "../../../components/FindGameStatus/AcceptedGame";
+import RegularGame from "../../../components/FindGameStatus/RegularGame";
 import SearchingGame from "../../../components/FindGameStatus/SearchingGame";
 
 const FindGame = () => {
@@ -70,29 +71,15 @@ const FindGame = () => {
 		};
 	}, [showSettings]);
 
-	if (status === ApiUserStatus.Searching)
-		return <SearchingGame passedTime={passedTime} setShowSettings={setShowSettings} showSettings={showSettings} />;
-
-	if (status === ApiUserStatus.FoundEnemy || status === ApiUserStatus.Accepted)
-		return <AcceptedGame passedTime={passedTime} enemy={enemy} />;
-
-	return (
-		<div className="find-game main-block">
-			<div className="find-game-img" />
-			<div className="find-game-back">
-				<span>Find game</span>
-				<button onClick={() => dispatch(setStatus(ApiUserStatus.Searching))} className="find-game-btn">
-					<FontAwesomeIcon icon={faPlay} />
-				</button>
-				<button type='button' className="find-game-settings__button" onClick={() => setShowSettings((prev) => !prev)}>
-					<FontAwesomeIcon icon={faCog}/>
-				</button>
-				{showSettings && (
-					<GameSettings/>
-				)}
-			</div>
-		</div>
-	);
+	switch (status) {
+		case ApiUserStatus.Searching:
+			return <SearchingGame passedTime={passedTime} setShowSettings={setShowSettings} showSettings={showSettings} />;
+		case ApiUserStatus.FoundEnemy:
+		case ApiUserStatus.Accepted:
+			return <AcceptedGame passedTime={passedTime} enemy={enemy} />;
+		default:
+			return <RegularGame setShowSettings={setShowSettings} showSettings={showSettings}/>;
+	}
 };
 
 export default FindGame;
