@@ -1,11 +1,10 @@
 import { faCog, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import GameSettings from "components/GameSettings";
+import { useAppDispatch } from "hook/reduxHooks";
+import { ApiUserStatus } from "models/ApiTypes";
 import React from 'react';
-
-import { useAppDispatch } from "../../hook/reduxHooks";
-import { ApiUserStatus } from "../../models/ApiTypes";
-import { setStatus } from "../../store/reducers/statusSlice";
-import GameSettings from "../GameSettings";
+import { setStatus } from "store/reducers/statusSlice";
 
 interface RegularGameProps {
 	showSettings: boolean;

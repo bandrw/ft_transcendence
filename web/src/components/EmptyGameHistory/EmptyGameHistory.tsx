@@ -1,9 +1,8 @@
 import { faArrowRight, faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppSelector } from "hook/reduxHooks";
 import React from 'react';
 import { Link } from "react-router-dom";
-
-import { useAppSelector } from "../../hook/reduxHooks";
 
 const EmptyGameHistory = () => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);

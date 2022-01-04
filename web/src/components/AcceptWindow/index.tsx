@@ -1,11 +1,10 @@
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppDispatch, useAppSelector } from "hook/reduxHooks";
+import { ApiUpdateUser, ApiUserStatus } from "models/ApiTypes";
 import React from "react";
+import { setStatus } from "store/reducers/statusSlice";
 import { clearInterval, setInterval } from "timers";
-
-import { useAppDispatch, useAppSelector } from "../../hook/reduxHooks";
-import { ApiUpdateUser, ApiUserStatus } from "../../models/ApiTypes";
-import { setStatus } from "../../store/reducers/statusSlice";
 
 interface AcceptWindowProps {
 	enemy: ApiUpdateUser;

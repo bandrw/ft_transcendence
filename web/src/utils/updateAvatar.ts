@@ -1,4 +1,4 @@
-import * as EditUser from "../api/editUser";
+import * as EditUser from "api/editUser";
 
 export type ImageState = {
 	type: 'generated' | 'uploaded';

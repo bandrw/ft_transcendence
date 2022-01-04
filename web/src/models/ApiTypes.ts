@@ -84,7 +84,8 @@ export interface ApiChannelExpand {
 }
 
 export interface ApiUserExpand {
-	[key: string]: any;
+	readonly [key: string]: number | string | undefined | null |
+		ApiGame[] | ApiUser[] | ApiChat[] | ApiMessage[] | ApiChannel[];
 	id: number;
 	login: string;
 	url_avatar: string;

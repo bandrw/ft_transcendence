@@ -1,11 +1,10 @@
+import * as EditUser from "api/editUser";
+import { useAppSelector } from "hook/reduxHooks";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-
-import * as EditUser from "../../api/editUser";
-import { useAppSelector } from "../../hook/reduxHooks";
-import { getTargetUser } from "../../utils/getTargetUser";
+import { getTargetUser } from "utils/getTargetUser";
 
 const TextInput = styled.input`
 	margin: 10px 0;
@@ -44,7 +43,6 @@ export const ChangeUsernameForm = () => {
 			usernameInput.length < 4 ||
 			usernameInput.length > 16 ||
 			getTargetUser(allUsers, usernameInput, 'login')
-			// allUsers.find((usr) => usr.login === usernameInput)
 		);
 	};
 

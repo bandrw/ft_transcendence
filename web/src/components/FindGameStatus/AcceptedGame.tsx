@@ -1,12 +1,11 @@
 import {faTimesCircle} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {AcceptWindow} from "components/AcceptWindow";
+import {useAppDispatch} from "hook/reduxHooks";
+import {ApiUpdateUser, ApiUserStatus} from "models/ApiTypes";
 import React from 'react';
 import {Fade} from "react-awesome-reveal";
-
-import {useAppDispatch} from "../../hook/reduxHooks";
-import {ApiUpdateUser, ApiUserStatus} from "../../models/ApiTypes";
-import {setStatus} from "../../store/reducers/statusSlice";
-import {AcceptWindow} from "../AcceptWindow";
+import {setStatus} from "store/reducers/statusSlice";
 
 interface AcceptedGameProps {
 	passedTime: number;

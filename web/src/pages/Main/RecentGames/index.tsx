@@ -2,15 +2,14 @@ import './styles.scss';
 
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import EmptyGameHistory from "components/EmptyGameHistory/EmptyGameHistory";
+import { GameTime } from 'components/GameTime';
 import { useAppSelector } from 'hook/reduxHooks';
-import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
+import { ApiGame } from 'models/ApiTypes';
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-import EmptyGameHistory from "../../../components/EmptyGameHistory/EmptyGameHistory";
-import { GameTime } from '../../../components/GameTime';
-import { getGameHistory } from "../../../utils/getGameHistory";
-import { getTargetUser } from "../../../utils/getTargetUser";
+import { getGameHistory } from "utils/getGameHistory";
+import { getTargetUser } from "utils/getTargetUser";
 
 const RecentGames = () => {
 	const [gamesHistory, setGamesHistory] = React.useState<ApiGame[]>([]);
@@ -18,9 +17,12 @@ const RecentGames = () => {
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 
 	React.useEffect(() => {
-		const { lostGames, wonGames } = getTargetUser(allUsers, currentUser.username, 'login') || {} as ApiUserExpand;
+		const user =  getTargetUser(allUsers, currentUser.username, 'login');
 
-		setGamesHistory(getGameHistory(wonGames, lostGames));
+		if (user) {
+			const { lostGames, wonGames } = user;
+			setGamesHistory(getGameHistory(wonGames, lostGames));
+		}
 	}, [allUsers, currentUser.username]);
 
 	if (gamesHistory.length === 0) {

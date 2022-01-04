@@ -1,11 +1,10 @@
 import axios from "axios";
+import CodeVerification from "components/CodeVerification";
+import { useAppSelector } from "hook/reduxHooks";
 import React, {FormEvent} from "react";
 import PhoneInput from "react-phone-input-2";
-
-import { useAppSelector } from "../../hook/reduxHooks";
-import { getTargetUser } from "../../utils/getTargetUser";
-import { getToken } from "../../utils/token";
-import CodeVerification from "../CodeVerification";
+import { getTargetUser } from "utils/getTargetUser";
+import { getToken } from "utils/token";
 
 export const TwoFactorAuthenticationForm = () => {
 	enum TwoFactorAuthenticationState {

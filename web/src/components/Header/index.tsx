@@ -35,7 +35,7 @@ const Header = ({ centerBlock }: HeaderProps) => {
 		return (
 			<header>
 				<div className="header-container">
-					<button onClick={() => history.goBack()} className="header-back-btn">
+					<button onClick={history.goBack} className="header-back-btn">
 						<FontAwesomeIcon icon={faChevronLeft} />
 					</button>
 
@@ -49,14 +49,13 @@ const Header = ({ centerBlock }: HeaderProps) => {
 						<button className="notifications-btn">
 							<FontAwesomeIcon icon={faBell} />
 						</button>
-						{/* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */}
 						<button className="user-btn" onClick={() => setShowUserMenu((prev) => !prev)}>
 							<div
 								className="user-btn-img"
 								style={{ backgroundImage: `url(${currentUser.urlAvatar})` }}
 							/>
 							<div className="user-status" style={{ backgroundColor: status }} />
-							{showUserMenu && <UserMenu />}
+							{showUserMenu && <UserMenu closeUserMenu={() => setShowUserMenu(false)}/>}
 						</button>
 					</div>
 				</div>
@@ -76,11 +75,10 @@ const Header = ({ centerBlock }: HeaderProps) => {
 					<button className="notifications-btn">
 						<FontAwesomeIcon icon={faBell} />
 					</button>
-					{/* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */}
 					<button className="user-btn" onClick={() => setShowUserMenu((prev) => !prev)}>
 						<div className="user-btn-img" style={{ backgroundImage: `url(${currentUser.urlAvatar})` }} />
 						<div className="user-status" style={{ backgroundColor: status }} />
-						{showUserMenu && <UserMenu />}
+						{showUserMenu && <UserMenu closeUserMenu={() => setShowUserMenu(false)}/>}
 					</button>
 				</div>
 			</div>

@@ -2,14 +2,13 @@ import './styles.scss';
 
 import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { SocialBlockFriend } from 'components/SocialBlockFriend';
+import { SocialBlockOnlineUser } from "components/SocialBlockOnlineUser/SocialBlockOnlineUser";
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiUserExpand } from 'models/ApiTypes';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
-
-import { SocialBlockFriend } from '../../../components/SocialBlockFriend';
-import { SocialBlockOnlineUser } from "../../../components/SocialBlockOnlineUser/SocialBlockOnlineUser";
-import {getTargetUser} from "../../../utils/getTargetUser";
+import {getTargetUser} from "utils/getTargetUser";
 
 const Social = () => {
 	const [friends, setFriends] = React.useState<ApiUserExpand[]>([]);

@@ -1,12 +1,11 @@
 import {faGamepad} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import GameItem from "components/GameItem";
+import {useAppSelector} from "hook/reduxHooks";
+import { ApiGame } from "models/ApiTypes";
 import React from 'react';
 import { useParams } from "react-router-dom";
-
-import {useAppSelector} from "../../hook/reduxHooks";
-import { ApiGame } from "../../models/ApiTypes";
-import {getTargetUser} from "../../utils/getTargetUser";
-import GameItem from "../GameItem";
+import {getTargetUser} from "utils/getTargetUser";
 
 interface GameListProps {
 	gamesHistory: ApiGame[];

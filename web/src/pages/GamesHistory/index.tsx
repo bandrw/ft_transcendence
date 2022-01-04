@@ -2,15 +2,14 @@ import './styles.scss';
 
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GameTime } from "components/GameTime";
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame } from 'models/ApiTypes';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Link, useParams } from 'react-router-dom';
-
-import { GameTime } from "../../components/GameTime";
-import { getGameHistory } from "../../utils/getGameHistory";
-import { getTargetUser } from "../../utils/getTargetUser";
+import { getGameHistory } from "utils/getGameHistory";
+import { getTargetUser } from "utils/getTargetUser";
 
 const GamesHistory = () => {
 	const params = useParams<{ login: string }>();
@@ -27,9 +26,9 @@ const GamesHistory = () => {
 	}, [allUsers, currentUser.id, params.login]);
 
 	return (
-		<div>
-			<div className="games-history-wrapper">
-				<Fade className="games-history">
+		<div className="games-history-wrapper">
+			<Fade className="games-history">
+				<>
 					<h1>{`Games history with ${params.login}`}</h1>
 					<div className="games-history-games main-block">
 						<div className="games-history-legend">
@@ -58,9 +57,7 @@ const GamesHistory = () => {
 												<div
 													style={{ backgroundImage: `url(${enemy?.url_avatar})` }}
 													className="games-history-game-img"
-												>
-													{/* <div className='games-history-user-status' style={ { backgroundColor: enemyColor } }/>*/}
-												</div>
+												/>
 												<Link
 													to={`/users/${enemy?.login}`}
 													className="games-history-user-login"
@@ -84,8 +81,8 @@ const GamesHistory = () => {
 								})
 							)}
 					</div>
-				</Fade>
-			</div>
+				</>
+			</Fade>
 		</div>
 	);
 };

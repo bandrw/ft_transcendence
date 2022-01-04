@@ -2,6 +2,8 @@ import './styles.scss';
 
 import { faEdit, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import GameList from "components/GameList";
+import { SubscribeBtn } from "components/SubscribeBtn";
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
 import FriendsList from 'pages/UserProfile/FriendsList';
@@ -9,10 +11,7 @@ import ListSection from 'pages/UserProfile/ListSection';
 import UserEditWindow from 'pages/UserProfile/UserEditWindow';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-
-import GameList from "../../components/GameList";
-import { SubscribeBtn } from "../../components/SubscribeBtn";
-import { getTargetUser } from "../../utils/getTargetUser";
+import { getTargetUser } from "utils/getTargetUser";
 
 const UserProfile = () => {
 	const params = useParams<{ login: string }>();

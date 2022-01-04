@@ -1,8 +1,7 @@
+import { useAppSelector } from "hook/reduxHooks";
 import { AvatarGenerator } from "random-avatar-generator";
 import React, { ChangeEvent, FormEvent } from "react";
-
-import { useAppSelector } from "../../hook/reduxHooks";
-import { ImageState, updateAvatar } from "../../utils/updateAvatar";
+import { ImageState, updateAvatar } from "utils/updateAvatar";
 
 export const ChangePictureForm = () => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);

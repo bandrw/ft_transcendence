@@ -1,14 +1,13 @@
 import './styles.scss';
 
+import { setLadderStatus } from "api/game";
+import AcceptedGame from "components/FindGameStatus/AcceptedGame";
+import RegularGame from "components/FindGameStatus/RegularGame";
+import SearchingGame from "components/FindGameStatus/SearchingGame";
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiUserStatus } from 'models/ApiTypes';
 import React from 'react';
 import { clearInterval, setInterval } from 'timers';
-
-import { setLadderStatus } from "../../../api/game";
-import AcceptedGame from "../../../components/FindGameStatus/AcceptedGame";
-import RegularGame from "../../../components/FindGameStatus/RegularGame";
-import SearchingGame from "../../../components/FindGameStatus/SearchingGame";
 
 const FindGame = () => {
 	const [passedTime, setPassedTime] = React.useState<number>(0);

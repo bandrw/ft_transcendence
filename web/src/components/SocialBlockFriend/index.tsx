@@ -1,7 +1,6 @@
+import { ApiUserExpand } from "models/ApiTypes";
 import React from "react";
 import { Link } from "react-router-dom";
-
-import { ApiUserExpand } from "../../models/ApiTypes";
 
 export const SocialBlockFriend = ({ user }: { user: ApiUserExpand }) => {
 	const statusDescription = 'Offline';

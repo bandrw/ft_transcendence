@@ -1,6 +1,6 @@
+import Header from "components/Header";
 import React, { FC } from 'react';
 
-import Header from "../components/Header";
 import {LayoutProps} from "./AppDataLayout";
 
 type MainLayoutProps = LayoutProps;

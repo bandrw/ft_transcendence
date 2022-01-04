@@ -1,4 +1,4 @@
-import { ApiGame } from "../models/ApiTypes";
+import { ApiGame } from "models/ApiTypes";
 
 export const getGameHistory = (wonGames: ApiGame[], lostGames: ApiGame[]) =>
 	wonGames

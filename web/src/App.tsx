@@ -46,7 +46,7 @@ const App = React.memo(() => {
 
 	const {socket, socket: { id }} = useAppSelector((state) => state.socket);
 	const [socketId, setSocketId] = React.useState<string>(id);
-	// Saving socketId in state
+
 	useEffect(() => {
 		const connectHandler = () => {
 			setSocketId(socket.id);

@@ -7,9 +7,9 @@ import moment from "moment";
 import Message from "pages/Main/Messenger/Chat/Message";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { getTargetUser } from 'utils/getTargetUser';
 import { getToken } from "utils/token";
 
-import { getTargetUser } from '../../../../../utils/getTargetUser';
 import { ISendMessage } from "../index";
 
 const joinChannel = (channelId: number) => {
