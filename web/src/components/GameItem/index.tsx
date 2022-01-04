@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from "react-router-dom";
 
 import {ApiGame, ApiUser} from "../../models/ApiTypes";
-import {GameTime} from "../../pages/GamesHistory";
+import {GameTime} from "../GameTime";
 
 interface GameItemProps {
 	game: ApiGame;

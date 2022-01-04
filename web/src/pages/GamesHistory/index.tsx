@@ -4,27 +4,13 @@ import { faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame } from 'models/ApiTypes';
-import moment from 'moment';
 import React from 'react';
 import { Fade } from 'react-awesome-reveal';
-import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
 
+import { GameTime } from "../../components/GameTime";
 import { getGameHistory } from "../../utils/getGameHistory";
 import { getTargetUser } from "../../utils/getTargetUser";
-
-export const GameTime = ({ date }: { date: string }) => {
-	const now = moment().format('DD.MM.YYYY');
-	const gameDateDay = moment(date).format('DD.MM.YYYY');
-	const yesterdayDay = moment().subtract(1, 'days').format('DD.MM.YYYY');
-	const gameDateTime = moment(date).format('HH:mm');
-
-	if (gameDateDay === now) return <div>{`Today, ${gameDateTime}`}</div>;
-
-	if (gameDateDay === yesterdayDay) return <div>{`Yesterday, ${gameDateTime}`}</div>;
-
-	return <Moment format="MM.DD.YYYY, HH:mm" date={date} />;
-};
 
 const GamesHistory = () => {
 	const params = useParams<{ login: string }>();
@@ -44,20 +30,19 @@ const GamesHistory = () => {
 		<div>
 			<div className="games-history-wrapper">
 				<Fade className="games-history">
-					<>
-						<h1>{`Games history with ${params.login}`}</h1>
-						<div className="games-history-games main-block">
-							<div className="games-history-legend">
-								<div className="games-history-legend-enemy">enemy</div>
-								<div className="games-history-legend-result">result</div>
-								<div className="games-history-legend-score">score</div>
-								<div className="games-history-legend-date">date</div>
+					<h1>{`Games history with ${params.login}`}</h1>
+					<div className="games-history-games main-block">
+						<div className="games-history-legend">
+							<div className="games-history-legend-enemy">enemy</div>
+							<div className="games-history-legend-result">result</div>
+							<div className="games-history-legend-score">score</div>
+							<div className="games-history-legend-date">date</div>
+						</div>
+						{gamesHistory.length === 0 ? (
+							<div className="recent-games-empty">
+								No games yet
+								<FontAwesomeIcon icon={faGamepad} />
 							</div>
-							{gamesHistory.length === 0 ? (
-								<div className="recent-games-empty">
-									No games yet
-									<FontAwesomeIcon icon={faGamepad} />
-								</div>
 							) : (
 								gamesHistory.map((game) => {
 									const loser = getTargetUser(allUsers, game.loserId, 'id'); // allUsers.find((usr) => usr.id === game.loserId);
@@ -98,8 +83,7 @@ const GamesHistory = () => {
 									);
 								})
 							)}
-						</div>
-					</>
+					</div>
 				</Fade>
 			</div>
 		</div>

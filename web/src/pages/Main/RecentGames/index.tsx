@@ -4,11 +4,11 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiGame, ApiUserExpand } from 'models/ApiTypes';
-import { GameTime } from 'pages/GamesHistory';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import EmptyGameHistory from "../../../components/EmptyGameHistory";
+import EmptyGameHistory from "../../../components/EmptyGameHistory/EmptyGameHistory";
+import { GameTime } from '../../../components/GameTime';
 import { getGameHistory } from "../../../utils/getGameHistory";
 import { getTargetUser } from "../../../utils/getTargetUser";
 
