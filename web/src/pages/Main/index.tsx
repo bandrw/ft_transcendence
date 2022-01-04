@@ -1,6 +1,5 @@
 import './styles.scss';
 
-import Header from 'components/Header';
 import { useAppSelector } from 'hook/reduxHooks';
 import { ApiUserStatus } from 'models/ApiTypes';
 import FindGame from 'pages/Main/FindGame';

@@ -1,17 +1,11 @@
 import './styles.scss';
 
-import { faCog, faPlay, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import GameSettings from "components/GameSettings";
-import { useAppDispatch, useAppSelector } from 'hook/reduxHooks';
+import { useAppSelector } from 'hook/reduxHooks';
 import { ApiUserStatus } from 'models/ApiTypes';
 import React from 'react';
-import { Fade } from 'react-awesome-reveal';
-import { setStatus } from 'store/reducers/statusSlice';
 import { clearInterval, setInterval } from 'timers';
 
-import {setLadderStatus} from "../../../api/game";
-import { AcceptWindow } from "../../../components/AcceptWindow";
+import { setLadderStatus } from "../../../api/game";
 import AcceptedGame from "../../../components/FindGameStatus/AcceptedGame";
 import RegularGame from "../../../components/FindGameStatus/RegularGame";
 import SearchingGame from "../../../components/FindGameStatus/SearchingGame";
@@ -23,7 +17,6 @@ const FindGame = () => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { status } = useAppSelector((state) => state.status);
 	const { enemy } = useAppSelector((state) => state.enemy);
-	const dispatch = useAppDispatch();
 
 	// /ladder/setStatus
 	React.useEffect(() => {
