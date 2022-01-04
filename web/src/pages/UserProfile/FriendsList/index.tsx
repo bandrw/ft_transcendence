@@ -12,19 +12,20 @@ interface FriendsListProps {
 }
 
 const getStatusDescription = (status: ApiUserStatus) => {
-	if (status === ApiUserStatus.Regular)
-		return 'Online';
-
-	if (status === ApiUserStatus.Offline)
-		return 'Offline';
-
-	if (status === ApiUserStatus.Searching || status === ApiUserStatus.FoundEnemy || status === ApiUserStatus.Accepted)
-		return 'Searching game';
-
-	if (status === ApiUserStatus.InGame)
-		return 'In game';
-
-	return '';
+	switch (status) {
+		case ApiUserStatus.Regular:
+			return 'Online';
+		case ApiUserStatus.Offline:
+			return 'Offline';
+		case ApiUserStatus.Searching:
+		case ApiUserStatus.FoundEnemy:
+		case ApiUserStatus.Accepted:
+			return 'Searching game';
+		case ApiUserStatus.InGame:
+			return 'In game';
+		default:
+			return '';
+	}
 };
 
 const FriendsList = ({ friends }: FriendsListProps) => {
