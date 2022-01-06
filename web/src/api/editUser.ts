@@ -1,4 +1,4 @@
-import { api } from "api/api";
+import { api } from "./api";
 
 export const updateAvatar = (data: { urlAvatar: string | ArrayBuffer | null }) => {
 	return api.post('/users/updateAvatar', data);

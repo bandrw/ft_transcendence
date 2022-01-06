@@ -37,6 +37,7 @@ export class UsersService {
 		'channels',
 		'channels.messages',
 		'channels.members',
+		'channels.members.banLists',
 	];
 
 	constructor(

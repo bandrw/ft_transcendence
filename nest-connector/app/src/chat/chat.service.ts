@@ -31,12 +31,16 @@ export class ChatService {
 			chat.userTwoId = userTwoId;
 			const r = await this.chatRepository.save(chat);
 
-			const u1 = this.usersService.onlineUsers.find(usr => usr.id === r.userOneId);
-			if (u1)
-				u1.socket.emit('newChat', JSON.stringify(r));
-			const u2 = this.usersService.onlineUsers.find(usr => usr.id === r.userTwoId);
-			if (u2)
-				u2.socket.emit('newChat', JSON.stringify(r));
+			this.getChat(r.id, true)
+				.then((chat) => {
+					const data = JSON.stringify(chat);
+					const u1 = this.usersService.onlineUsers.find(usr => usr.id === r.userOneId);
+					if (u1)
+						u1.socket.emit('newChat', data);
+					const u2 = this.usersService.onlineUsers.find(usr => usr.id === r.userTwoId);
+					if (u2)
+						u2.socket.emit('newChat', data);
+				});
 
 			return r;
 		} catch (e) {
@@ -78,6 +82,19 @@ export class ChatService {
 		return await this.chatRepository.findOne({ where: { id: id } });
 	}
 
+	updateChats(initiatorId: number, memberId: number) {
+		const initiator = this.usersService.onlineUsers.find(usr => usr.id === initiatorId);
+		if (initiator) {
+			this.getChats(initiatorId, true)
+				.then((chats) => initiator.socket.emit('updateChats', JSON.stringify(chats)));
+		}
+		const member = this.usersService.onlineUsers.find(usr => usr.id === memberId);
+		if (member) {
+			this.getChats(memberId, true)
+				.then((chats) => member.socket.emit('updateChats', JSON.stringify(chats)));
+		}
+	}
+
 	async muteMember(initiatorId: number, chatId: number, memberId: number, unbanDate: string | null) {
 		const chat = await this.getChat(chatId);
 		if (!chat)
@@ -89,7 +106,7 @@ export class ChatService {
 			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
 
 		const r = await this.banListsService.muteMember(chatId, null, initiatorId, memberId, unbanDate);
-		this.usersService.broadcastEventData('newChat', '');
+		await this.updateChats(initiatorId, memberId);
 		return r;
 	}
 
@@ -104,7 +121,7 @@ export class ChatService {
 			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
 
 		const r = await this.banListsService.unmuteMember(chatId, null, initiatorId, memberId);
-		this.usersService.broadcastEventData('newChat', '');
+		await this.updateChats(initiatorId, memberId);
 		return r;
 	}
 }

@@ -1,168 +1,84 @@
 import './styles.scss';
 
-import { faBullhorn, faComment, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from 'axios';
-import { useAppSelector } from 'hook/reduxHooks';
-import { ApiChannelExpand, ApiChatExpand, ApiMessage, ApiUserExpand } from 'models/ApiTypes';
+import { useAppDispatch, useAppSelector } from "hook/reduxHooks";
+import { ApiChannelExpand, ApiChatExpand, ApiMessage } from "models/ApiTypes";
 import Chat from 'pages/Main/Messenger/Chat';
-import LeftMenuChannel from 'pages/Main/Messenger/LeftMenuChannel';
-import LeftMenuChat from 'pages/Main/Messenger/LeftMenuChat';
 import React from 'react';
-import { Fade } from 'react-awesome-reveal';
-import { getToken } from 'utils/token';
+import {
+	addNewChannel,
+	addNewChat, addNewMessage,
+	getAllChannelsAction,
+	getChannelsAction,
+	getChatsAction, setChats,
+	setSelectedChannel,
+	setSelectedChat,
+} from "store/reducers/messengerSlice";
+
+import Contacts from "./Contacts";
 
 const Messenger = () => {
 	const { socket } = useAppSelector((state) => state.socket);
-	const [chats, setChats] = React.useState<ApiChatExpand[]>([]);
-	const [channels, setChannels] = React.useState<ApiChannelExpand[]>([]);
-	const [selectedChat, setSelectedChat] = React.useState<ApiChatExpand | null>(null);
-	const [selectedChannel, setSelectedChannel] = React.useState<ApiChannelExpand | null>(null);
-	const [showCreateMenu, setShowCreateMenu] = React.useState(false);
-	const [chatState, setChatState] = React.useState('default');
-	const [allChannels, setAllChannels] = React.useState<ApiChannelExpand[]>([]);
-	const [searchPattern, setSearchPattern] = React.useState('');
 	const { currentUser } = useAppSelector((state) => state.currentUser);
+	const {
+		selectedChat,
+		selectedChannel,
+		chats,
+		allChannels,
+	} = useAppSelector((state) => state.messenger);
+	const dispatch = useAppDispatch();
 
 	// Fetching user's chats and channels
 	React.useEffect(() => {
-		let isMounted = true;
-
-		axios
-			.get<ApiChatExpand[]>('/chats', {
-				params: { expand: '' },
-				headers: { Authorization: `Bearer ${getToken()}` },
-			})
-			.then((res) => {
-				if (!isMounted) return;
-
-				setChats(res.data);
-			});
-
-		axios
-			.get<ApiUserExpand>('/users', {
-				params: { login: currentUser.username, expand: '' },
-				headers: { Authorization: `Bearer ${getToken()}` },
-			})
-			.then((res) => {
-				if (!isMounted) return;
-
-				setChannels(res.data.channels);
-			});
-
-		return () => {
-			isMounted = false;
-		};
-	}, [currentUser.id, currentUser.username]);
+		dispatch(getChatsAction());
+		dispatch(getChannelsAction(currentUser.username));
+	}, [currentUser.username, dispatch]);
 
 	// Events handlers
 	React.useEffect(() => {
 		const receiveMessageHandler = (data: string): void => {
 			const msg: ApiMessage = JSON.parse(data);
-
-			if (msg.chatId) {
-				setSelectedChat((prev) => {
-					const cpy: ApiChatExpand | null = JSON.parse(JSON.stringify(prev));
-
-					if (cpy && !cpy.messages.find((m) => m.id === msg.id)) {
-						cpy.messages = cpy.messages.concat(msg);
-					}
-
-					return cpy;
-				});
-
-				setChats((prev) => {
-					const out: ApiChatExpand[] = [];
-					for (const chat of prev) {
-						const cpy: ApiChatExpand = JSON.parse(JSON.stringify(chat));
-
-						if (chat.id === msg.chatId) {
-							cpy.messages = cpy.messages.concat(msg);
-						}
-						out.push(cpy);
-					}
-
-					return out;
-				});
-			} else if (msg.channelId) {
-				setAllChannels((prev) => {
-					const cpy: ApiChannelExpand[] = JSON.parse(JSON.stringify(prev));
-					const ch = cpy.find((channel) => channel.id === msg.channelId);
-
-					if (ch) ch.messages = [...ch.messages, msg];
-
-					return cpy;
-				});
-			}
+			dispatch(addNewMessage(msg));
 		};
 
-		const newChatHandler = () => {
-			axios
-				.get<ApiChatExpand[]>('/chats', {
-					params: { expand: '' },
-					headers: { Authorization: `Bearer ${getToken()}` },
-				})
-				.then((res) => setChats(res.data));
-			axios
-				.get<ApiUserExpand>('/users', {
-					params: { login: currentUser.username, expand: '' },
-					headers: { Authorization: `Bearer ${getToken()}` },
-				})
-				.then((res) => setChannels(res.data.channels));
+		const newChatHandler = (data: string) => {
+			const newChat: ApiChatExpand = JSON.parse(data);
+			dispatch(addNewChat(newChat));
 		};
 
 		const newChannelHandler = (data: string) => {
 			const newChannel: ApiChannelExpand = JSON.parse(data);
-			setAllChannels((prev) => [...prev, newChannel]);
+			dispatch(addNewChannel(newChannel));
+		};
+
+		const updateChatsHandler = (data: string) => {
+			const updatedChats: ApiChatExpand[] = JSON.parse(data);
+			dispatch(setChats(updatedChats));
 		};
 
 		const updateChannelHandler = () => {
-			axios
-				.get<ApiChannelExpand[]>('/channels', {
-					params: { expand: '' },
-					headers: { Authorization: `Bearer ${getToken()}` },
-				})
-				.then((res) => setAllChannels(res.data));
-			axios
-				.get<ApiUserExpand>('/users', {
-					params: { login: currentUser.username, expand: '' },
-					headers: { Authorization: `Bearer ${getToken()}` },
-				})
-				.then((res) => setChannels(res.data.channels));
+			dispatch(getAllChannelsAction());
+			dispatch(getChannelsAction(currentUser.username));
 		};
 
 		socket.on('receiveMessage', receiveMessageHandler);
 		socket.on('newChat', newChatHandler);
 		socket.on('newChannel', newChannelHandler);
+		socket.on('updateChats', updateChatsHandler);
 		socket.on('updateChannel', updateChannelHandler);
 
 		return () => {
 			socket.off('receiveMessage', receiveMessageHandler);
 			socket.off('newChat', newChatHandler);
 			socket.off('newChannel', newChannelHandler);
+			socket.off('updateChats', updateChatsHandler);
 			socket.off('updateChannel', updateChannelHandler);
 		};
-	}, [currentUser.id, currentUser.username, socket]);
+	}, [currentUser.username, dispatch, socket]);
 
 	// Fetching all channels
 	React.useEffect(() => {
-		let isMounted = true;
-
-		axios
-			.get<ApiChannelExpand[]>('/channels', {
-				params: { expand: '' },
-				headers: { Authorization: `Bearer ${getToken()}` },
-			})
-			.then((res) => {
-				if (!isMounted) return;
-
-				setAllChannels(res.data);
-			});
-
-		return () => {
-			isMounted = false;
-		};
-	}, []);
+		dispatch(getAllChannelsAction());
+	}, [dispatch]);
 
 	// Updating selectedChat
 	React.useEffect(() => {
@@ -170,8 +86,8 @@ const Messenger = () => {
 
 		const chat = chats.find((ch) => ch.id === selectedChat.id);
 
-		if (chat) setSelectedChat(chat);
-	}, [chats, selectedChat]);
+		if (chat) dispatch(setSelectedChat(chat));
+	}, [chats, dispatch, selectedChat]);
 
 	// Updating selectedChannel
 	React.useEffect(() => {
@@ -179,29 +95,8 @@ const Messenger = () => {
 
 		const channel = allChannels.find((ch) => ch.id === selectedChannel.id);
 
-		if (channel) setSelectedChannel(channel);
-	}, [allChannels, selectedChannel]);
-
-	// Hiding CreateMenu on click
-	React.useEffect(() => {
-		const clickHandler = () => {
-			if (showCreateMenu) setShowCreateMenu(false);
-		};
-
-		window.addEventListener('click', clickHandler);
-
-		return () => {
-			window.removeEventListener('click', clickHandler);
-		};
-	}, [showCreateMenu]);
-
-	const matchedChannels: ApiChannelExpand[] = allChannels.filter(
-		(channel) =>
-			searchPattern.length !== 0 &&
-			!channels.find((ch) => ch.id === channel.id) &&
-			(channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
-			channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase())),
-	);
+		if (channel) dispatch(setSelectedChannel(channel));
+	}, [allChannels, dispatch, selectedChannel]);
 
 	return (
 		<div className="main-block messenger">
@@ -209,128 +104,8 @@ const Messenger = () => {
 				<span>Messenger</span>
 			</div>
 			<div className="messenger-container">
-				<div className="messenger-contacts">
-					<div className="messenger-contacts-header">
-						<input
-							type="text"
-							placeholder="Search"
-							className="messenger-contacts-header-search"
-							onChange={(e) => setSearchPattern(e.target.value)}
-						/>
-						<button
-							className={`messenger-contacts-header-btn ${
-								showCreateMenu ? 'messenger-contacts-header-btn-active' : ''
-							}`}
-							onClick={() => setShowCreateMenu((prev) => !prev)}
-						>
-							<FontAwesomeIcon icon={faPlus} />
-							{showCreateMenu && (
-								<Fade duration={300}>
-									<div className="messenger-contacts-header-menu-wrapper">
-										<div className="messenger-contacts-header-menu">
-											<div
-												className="messenger-contacts-header-menu-btn"
-												onClick={() => setChatState('newChat')}
-											>
-												<FontAwesomeIcon icon={faComment} />
-												New Chat
-											</div>
-											<div
-												className="messenger-contacts-header-menu-btn"
-												onClick={() => setChatState('newChannel')}
-											>
-												<FontAwesomeIcon icon={faBullhorn} />
-												New Channel
-											</div>
-										</div>
-									</div>
-								</Fade>
-							)}
-						</button>
-					</div>
-					<div className="messenger-contacts-scroll">
-						{chats
-							.filter((chat) => {
-								const companion =
-									chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
-
-								return companion.login
-									.trim()
-									.toLowerCase()
-									.includes(searchPattern.trim().toLowerCase());
-							})
-							.map((chat) => {
-								const companion =
-									chat.userOne.login === currentUser.username ? chat.userTwo : chat.userOne;
-
-								return (
-									<LeftMenuChat
-										key={chat.id}
-										image={companion.url_avatar}
-										title={companion.login}
-										isSelected={chat.id === selectedChat?.id}
-										selectChat={() => {
-											setSelectedChat(chat);
-											setSelectedChannel(null);
-											setChatState('default');
-										}}
-									/>
-								);
-							})}
-						{channels
-							.filter(
-								(channel) =>
-									channel.name.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()) ||
-									channel.title.trim().toLowerCase().includes(searchPattern.trim().toLowerCase()),
-							)
-							.map((channel) => (
-								<LeftMenuChannel
-									key={channel.id}
-									title={channel.title}
-									isSelected={selectedChannel?.id === channel.id}
-									selectChannel={() => {
-										setSelectedChannel(channel);
-										setSelectedChat(null);
-										setChatState('default');
-									}}
-									isPrivate={channel.isPrivate}
-								/>
-							))}
-						{searchPattern && <div className="messenger-contacts-search-scope">global search</div>}
-						{matchedChannels.map((channel) => (
-							<LeftMenuChannel
-								key={channel.id}
-								title={channel.title}
-								isSelected={selectedChannel?.id === channel.id}
-								selectChannel={() => {
-									setSelectedChannel(channel);
-									setSelectedChat(null);
-									setChatState('default');
-								}}
-								isPrivate={channel.isPrivate}
-							/>
-						))}
-						{chats.length + channels.length === 0 && (
-							<div className="messenger-contacts-empty-msg">You have no chats yet</div>
-						)}
-					</div>
-				</div>
-				<Chat
-					selectedChat={selectedChat}
-					selectedChannel={selectedChannel}
-					closeSelectedChat={() => {
-						setSelectedChat(null);
-						setSelectedChannel(null);
-					}}
-					chatState={chatState}
-					setDefaultChatState={() => {
-						setChatState('default');
-						setSelectedChat(null);
-					}}
-					setSettingsChatState={() => setChatState('settings')}
-					chats={chats}
-					channels={channels}
-				/>
+				<Contacts/>
+				<Chat />
 			</div>
 		</div>
 	);

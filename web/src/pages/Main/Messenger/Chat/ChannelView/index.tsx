@@ -1,12 +1,13 @@
 import { faBullhorn, faLock, faPaperPlane, faSlidersH, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { useAppSelector } from "hook/reduxHooks";
+import { useAppDispatch, useAppSelector } from "hook/reduxHooks";
 import { ApiBanList, ApiChannelExpand } from "models/ApiTypes";
 import moment from "moment";
 import Message from "pages/Main/Messenger/Chat/Message";
-import React from "react";
+import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
+import { ChatState, closeSelectedChat, setChatState } from "store/reducers/messengerSlice";
 import { getTargetUser } from 'utils/getTargetUser';
 import { getToken } from "utils/token";
 
@@ -24,15 +25,13 @@ const joinChannel = (channelId: number) => {
 
 interface ChannelViewProps {
 	selectedChannel: ApiChannelExpand;
-	closeSelectedChat: () => void;
-	setSettingsChatState: () => void;
 }
 
 interface IJoinPrivateChannel {
 	password: string;
 }
 
-const ChannelView = ({ selectedChannel, closeSelectedChat, setSettingsChatState }: ChannelViewProps) => {
+const ChannelView = ({ selectedChannel }: ChannelViewProps) => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 	const [joinError, setJoinError] = React.useState<string>('');
@@ -43,6 +42,11 @@ const ChannelView = ({ selectedChannel, closeSelectedChat, setSettingsChatState 
 		handleSubmit: joinPrivateHandleSubmit,
 		reset: joinPrivateReset,
 	} = useForm<IJoinPrivateChannel>();
+	const dispatch = useAppDispatch();
+
+	const setSettingsChatState = useCallback(() => {
+		dispatch(setChatState(ChatState.Settings));
+	}, [dispatch]);
 
 	const isMember = selectedChannel.members.find((member) => member.id === currentUser.id);
 
@@ -92,7 +96,7 @@ const ChannelView = ({ selectedChannel, closeSelectedChat, setSettingsChatState 
 							</div>
 						</div>
 					</div>
-					<button className="messenger-chat-close-btn" onClick={closeSelectedChat} title="Close">
+					<button className="messenger-chat-close-btn" onClick={() => dispatch(closeSelectedChat())} title="Close">
 						<FontAwesomeIcon icon={faTimes} />
 					</button>
 				</div>
@@ -144,10 +148,10 @@ const ChannelView = ({ selectedChannel, closeSelectedChat, setSettingsChatState 
 						</div>
 					</div>
 				</div>
-				<button className="messenger-chat-info-settings-btn" onClick={() => setSettingsChatState()}>
+				<button className="messenger-chat-info-settings-btn" onClick={setSettingsChatState}>
 					<FontAwesomeIcon icon={faSlidersH} />
 				</button>
-				<button className="messenger-chat-close-btn" onClick={closeSelectedChat} title="Close">
+				<button className="messenger-chat-close-btn" onClick={() => dispatch(closeSelectedChat())} title="Close">
 					<FontAwesomeIcon icon={faTimes} />
 				</button>
 			</div>

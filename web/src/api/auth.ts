@@ -1,10 +1,11 @@
-import { api } from 'api/api';
 import {getCurrentUser} from "App";
 import axios, {AxiosResponse} from "axios";
 import {ApiUser, ApiUserLogin, IAuthIntraReq, IAuthIntraRes} from 'models/ApiTypes';
 import {User} from "models/User";
 import React from "react";
 import {removeToken, setToken} from "utils/token";
+
+import { api } from './api';
 
 export enum LoginState {
 	Default = 'default',

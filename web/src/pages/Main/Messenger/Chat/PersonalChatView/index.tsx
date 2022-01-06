@@ -8,13 +8,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { useAppSelector } from "hook/reduxHooks";
+import { useAppDispatch, useAppSelector } from "hook/reduxHooks";
 import { ApiChatExpand } from "models/ApiTypes";
 import moment from "moment";
 import Message from "pages/Main/Messenger/Chat/Message";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { closeSelectedChat } from "store/reducers/messengerSlice";
 import { getToken } from "utils/token";
 
 import { ISendMessage } from "../index";
@@ -24,7 +25,6 @@ interface PersonalChatViewProps {
 	duelStatus: string;
 	localDuelStatus: string;
 	setLocalDuelStatus: React.Dispatch<React.SetStateAction<string>>;
-	closeSelectedChat: () => void;
 }
 
 const PersonalChatView = ({
@@ -32,13 +32,13 @@ const PersonalChatView = ({
 														duelStatus,
 														localDuelStatus,
 														setLocalDuelStatus,
-														closeSelectedChat,
 }: PersonalChatViewProps) => {
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const [showChatMuteChoices, setShowChatMuteChoices] = React.useState<boolean>(false);
 	const { register, handleSubmit, reset } = useForm<ISendMessage>();
 	const { socket } = useAppSelector((state) => state.socket);
 	const companion = selectedChat.userOne?.login === currentUser.username ? selectedChat.userTwo : selectedChat.userOne;
+	const dispatch = useAppDispatch();
 
 	const sendDuelEvent = React.useCallback((event: string) => {
 		socket.emit(event, JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
@@ -217,7 +217,7 @@ const PersonalChatView = ({
 						if (localDuelStatus === 'yellow') {
 							sendDuelEvent('cancelDuel');
 						}
-						closeSelectedChat();
+						dispatch(closeSelectedChat());
 					}}
 					title="Close"
 				>

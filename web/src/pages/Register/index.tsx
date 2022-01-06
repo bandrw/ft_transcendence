@@ -26,15 +26,15 @@ const Register = () => {
 
 	useEffect(() => {
 		if (errors.login) {
-			return setErrorMessage(errors.login.message || '');
+			return setErrorMessage(errors.login.message || 'Error');
 		}
 
 		if (errors.password) {
-			return setErrorMessage(errors.password.message || '');
+			return setErrorMessage(errors.password.message || 'Error');
 		}
 
 		if (errors.passwordConfirm) {
-			return setErrorMessage(errors.passwordConfirm.message || '');
+			return setErrorMessage(errors.passwordConfirm.message || 'Error');
 		}
 	}, [errors]);
 

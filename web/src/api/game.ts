@@ -1,4 +1,5 @@
-import { ApiUserStatus } from "../models/ApiTypes";
+import { ApiUserStatus } from "models/ApiTypes";
+
 import { api } from './api';
 
 export const setLadderStatus = (status:  ApiUserStatus) => {

@@ -43,6 +43,17 @@ export class ChannelService {
 		}
 	}
 
+	updateChannelEvent() {
+		for (const user of this.usersService.onlineUsers) {
+			// const usr = await this.usersService.findOneById(user.id, true);
+			// const data = JSON.stringify({
+			// 	channels: usr?.channels || [],
+			// 	allChannels: await this.getChannels(user.id, true),
+			// });
+			user.socket.emit('updateChannel', '');
+		}
+	}
+
 	async addMember(channelId: number, userId: number, password: string | null = null): Promise<ChannelMemberEntity> {
 		const m = await this.channelMemberRepository.findOne({ where: { channelId: channelId, userId: userId } });
 		if (m)
@@ -61,7 +72,7 @@ export class ChannelService {
 			if (userId === channel.ownerId)
 				member.isAdmin = true;
 			const r = await this.channelMemberRepository.save(member);
-			this.usersService.broadcastEventData('updateChannel', '');
+			this.updateChannelEvent();
 			return r;
 		} catch (e) {
 			throw new HttpException(e.detail, HttpStatus.BAD_REQUEST);
@@ -77,6 +88,7 @@ export class ChannelService {
 		return await this.channelRepository.findOne({ where: { id: id } });
 	}
 
+	// TODO to much time complexity
 	async getChannels(userId: number, expand = false) {
 		if (expand) {
 			const r = await this.channelRepository.find({ relations: ['owner', 'members', 'messages', 'memberEntities', 'memberEntities.user', 'members.banLists'] });
@@ -89,6 +101,7 @@ export class ChannelService {
 				for (let i = 0; i < channel.memberEntities.length; ++i) {
 					channel.members[i].isAdmin = channel.memberEntities.find(m => m.userId === channel.members[i].id)?.isAdmin || false;
 				}
+				for (const member of channel.members) delete member.password;
 				delete channel.memberEntities;
 			}
 			return r;
@@ -109,7 +122,7 @@ export class ChannelService {
 		else if (status === 'member')
 			member.isAdmin = false;
 		const r = await this.channelMemberRepository.save(member);
-		this.usersService.broadcastEventData('updateChannel', '');
+		this.updateChannelEvent();
 		return r;
 	}
 
@@ -122,7 +135,7 @@ export class ChannelService {
 			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
 
 		const r = await this.banListsService.muteMember(null, channel.id, initiatorId, memberId, unbanDate);
-		this.usersService.broadcastEventData('updateChannel', '');
+		this.updateChannelEvent();
 		return r;
 	}
 
@@ -135,7 +148,7 @@ export class ChannelService {
 			throw new HttpException('Access denied', HttpStatus.BAD_REQUEST);
 
 		const r = await this.banListsService.unmuteMember(null, channel.id, null, memberId);
-		this.usersService.broadcastEventData('updateChannel', '');
+		this.updateChannelEvent();
 		return r;
 	}
 
@@ -151,7 +164,7 @@ export class ChannelService {
 			channel.password = password;
 		}
 		const r = await this.channelRepository.save(channel);
-		this.usersService.broadcastEventData('updateChannel', '');
+		this.updateChannelEvent();
 		return r;
 	}
 
@@ -163,7 +176,7 @@ export class ChannelService {
 			throw new HttpException('Owner cannot leave his channel', HttpStatus.BAD_REQUEST);
 
 		const r = await this.channelMemberRepository.delete({ channelId, userId });
-		this.usersService.broadcastEventData('updateChannel', '');
+		this.updateChannelEvent();
 		return r;
 	}
 

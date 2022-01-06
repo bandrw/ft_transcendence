@@ -11,7 +11,7 @@ interface LeftMenuChannelProps {
 	isPrivate: boolean;
 }
 
-const LeftMenuChannel = ({ isSelected, title, selectChannel, isPrivate }: LeftMenuChannelProps) => {
+const Channel = ({ isSelected, title, selectChannel, isPrivate }: LeftMenuChannelProps) => {
 	return (
 		<div
 			className={`messenger-channel ${isSelected ? 'messenger-channel-selected' : ''}`}
@@ -26,4 +26,4 @@ const LeftMenuChannel = ({ isSelected, title, selectChannel, isPrivate }: LeftMe
 	);
 };
 
-export default LeftMenuChannel;
+export default Channel;
