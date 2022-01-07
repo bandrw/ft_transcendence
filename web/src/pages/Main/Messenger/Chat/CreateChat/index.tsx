@@ -27,16 +27,19 @@ const CreateChat = () => {
 		<div className="messenger-chat">
 			<div className="messenger-chat-info">
 				<div>Create a new chat</div>
-				<button className="messenger-chat-close-btn" onClick={() => dispatch(setDefaultChatState())} title="Close">
+				<button
+					className="messenger-chat-close-btn"
+					onClick={() => dispatch(setDefaultChatState())}
+					title="Close"
+				>
 					<FontAwesomeIcon icon={faTimes} />
 				</button>
 			</div>
 			<div className="messenger-create-chat">
 				<p>Select a user</p>
-				{allUsers
-					.filter((usr) => chatsToCreate.find((u) => usr.login === u.login))
+				{chatsToCreate
 					.map((usr) => (
-						<div
+						<button
 							className="messenger-create-chat-user"
 							key={usr.id}
 							onClick={() => createChat(usr)}
@@ -46,7 +49,7 @@ const CreateChat = () => {
 								style={{ backgroundImage: `url(${usr.url_avatar})` }}
 							/>
 							<div className="messenger-create-chat-user-login">{usr.login}</div>
-						</div>
+						</button>
 					))}
 			</div>
 		</div>

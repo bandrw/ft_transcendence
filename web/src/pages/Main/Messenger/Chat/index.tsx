@@ -14,11 +14,6 @@ export interface ISendMessage {
 }
 
 const Chat = () => {
-	const [duelStatus, setDuelStatus] = React.useState<string>('green');
-	const [localDuelStatus, setLocalDuelStatus] = React.useState<string>('green');
-
-	const { currentUser } = useAppSelector((state) => state.currentUser);
-	const { socket } = useAppSelector((state) => state.socket);
 	const {
 		chats,
 		channels,
@@ -26,30 +21,6 @@ const Chat = () => {
 		selectedChannel,
 		chatState ,
 	} = useAppSelector((state) => state.messenger);
-
-	// socket events handlers
-	React.useEffect(() => {
-		const duelStatusHandler = (data: string) => {
-			const duelStatusData: { status: string; chatId: number } = JSON.parse(data);
-
-			if (selectedChat?.id === duelStatusData.chatId) setDuelStatus(duelStatusData.status);
-		};
-
-		socket.on('duelStatus', duelStatusHandler);
-
-		return () => {
-			socket.off('duelStatus', duelStatusHandler);
-
-			if (selectedChat) {
-				const companion = selectedChat.userOne?.login === currentUser.username ?
-					selectedChat.userTwo : selectedChat.userOne;
-
-				if (localDuelStatus === 'yellow')
-					socket.emit('cancelDuel', JSON.stringify({ enemyId: companion.id, chatId: selectedChat.id }));
-				setDuelStatus('green');
-			}
-		};
-	}, [currentUser.username, localDuelStatus, selectedChat, socket]);
 
 	// Scroll to the newest messages
 	React.useEffect(() => {
@@ -79,12 +50,7 @@ const Chat = () => {
 
 	if (selectedChat) {
 		return (
-			<PersonalChatView
-				selectedChat={selectedChat}
-				duelStatus={duelStatus}
-				localDuelStatus={localDuelStatus}
-				setLocalDuelStatus={setLocalDuelStatus}
-			/>
+			<PersonalChatView selectedChat={selectedChat} />
 		);
 	}
 

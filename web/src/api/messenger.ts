@@ -1,7 +1,6 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { ApiChannelExpand, ApiChat, ApiChatExpand } from "models/ApiTypes";
 
-import { getToken } from "../utils/token";
 import { api } from "./api";
 
 export const getChats = (): Promise<ApiChatExpand[]> => {
@@ -75,5 +74,25 @@ export const muteChannelMember = (channelId: number, memberId: number, unbanDate
 
 export const unmuteChannelMember = (channelId: number, memberId: number) => {
 	return api.post('/channels/unmuteMember', { channelId, memberId })
+		.then((res) => res.data);
+};
+
+export const joinChannel = (channelId: number) => {
+	return api.post('/channels/join', { channelId })
+		.then((res) => res.data);
+};
+
+export const joinPrivateChannel = (channelId: number, password: string) => {
+	return api.post('/channels/join', { channelId, password })
+		.then((res) => res.data);
+};
+
+export const muteChatMember = (chatId: number, memberId: number, unbanDate: string | null) => {
+	return api.post('/chats/muteMember', { chatId, memberId, unbanDate })
+		.then((res) => res.data);
+};
+
+export const unmuteChatMember = (chatId: number, memberId: number) => {
+	return api.post('/chats/unmuteMember', { chatId, memberId })
 		.then((res) => res.data);
 };

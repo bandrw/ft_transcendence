@@ -27,7 +27,7 @@ const CreateChannel = () => {
 		}
 	}, [errors]);
 
-	const createChannelForm = useCallback(async ({ name, title, password }: ICreateChannelForm) => {
+	const createChannelSubmit = useCallback(async ({ name, title, password }: ICreateChannelForm) => {
 		if (isPrivate && password && password.length < 6) {
 			return setError('password', { type: 'manual', message: 'Password\'s length must be greater than 6' });
 		}
@@ -45,7 +45,7 @@ const CreateChannel = () => {
 					<FontAwesomeIcon icon={faTimes} />
 				</button>
 			</div>
-			<form className="messenger-create-channel" onSubmit={handleSubmit(createChannelForm)}>
+			<form className="messenger-create-channel" onSubmit={handleSubmit(createChannelSubmit)}>
 				<input
 					required
 					type="text"

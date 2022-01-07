@@ -22,14 +22,9 @@ export const SocialBlockOnlineUser = ({ user }: SocialBlockOnlineUserProps) => {
 				<button
 					title="Watch game"
 					className="social-block-user-watch-btn"
-					onClick={async () => {
-						await getWatchGame(user.login).
-						finally(() => history.push('/game'));
-						// await axios.get('/games/watchGame', {
-						// 	params: { gamerLogin: user.login },
-						// 	headers: { Authorization: `Bearer ${getToken()}` },
-						// });
-						// history.push('/game');
+					onClick={() => {
+						getWatchGame(user.login)
+							.finally(() => history.push('/game'));
 					}}
 				>
 					<FontAwesomeIcon icon={faTv} />

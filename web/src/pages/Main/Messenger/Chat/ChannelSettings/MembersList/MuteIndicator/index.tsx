@@ -10,8 +10,6 @@ interface MuteIndicatorProps {
 }
 
 const MuteIndicator = ({ member, selectedChannel }: MuteIndicatorProps) => {
-	if (!member.banLists) return <div>Err</div>;
-
 	const ban = member.banLists.find(
 		(list) =>
 			list.channelId === selectedChannel.id &&

@@ -31,7 +31,7 @@ const ChannelSettings = ({ selectedChannel }: ChannelSettingsProps) => {
 	const { register, handleSubmit, reset } = useForm<IChangeAccessibilityForm>();
 	const dispatch = useAppDispatch();
 
-	// Click outside of MuteChoices
+	// Click outside of BanButton
 	React.useEffect(() => {
 		const windowClickHandler = () => {
 			if (showMuteChoices) setShowMuteChoices(null);

@@ -25,6 +25,10 @@
 		}
 	}
 
+	&::selection {
+		background-color: #29aa44;
+	}
+
 	&:after {
 		transition: all 0.1s ease-in-out;
 		visibility: hidden;

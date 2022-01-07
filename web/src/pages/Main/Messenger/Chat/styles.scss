@@ -468,6 +468,10 @@
 		p {
 			margin: 25px 0 10px;
 			font-size: 20px;
+
+			&::selection {
+				background-color: #29aa44;
+			}
 		}
 
 		.messenger-create-channel-visibility {
@@ -552,6 +556,10 @@
 		}
 
 		.messenger-create-chat-user {
+			background: none;
+			outline: none;
+			font-size: 1em;
+			color: white;
 			width: 350px;
 			height: 60px;
 			border: 1px solid #2c2f3a;
@@ -570,6 +578,12 @@
 				background-size: 100%;
 				border-radius: 50%;
 				margin: 0 15px;
+			}
+
+			.messenger-create-chat-user-login {
+				&::selection {
+					background-color: #29aa44;
+				}
 			}
 
 			&:hover {

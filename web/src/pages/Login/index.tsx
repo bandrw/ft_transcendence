@@ -5,7 +5,7 @@ import CircleLoading from "components/CircleLoading";
 import CodeVerification from "components/CodeVerification";
 import {useAppDispatch, useAppSelector} from "hook/reduxHooks";
 import { User } from "models/User";
-import React, {useMemo} from "react";
+import React, { useCallback } from "react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
 import { setCurrentUser } from "store/reducers/currentUserSlice";
@@ -98,7 +98,7 @@ const Login = () => {
 		};
 	}, [history, authCode, socketId, dispatch]);
 
-	const loginSubmit: SubmitHandler<ILoginInput> = useMemo(() => async ({ login, password }) => {
+	const loginSubmit: SubmitHandler<ILoginInput> = useCallback(async ({ login, password }) => {
 		setIsLoading(true);
 		signIn(
 			login,
@@ -112,7 +112,7 @@ const Login = () => {
 			.finally(() => setIsLoading(false));
 	}, [dispatch, socket.id]);
 
-	const verifyCode = useMemo(() => ({ login, password, code }: ILoginInput) => {
+	const verifyCode = useCallback(({ login, password, code }: ILoginInput) => {
 		setIsLoading(true);
 		signIn(
 			login,
@@ -126,7 +126,7 @@ const Login = () => {
 			.finally(() => setIsLoading(false));
 	}, [dispatch, socket.id]);
 
-	const verifyCodeIntra = useMemo(() => (code: string) => {
+	const verifyCodeIntra = useCallback((code: string) => {
 		if (!authCode) return ;
 
 		setIsLoading(true);
