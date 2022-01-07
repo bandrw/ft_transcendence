@@ -1,18 +1,17 @@
-import axios from "axios";
+import { disable2FA, sendSms, verifySms } from "api/auth";
 import CodeVerification from "components/CodeVerification";
 import { useAppSelector } from "hook/reduxHooks";
-import React, {FormEvent} from "react";
+import React, { FormEvent, useCallback } from "react";
 import PhoneInput from "react-phone-input-2";
 import { getTargetUser } from "utils/getTargetUser";
-import { getToken } from "utils/token";
+
+enum TwoFactorAuthenticationState {
+	Disabled = 'disabled',
+	Confirmation = 'confirmation',
+	Enabled = 'enabled'
+}
 
 export const TwoFactorAuthenticationForm = () => {
-	enum TwoFactorAuthenticationState {
-		Disabled = 'disabled',
-		Confirmation = 'confirmation',
-		Enabled = 'enabled'
-	}
-
 	const { currentUser } = useAppSelector((state) => state.currentUser);
 	const { allUsers } = useAppSelector((state) => state.allUsers);
 	const user = getTargetUser(allUsers, currentUser.id, 'id'); // allUsers.find((usr) => usr.id === currentUser.id);
@@ -23,34 +22,24 @@ export const TwoFactorAuthenticationForm = () => {
 		twoFactorAuthenticationIsDisabled ? TwoFactorAuthenticationState.Disabled : TwoFactorAuthenticationState.Enabled,
 	);
 
-	if (!user) return <div>No user</div>;
+	const verifyCode = useCallback((code: string) => {
+		verifySms(code, phoneNumber)
+			.then(() => setState(TwoFactorAuthenticationState.Enabled));
+	}, [phoneNumber]);
 
-
-	const verifyCode = (code: string) => {
-		axios.get('/auth/verifySms', {
-			params: { code, phoneNumber },
-			headers: { Authorization: `Bearer ${getToken()}` },
-		})
-			.then(() => setState(TwoFactorAuthenticationState.Enabled))
-			.catch(() => {});
-	};
-
-	const disabledSubmitHandler = (e: FormEvent) => {
+	const disabledSubmitHandler = useCallback((e: FormEvent) => {
 		e.preventDefault();
-		axios.get('/auth/sendSms', {
-			params: { phoneNumber },
-			headers: { Authorization: `Bearer ${getToken()}` },
-		})
+		sendSms(phoneNumber)
 			.then(() => setState(TwoFactorAuthenticationState.Confirmation));
-	};
+	}, [phoneNumber]);
 
-	const disableTwoFactorAuthentication = (e: FormEvent) => {
+	const disableTwoFactorAuthentication = useCallback((e: FormEvent) => {
 		e.preventDefault();
-		axios.post('/auth/disable2FA', null, {
-			headers: { Authorization: `Bearer ${getToken()}` },
-		})
+		disable2FA()
 			.then(() => setState(TwoFactorAuthenticationState.Disabled));
-	};
+	}, []);
+
+	if (!user) return <div>No user</div>;
 
 	if (state === 'disabled')
 		return (

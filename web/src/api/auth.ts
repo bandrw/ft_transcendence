@@ -1,4 +1,3 @@
-import {getCurrentUser} from "App";
 import axios, {AxiosResponse} from "axios";
 import {ApiUser, ApiUserLogin, IAuthIntraReq, IAuthIntraRes} from 'models/ApiTypes';
 import {User} from "models/User";
@@ -21,6 +20,30 @@ export const logout = () => {
 };
 
 export const registry = () => {};
+
+export const getCurrentUser = async (accessToken: string, socketId: string): Promise<User | null> => {
+	try {
+		const usr = await axios
+			.get<ApiUser | null>('/auth', {
+				params: { socketId },
+				headers: { Authorization: `Bearer ${accessToken}` },
+			})
+			.then((res) => res.data);
+
+		if (usr) {
+			const user = new User();
+			user.id = usr.id;
+			user.username = usr.login;
+			user.urlAvatar = usr.url_avatar;
+
+			return user;
+		}
+
+		return null;
+	} catch {
+		return null;
+	}
+};
 
 export const signIn = async (
 	username: string,
@@ -91,4 +114,19 @@ export const getUserFromIntra = async (
 
 		return { user, twoFactorAuthentication: r.twoFactorAuthentication };
 	}
+};
+
+export const verifySms = (code: string, phoneNumber: string) => {
+	return api.get('/auth/verifySms', { params: { code, phoneNumber } })
+		.then((res) => res.data);
+};
+
+export const sendSms = (phoneNumber: string) => {
+	return api.get('/auth/sendSms', { params: { phoneNumber } })
+		.then((res) => res.data);
+};
+
+export const disable2FA = () => {
+	return api.post('/auth/disable2FA')
+		.then((res) => res.data);
 };
