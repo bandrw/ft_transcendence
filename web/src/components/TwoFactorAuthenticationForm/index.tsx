@@ -24,19 +24,22 @@ export const TwoFactorAuthenticationForm = () => {
 
 	const verifyCode = useCallback((code: string) => {
 		verifySms(code, phoneNumber)
-			.then(() => setState(TwoFactorAuthenticationState.Enabled));
+			.then(() => setState(TwoFactorAuthenticationState.Enabled))
+			.catch(() => {});
 	}, [phoneNumber]);
 
 	const disabledSubmitHandler = useCallback((e: FormEvent) => {
 		e.preventDefault();
 		sendSms(phoneNumber)
-			.then(() => setState(TwoFactorAuthenticationState.Confirmation));
+			.then(() => setState(TwoFactorAuthenticationState.Confirmation))
+			.catch(() => {});
 	}, [phoneNumber]);
 
 	const disableTwoFactorAuthentication = useCallback((e: FormEvent) => {
 		e.preventDefault();
 		disable2FA()
-			.then(() => setState(TwoFactorAuthenticationState.Disabled));
+			.then(() => setState(TwoFactorAuthenticationState.Disabled))
+			.catch(() => {});
 	}, []);
 
 	if (!user) return <div>No user</div>;

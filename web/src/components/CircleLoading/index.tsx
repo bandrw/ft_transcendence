@@ -1,6 +1,6 @@
 import './styles.scss';
 
-import React from 'react';
+import React, { useMemo } from "react";
 
 interface CircleLoadingProps {
 	bgColor?: string;
@@ -9,10 +9,13 @@ interface CircleLoadingProps {
 }
 
 const CircleLoading = ({ bgColor = '#000', width = '50px', height = '50px' }: CircleLoadingProps) => {
-	const divArray = [];
 
-	// TODO переписать на обычную верстку, т.к. каждый раз генерирует новый массив
-	for (let i = 0; i < 12; ++i) divArray.push(<div />);
+	const divArray = useMemo(() => {
+		const arr = [];
+		for (let i = 0; i < 12; ++i) arr.push(<div />);
+
+		return arr;
+	}, []);
 
 	return (
 		<div className="lds-spinner" style={{ width, height }}>

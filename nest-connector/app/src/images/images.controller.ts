@@ -5,7 +5,7 @@ export class ImagesController {
 
 	@Get(':filename')
 	getImage(@Param('filename') filename: string, @Res() res) {
-		res.sendFile(filename, { root: '../uploads' });
+		res.sendFile(filename, { root: '/uploads' });
 	}
 
 }

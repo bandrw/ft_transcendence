@@ -104,7 +104,8 @@ export class UsersController {
 
 		if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpg' && file.mimetype !== 'image/jpeg')
 			throw new HttpException('Only png/jpg/jpeg allowed', HttpStatus.BAD_REQUEST);
-		return await this.usersService.uploadAvatar(user.id, `http://localhost:3000/images/${file.filename}`); // TODO move url to env
+		const url = process.env.API_URL || 'http://localhost:3000';
+		return await this.usersService.uploadAvatar(user.id, `${url}/images/${file.filename}`);
 	}
 
 	@UsePipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }))
