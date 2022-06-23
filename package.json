@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "prepare": "husky install",
-    "test": "lint-staged"
+    "test": "lint-staged",
+    "lint": "npm run lint --prefix ./web"
   },
   "repository": {
     "type": "git",
