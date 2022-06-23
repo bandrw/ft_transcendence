@@ -1,0 +1,23 @@
+name: eslint CI
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+jobs:
+  eslint:
+    name: Run eslint
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci && npm ci --prefix ./web
+    - run: npm run lint
