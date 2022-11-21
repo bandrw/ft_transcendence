@@ -40,6 +40,7 @@
     "start": "PORT=3001 react-scripts start",
     "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "lint": "eslint --fix --max-warnings=0 \"./src/**/*.{ts,tsx,js,jsx}\"",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit --skipLibCheck",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
